@@ -51,8 +51,11 @@ function download(uri, filename, callback){
     request.head(uri, function(err, res, body){
 	console.log('content-type:', res.headers['content-type']);
 	console.log('content-length:', res.headers['content-length']);
-
-	request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+	var stream = fs.createWriteStream(filename);	
+	request(uri).pipe(stream).on('close', function(){
+	    stream.end();
+	    callback();
+	});
     });
 };
 exports.ClassifierInputObject = function( data, callback ){
