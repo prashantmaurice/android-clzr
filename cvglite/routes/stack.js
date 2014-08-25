@@ -5,6 +5,7 @@ var net = require("net");
 var settings = require("./settings");
 var fs = require('fs');
 
+var request = require('request');
 
 var DualQueue = function(){
 
@@ -46,6 +47,14 @@ var DualQueue = function(){
     }
 }
 
+function download(uri, filename, callback){
+    request.head(uri, function(err, res, body){
+	console.log('content-type:', res.headers['content-type']);
+	console.log('content-length:', res.headers['content-length']);
+
+	request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+    });
+};
 exports.ClassifierInputObject = function( data, callback ){
 
     this.data = data;
@@ -53,13 +62,20 @@ exports.ClassifierInputObject = function( data, callback ){
     
     this.hash = new Date().getTime();
 
-    this.prepare = function(){
+    this.prepare = function(callback){
 	var http = require('http');
+	var fs = require('fs');
 
-	var file = fs.createWriteStream( __dirname + "/temp/" + this.getHash() );
+
+	download( this.data.url ,  __dirname + "/temp/" + this.getHash() , function(){
+	    console.log('done');
+	    callback();
+	});
+
+	/*var file = fs.createWriteStream( __dirname + "/temp/" + this.getHash() );
 	var request = http.get(this.data.url, function(response) {
 	    response.pipe(file);
-	});
+	});*/
     }
 
     this.getInputString = function(){
@@ -71,7 +87,7 @@ exports.ClassifierInputObject = function( data, callback ){
     }
     
     this.clean = function(){
-	fs.unlink( __dirname + "/temp/" + this.getHash() );
+	//fs.unlink( __dirname + "/temp/" + this.getHash() );
     }
     
     this.getHash = function(){
@@ -84,9 +100,11 @@ exports.StreamControl = function( conn_details ){
     this.queue = new DualQueue();
 
     this.doJob = function( job ){
-	job.prepare();
-	this.queue.push( job );
-	this.batchCall();
+	var self = this;
+	job.prepare(function(){
+	    self.queue.push( job );
+	    self.batchCall();
+	});
     }
 
     this.batchCall = function(){
