@@ -49,8 +49,8 @@ var DualQueue = function(){
 
 function download(uri, filename, callback){
     request.head(uri, function(err, res, body){
-	console.log('content-type:', res.headers['content-type']);
-	console.log('content-length:', res.headers['content-length']);
+	//console.log('content-type:', res.headers['content-type']);
+	//console.log('content-length:', res.headers['content-length']);
 	var stream = fs.createWriteStream(filename);	
 	request(uri).pipe(stream).on('close', function(){
 	    stream.end();
@@ -71,7 +71,7 @@ exports.ClassifierInputObject = function( data, callback ){
 
 
 	download( this.data.url ,  __dirname + "/temp/" + this.getHash() , function(){
-	    console.log('done');
+	    //console.log('done');
 	    callback();
 	});
 

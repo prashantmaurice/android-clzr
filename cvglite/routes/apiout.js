@@ -50,7 +50,7 @@ exports.ClassifierDataOutput = function(){
 	var obj = {};
 
 	str.split("|").forEach(function( value, index, array ){
-	    obj[value.split(":")[0]] = parseFloat(value.split(":")[1]);
+	    obj[value.split(":")[0].trim()] = parseFloat(value.split(":")[1].trim());
 	});
 	return obj;
     }
