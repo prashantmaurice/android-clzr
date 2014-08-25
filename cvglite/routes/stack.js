@@ -125,8 +125,9 @@ exports.StreamControl = function( conn_details ){
 	    if( obj == null )
 		break;
 	    
-	    raw_input += obj.getInputString() + " ";
-
+	    raw_input += obj.getInputString();
+	    if( i!= settings.MAX_BATCH_LENGTH - 1 )
+		raw_input += " ";
 	}
 	
 	if( !i )
