@@ -126,8 +126,8 @@ exports.StreamControl = function( conn_details ){
 		break;
 	    
 	    raw_input += obj.getInputString();
-	    if( i!= settings.MAX_BATCH_LENGTH - 1 )
-		raw_input += " ";
+	    if( this.queue.queueSize() == 0 )
+		raw_input+=" "
 	}
 	
 	if( !i )
