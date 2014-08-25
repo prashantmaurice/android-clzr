@@ -71,7 +71,7 @@ exports.ClassifierInputObject = function( data, callback ){
 
 
 	download( this.data.url ,  __dirname + "/temp/" + this.getHash() , function(){
-	    //console.log('done');
+	    console.log('done loading image');
 	    callback();
 	});
 
@@ -111,7 +111,7 @@ exports.StreamControl = function( conn_details ){
     }
 
     this.batchCall = function(){
-	//console.log("In batch call.")
+	console.log("In batch call.")
 	// check if a process is already underway.
 	if(this.queue.currSize())
 	    return;
@@ -121,7 +121,7 @@ exports.StreamControl = function( conn_details ){
 		
 	for( var i = 0 ; i < settings.MAX_BATCH_LENGTH ; i++ ){
 	    var obj = this.queue.shift();
-	    //console.log("Shifted: Curr size: "+this.queue.currSize());
+	    console.log("Shifted: Curr size: "+this.queue.currSize());
 	    if( obj == null )
 		break;
 	    
@@ -137,11 +137,11 @@ exports.StreamControl = function( conn_details ){
 
 	var self = this;
 	socket.connect( settings.CLASSIFIER_SERVICE.port, settings.CLASSIFIER_SERVICE.host, function(){
-	    //console.log( "Writing: "+raw_input );
+	    console.log( "Writing: "+raw_input );
 	    socket.write(raw_input);
 	    //console.log("opened");
 	    socket.on("data", function( msg ){
-		//console.log('Data:'+msg);
+		console.log('Data:'+msg);
 	        self.onFinish( msg.toString() );
 		socket.destroy();
 	    });
@@ -153,9 +153,9 @@ exports.StreamControl = function( conn_details ){
     }
     this.onFinish = function( out ){
 	var len = this.queue.currSize();
-	//console.log("Num in curr: "+ len);
+	console.log("Num in curr: "+ len);
 	for( var i=0; i<len; i++){
-	    //console.log("Responding");
+	    console.log("Responding");
 	    var obj = this.queue.pop();
 	    obj.clean();
 	    obj.respond( out );
