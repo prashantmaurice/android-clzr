@@ -133,6 +133,7 @@ exports.StreamControl = function( conn_details ){
 
 	var self = this;
 	socket.connect( settings.CLASSIFIER_SERVICE.port, settings.CLASSIFIER_SERVICE.host, function(){
+	    console.log( "Writing: "+raw_input );
 	    socket.write(raw_input);
 	    console.log("opened");
 	    socket.on("data", function( msg ){
