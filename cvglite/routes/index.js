@@ -39,9 +39,10 @@ router.post('/classify', function(req, res) {
 
     //immediate.outHead( res );
     var jobObject = new cvgadaptor.ClassifierInputObject( jobDetails, function( outputMsg ){
-	output = new apioutput.BaseOutput();
+	output = new apioutput.ClassifierDataOutput();
 	//debugger;
-	output.setBody({"data":outputMsg});
+	//output.setBody({"data":outputMsg});
+	output.setData( outputMsg );
 	output.outBody( res );
 	res.end();
 	//debugger;

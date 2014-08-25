@@ -32,3 +32,30 @@ exports.BaseOutput = function(){
     }
 
 }
+
+exports.ClassifierDataOutput = function(){
+    exports.BaseOutput.call(this);
+    
+    this._nullTerminate = function( str ){
+	var out = "";
+	for( var i = 0 ;i < str.length; i++ ){
+	    if( str[i] == '\0' )
+		break;
+	    out += (str[i]);
+	}
+	return out;
+    }
+
+    this._toJSON = function( str ){
+	var obj = {};
+
+	str.split("|").forEach(function( value, index, array ){
+	    obj[value.split(":")[0]] = parseInt(value.split(":")[1]);
+	});
+	return obj;
+    }
+
+    this.setData = function( str ){
+	this.setBody( {"data": this._toJSON(this._nullTerminate( str )) } )
+    }
+}
