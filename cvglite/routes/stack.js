@@ -126,7 +126,7 @@ exports.StreamControl = function( conn_details ){
 		break;
 	    
 	    raw_input += obj.getInputString();
-	    if( this.queue.queueSize() == 0 )
+	    if( this.queue.queueSize() != 0 )
 		raw_input+=" "
 	}
 	
