@@ -67,7 +67,7 @@ exports.ClassifierInputObject = function( data, callback ){
 	var fs = require('fs');
 
 
-	download( this.data.url ,  __dirname + "/temp/" + this.getHash() , function(){
+	download( this.data.url ,  __dirname + "/temp/" + this.getHash() + '.png' , function(){
 	    console.log('done');
 	    callback();
 	});
@@ -79,7 +79,7 @@ exports.ClassifierInputObject = function( data, callback ){
     }
 
     this.getInputString = function(){
-	return __dirname + "/temp/" + this.getHash()
+	return __dirname + "/temp/" + this.getHash() +'.png'
     }
 
     this.respond = function( data ){
