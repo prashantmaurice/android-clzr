@@ -33,8 +33,21 @@ exports.BaseOutput = function(){
 
 }
 
-exports.ClassifierDataOutput = function(){
+exports.SuccessOutput = function(){
     exports.BaseOutput.call(this);
+    this.setBody({"result":"ok"});
+}
+
+exports.ErrorOutput = function(){
+    exports.BaseOutput.call(this);
+
+    this.setBody({"result":"err"});
+    this.setMessage = function(msg){
+	this.setBody({"message":msg});
+    }
+}
+exports.ClassifierDataOutput = function(){
+    exports.SuccessOutput.call(this);
     
     this._nullTerminate = function( str ){
 	var out = "";

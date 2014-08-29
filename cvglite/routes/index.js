@@ -6,6 +6,8 @@ var apioutput = require("./apiout");
 
 var router = express.Router();
 
+
+var db = require('./logger');
 /* Process Control Module*/
 var adaptor = new cvgadaptor.StreamControl();
 
@@ -40,17 +42,32 @@ router.post('/classify', function(req, res) {
     //immediate.outHead( res );
     var jobObject = new cvgadaptor.ClassifierInputObject( jobDetails, function( outputMsg ){
 	output = new apioutput.ClassifierDataOutput();
-	//debugger;
+	debugger;
 	//output.setBody({"data":outputMsg});
 	output.setData( outputMsg );
 	output.outBody( res );
 	res.end();
+
+	db.putJob( jobObject , function(){ console.log('logged.') });
 	//debugger;
+    }, function(err){
+	output = new apioutput.ErrorOutput();
+	output.setMessage( "Error loading link." );
+	output.outBody( res );
+	res.end();
     });
 
     //debugger;
     adaptor.doJob( jobObject );
     //debugger;
+});
+
+
+router.get('/', function( err, req, res, next ){
+    output = new apioutput.ErrorOutput();
+    output.setMessage( err.message );
+    output.outBody( res );
+    res.end();
 });
 
 module.exports = router;

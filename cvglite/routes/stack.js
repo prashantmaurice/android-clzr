@@ -47,34 +47,85 @@ var DualQueue = function(){
     }
 }
 
-function download(uri, filename, callback){
+function download(uri, filename, callback, error){
     request.head(uri, function(err, res, body){
 	//console.log('content-type:', res.headers['content-type']);
 	//console.log('content-length:', res.headers['content-length']);
-	var stream = fs.createWriteStream(filename);	
-	request(uri).pipe(stream).on('close', function(){
+	var stream = fs.createWriteStream(filename);
+	stream.on('error', function(){
+	    console.log("Error loading img.");
+	    stream.end();
+	    error();
+	});
+	request(uri).on('error', function(){
+	    console.log("Error loading img.");
+	    stream.end();
+	    error();
+	}).pipe(stream).on('error', function(){
+	    console.log("Error loading img.");
+	    stream.end();
+	    error();
+	}).on('close', function(){
 	    stream.end();
 	    callback();
 	});
     });
 };
-exports.ClassifierInputObject = function( data, callback ){
 
+exports.EventTimer = function(){
+    this._timedeltas = {};
+    this._current = {};
+    this.getLabel = function( label ){
+	return parseFloat(this._timedeltas[label][0]) + parseFloat(this._timedeltas[label][1])/100000.0;
+    }
+
+    this.start = function( label ){
+	var time = process.hrtime();
+	this._current[label] = [process.hrtime()[0], process.hrtime()[1]];
+    }
+
+    this.end = function( label ){
+        var time = process.hrtime();
+	this._timedeltas[label] = [time[0] - this._current[label][0], time[1] - this._current[label][1]];
+    }
+}
+exports.ClassifierInputObject = function( data, callback, error ){
+    exports.EventTimer.call( this );
+
+    // input state storage
     this.data = data;
-    this.callback = callback;
     
-    this.hash = new Date().getTime();
+    // output state storage
+    this.output = '';
+
+    // error state storage
+    this.errState = false;
+
+    // err and success callbacks
+    this.callback = callback;
+    this.error = error;
+
+    // fast access precomputed variable determining the signature of this object uniquely.
+    this.hash = new Date().getTime() + "_" + ( Math.random()*1000 );
+    this.startTime = new Date().toISOString();
 
     this.prepare = function(callback){
 	var http = require('http');
 	var fs = require('fs');
 
-
+	var self = this;
+	this.start('download');
 	download( this.data.url ,  __dirname + "/temp/" + this.getHash() , function(){
-	    console.log('done loading image');
-	    callback();
+	    self.end('download');
+	    if(!self.errState)
+		callback();
+	    //console.log('done loading image');
+	}, function(){
+	    console.log('Error loading image');
+	    self.end('download');
+	    self.errState = true;
+	    self.error();
 	});
-
 	/*var file = fs.createWriteStream( __dirname + "/temp/" + this.getHash() );
 	var request = http.get(this.data.url, function(response) {
 	    response.pipe(file);
@@ -84,17 +135,27 @@ exports.ClassifierInputObject = function( data, callback ){
     this.getInputString = function(){
 	return __dirname + "/temp/" + this.getHash()
     }
+    
+    this.begin = function(){
+	this.start('process');
+    }
 
     this.respond = function( data ){
+	this.end('process');
+	this.output = data;
 	callback(data);
     }
     
-    this.clean = function(){
+    this.finish = function(){
 	fs.unlink( __dirname + "/temp/" + this.getHash() );
     }
     
     this.getHash = function(){
 	return this.hash;
+    }
+
+    this.getDetails = function(){
+	return { 'output': this.output, 'err': this.errState + '', 'url': this.data.url, 'timestamp': this.startTime, 'download_delta': this.getLabel('download'),'process_delta': this.getLabel('process') };
     }
 }
 
@@ -125,6 +186,7 @@ exports.StreamControl = function( conn_details ){
 	    if( obj == null )
 		break;
 	    
+	    obj.begin();
 	    raw_input += obj.getInputString();
 	    if( this.queue.queueSize() != 0 )
 		raw_input+=" "
@@ -153,11 +215,13 @@ exports.StreamControl = function( conn_details ){
     }
     this.onFinish = function( out ){
 	var len = this.queue.currSize();
-	console.log("Num in curr: "+ len);
+	console.log( "Num in curr: "+ len );
+	console.log( "Num in queue: "+ this.queue.queueSize() );
+
 	for( var i=0; i<len; i++){
 	    console.log("Responding");
 	    var obj = this.queue.pop();
-	    obj.clean();
+	    obj.finish();
 	    obj.respond( out );
 	    //console.log("Responded");
 	}
