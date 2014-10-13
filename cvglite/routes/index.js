@@ -20,9 +20,14 @@ function _makeJobDataFromRequest( req ){
 
 /* */
 
+
+router.use('/', function( req, res, next )){
+    res.set('Access-Control-Allow-Origin:','*');
+    next();
+});
 router.get('/', function( req, res ){
-    res.writeHead(200,{"Content-Type":"text/plain"});
-    res.write("Hello!");
+    res.writeHead(200,{"Content-Type":"application/json"});
+    res.write( JSON.stringify({ "version":1.0 }) );
     res.end();
 });
 

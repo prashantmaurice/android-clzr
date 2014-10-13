@@ -72,16 +72,35 @@ function download(uri, filename, callback, error){
     });
 };
 
+_nullTerminate = function( str ){
+    var out = "";
+    for( var i = 0 ;i < str.length; i++ ){
+	if( str[i] == '\0' )
+	    break;
+	out += (str[i]);
+    }
+    return out;
+}
+
+_toJSON = function( str ){
+    var obj = {};
+
+    str.split("|").forEach(function( value, index, array ){
+        obj[value.split(":")[0].trim()] = parseFloat(value.split(":")[1].trim());
+    });
+    return obj;
+}
+
 exports.EventTimer = function(){
     this._timedeltas = {};
     this._current = {};
     this.getLabel = function( label ){
-	return parseFloat(this._timedeltas[label][0]) + parseFloat(this._timedeltas[label][1])/100000.0;
+	return parseFloat(this._timedeltas[label][0]) + parseFloat(this._timedeltas[label][1])/1e9;
     }
 
     this.start = function( label ){
 	var time = process.hrtime();
-	this._current[label] = [process.hrtime()[0], process.hrtime()[1]];
+	this._current[label] = time;
     }
 
     this.end = function( label ){
@@ -155,7 +174,8 @@ exports.ClassifierInputObject = function( data, callback, error ){
     }
 
     this.getDetails = function(){
-	return { 'output': this.output, 'err': this.errState + '', 'url': this.data.url, 'timestamp': this.startTime, 'download_delta': this.getLabel('download'),'process_delta': this.getLabel('process') };
+	debugger;
+	return { 'output': JSON.stringify( _toJSON( _nullTerminate(this.output) ) ), 'err': this.errState + '', 'url': this.data.url, 'timestamp': this.startTime, 'download_delta': this.getLabel('download'),'process_delta': this.getLabel('process') };
     }
 }
 
