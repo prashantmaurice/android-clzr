@@ -21,7 +21,9 @@ public class MyOffer {
     }
 
     public MyOffer(String caption,int stamps) {
+
         this.caption = caption;
         this.stamps = stamps;
+
     }
 }
