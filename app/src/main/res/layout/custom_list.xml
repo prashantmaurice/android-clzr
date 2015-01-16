@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:orientation="vertical"
-    android:background="#000000"
+    android:background="#FFFFFF"
     android:layout_height="wrap_content"
     android:layout_margin="0dp"
  >
@@ -54,7 +54,7 @@
         android:layout_height="50dp"
         android:layout_marginBottom="0dp"
         android:padding="0dp"
-        android:background="#EF6C00">
+        android:background="@drawable/partial_rounded_rect">
 
         <TextView
             android:layout_width="wrap_content"

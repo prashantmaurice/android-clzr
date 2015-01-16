@@ -46,6 +46,7 @@ import com.google.android.gcm.GCMRegistrar;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -589,21 +590,25 @@ public class Home  extends ActionBarActivity {
                     name.setBackgroundColor(Color.RED);
                 }
                 else
-                    new AsyncGet(c, "http://api.clozerr.com/vendor/request?access_token=" + TOKEN + "&name=" + s1 +"&remarks=" + s2, new AsyncGet.AsyncResult() {
+                try {
+                    new AsyncGet(c, "http://api.clozerr.com/vendor/request?access_token=" + TOKEN + "&name=" + URLEncoder.encode(s1, "UTF-8") + "&remarks=" + URLEncoder.encode(s2, "UTF-8"), new AsyncGet.AsyncResult() {
                         @Override
                         public void gotResult(String s) {
                             // t1.setText(s);
                             Log.i("result", s);
-                            Toast.makeText(c,"Thank you. The restaurant will be added soon.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(c, "Thank you. The restaurant will be added soon.", Toast.LENGTH_LONG).show();
                             //RecyclerViewAdapter adapter = new RecyclerViewAdapter(convertRow(s), Home.this);
                             //mRecyclerView.setAdapter(adapter);
 
                             //l1.setAdapter(adapter);
-                            if(s==null) {
-                                Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
+                            if (s == null) {
+                                Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
+                }catch( Exception e ){
+                    e.printStackTrace();
+                }
             }
         });
         cancelButton.setOnClickListener(new View.OnClickListener() {
