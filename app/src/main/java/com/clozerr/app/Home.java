@@ -48,6 +48,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
+import static com.clozerr.app.R.drawable.rest1;
+import static com.clozerr.app.R.drawable.rest2;
+import static com.clozerr.app.R.drawable.rest4;
+import static com.clozerr.app.R.drawable.rest6;
+import static com.clozerr.app.R.drawable.rest7;
 
 public class Home  extends ActionBarActivity {
 
@@ -380,8 +387,18 @@ public class Home  extends ActionBarActivity {
             public void onDrawerOpened(View drawerView) {
                 //new code
                 super.onDrawerOpened( drawerView );
+                int draw= rest1;
+                Random rand=new Random();
+                int test=rand.nextInt(7)+1;
+                if(test==1) draw = rest1;
+                else if(test==2)draw=rest2;
+                else if(test==3)draw=R.drawable.rest3;
+                else if(test==4)draw=rest4;
+                else if(test==5)draw=R.drawable.rest5;
+                else if(test==6)draw=rest6;
+                else if(test==7)draw=rest7;
                 LinearLayout user=(LinearLayout)findViewById(R.id.user);
-                user.setBackground(getResources().getDrawable(R.drawable.rest3));
+                user.setBackground(getResources().getDrawable(draw));
             }
         };
         drawerLayout.setDrawerListener(drawerToggle);
