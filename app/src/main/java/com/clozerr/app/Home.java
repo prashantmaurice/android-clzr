@@ -34,6 +34,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SlidingDrawer;
 import android.widget.TextView;
@@ -377,8 +378,10 @@ public class Home  extends ActionBarActivity {
 
             @Override
             public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-
+                //new code
+                super.onDrawerOpened( drawerView );
+                LinearLayout user=(LinearLayout)findViewById(R.id.user);
+                user.setBackground(getResources().getDrawable(R.drawable.rest3));
             }
         };
         drawerLayout.setDrawerListener(drawerToggle);
