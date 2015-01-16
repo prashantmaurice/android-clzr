@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" tools:context="com.clozerr.app.Home">
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="25dp"
+        android:src="@drawable/clozerr_logo"
+        android:gravity="center"
+        android:layout_gravity="center"
+        />
+</menu>

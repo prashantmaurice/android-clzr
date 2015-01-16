@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <SlidingDrawer
+        android:id="@+id/sliding_drawer1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:content="@+id/myofferslayout"
+        android:handle="@+id/myoffers"
+        >
+        <Button
+            android:layout_width="match_parent"
+            android:text="My Offers"
+            android:id="@+id/myoffers"
+            android:textSize="20sp"
+            android:textColor="#EF6C00"
+            android:background="#FFFFFF"
+            android:layout_height="55dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/myofferslayout"
+            android:orientation="vertical"
+            android:background="#ffffff">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/sliding_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:context=".CountryActivity">
+                </android.support.v7.widget.RecyclerView>
+
+        </LinearLayout>
+    </SlidingDrawer>
+
+</LinearLayout>

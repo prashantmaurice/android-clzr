@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/your_pin"
+        android:gravity="center"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:text="0000"
+        android:gravity="center"
+        android:textColor="#000000"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:id="@+id/pinView"
+        android:padding="@dimen/activity_horizontal_margin"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/please_confirm"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/confirm"
+        android:textColor="#FFFFFFFF"
+        android:background="#FFFF6F00"
+        android:textSize="20sp"
+        android:id="@+id/confirmButton" />
+
+
+</LinearLayout>-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="#EEEEEE"
+    android:layout_gravity="center"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="50dp"
+    android:layout_marginRight="50dp">
+
+    <View android:layout_width="match_parent"
+        android:layout_margin="0dp"
+        android:background="#EF6C00"
+        android:layout_height="10dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Vendor Name"
+        android:textColor="#000000"
+        android:textSize="30sp"
+        android:id="@+id/confirmTitleView"
+        android:padding="8dp"
+        android:gravity="center"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/please_confirm"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:id="@+id/pleaseConfirm"
+        android:padding="5dp"
+        android:gravity="center"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:text="0000"
+        android:gravity="center"
+        android:textColor="#000000"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:id="@+id/pinView"
+        android:layout_margin="8dp"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:text="@string/confirm"
+        android:textColor="#FFFFFFFF"
+        android:background="#FFFF6F00"
+        android:textSize="20sp"
+        android:id="@+id/confirmButton" />
+
+    <View android:layout_width="match_parent"
+        android:layout_margin="0dp"
+        android:background="#EF6C00"
+        android:layout_height="10dp" />
+
+</LinearLayout>

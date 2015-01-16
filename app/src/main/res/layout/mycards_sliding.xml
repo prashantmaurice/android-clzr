@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <SlidingDrawer
+        android:id="@+id/sliding_drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:content="@+id/mycardslayout"
+        android:handle="@+id/mycards"
+        >
+
+        <Button
+            android:layout_width="match_parent"
+            android:text="My Cards"
+            android:id="@+id/mycards"
+            android:textSize="20sp"
+            android:textColor="#EF6C00"
+            android:background="@drawable/shadow_layers"
+            android:layout_height="60dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/mycardslayout"
+            android:background="#ffffff"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/loyaltyempty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/loyaltyempty"
+                android:background="#ffffff"
+                />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/sliding_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".CountryActivity"
+            />
+
+        </RelativeLayout>
+        </SlidingDrawer>
+
+</LinearLayout>

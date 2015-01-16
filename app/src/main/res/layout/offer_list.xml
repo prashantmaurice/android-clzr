@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:padding="0dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="10dp"
+        android:text="0"
+        android:textColor="#ffffff"
+        android:textSize="20sp"
+        style="@style/Circle_offer"
+        android:textStyle="bold"
+        android:id="@+id/txtNum"/>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:padding="0dp"
+        android:layout_marginLeft="5dp"
+        android:text="This is my offer"
+        android:textColor="#000000"
+        android:textSize="15sp"
+        android:id="@+id/txtOffer"
+        android:textStyle="normal" />
+
+        </LinearLayout>
+
+
+</LinearLayout>

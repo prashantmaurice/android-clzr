@@ -1,0 +1,74 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    style="rect_answer">
+
+    <include layout="@layout/toolbar" />
+
+
+    <android.support.v4.widget.DrawerLayout
+        android:layout_width="match_parent"
+        android:id="@+id/drawerLayout"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="#ffffff">
+
+
+            <Button
+                android:layout_width="match_parent"
+                android:text="Suggest a Restaurant"
+                android:textSize="15sp"
+                android:textColor="#000000"
+                android:onClick="prompt"
+                android:layout_height="35dp"
+                android:background="#FFFFFF"
+                android:elevation="5dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="0dp"
+                style="@style/rect_answer"
+                />
+        <!-- activity view -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:background="#fff"
+            android:layout_height="match_parent">
+
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:context=".Home"
+                android:layout_marginBottom="55dp"
+                />
+
+            <include layout="@layout/mycards_sliding"/>
+        </RelativeLayout>
+        </LinearLayout>
+        <include layout="@layout/navdrawer_content"/>
+        <!-- navigation drawer -->
+        <!--<RelativeLayout-->
+        <!--android:layout_gravity="left|start"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:background="#fff"-->
+        <!--android:layout_height="match_parent">-->
+
+        <!--<ListView-->
+        <!--android:id="@+id/left_drawer"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:divider="#eee"-->
+        <!--android:background="#fff"-->
+        <!--android:dividerHeight="1dp" />-->
+        <!--</RelativeLayout>-->
+
+    </android.support.v4.widget.DrawerLayout>
+
+</LinearLayout>

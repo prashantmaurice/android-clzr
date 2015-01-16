@@ -1,0 +1,51 @@
+<resources>
+
+    <!--&lt;!&ndash; Base application theme. &ndash;&gt;-->
+    <!--<style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">-->
+        <!--&lt;!&ndash; Customize your theme here. &ndash;&gt;-->
+    <!--</style>-->
+
+    <style name="DividerHorizontal">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?android:attr/listDivider</item>
+        <item name="android:layout_marginLeft">@dimen/activity_horizontal_margin</item>
+        <item name="android:layout_marginRight">@dimen/activity_horizontal_margin</item>
+    </style>
+
+    <style name="DividerVertical">
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">1dp</item>
+        <item name="android:background">?android:attr/listDivider</item>
+        <item name="android:layout_marginLeft">@dimen/activity_horizontal_margin</item>
+        <item name="android:layout_marginRight">@dimen/activity_horizontal_margin</item>
+    </style>
+
+    <style name="PopupWindowAnimation">
+        <item name="android:windowEnterAnimation">@anim/popup_show</item>
+        <item name="android:windowExitAnimation">@anim/popup_hide</item>
+    </style>
+
+    <style name="image_slider">
+        <item name="android:background">@drawable/image_slider</item>
+    </style>
+    <style name="image_slider_current">
+        <item name="android:background">@drawable/image_slider_current</item>
+    </style>
+
+    <style name="Circle">
+        <item name="android:background">@drawable/circulartext</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="Circle_offer">
+        <item name="android:background">@drawable/circulartext_offer</item>
+        <item name="android:gravity">center</item>
+    </style>
+    <style name="round_rect">
+        <item name="android:background">@drawable/round_rect</item>
+    </style>
+    <style name="rect_answer">
+        <item name="android:background">@drawable/rect_answer</item>
+    </style>
+</resources>
