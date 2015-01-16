@@ -15,11 +15,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.graphics.*;
+import android.util.Log;
 
 import com.facebook.Session;
 import com.koushikdutta.ion.Ion;
 
 import java.util.List;
+
 
 /**
  * Created by Junaid on 29/11/14.
@@ -54,7 +57,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
 
     @Override
-    public void onBindViewHolder(ListItemViewHolder viewHolder, int position) {
+    public void onBindViewHolder(final ListItemViewHolder viewHolder, int position) {
         viewHolder.currentItem = items.get(position);
         CardModel model = items.get(position);
         viewHolder.txtTitle.setText(model.getTitle());
@@ -65,12 +68,34 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         // viewHolder.txtDist.setText(model.getDesc());
 
-        Ion.with(viewHolder.imageView)
-             //   .placeholder(R.drawable.call)
-             //   .error(R.drawable.bat)
-            //    .animateLoad(spinAnimation)
-            //    .animateIn(fadeInAnimation)
-                .load(model.getImageId());
+        Ion.with(c).load(model.getImageId()).withBitmap().placeholder(R.drawable.defoffer).transform(new com.koushikdutta.ion.bitmap.Transform() {
+            public Bitmap transform(Bitmap bitmap) {
+                Log.d("Bitmap tranform", "wd:" + viewHolder.imageView.getWidth() + " ht:" + viewHolder.imageView.getHeight() );
+                Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(output);
+
+                final int color = 0xff424242;
+                final Paint paint = new Paint();
+                final Rect rect = new Rect( 0, 0, bitmap.getWidth(), bitmap.getHeight());
+                final RectF rectF = new RectF(rect);
+                final float roundPx = 10.0f;
+
+                paint.setAntiAlias(true);
+                canvas.drawARGB(0, 0, 0, 0);
+                paint.setColor(color);
+                canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+
+                paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+                canvas.drawBitmap(bitmap, rect, rect, paint);
+
+                return output;
+            }
+
+            public String key() {
+                Log.d("Bitmap transform key", "ht:");
+                return "rounded_rect_40";
+            }
+        }).intoImageView(viewHolder.imageView);
     }
 
     @Override

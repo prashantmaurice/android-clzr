@@ -388,6 +388,7 @@ public class Home  extends ActionBarActivity {
             public void onDrawerOpened(View drawerView) {
                 //new code
                 super.onDrawerOpened( drawerView );
+
                 int draw= rest1;
                 Random rand=new Random();
                 int test=rand.nextInt(7)+1;
