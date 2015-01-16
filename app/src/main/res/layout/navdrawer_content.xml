@@ -34,9 +34,10 @@
             android:layout_height="120dp"
             android:padding="10dp"
             android:orientation="vertical"
-
+            android:id="@+id/user"
             android:layout_gravity="left|bottom"
-            android:layout_marginTop="3dp">
+            android:layout_marginTop="3dp"
+            android:background="@drawable/rest1">
 
             <!-- your image, you can set it later (see NavDrawerFrag) -->
             <!--<ImageView
