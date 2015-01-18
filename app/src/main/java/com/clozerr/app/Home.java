@@ -581,7 +581,6 @@ public class Home  extends ActionBarActivity {
         // show it
         alertDialog.show();
         Button submitButton = (Button) promptsView.findViewById(R.id.submit);
-        Button cancelButton = (Button) promptsView.findViewById(R.id.cancel);
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -614,12 +613,6 @@ public class Home  extends ActionBarActivity {
                 }
             }
         });
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
     }
 
     @Override
@@ -635,6 +628,8 @@ public class Home  extends ActionBarActivity {
         else{
             super.onBackPressed();
         }
+
+
     }
 
 }
