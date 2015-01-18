@@ -25,6 +25,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -585,6 +586,7 @@ public class Home  extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 final String s1=name.getText().toString();
+                final String s2=remark.getText().toString();
 
                 if (s1.equals("")) {
                     Toast.makeText(Home.this, "Please enter a restaurant name.", Toast.LENGTH_LONG).show();
@@ -607,8 +609,23 @@ public class Home  extends ActionBarActivity {
                             }
                         }
                     });
+                    alertDialog.dismiss();
                 }catch( Exception e ){
                     e.printStackTrace();
+                }
+            }
+        });
+        alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                @Override
+                public boolean onKey(DialogInterface arg0, int keyCode, KeyEvent event) {
+                    // TODO Auto-generated method stub
+                    if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        finish();
+                        dialog.dismiss();
+                    }
+                    return false;
                 }
             }
         });
