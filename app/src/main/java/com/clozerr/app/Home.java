@@ -9,6 +9,8 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.LightingColorFilter;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -48,6 +50,7 @@ import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -72,6 +75,7 @@ public class Home  extends ActionBarActivity {
     private ActionBarDrawerToggle drawerToggle;
     private ListView leftDrawerList;
     private ArrayAdapter<String> navigationDrawerAdapter;
+    private NavDrawAdapter nav;
     private String[] leftSliderData = {"ABOUT US","FAQ'S","LIKE CLOZERR ?","RATE CLOZERR", "LOGOUT"};
     private boolean nav_drawer_open = false;
 
@@ -169,8 +173,8 @@ public class Home  extends ActionBarActivity {
                 try{
                     lat=location.getLatitude();
                     longi=location.getLongitude();
-                    Log.e("lat", lat+"");
-                    Log.e("long", longi+"");
+                    Log.e("lat", lat + "");
+                    Log.e("long", longi + "");
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -300,8 +304,16 @@ public class Home  extends ActionBarActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         //navigationDrawerAdapter=new ArrayAdapter<String>( Home.this, android.R.layout.simple_list_item_1, leftSliderData);
-        navigationDrawerAdapter=new ArrayAdapter<String>( Home.this, R.layout.navdrawlist,R.id.textView, leftSliderData);
-        leftDrawerList.setAdapter(navigationDrawerAdapter);
+       // navigationDrawerAdapter=new ArrayAdapter<String>( Home.this, R.layout.navdrawlist,R.id.textView, leftSliderData);
+       // Log.i("omy",leftSliderData[0]);
+        List<String> l = Arrays.<String>asList(leftSliderData);
+
+// if List<String> isnt specific enough:
+        ArrayList<String> al = new ArrayList<String>(l);
+       // ArrayList<String> arr ;
+       // arr= (ArrayList<String>) Arrays.asList(leftSliderData);
+        nav=new NavDrawAdapter(this,al);
+        leftDrawerList.setAdapter(nav);
         leftDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -401,7 +413,10 @@ public class Home  extends ActionBarActivity {
                 else if(test==6)draw=rest6;
                 else if(test==7)draw=rest7;
                 LinearLayout user=(LinearLayout)findViewById(R.id.user);
+                LightingColorFilter lcf = new LightingColorFilter( 0x888888, 0x000000);
+                //imageView.setColorFilter(lcf);
                 user.setBackground(getResources().getDrawable(draw));
+                user.getBackground().setColorFilter( lcf );
             }
         };
         drawerLayout.setDrawerListener(drawerToggle);
@@ -633,6 +648,8 @@ public class Home  extends ActionBarActivity {
         }*/
         else{
             super.onBackPressed();
+            Button cancel=(Button)findViewById(R.id.cancel);
+
         }
     }
 
