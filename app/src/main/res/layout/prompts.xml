@@ -5,19 +5,16 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="0dp"
+    android:background="@drawable/rect_back_suggest"
     android:weightSum="1">
-
-    <View android:layout_width="match_parent"
-        android:layout_margin="0dp"
-        android:background="#EF6C00"
-        android:layout_height="10dp" />
 
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Please fill in name of the Restaurant you would like to see on Clozerr : "
+        android:text="Name of the restaurant"
         android:layout_marginTop="15dp"
+        android:textStyle="bold"
         android:paddingLeft="10dp"
         android:textSize="18sp"
         android:textColor="#000000"
@@ -36,7 +33,7 @@
         android:maxLines="1"
         android:singleLine="true"
         android:imeOptions="actionNext"
-        android:background="#FFFFFF"
+        android:background="@drawable/rect_back_trans_textbox"
         android:nextFocusDown="@+id/text2">
 
         <requestFocus />
@@ -47,7 +44,8 @@
         android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Any Remarks ?  "
+        android:text="Remarks"
+        android:textStyle="bold"
         android:textSize="18sp"
         android:padding="10dp"
         android:textColor="#000000"
@@ -64,8 +62,7 @@
         android:textSize="20sp"
         android:padding="10dp"
         android:gravity="start"
-        android:layout_marginTop="10dp"
-        android:background="#FFFFFF">
+        android:background="@drawable/rect_back_trans_textbox">
 
 
     </EditText>
@@ -83,28 +80,10 @@
             android:padding="10dp"
             android:text="Submit"
             android:textColor="#FFFFFFFF"
-            android:background="#FFFF6F00"
+            android:background="@drawable/round_rect_submit"
             android:textSize="20sp"
             android:id="@+id/submit"
              />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="Cancel"
-            android:textColor="#FFFFFFFF"
-            android:background="#FFFF6F00"
-            android:textSize="20sp"
-            android:id="@+id/cancel"
-            android:layout_gravity="right"
-            android:layout_marginLeft="40dp" />
-
     </LinearLayout>
-
-    <View android:layout_width="match_parent"
-        android:layout_margin="0dp"
-        android:background="#EF6C00"
-        android:layout_height="10dp" />
 
 </LinearLayout>
