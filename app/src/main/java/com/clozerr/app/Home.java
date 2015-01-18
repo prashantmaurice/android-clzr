@@ -59,7 +59,7 @@ import static com.clozerr.app.R.drawable.rest7;
 
 public class Home  extends ActionBarActivity {
 
-    static final String SENDER_ID = "737613032357";  // project id from Google Console
+    static final String SENDER_ID = "496568600186";  // project id from Google Console
     public static String TOKEN = "";
     private static String USERNAME = "";
     private static String USERID = "";
@@ -80,17 +80,17 @@ public class Home  extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         Log.i("create", "Creation of Home");
 
-       /* GCMRegistrar.checkDevice(this);
+        GCMRegistrar.checkDevice(this);
         GCMRegistrar.checkManifest(this);
         final String regId = GCMRegistrar.getRegistrationId(this);
         if (regId.equals("")) {
             GCMRegistrar.register(this, SENDER_ID);
-        }*/
+        }
 
         if (logincheck()==0)
             return;
 
-        //locationEnabledCheck();   // Enable if strict location is required
+        locationEnabledCheck();   // Enable if strict location is required
         c = Home.this;
         setContentView(R.layout.activity_my);
         nitView();
@@ -165,11 +165,12 @@ public class Home  extends ActionBarActivity {
         new MyLocation().getLocation(getApplicationContext(), new MyLocation.LocationResult(){
             @Override
             public void gotLocation (Location location) {
+                Log.e("location stuff","Location Callback called.");
                 try{
                     lat=location.getLatitude();
                     longi=location.getLongitude();
-                    Log.i("lat", lat+"");
-                    Log.i("long", longi+"");
+                    Log.e("lat", lat+"");
+                    Log.e("long", longi+"");
                 }catch (Exception e){
                     e.printStackTrace();
                 }

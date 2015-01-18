@@ -34,6 +34,7 @@ import android.widget.SlidingDrawer;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gcm.GCMRegistrar;
 import com.koushikdutta.ion.Ion;
 
 import org.json.JSONArray;
@@ -423,7 +424,13 @@ public class CouponDetails extends ActionBarActivity {
 
                                 ((Button)displayView.findViewById(R.id.redeemButton)).setEnabled(false);
                                 String url="http://api.clozerr.com/checkin/create?access_token=" + TOKEN + "&vendor_id=" + detailsBundle.getString("vendorId") +"&offer_id=" + detailsBundle.getString("offerId");
+
+                                String gcm_id = GCMRegistrar.getRegistrationId(getApplicationContext());
+                                if( !gcm_id.equals("") )
+                                    url += "&gcm_id=" + gcm_id;
+
                                 Log.e("CouponDetails url", url);
+
                                // Login.showProgressDialog(getApplicationContext());
                                 new AsyncGet(CouponDetails.this, url, new AsyncGet.AsyncResult() {
                                     @Override

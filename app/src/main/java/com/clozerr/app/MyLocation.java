@@ -89,7 +89,7 @@ public class MyLocation {
                }catch (Exception e){
                    e.printStackTrace();
                }
-                return;
+               return;
             }
             if (net_loc != null) {
                 locationResult.gotLocation(net_loc);

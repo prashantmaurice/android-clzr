@@ -92,7 +92,7 @@ public abstract class GCMBaseIntentService extends IntentService {
      */
 
 	protected void onMessage(Context context, Intent intent){
-    	
+    	Log.e("GCM","Message!!");
     	}
     /**
      * Called when the GCM server tells pending messages have been deleted
