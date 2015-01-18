@@ -586,6 +586,7 @@ public class Home  extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 final String s1=name.getText().toString();
+                final String s2=remark.getText().toString();
 
                 if (s1.equals("")) {
                     Toast.makeText(Home.this, "Please enter a restaurant name.", Toast.LENGTH_LONG).show();
