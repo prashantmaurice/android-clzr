@@ -561,7 +561,7 @@ public class Home  extends ActionBarActivity {
 
         // set dialog message
         alertDialogBuilder
-                .setCancelable(false)
+                .setCancelable(true)
                 /*.setNeutralButton("Submit",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,int id) {
@@ -630,18 +630,10 @@ public class Home  extends ActionBarActivity {
                 }
             }
         });
-        alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
-            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                @Override
-                public boolean onKey(DialogInterface arg0, int keyCode, KeyEvent event) {
-                    // TODO Auto-generated method stub
-                    if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        finish();
-                        dialog.dismiss();
-                    }
-                    return false;
-                }
+            public void onCancel(DialogInterface dialog) {
+                dialog.dismiss();
             }
         });
     }
@@ -658,7 +650,7 @@ public class Home  extends ActionBarActivity {
         }*/
         else{
             super.onBackPressed();
-            Button cancel=(Button)findViewById(R.id.cancel);
+            //Button cancel=(Button)findViewById(R.id.cancel);
 
         }
 
