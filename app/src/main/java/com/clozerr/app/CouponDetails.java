@@ -68,6 +68,11 @@ public class CouponDetails extends ActionBarActivity {
         System.out.println("set content view");
         Intent callingIntent = getIntent();
         initViews();
+        String checkin_id_review;
+        if(callingIntent.getBooleanExtra("from_notify_review",false)) {
+            checkin_id_review = callingIntent.getStringExtra("checkin_id");
+            feedback(checkin_id_review);
+        }
 
         detailsBundle = new Bundle();
         String vendor_id = callingIntent.getStringExtra("vendor_id");
@@ -108,10 +113,10 @@ public class CouponDetails extends ActionBarActivity {
                             object.getString("fid"),object.getString("_id"),
                             0
                     );
-                     JSONArray question= object.getJSONArray("question");
+                     /*JSONArray question= object.getJSONArray("question");
                     for(int i=0;i<question.length();i++){
                       ques_arr.add(question.getString(i));
-                    }
+                    }*/
                     //Log.e("title", currentItem.getTitle());
                     //Toast.makeText(CouponDetails.this, "title - " + currentItem.getTitle(), Toast.LENGTH_SHORT).show();
                     detailsBundle.putString("vendorTitle", currentItem.getTitle());
@@ -177,7 +182,7 @@ public class CouponDetails extends ActionBarActivity {
                         }
                     });
 
-                    rateButton.setOnClickListener(new View.OnClickListener() {
+                    /*rateButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             Context c = CouponDetails.this;
@@ -189,11 +194,11 @@ public class CouponDetails extends ActionBarActivity {
                             rv.setHasFixedSize(true);
 
 
-       /*                     ques_arr.add("How would you rate the ambiance of the restaurant?");
+                          ques_arr.add("How would you rate the ambiance of the restaurant?");
                             ques_arr.add("How would you rate the ambiance of the restaurant?");
                             ques_arr.add("How would you rate the ambiance of the restaurant?");
                             ques_arr.add("How would you rate the ambiance of the restaurant?");
-                            ques_arr.add("How would you rate the ambiance of the restaurant?");*/
+                            ques_arr.add("How would you rate the ambiance of the restaurant?");
                             ReviewQuestionsAdapter rqa = new ReviewQuestionsAdapter(ques_arr,c);
                             rv.setAdapter(rqa);
 
@@ -213,10 +218,20 @@ public class CouponDetails extends ActionBarActivity {
                                 public void onClick(View v) {
                                     alertDialog.dismiss();
                                     //submit the reviews
+                                    final String url_review = "";
+                                    new AsyncGet(CouponDetails.this, url_review, new AsyncGet.AsyncResult() {
+
+                                        @Override
+                                        public void gotResult(String s) {
+
+                                        }
+                                    });
                                 }
+
+
                             });
                         }
-                    });
+                    });*/
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -515,7 +530,7 @@ public class CouponDetails extends ActionBarActivity {
         checkinPopup.showAtLocation(detailsLayout, Gravity.CENTER, 0, 0);
     }
 
-    public void feedback(View v)
+    public void feedback(String checkin_id)
     {
         Context c = getApplicationContext();
         LayoutInflater lf = LayoutInflater.from(c);
@@ -523,11 +538,11 @@ public class CouponDetails extends ActionBarActivity {
         RecyclerView rv = (RecyclerView) feedbackView.findViewById(R.id.list_questions);
 
         ArrayList<String> ques_arr = new ArrayList<String>();
+        /*ques_arr.add("How would you rate the ambiance of the restaurant?");
         ques_arr.add("How would you rate the ambiance of the restaurant?");
         ques_arr.add("How would you rate the ambiance of the restaurant?");
         ques_arr.add("How would you rate the ambiance of the restaurant?");
-        ques_arr.add("How would you rate the ambiance of the restaurant?");
-        ques_arr.add("How would you rate the ambiance of the restaurant?");
+        ques_arr.add("How would you rate the ambiance of the restaurant?");*/
         ReviewQuestionsAdapter rqa = new ReviewQuestionsAdapter(ques_arr,c);
         rv.setAdapter(rqa);
 
@@ -547,6 +562,15 @@ public class CouponDetails extends ActionBarActivity {
             public void onClick(View v) {
                 alertDialog.dismiss();
                 //submit the reviews
+                final String url_review = "";           //fill the url - use function getStarCount(position) to get the stars
+                new AsyncGet(CouponDetails.this, url_review, new AsyncGet.AsyncResult() {
+
+                    @Override
+                    public void gotResult(String s) {
+                        Toast.makeText(getApplicationContext(),"Thank you for your reviews",Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
             }
         });
 

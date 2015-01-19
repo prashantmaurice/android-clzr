@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:text="1. How would you rate the food at restaurant?"
         android:textStyle="bold"
-        android:textSize="13sp"
+        android:textSize="11sp"
         android:paddingTop="0dp"
         android:paddingBottom="0dp"
         android:paddingLeft="10dp"
