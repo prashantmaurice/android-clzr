@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/textView_heading_feedback"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="FEEDBACK FORM"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:padding="10dp"
+        android:textColor="#444444"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list_questions"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_gravity="start"
+        />
+
+    <TextView
+        android:id="@+id/textView21"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Remarks/Suggestions"
+        android:textSize="13sp"
+        android:paddingLeft="15dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:textColor="#000000"
+        android:layout_marginTop="10dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        />
+
+    <EditText
+        android:id="@+id/text_remarks"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="100sp"
+        android:textSize="20sp"
+        android:padding="10dp"
+        android:background="@drawable/rect_back_trans_textbox">
+
+
+    </EditText>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_gravity="right"
+        android:gravity="right">
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="SUBMIT"
+            android:textColor="#FFFFFFFF"
+            android:background="@drawable/round_rect_submit"
+            android:textSize="14sp"
+            android:id="@+id/submit_feedback"
+            />
+    </LinearLayout>
+
+</LinearLayout>

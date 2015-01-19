@@ -417,7 +417,7 @@ public class Home  extends ActionBarActivity {
                 LightingColorFilter lcf = new LightingColorFilter( 0x888888, 0x000000);
                 //imageView.setColorFilter(lcf);
                 user.setBackground(getResources().getDrawable(draw));
-                user.getBackground().setColorFilter( lcf );
+                user.getBackground().setColorFilter(lcf);
             }
         };
         drawerLayout.setDrawerListener(drawerToggle);
