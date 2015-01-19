@@ -76,6 +76,7 @@ public class CouponDetails extends ActionBarActivity {
 
         detailsBundle.putString("offerId", offer_id);
         detailsBundle.putString("offerText", offer_text);
+        final ArrayList<String> ques_arr = new ArrayList<String>();
 
 
         //Toast.makeText(this, "id - " + vendor_id, Toast.LENGTH_SHORT).show();
@@ -107,6 +108,10 @@ public class CouponDetails extends ActionBarActivity {
                             object.getString("fid"),object.getString("_id"),
                             0
                     );
+                     JSONArray question= object.getJSONArray("question");
+                    for(int i=0;i<question.length();i++){
+                      ques_arr.add(question.getString(i));
+                    }
                     //Log.e("title", currentItem.getTitle());
                     //Toast.makeText(CouponDetails.this, "title - " + currentItem.getTitle(), Toast.LENGTH_SHORT).show();
                     detailsBundle.putString("vendorTitle", currentItem.getTitle());
@@ -119,6 +124,7 @@ public class CouponDetails extends ActionBarActivity {
                     detailsBundle.putDouble("longitude", currentItem.getLong());
                     detailsBundle.putString("distance", currentItem.getDistance());
                     detailsBundle.putString("phonenumber", phonenumber);
+
                     Log.i("fvgh",detailsBundle.toString());
 
                     try {
@@ -182,12 +188,12 @@ public class CouponDetails extends ActionBarActivity {
                             rv.setItemAnimator(new DefaultItemAnimator());
                             rv.setHasFixedSize(true);
 
-                            ArrayList<String> ques_arr = new ArrayList<String>();
+
+       /*                     ques_arr.add("How would you rate the ambiance of the restaurant?");
                             ques_arr.add("How would you rate the ambiance of the restaurant?");
                             ques_arr.add("How would you rate the ambiance of the restaurant?");
                             ques_arr.add("How would you rate the ambiance of the restaurant?");
-                            ques_arr.add("How would you rate the ambiance of the restaurant?");
-                            ques_arr.add("How would you rate the ambiance of the restaurant?");
+                            ques_arr.add("How would you rate the ambiance of the restaurant?");*/
                             ReviewQuestionsAdapter rqa = new ReviewQuestionsAdapter(ques_arr,c);
                             rv.setAdapter(rqa);
 
