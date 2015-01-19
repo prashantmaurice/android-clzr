@@ -15,7 +15,7 @@
         android:padding="10dp"
         android:background="#eee"
         android:textColor="#444444"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="0dp"
         android:gravity="center_horizontal"
         android:textAppearance="?android:attr/textAppearanceLarge"
         />
@@ -52,7 +52,7 @@
         android:layout_width="match_parent"
         android:minLines="5"
         android:gravity="start"
-        android:textSize="10sp"
+        android:textSize="14sp"
         android:layout_height="wrap_content"
         android:padding="5dp"
         android:background="@drawable/rect_back_trans_textbox">
