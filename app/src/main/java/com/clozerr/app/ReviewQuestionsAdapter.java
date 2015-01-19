@@ -61,7 +61,7 @@ public class ReviewQuestionsAdapter extends RecyclerView.Adapter<ReviewQuestions
     @Override
     public void onBindViewHolder(final ListItemViewHolder viewHolder, int position) {
         viewHolder.currentItem = items.get(position);
-       viewHolder.txtQuestion.setText(items.get(position));
+       viewHolder.txtQuestion.setText(Integer.toString(position+1)+"."+items.get(position));
         viewHolder.star1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,7 +70,7 @@ public class ReviewQuestionsAdapter extends RecyclerView.Adapter<ReviewQuestions
                 viewHolder.star3.setImageResource(R.drawable.star_outline);
                 viewHolder.star4.setImageResource(R.drawable.star_outline);
                 viewHolder.star5.setImageResource(R.drawable.star_outline);
-                i=1;
+                i = 1;
                 //stars.add(viewHolder.getPosition(),1);
             }
         });
