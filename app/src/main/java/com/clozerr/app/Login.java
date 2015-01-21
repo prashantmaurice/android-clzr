@@ -28,13 +28,18 @@ import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.model.GraphUser;
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -47,7 +52,7 @@ public class Login extends FragmentActivity implements
     private static final int STATE_DEFAULT = 0;
     private static final int STATE_SIGN_IN = 1;
     private static final int STATE_IN_PROGRESS = 2;
-    int googleOrFb=3;
+    static int googleOrFb=3;
     //ImageView slide1=(ImageView)findViewById(R.id.slide1);
 //ImageView slide2=(ImageView)findViewById(R.id.slide2);
 //ImageView slide3=(ImageView)findViewById(R.id.slide3);
@@ -57,7 +62,7 @@ public class Login extends FragmentActivity implements
     private static final String SAVED_PROGRESS = "sign_in_progress";
     // GoogleApiClient wraps our service connection to Google Play services and
 // provides access to the users sign in state and Google's APIs.
-    private GoogleApiClient mGoogleApiClient;
+    public static GoogleApiClient mGoogleApiClient;
     // We use mSignInProgress to track whether user has clicked sign in.
 // mSignInProgress can be one of three values:
 //
@@ -80,7 +85,7 @@ public class Login extends FragmentActivity implements
     // Used to store the error code most recently returned by Google Play services
 // until the user clicks 'sign in'.
     private int mSignInError;
-    private Button mSignInButton;
+    private ImageButton mSignInButton;
     public static ProgressDialog pDialog;
     private static final int NUM_PAGES = 5;
     /**
@@ -104,8 +109,8 @@ public class Login extends FragmentActivity implements
 //super.setIntegerProperty("splashscreen", R.drawable.splash);
 // this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_loginfb);
-       mSignInButton = (Button) findViewById(R.id.ibutton);
-        //mSignInButton.setOnClickListener(this);
+        mSignInButton = (ImageButton) findViewById(R.id.sign_in_button);
+        mSignInButton.setOnClickListener(this);
         final Resources reso = this.getResources();
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setPageTransformer(true, new ZoomOutPageTransformer());
@@ -347,14 +352,44 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.i(TAG, "onConnected");
-// Update the user interface to reflect that the user is signed in.
-        mSignInButton.setEnabled(false);
-        Person currentUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
-        userName =
-                currentUser.getDisplayName();
+        /*// Update the user interface to reflect that the user is signed in.
+        // mSignInButton.setEnabled(false);*/
+
+        final Person currentUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+        userName = currentUser.getDisplayName();
         dispPicUrl = currentUser.getImage().getUrl();
-// Indicate that the sign in process is complete.
+        // Indicate that the sign in process is complete.
         mSignInProgress = STATE_DEFAULT;
+
+        final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
+        editor.putString("gplus_name", userName);
+        editor.putString("gplus_id", currentUser.getId());
+        editor.putString("gplus_pic", dispPicUrl);
+        editor.commit();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String token = null;
+                try {
+                    token = GoogleAuthUtil.getToken(
+                            Login.this,
+                            Plus.AccountApi.getAccountName(mGoogleApiClient) + "",
+                            "oauth2:" + "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/plus.login"
+                    );
+                } catch (IOException | GoogleAuthException e) {
+                    e.printStackTrace();
+
+                }
+                Log.e("AccessToken", token);
+                Toast.makeText(Login.this, token, Toast.LENGTH_LONG).show();
+                editor.putString("loginskip", "true");
+                editor.putString("token", token);
+                editor.apply();
+                startActivity(new Intent(Login.this, Home.class));
+                finish();
+            }
+        }).start();
     }
     @Override
     public void onConnectionSuspended(int i) {
@@ -362,13 +397,15 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
     }
     @Override
     public void onClick(View v) {
-        googleOrFb=2;
+        googleOrFb = 2;
         if (!mGoogleApiClient.isConnecting()) {
 // We only process button clicks when GoogleApiClient is not transitioning
 // between connected and not connected.
-          /*  switch (v.getId()) {
+            switch (v.getId()) {
                 case R.id.sign_in_button:
-                    break;*/
+                    Toast.makeText(this, "Signing in...", Toast.LENGTH_LONG).show();
+                    resolveSignInError();
+                    break;
 /*case R.id.sign_out_button:
 // We clear the default account on sign out so that Google Play
 // services will not return an onConnected callback without user
@@ -391,6 +428,7 @@ mGoogleApiClient.connect();
 break;*/
             }
         }
+    }
         @Override
     public void onConnectionFailed(ConnectionResult result) {
         Log.i(TAG, "onConnectionFailed: ConnectionResult.getErrorCode() = "
@@ -400,15 +438,18 @@ break;*/
 // configuration might not be supported with the requested API or a required component
 // may not be installed, such as the Android Wear application. You may need to use a
 // second GoogleApiClient to manage the application's optional APIs.
+            Toast.makeText(this, "Google+ API(s) unavailable", Toast.LENGTH_LONG).show();
         } else if (mSignInProgress != STATE_IN_PROGRESS) {
 // We do not have an intent in progress so we should store the latest
 // error resolution intent for use when the sign in button is clicked.
+            Toast.makeText(this, "Storing error resolution intent; click sign in again", Toast.LENGTH_LONG).show();
             mSignInIntent = result.getResolution();
             mSignInError = result.getErrorCode();
             if (mSignInProgress == STATE_SIGN_IN) {
 // STATE_SIGN_IN indicates the user already clicked the sign in button
 // so we should continue processing errors until the user is signed in
 // or they click cancel.
+                Toast.makeText(this, "Error processing is going on...", Toast.LENGTH_LONG).show();
                 resolveSignInError();
             }
         }
@@ -461,7 +502,7 @@ break;*/
                                 public void onCancel(DialogInterface dialog) {
                                     Log.e(TAG, "Google Play services resolution cancelled");
                                     mSignInProgress = STATE_DEFAULT;
-                                    Toast.makeText(getApplicationContext(),"Signed out",Toast.LENGTH_SHORT);
+                                    Toast.makeText(getApplicationContext(),"Signed out",Toast.LENGTH_SHORT).show();
                                 }
                             });
                 } else {
@@ -474,7 +515,7 @@ break;*/
                                             Log.e(TAG, "Google Play services error could not be "
                                                     + "resolved: " + mSignInError);
                                             mSignInProgress = STATE_DEFAULT;
-                                            Toast.makeText(getApplicationContext(),"Signed out",Toast.LENGTH_SHORT);
+                                            Toast.makeText(getApplicationContext(),"Signed out",Toast.LENGTH_SHORT).show();
                                         }
                                     }).create();
                 }

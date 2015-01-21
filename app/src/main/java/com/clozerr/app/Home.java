@@ -45,6 +45,7 @@ import android.widget.Toast;
 
 import com.facebook.Session;
 import com.google.android.gcm.GCMRegistrar;
+import com.google.android.gms.plus.Plus;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -67,6 +68,7 @@ public class Home  extends ActionBarActivity {
     public static String TOKEN = "";
     private static String USERNAME = "";
     private static String USERID = "";
+    private static String USER_PIC_URL = "";
     public static Context c;
     Button button;
     static double lat;
@@ -119,10 +121,11 @@ public class Home  extends ActionBarActivity {
         if(USERNAME.length()!=0)
             username.setText(USERNAME);
 
-        Log.e("facebook pic", "https://graph.facebook.com/" + USERID + "/picture?type=large&width=200&height=200");
+        Log.e("pic", USER_PIC_URL);
 
         new DownloadImageTask((de.hdodenhof.circleimageview.CircleImageView)findViewById(R.id.nav_image))
-                .execute("https://graph.facebook.com/" + USERID + "/picture?type=large&width=200&height=200");
+                .execute(USER_PIC_URL);
+
         Log.d("app", "dld img");
         //startService(new Intent(this, LocationService.class));
         lat = 13;
@@ -245,9 +248,18 @@ public class Home  extends ActionBarActivity {
     public int logincheck(){
         SharedPreferences status = getSharedPreferences("USER", 0);
         TOKEN = status.getString("token", "");
-
-        USERID = status.getString("fb_id", "");
-        USERNAME = status.getString("fb_name", "");
+        if (Login.googleOrFb == 1)
+        {
+            USERID = status.getString("fb_id", "");
+            USERNAME = status.getString("fb_name", "");
+            USER_PIC_URL = "https://graph.facebook.com/" + USERID + "/picture?type=large&width=200&height=200";
+        }
+        else if (Login.googleOrFb == 2)
+        {
+            USERID = status.getString("gplus_id", "");
+            USERNAME = status.getString("gplus_name", "");
+            USER_PIC_URL = status.getString("gplus_pic", "");
+        }
         Log.i("all saved prefs", status.getAll().toString());
         String loginskipped = status.getString("loginskip", "false");
         if(!loginskipped.equals("true")){
@@ -330,10 +342,11 @@ public class Home  extends ActionBarActivity {
                 if(i==1){
                     startActivity(new Intent(Home.this,FAQ.class));
                 }
-                if(i==0){
+                else if(i==0){
                     startActivity(new Intent(Home.this,AboutUs.class));
                 }
                 else if(i==2) {
+                    // TODO put google+ +1 thing here
                     Uri uri = Uri.parse("https://www.facebook.com/clozerrdeals");
                     Intent intent = new Intent(Intent.ACTION_VIEW,uri);
                     // Create and start the chooser
@@ -366,15 +379,24 @@ public class Home  extends ActionBarActivity {
                     SharedPreferences.Editor editor = example.edit();
                     editor.clear();
                     editor.apply();
-                    Session session = Session.getActiveSession();
-                    if (session != null) {
-                        if (!session.isClosed()) {
+                    if (Login.googleOrFb == 2 && Login.mGoogleApiClient.isConnected())
+                    {
+                        Plus.AccountApi.clearDefaultAccount(Login.mGoogleApiClient);
+                        Login.mGoogleApiClient.disconnect();
+                        Login.mGoogleApiClient.connect();
+                    }
+                    else if (Login.googleOrFb == 1)
+                    {
+                        Session session = Session.getActiveSession();
+                        if (session != null) {
+                            if (!session.isClosed()) {
+                                session.closeAndClearTokenInformation();
+                            }
+                        } else {
+                            session = new Session(Home.this);
+                            Session.setActiveSession(session);
                             session.closeAndClearTokenInformation();
                         }
-                    } else {
-                        session = new Session(Home.this);
-                        Session.setActiveSession(session);
-                        session.closeAndClearTokenInformation();
                     }
 
                     startActivity(new Intent(Home.this, Login.class));

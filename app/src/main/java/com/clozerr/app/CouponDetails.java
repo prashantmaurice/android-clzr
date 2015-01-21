@@ -253,7 +253,7 @@ public class CouponDetails extends ActionBarActivity {
         checkinButton = (TextView) findViewById(R.id.checkinButton);
         callButton = (CircleImageView) findViewById(R.id.itemCallButton);
         dirButton = (CircleImageView) findViewById(R.id.itemDirButton);
-        rateButton = (CircleImageView) findViewById(R.id.itemRateButton);
+        //rateButton = (CircleImageView) findViewById(R.id.itemRateButton);
         setSupportActionBar(backToolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
