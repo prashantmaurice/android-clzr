@@ -61,35 +61,12 @@ public class RecyclerViewAdapter1 extends RecyclerView.Adapter<RecyclerViewAdapt
         TextView txtvisitno;
 
         TextView txtoffer;
-        public MyOffer currentItem;
+        /*public MyOffer currentItem;*/
 
         public ListItemViewHolder(View itemView) {
             super(itemView);
-
             txtvisitno = (TextView) itemView.findViewById(R.id.txtNum);
             txtoffer = (TextView) itemView.findViewById(R.id.txtOffer);
-
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    /*Intent detailIntent = new Intent(c, CouponDetails.class);
-                    // pass selected vendor's image to details activity to avoid re-download
-                    imageView.buildDrawingCache();
-                    Bitmap image = imageView.getDrawingCache();
-                    Bundle vendorBundle = new Bundle();
-                    vendorBundle.putParcelable("vendorImage", image);
-                /*TODO send phone number, location details and restaurant description along with this.
-                vendorBundle.putString("phoneNumber", phone number);
-                vendorBundle.putString("location", location);
-                vendorBundle.putString("description", description);
-                    vendorBundle.putString("vendorTitle", currentItem.getTitle());
-                    vendorBundle.putString("offerText", currentItem.getCaption());
-
-                    detailIntent.putExtra("detailsBundle", vendorBundle);
-                    c.startActivity(detailIntent);*/
-                }
-            });
         }
     }
 

@@ -30,6 +30,7 @@ import com.facebook.SessionState;
 import com.facebook.model.GraphUser;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
@@ -375,14 +376,19 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                     token = GoogleAuthUtil.getToken(
                             Login.this,
                             Plus.AccountApi.getAccountName(mGoogleApiClient) + "",
-                            "oauth2:" + "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/plus.login"
+                            "oauth2:" + "https://www.googleapis.com/auth/userinfo.profile"
                     );
-                } catch (IOException | GoogleAuthException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
 
+                } catch ( UserRecoverableAuthException e ){
+                    startActivityForResult(e.getIntent(), 0);
+                } catch ( GoogleAuthException e ){
+                    e.printStackTrace();
                 }
                 Log.e("AccessToken", token);
-                Toast.makeText(Login.this, token, Toast.LENGTH_LONG).show();
+                //Toast.makeText(Login.this, token, Toast.LENGTH_LONG).show();
+
                 editor.putString("loginskip", "true");
                 editor.putString("token", token);
                 editor.apply();
