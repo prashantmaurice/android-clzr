@@ -79,7 +79,7 @@ public class Home  extends ActionBarActivity {
     private ListView leftDrawerList;
     private ArrayAdapter<String> navigationDrawerAdapter;
     private NavDrawAdapter nav;
-    private String[] leftSliderData = {"ABOUT US","FAQ'S","LIKE CLOZERR ?","RATE CLOZERR", "LOGOUT"};
+    private String[] leftSliderData = {"ABOUT US","FAQ'S","LIKE/FOLLOW CLOZERR","RATE CLOZERR", "LOGOUT"};
     private boolean nav_drawer_open = false;
 
     @Override
@@ -338,7 +338,7 @@ public class Home  extends ActionBarActivity {
                             .setNegativeButton("No", dialogClickListener).show();
 
                 }
-                //"ABOUT US","FAQ'S","LIKE CLOZERR ?","RATE CLOZERR", "LOGOUT"
+                //"ABOUT US","FAQ'S","LIKE/FOLLOW CLOZERR","RATE CLOZERR", "LOGOUT"
                 if(i==1){
                     startActivity(new Intent(Home.this,FAQ.class));
                 }
@@ -346,8 +346,15 @@ public class Home  extends ActionBarActivity {
                     startActivity(new Intent(Home.this,AboutUs.class));
                 }
                 else if(i==2) {
-                    // TODO put google+ +1 thing here
-                    Uri uri = Uri.parse("https://www.facebook.com/clozerrdeals");
+                    Uri uri = null;
+                    if (Login.googleOrFb == 1)
+                    {
+                        uri = Uri.parse("https://www.facebook.com/clozerrdeals");
+                    }
+                    else if (Login.googleOrFb == 2)
+                    {
+                        uri = Uri.parse("https://plus.google.com/112342093373744098489/about");
+                    }
                     Intent intent = new Intent(Intent.ACTION_VIEW,uri);
                     // Create and start the chooser
                     Intent chooser = Intent.createChooser(intent, "Open with");

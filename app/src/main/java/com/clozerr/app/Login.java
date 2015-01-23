@@ -30,6 +30,7 @@ import com.facebook.SessionState;
 import com.facebook.model.GraphUser;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
@@ -47,6 +48,9 @@ public class Login extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         View.OnClickListener {
     private static final String TAG = "clozerr";
+    private static final String GOOGLE_PLUS_PROJECT_ID = "key-surf-834";
+    private static final String GOOGLE_PLUS_CLIENT_ID = "597460526405-i65fhqcbsn0khe3b25qsfav4cohs9dkn.apps.googleusercontent.com";
+    private static final String SHA1_HASH = "71:E4:E8:FC:F5:46:67:14:BB:C1:93:E5:A4:82:9A:84:BF:D8:E9:30";
     public static String userName;
     public static String dispPicUrl;
     private static final int STATE_DEFAULT = 0;
@@ -254,7 +258,7 @@ public class Login extends FragmentActivity implements
                                 final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                                 editor.putString("fb_name", user.getName());
                                 editor.putString("fb_id", user.getId());
-                                editor.commit();
+                                editor.apply();
                                 new AsyncGet(Login.this, "http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken(), new AsyncGet.AsyncResult() {
                                     @Override
                                     public void gotResult(String s) {
@@ -370,24 +374,57 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String token = null;
+                String token;
+                String scopes = "oauth2:" +
+                        "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/plus.login";
                 try {
                     token = GoogleAuthUtil.getToken(
                             Login.this,
-                            Plus.AccountApi.getAccountName(mGoogleApiClient) + "",
-                            "oauth2:" + "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/plus.login"
-                    );
-                } catch (IOException | GoogleAuthException e) {
-                    e.printStackTrace();
-
+                            Plus.AccountApi.getAccountName(mGoogleApiClient),
+                            scopes);
+                    Log.e("AccessToken", token);
+                } catch (IOException transientEx) {
+                    // network or server error, the call is expected to succeed if you try again later.
+                    // Don't attempt to call again immediately - the request is likely to
+                    // fail, you'll hit quotas or back-off.
+                    return;
+                } catch (UserRecoverableAuthException e) {
+                    // Recover
+                    token = null;
+                } catch (GoogleAuthException authEx) {
+                    // Failure. The call is not expected to ever succeed so it should not be
+                    // retried.
+                    return;
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
                 Log.e("AccessToken", token);
-                Toast.makeText(Login.this, token, Toast.LENGTH_LONG).show();
-                editor.putString("loginskip", "true");
-                editor.putString("token", token);
-                editor.apply();
-                startActivity(new Intent(Login.this, Home.class));
-                finish();
+                Toast.makeText(Login.this, "G+ Token:\n" + token, Toast.LENGTH_LONG).show();
+                final String gplusToken = token;
+
+                new AsyncGet(Login.this, "http://api.clozerr.com/auth/login/google?token=" + gplusToken, new AsyncGet.AsyncResult() {
+                    @Override
+                    public void gotResult(String s) {
+                                        /*Log.i("urltest","http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken());
+                                        Log.i("token result", s);*/
+                        try {
+                            JSONObject res = new JSONObject(s);
+                            if (res.getString("result").equals("true")) {
+                                editor.putString("loginskip", "true");
+                                editor.putString("token", res.getString("token"));
+                                editor.apply();
+                                startActivity(new Intent(Login.this, Home.class));
+                                finish();
+                            } else {
+                                Toast.makeText(Login.this, gplusToken,Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Login.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            Toast.makeText(Login.this, "Something went wrong...", Toast.LENGTH_SHORT).show();
+                            e.printStackTrace();
+                        }
+                    }
+                });
             }
         }).start();
     }
