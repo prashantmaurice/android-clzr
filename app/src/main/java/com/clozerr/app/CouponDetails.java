@@ -1,9 +1,11 @@
 package com.clozerr.app;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -54,7 +56,7 @@ public class CouponDetails extends ActionBarActivity {
     private Toolbar backToolbar;
     private TextView titleView, locView, nextOfferView, detailsView;
     private ImageView itemImageView;
-    private CircleImageView callButton, dirButton;
+    private CircleImageView callButton, dirButton, rateButton;
     private TextView checkinButton;
     private Bundle detailsBundle;
     private String pinNumber, gcmId;
@@ -66,6 +68,11 @@ public class CouponDetails extends ActionBarActivity {
         System.out.println("set content view");
         Intent callingIntent = getIntent();
         initViews();
+        String checkin_id_review;
+        if(callingIntent.getBooleanExtra("from_notify_review",false)) {
+            checkin_id_review = callingIntent.getStringExtra("checkin_id");
+            feedback(checkin_id_review);
+        }
 
         detailsBundle = new Bundle();
         String vendor_id = callingIntent.getStringExtra("vendor_id");
@@ -74,6 +81,7 @@ public class CouponDetails extends ActionBarActivity {
 
         detailsBundle.putString("offerId", offer_id);
         detailsBundle.putString("offerText", offer_text);
+        final ArrayList<String> ques_arr = new ArrayList<String>();
 
 
         //Toast.makeText(this, "id - " + vendor_id, Toast.LENGTH_SHORT).show();
@@ -105,6 +113,10 @@ public class CouponDetails extends ActionBarActivity {
                             object.getString("fid"),object.getString("_id"),
                             0
                     );
+                     /*JSONArray question= object.getJSONArray("question");
+                    for(int i=0;i<question.length();i++){
+                      ques_arr.add(question.getString(i));
+                    }*/
                     //Log.e("title", currentItem.getTitle());
                     //Toast.makeText(CouponDetails.this, "title - " + currentItem.getTitle(), Toast.LENGTH_SHORT).show();
                     detailsBundle.putString("vendorTitle", currentItem.getTitle());
@@ -117,6 +129,7 @@ public class CouponDetails extends ActionBarActivity {
                     detailsBundle.putDouble("longitude", currentItem.getLong());
                     detailsBundle.putString("distance", currentItem.getDistance());
                     detailsBundle.putString("phonenumber", phonenumber);
+
                     Log.i("fvgh",detailsBundle.toString());
 
                     try {
@@ -169,6 +182,57 @@ public class CouponDetails extends ActionBarActivity {
                         }
                     });
 
+                    /*rateButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Context c = CouponDetails.this;
+                            LayoutInflater lf = LayoutInflater.from(c);
+                            View feedbackView = lf.inflate(R.layout.dialog_reviews,null);
+                            RecyclerView rv = (RecyclerView) feedbackView.findViewById(R.id.list_questions);
+                            rv.setLayoutManager(new LinearLayoutManager(c));
+                            rv.setItemAnimator(new DefaultItemAnimator());
+                            rv.setHasFixedSize(true);
+
+
+                          ques_arr.add("How would you rate the ambiance of the restaurant?");
+                            ques_arr.add("How would you rate the ambiance of the restaurant?");
+                            ques_arr.add("How would you rate the ambiance of the restaurant?");
+                            ques_arr.add("How would you rate the ambiance of the restaurant?");
+                            ques_arr.add("How would you rate the ambiance of the restaurant?");
+                            ReviewQuestionsAdapter rqa = new ReviewQuestionsAdapter(ques_arr,c);
+                            rv.setAdapter(rqa);
+
+                            final AlertDialog.Builder adbuilder = new AlertDialog.Builder(c);
+                            adbuilder.setView(feedbackView);
+
+                            adbuilder.setCancelable(true);
+                            final AlertDialog alertDialog = adbuilder.create();
+                            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                            // show it
+                            alertDialog.show();
+                            Button submitButton = (Button) feedbackView.findViewById(R.id.submit_feedback);
+
+                            submitButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    alertDialog.dismiss();
+                                    //submit the reviews
+                                    final String url_review = "";
+                                    new AsyncGet(CouponDetails.this, url_review, new AsyncGet.AsyncResult() {
+
+                                        @Override
+                                        public void gotResult(String s) {
+
+                                        }
+                                    });
+                                }
+
+
+                            });
+                        }
+                    });*/
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -189,6 +253,7 @@ public class CouponDetails extends ActionBarActivity {
         checkinButton = (TextView) findViewById(R.id.checkinButton);
         callButton = (CircleImageView) findViewById(R.id.itemCallButton);
         dirButton = (CircleImageView) findViewById(R.id.itemDirButton);
+        //rateButton = (CircleImageView) findViewById(R.id.itemRateButton);
         setSupportActionBar(backToolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -463,6 +528,52 @@ public class CouponDetails extends ActionBarActivity {
             }
         }
         checkinPopup.showAtLocation(detailsLayout, Gravity.CENTER, 0, 0);
+    }
+
+    public void feedback(String checkin_id)
+    {
+        Context c = getApplicationContext();
+        LayoutInflater lf = LayoutInflater.from(c);
+        View feedbackView = lf.inflate(R.layout.dialog_reviews,null);
+        RecyclerView rv = (RecyclerView) feedbackView.findViewById(R.id.list_questions);
+
+        ArrayList<String> ques_arr = new ArrayList<String>();
+        /*ques_arr.add("How would you rate the ambiance of the restaurant?");
+        ques_arr.add("How would you rate the ambiance of the restaurant?");
+        ques_arr.add("How would you rate the ambiance of the restaurant?");
+        ques_arr.add("How would you rate the ambiance of the restaurant?");
+        ques_arr.add("How would you rate the ambiance of the restaurant?");*/
+        ReviewQuestionsAdapter rqa = new ReviewQuestionsAdapter(ques_arr,c);
+        rv.setAdapter(rqa);
+
+        final AlertDialog.Builder adbuilder = new AlertDialog.Builder(c);
+        adbuilder.setView(feedbackView);
+
+        adbuilder.setCancelable(true);
+        final AlertDialog alertDialog = adbuilder.create();
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        // show it
+        alertDialog.show();
+        Button submitButton = (Button) feedbackView.findViewById(R.id.submit_feedback);
+
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+                //submit the reviews
+                final String url_review = "";           //fill the url - use function getStarCount(position) to get the stars
+                new AsyncGet(CouponDetails.this, url_review, new AsyncGet.AsyncResult() {
+
+                    @Override
+                    public void gotResult(String s) {
+                        Toast.makeText(getApplicationContext(),"Thank you for your reviews",Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
+            }
+        });
+
     }
 
     public void showConfirmPopup(String pin) {
