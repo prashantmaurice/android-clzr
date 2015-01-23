@@ -388,12 +388,16 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                 }
                 Log.e("AccessToken", token);
                 //Toast.makeText(Login.this, token, Toast.LENGTH_LONG).show();
-
-                editor.putString("loginskip", "true");
-                editor.putString("token", token);
-                editor.apply();
-                startActivity(new Intent(Login.this, Home.class));
-                finish();
+                new AsyncGet(Login.this,"http://api.clozerr.com/auth/login/google?token="+token,new AsyncGet.AsyncResult() {
+                    @Override
+                    public void gotResult(String s) {
+                        editor.putString("loginskip", "true");
+                        editor.putString("token", token);
+                        editor.apply();
+                        startActivity(new Intent(Login.this, Home.class));
+                        finish();
+                    }
+                });
             }
         }).start();
     }
