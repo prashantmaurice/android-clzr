@@ -13,6 +13,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
@@ -369,9 +370,9 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
         editor.putString("gplus_name", userName);
         editor.putString("gplus_id", currentUser.getId());
         editor.putString("gplus_pic", dispPicUrl);
-        editor.commit();
+        editor.apply();
 
-        new Thread(new Runnable() {
+        /*Thread tokenThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 String token;
@@ -382,7 +383,7 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                             Login.this,
                             Plus.AccountApi.getAccountName(mGoogleApiClient),
                             scopes);
-                    Log.e("AccessToken", token);
+                    // Log.e("AccessToken", token);
                 } catch (IOException transientEx) {
                     // network or server error, the call is expected to succeed if you try again later.
                     // Don't attempt to call again immediately - the request is likely to
@@ -398,15 +399,15 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-                Log.e("AccessToken", token);
+                //Log.e("AccessToken", token);
                 Toast.makeText(Login.this, "G+ Token:\n" + token, Toast.LENGTH_LONG).show();
                 final String gplusToken = token;
 
                 new AsyncGet(Login.this, "http://api.clozerr.com/auth/login/google?token=" + gplusToken, new AsyncGet.AsyncResult() {
                     @Override
                     public void gotResult(String s) {
-                                        /*Log.i("urltest","http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken());
-                                        Log.i("token result", s);*/
+                                        *//*Log.i("urltest","http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken());
+                                        Log.i("token result", s);*//*
                         try {
                             JSONObject res = new JSONObject(s);
                             if (res.getString("result").equals("true")) {
@@ -426,7 +427,43 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                     }
                 });
             }
-        }).start();
+        });
+        tokenThread.start();*/
+        final Handler handler = getWindow().getDecorView().getHandler();
+        new AsyncTokenGet(this, new AsyncTokenGet.AsyncTokenResult() {
+            @Override
+            public void gotResult(final String s) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(Login.this, "G+ Token:\n" + s, Toast.LENGTH_LONG).show();
+                        new AsyncGet(Login.this, "http://api.clozerr.com/auth/login/google?token=" + s, new AsyncGet.AsyncResult() {
+                            @Override
+                            public void gotResult(String s) {
+                                //Log.i("urltest","http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken());
+                                //Log.i("token result", s);
+                                try {
+                                    JSONObject res = new JSONObject(s);
+                                    if (res.getString("result").equals("true")) {
+                                        editor.putString("loginskip", "true");
+                                        editor.putString("token", res.getString("token"));
+                                        editor.apply();
+                                        startActivity(new Intent(Login.this, Home.class));
+                                        finish();
+                                    } else {
+                                        Toast.makeText(Login.this, s,Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(Login.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
+                                    }
+                                } catch (JSONException e) {
+                                    Toast.makeText(Login.this, "Something went wrong...", Toast.LENGTH_SHORT).show();
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
     }
     @Override
     public void onConnectionSuspended(int i) {
