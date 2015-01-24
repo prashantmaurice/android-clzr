@@ -23,9 +23,9 @@
 
             <Button
                 android:layout_width="match_parent"
-                android:text="Suggest a Restaurant"
-                android:textSize="15sp"
-                android:textColor="#000000"
+                android:text="SUGGEST A RESTAURANT"
+                android:textSize="13sp"
+                android:textColor="#ff434444"
                 android:onClick="prompt"
                 android:layout_height="35dp"
                 android:background="#FFFFFF"
@@ -33,7 +33,7 @@
                 android:layout_marginTop="0dp"
                 android:layout_marginBottom="0dp"
                 style="@style/rect_answer"
-                />
+                android:textStyle="bold" />
         <!-- activity view -->
         <RelativeLayout
             android:layout_width="match_parent"

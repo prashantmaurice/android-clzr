@@ -46,6 +46,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Vector;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -417,8 +418,14 @@ public class CouponDetails extends ActionBarActivity {
                      // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
 
 
-                      RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyCard(s), CouponDetails.this);
-                      mRecyclerView.setAdapter(Cardadapter);
+                      /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyCard(s), CouponDetails.this);
+                      mRecyclerView.setAdapter(Cardadapter);*/
+
+                      List<MyOffer> myOffers = convertRowMyCard(s);
+                      MyOffer currentOffer = getCurrentOffer(s);
+
+                      MyOffersRecyclerViewAdapter myOffersAdapter = new MyOffersRecyclerViewAdapter(myOffers, currentOffer, CouponDetails.this);
+                      mRecyclerView.setAdapter(myOffersAdapter);
 
                       //l1.setAdapter(adapter);
                       if(s==null) {
@@ -605,7 +612,7 @@ public class CouponDetails extends ActionBarActivity {
         confirmPopup.showAtLocation(detailsLayout, Gravity.CENTER, 0, 0);
     }
 
-    public void JSONParseCheckin(String input)
+    /*public void JSONParseCheckin(String input)
     {
         try {
             JSONObject reader = new JSONObject(input);
@@ -626,5 +633,17 @@ public class CouponDetails extends ActionBarActivity {
         }
 
         //DrawerLayout d1 = (DrawerLayout) findViewById(R.id.drawerLayout);
+    }*/
+
+    public MyOffer getCurrentOffer(String data) {
+        try {
+            JSONObject currentOfferJson = new JSONObject(data).getJSONArray("offers_qualified").getJSONObject(0);
+            MyOffer currentOffer = new MyOffer(currentOfferJson.getString("caption"),
+                    currentOfferJson.getInt("stamps"));
+            return currentOffer;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
