@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -20,7 +19,6 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -29,19 +27,14 @@ import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.model.GraphUser;
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -49,9 +42,6 @@ public class Login extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         View.OnClickListener {
     private static final String TAG = "clozerr";
-    private static final String GOOGLE_PLUS_PROJECT_ID = "key-surf-834";
-    private static final String GOOGLE_PLUS_CLIENT_ID = "597460526405-i65fhqcbsn0khe3b25qsfav4cohs9dkn.apps.googleusercontent.com";
-    private static final String SHA1_HASH = "71:E4:E8:FC:F5:46:67:14:BB:C1:93:E5:A4:82:9A:84:BF:D8:E9:30";
     public static String userName;
     public static String dispPicUrl;
     private static final int STATE_DEFAULT = 0;
@@ -99,10 +89,7 @@ public class Login extends FragmentActivity implements
      */
     private ViewPager mPager;
     int i=0;
-    /**
-     * The pager adapter, which provides the pages to the view pager widget.
-     */
-    private PagerAdapter mPagerAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,7 +106,10 @@ public class Login extends FragmentActivity implements
         final Resources reso = this.getResources();
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setPageTransformer(true, new ZoomOutPageTransformer());
-        mPagerAdapter = new ScreenSlidePagerAdapter(getFragmentManager());
+        /*
+      The pager adapter, which provides the pages to the view pager widget.
+     */
+        PagerAdapter mPagerAdapter = new ScreenSlidePagerAdapter(getFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -130,27 +120,27 @@ public class Login extends FragmentActivity implements
                 ImageView slide4=(ImageView)findViewById(R.id.slide4);
                 ImageView slide5=(ImageView)findViewById(R.id.slide5);
 //slide1.setAlpha(0.0f);
-                slide1.setBackground((GradientDrawable) reso.getDrawable(R.drawable.image_slider));
-                slide2.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
-                slide3.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
-                slide4.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
-                slide5.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
+                slide1.setBackground(reso.getDrawable(R.drawable.image_slider));
+                slide2.setBackground(reso.getDrawable(R.drawable.image_slider));
+                slide3.setBackground(reso.getDrawable(R.drawable.image_slider));
+                slide4.setBackground(reso.getDrawable(R.drawable.image_slider));
+                slide5.setBackground(reso.getDrawable(R.drawable.image_slider));
                 i=position;
                 switch (position){
                     case 0:
-                        slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
+                        slide1.setBackground(reso.getDrawable(R.drawable.image_slider_current));
                         break;
                     case 1:
-                        slide2.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
+                        slide2.setBackground(reso.getDrawable(R.drawable.image_slider_current));
                         break;
                     case 2:
-                        slide3.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
+                        slide3.setBackground(reso.getDrawable(R.drawable.image_slider_current));
                         break;
                     case 3:
-                        slide4.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
+                        slide4.setBackground(reso.getDrawable(R.drawable.image_slider_current));
                         break;
                     case 4:
-                        slide5.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
+                        slide5.setBackground(reso.getDrawable(R.drawable.image_slider_current));
                         break;
                 }
                 invalidateOptionsMenu();
@@ -161,8 +151,8 @@ public class Login extends FragmentActivity implements
                     .getInt(SAVED_PROGRESS, STATE_DEFAULT);
         }
         mGoogleApiClient = buildGoogleApiClient();
-        int found=0;
-//slideToImage(2);
+        //int found=0;
+        //slideToImage(2);
         change();
     }
     public void change(){
@@ -194,7 +184,7 @@ public class Login extends FragmentActivity implements
         super.onStart();
 // EasyTracker.getInstance().activityStart(this);
 // The rest of your onStart() code.
-        mGoogleApiClient.connect();
+        //mGoogleApiClient.connect();
     }
     @Override
     public void onStop() {
@@ -212,7 +202,7 @@ public class Login extends FragmentActivity implements
             try {
                 Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
             } catch (Exception e) {
-                Toast.makeText(Login.this, "Oops. Something went wrong. Please try again later", Toast.LENGTH_SHORT);
+                Toast.makeText(Login.this, "Oops. Something went wrong. Please try again later", Toast.LENGTH_SHORT).show();
             }
         }
         else{
@@ -296,7 +286,7 @@ public class Login extends FragmentActivity implements
         SharedPreferences.Editor editor = example.edit();
         editor.putString("loginskip", "true");
         editor.putString("notNow","true");
-        editor.commit();
+        editor.apply();
         startActivity(new Intent(this, Home.class));
         finish();
     }
@@ -310,7 +300,7 @@ public class Login extends FragmentActivity implements
         return true;
     }
     public void slide(View v) {
-        final Resources reso = this.getResources();
+        //final Resources reso = this.getResources();
         switch (v.getId()) {
             case R.id.slide1:
                 mPager.setCurrentItem(0);
@@ -380,7 +370,7 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(Login.this, "G+ Token:\n" + s, Toast.LENGTH_LONG).show();
+                        //Toast.makeText(Login.this, "G+ Token:\n" + s, Toast.LENGTH_LONG).show();
                         new AsyncGet(Login.this, "http://api.clozerr.com/auth/login/google?token=" + s, new AsyncGet.AsyncResult() {
                             @Override
                             public void gotResult(String s) {
@@ -395,7 +385,7 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                                         startActivity(new Intent(Login.this, Home.class));
                                         finish();
                                     } else {
-                                        Toast.makeText(Login.this, s,Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(Login.this, s,Toast.LENGTH_SHORT).show();
                                         Toast.makeText(Login.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
                                     }
                                 } catch (JSONException e) {
@@ -421,33 +411,14 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
 // between connected and not connected.
             switch (v.getId()) {
                 case R.id.sign_in_button:
-                    Toast.makeText(this, "Signing in...", Toast.LENGTH_LONG).show();
-                    resolveSignInError();
+                    //Toast.makeText(this, "Signing in...", Toast.LENGTH_LONG).show();
+                    mGoogleApiClient.connect();
+                    //resolveSignInError();
                     break;
-/*case R.id.sign_out_button:
-// We clear the default account on sign out so that Google Play
-// services will not return an onConnected callback without user
-// interaction.
-Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-mGoogleApiClient.disconnect();
-mGoogleApiClient.connect();
-break;
-case R.id.revoke_access_button:
-// After we revoke permissions for the user with a GoogleApiClient
-// instance, we must discard it and create a new one.
-Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-// Our sample has caches no user data from Google+, however we
-// would normally register a callback on revokeAccessAndDisconnect
-// to delete user data so that we comply with Google developer
-// policies.
-Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApiClient);
-mGoogleApiClient = buildGoogleApiClient();
-mGoogleApiClient.connect();
-break;*/
             }
         }
     }
-        @Override
+    @Override
     public void onConnectionFailed(ConnectionResult result) {
         Log.i(TAG, "onConnectionFailed: ConnectionResult.getErrorCode() = "
                 + result.getErrorCode());
@@ -468,7 +439,7 @@ break;*/
         } else if (mSignInProgress != STATE_IN_PROGRESS) {
 // We do not have an intent in progress so we should store the latest
 // error resolution intent for use when the sign in button is clicked.
-            Toast.makeText(this, "Storing error resolution intent; click sign in again", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "Error; try signing in again", Toast.LENGTH_LONG).show();
             mSignInIntent = result.getResolution();
             mSignInError = result.getErrorCode();
             if (mSignInProgress == STATE_SIGN_IN) {

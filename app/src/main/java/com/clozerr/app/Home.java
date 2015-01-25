@@ -7,13 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -26,14 +22,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -48,7 +40,6 @@ import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.plus.Plus;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URLEncoder;
@@ -78,10 +69,10 @@ public class Home  extends ActionBarActivity {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private ListView leftDrawerList;
-    private ArrayAdapter<String> navigationDrawerAdapter;
+    //private ArrayAdapter<String> navigationDrawerAdapter;
     private NavDrawAdapter nav;
     private String[] leftSliderData = {"ABOUT US","FAQ'S","LIKE/FOLLOW CLOZERR","RATE CLOZERR", "LOGOUT"};
-    private boolean nav_drawer_open = false;
+    //private boolean nav_drawer_open = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,7 +183,7 @@ public class Home  extends ActionBarActivity {
                 }
                 SharedPreferences status = getSharedPreferences("USER", 0);
                 TOKEN = status.getString("token", "");
-                String url = "";
+                String url;
                 if(!TOKEN.equals(""))
                     url = "http://api.clozerr.com/vendor/get/near?latitude="+lat+"&longitude="+longi+"&access_token="+TOKEN;
                 else
@@ -249,20 +240,19 @@ public class Home  extends ActionBarActivity {
                 }
             });
             builder.create().show();
-            return;
         }
     }
 
     public int logincheck(){
         SharedPreferences status = getSharedPreferences("USER", 0);
         TOKEN = status.getString("token", "");
-        if (Login.googleOrFb == 1)
+        if (status.contains("fb_id"))
         {
             USERID = status.getString("fb_id", "");
             USERNAME = status.getString("fb_name", "");
             USER_PIC_URL = "https://graph.facebook.com/" + USERID + "/picture?type=large&width=200&height=200";
         }
-        else if (Login.googleOrFb == 2)
+        else if (status.contains("gplus_id"))
         {
             USERID = status.getString("gplus_id", "");
             USERNAME = status.getString("gplus_name", "");
@@ -327,10 +317,10 @@ public class Home  extends ActionBarActivity {
         //navigationDrawerAdapter=new ArrayAdapter<String>( Home.this, android.R.layout.simple_list_item_1, leftSliderData);
        // navigationDrawerAdapter=new ArrayAdapter<String>( Home.this, R.layout.navdrawlist,R.id.textView, leftSliderData);
        // Log.i("omy",leftSliderData[0]);
-        List<String> l = Arrays.<String>asList(leftSliderData);
+        List<String> l = Arrays.asList(leftSliderData);
 
 // if List<String> isnt specific enough:
-        ArrayList<String> al = new ArrayList<String>(l);
+        ArrayList<String> al = new ArrayList<>(l);
        // ArrayList<String> arr ;
        // arr= (ArrayList<String>) Arrays.asList(leftSliderData);
         nav=new NavDrawAdapter(this,al);
@@ -398,7 +388,7 @@ public class Home  extends ActionBarActivity {
                     {
                         Plus.AccountApi.clearDefaultAccount(Login.mGoogleApiClient);
                         Login.mGoogleApiClient.disconnect();
-                        Login.mGoogleApiClient.connect();
+                        //Login.mGoogleApiClient.connect();
                     }
                     else if (Login.googleOrFb == 1)
                     {
@@ -493,13 +483,12 @@ public class Home  extends ActionBarActivity {
 
 
     private List<CardModel> convertRow(String s) {
-        List<CardModel> rowItems;
-        rowItems = new ArrayList<CardModel>();
+        List<CardModel> rowItems = new ArrayList<>();
         JSONArray array;
         try {
             array = new JSONArray(s);
             for(int i = 0 ; i < array.length() ; i++){
-                String phonenumber = "";
+                String phonenumber;
                 try {
                     phonenumber = array.getJSONObject(i).getString("phonenumber");
                 }
@@ -507,7 +496,7 @@ public class Home  extends ActionBarActivity {
                 {
                     phonenumber="0123456789";
                 }
-                String vendorDescription = "";
+                String vendorDescription;
                 try {
                     vendorDescription = array.getJSONObject(i).getString("description");
                 }
@@ -539,8 +528,7 @@ public class Home  extends ActionBarActivity {
         return rowItems;
     }
     private List<CardModel> convertRowMyCard(String s) {
-        List<CardModel> rowItems;
-        rowItems = new ArrayList<CardModel>();
+        List<CardModel> rowItems = new ArrayList<>();
         JSONObject temp;
         JSONArray array;
         try {
@@ -594,7 +582,7 @@ public class Home  extends ActionBarActivity {
         final EditText remark = (EditText) promptsView.findViewById(R.id.text2);
 
 
-        final String s2=remark.getText().toString();
+        //final String s2=remark.getText().toString();
 
         // set dialog message
         alertDialogBuilder
@@ -677,7 +665,7 @@ public class Home  extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        boolean superBackPressed = false;
+        //boolean superBackPressed = false;
         SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer);
         if(drawer.isOpened()) {
             drawer.close();
