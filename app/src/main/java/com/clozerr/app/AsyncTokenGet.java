@@ -1,5 +1,6 @@
 package com.clozerr.app;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -17,11 +18,13 @@ import java.io.IOException;
 public class AsyncTokenGet extends AsyncTask<Void, Void, String> {
 
     Context mContext;
+    Activity mInvokingActivity;
     AsyncTokenResult mResult;
     ProgressDialog pDialog;
-    public AsyncTokenGet(Context context, AsyncTokenResult result) {
+    public AsyncTokenGet(Context context, AsyncTokenResult result, Activity invokingActivity ) {
         mContext = context;
         mResult = result;
+        mInvokingActivity = invokingActivity;
 
         pDialog = new ProgressDialog(context);
         pDialog.setMessage("Loading...");
@@ -35,7 +38,7 @@ public class AsyncTokenGet extends AsyncTask<Void, Void, String> {
     protected String doInBackground(Void... params) {
         String token;
         String scopes = "oauth2:" +
-                "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/plus.login";
+                "https://www.googleapis.com/auth/userinfo.profile";
         try {
             token = GoogleAuthUtil.getToken(
                     mContext,
@@ -49,6 +52,7 @@ public class AsyncTokenGet extends AsyncTask<Void, Void, String> {
             return null;
         } catch (UserRecoverableAuthException e) {
             // Recover
+            mInvokingActivity.startActivityForResult(e.getIntent(), 0);
             token = null;
         } catch (GoogleAuthException authEx) {
             // Failure. The call is not expected to ever succeed so it should not be

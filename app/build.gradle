@@ -1,9 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('/Users/saipraveenb/Documents/android.jks')
+            keyAlias 'clozerr_key'
+            keyPassword 'clozerr'
+            storePassword 'clozerr'
+        }
+    }
     compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
     buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
-
     defaultConfig {
         applicationId "com.clozerr.app"
         minSdkVersion 16
@@ -29,6 +36,4 @@ dependencies {
     compile 'com.koushikdutta.ion:ion:2.+'
     compile files('libraries/android-support-v13.jar')
     compile 'com.google.android.gms:play-services:6.+'
-
-
 }

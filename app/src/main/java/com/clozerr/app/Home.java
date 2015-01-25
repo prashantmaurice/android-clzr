@@ -48,6 +48,7 @@ import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.plus.Plus;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URLEncoder;
@@ -92,6 +93,13 @@ public class Home  extends ActionBarActivity {
         final String regId = GCMRegistrar.getRegistrationId(this);
         if (regId.equals("")) {
             GCMRegistrar.register(this, SENDER_ID);
+        }else{
+            new AsyncGet(Home.this, "http://api.clozerr.com/auth/update/gcm?gcm_id=" + regId, new AsyncGet.AsyncResult() {
+                @Override
+                public void gotResult(String s) {
+                    Log.e("gcm_update_result",s);
+                }
+            });
         }
 
         if (logincheck()==0)

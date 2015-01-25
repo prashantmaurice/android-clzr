@@ -372,63 +372,7 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
         editor.putString("gplus_pic", dispPicUrl);
         editor.apply();
 
-        /*Thread tokenThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String token;
-                String scopes = "oauth2:" +
-                        "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/plus.login";
-                try {
-                    token = GoogleAuthUtil.getToken(
-                            Login.this,
-                            Plus.AccountApi.getAccountName(mGoogleApiClient),
-                            scopes);
-                    // Log.e("AccessToken", token);
-                } catch (IOException transientEx) {
-                    // network or server error, the call is expected to succeed if you try again later.
-                    // Don't attempt to call again immediately - the request is likely to
-                    // fail, you'll hit quotas or back-off.
-                    return;
-                } catch (UserRecoverableAuthException e) {
-                    // Recover
-                    token = null;
-                } catch (GoogleAuthException authEx) {
-                    // Failure. The call is not expected to ever succeed so it should not be
-                    // retried.
-                    return;
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-                //Log.e("AccessToken", token);
-                Toast.makeText(Login.this, "G+ Token:\n" + token, Toast.LENGTH_LONG).show();
-                final String gplusToken = token;
 
-                new AsyncGet(Login.this, "http://api.clozerr.com/auth/login/google?token=" + gplusToken, new AsyncGet.AsyncResult() {
-                    @Override
-                    public void gotResult(String s) {
-                                        *//*Log.i("urltest","http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken());
-                                        Log.i("token result", s);*//*
-                        try {
-                            JSONObject res = new JSONObject(s);
-                            if (res.getString("result").equals("true")) {
-                                editor.putString("loginskip", "true");
-                                editor.putString("token", res.getString("token"));
-                                editor.apply();
-                                startActivity(new Intent(Login.this, Home.class));
-                                finish();
-                            } else {
-                                Toast.makeText(Login.this, gplusToken,Toast.LENGTH_SHORT).show();
-                                Toast.makeText(Login.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
-                            }
-                        } catch (JSONException e) {
-                            Toast.makeText(Login.this, "Something went wrong...", Toast.LENGTH_SHORT).show();
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            }
-        });
-        tokenThread.start();*/
         final Handler handler = getWindow().getDecorView().getHandler();
         new AsyncTokenGet(this, new AsyncTokenGet.AsyncTokenResult() {
             @Override
@@ -463,7 +407,7 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                     }
                 });
             }
-        });
+        }, this);
     }
     @Override
     public void onConnectionSuspended(int i) {
@@ -507,7 +451,15 @@ break;*/
     public void onConnectionFailed(ConnectionResult result) {
         Log.i(TAG, "onConnectionFailed: ConnectionResult.getErrorCode() = "
                 + result.getErrorCode());
-        if (result.getErrorCode() == ConnectionResult.API_UNAVAILABLE) {
+
+        if( result.getErrorCode() == ConnectionResult.SIGN_IN_REQUIRED ){
+            try {
+                result.startResolutionForResult(Login.this, 0);
+            }catch( Exception e ){
+                e.printStackTrace();
+            }
+        }
+        else if (result.getErrorCode() == ConnectionResult.API_UNAVAILABLE) {
 // An API requested for GoogleApiClient is not available. The device's current
 // configuration might not be supported with the requested API or a required component
 // may not be installed, such as the Android Wear application. You may need to use a

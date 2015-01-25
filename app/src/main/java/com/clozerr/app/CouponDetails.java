@@ -80,6 +80,7 @@ public class CouponDetails extends ActionBarActivity {
         String offer_id = callingIntent.getStringExtra("offer_id");
         String offer_text = callingIntent.getStringExtra("offer_text");
 
+
         detailsBundle.putString("offerId", offer_id);
         detailsBundle.putString("offerText", offer_text);
         final ArrayList<String> ques_arr = new ArrayList<String>();
@@ -545,11 +546,7 @@ public class CouponDetails extends ActionBarActivity {
         RecyclerView rv = (RecyclerView) feedbackView.findViewById(R.id.list_questions);
 
         ArrayList<String> ques_arr = new ArrayList<String>();
-        /*ques_arr.add("How would you rate the ambiance of the restaurant?");
-        ques_arr.add("How would you rate the ambiance of the restaurant?");
-        ques_arr.add("How would you rate the ambiance of the restaurant?");
-        ques_arr.add("How would you rate the ambiance of the restaurant?");
-        ques_arr.add("How would you rate the ambiance of the restaurant?");*/
+
         ReviewQuestionsAdapter rqa = new ReviewQuestionsAdapter(ques_arr,c);
         rv.setAdapter(rqa);
 
