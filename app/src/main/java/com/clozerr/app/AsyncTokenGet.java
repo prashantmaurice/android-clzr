@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.plus.Plus;
 
 import java.io.IOException;
@@ -34,8 +35,8 @@ public class AsyncTokenGet extends AsyncTask<Void, Void, String> {
     @Override
     protected String doInBackground(Void... params) {
         String token;
-        String scopes = "oauth2:" +
-                "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/plus.login";
+        String scopes = "oauth2:" + Scopes.PLUS_LOGIN;
+                //"https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/plus.login";
         try {
             token = GoogleAuthUtil.getToken(
                     mContext,
