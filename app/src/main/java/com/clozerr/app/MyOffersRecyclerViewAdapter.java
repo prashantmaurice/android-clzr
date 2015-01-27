@@ -53,14 +53,14 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
 
     MyOffersRecyclerViewAdapter(List<MyOffer> allOffers, MyOffer currentOffer, Context context) {
         c = context;
-        items = new ArrayList<>(3);
+        items = new ArrayList<>();
         Log.e("offerlist", String.valueOf(allOffers.size()));
         MyOffersCardModel model = new MyOffersCardModel("USED", c, allOffers.subList(0, currentOffer.getStamps() - 1));
-        items.add(model);
+        if (model.getMyOfferAdapter().getItemCount() > 0) items.add(model);
         model = new MyOffersCardModel("UPCOMING", c, allOffers.subList(currentOffer.getStamps() - 1, currentOffer.getStamps()));
-        items.add(model);
+        if (model.getMyOfferAdapter().getItemCount() > 0) items.add(model);
         model = new MyOffersCardModel("LATER", c, allOffers.subList(currentOffer.getStamps(), allOffers.size()));
-        items.add(model);
+        if (model.getMyOfferAdapter().getItemCount() > 0) items.add(model);
     }
 
     @Override

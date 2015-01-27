@@ -70,7 +70,7 @@ public class FAQ extends ActionBarActivity {
                     else{
                         final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                         editor.putString("faq_html", faq_html);
-                        editor.commit();
+                        editor.apply();
                         webView.loadData(faq_html,"text/html",null);
                     }
 

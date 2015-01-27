@@ -67,7 +67,7 @@ public class AboutUs extends ActionBarActivity {
                     else{
                         final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                         editor.putString("about_us_html", about_us_html);
-                        editor.commit();
+                        editor.apply();
                         webView.loadData(about_us_html,"text/html",null);
                     }
 
