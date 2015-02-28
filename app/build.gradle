@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         debug {
-            storeFile file('/Users/saipraveenb/Documents/android.jks')
+            storeFile file('../android.jks')
             keyAlias 'clozerr_key'
             keyPassword 'clozerr'
             storePassword 'clozerr'

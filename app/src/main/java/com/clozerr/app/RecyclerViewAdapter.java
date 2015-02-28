@@ -70,7 +70,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         Ion.with(c).load(model.getImageId()).withBitmap().placeholder(R.drawable.defoffer).transform(new com.koushikdutta.ion.bitmap.Transform() {
             public Bitmap transform(Bitmap bitmap) {
-                Log.d("Bitmap tranform", "wd:" + viewHolder.imageView.getWidth() + " ht:" + viewHolder.imageView.getHeight() );
+                Log.d("Bitmap transform", "wd:" + viewHolder.imageView.getWidth() + " ht:" + viewHolder.imageView.getHeight() );
                 Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(output);
 
@@ -151,6 +151,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         vendor_name_temp = currentItem.getTitle();
                         detailIntent.putExtra("vendor_id", currentItem.getVendorId());
                         detailIntent.putExtra("offer_id", currentItem.getOfferId());
+                        detailIntent.putExtra("offer_caption", currentItem.getCaption());
                         detailIntent.putExtra("offer_text", currentItem.getOfferDescription());
 
                         c.startActivity(detailIntent);

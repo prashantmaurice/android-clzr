@@ -11,10 +11,12 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -43,7 +45,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -79,10 +83,11 @@ public class CouponDetails extends ActionBarActivity {
         String vendor_id = callingIntent.getStringExtra("vendor_id");
         String offer_id = callingIntent.getStringExtra("offer_id");
         String offer_text = callingIntent.getStringExtra("offer_text");
-
+        String offer_caption = callingIntent.getStringExtra("offer_caption");
 
         detailsBundle.putString("offerId", offer_id);
         detailsBundle.putString("offerText", offer_text);
+        detailsBundle.putString("offerCaption", offer_caption);
         final ArrayList<String> ques_arr = new ArrayList<String>();
 
 
@@ -459,7 +464,7 @@ public class CouponDetails extends ActionBarActivity {
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View displayView = inflater.inflate(layoutId, null);
         popupWindow.setFocusable(true);
-        popupWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
+        popupWindow.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
         popupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
         popupWindow.setAnimationStyle(R.style.PopupWindowAnimation);
         popupWindow.setContentView(displayView);
@@ -583,26 +588,37 @@ public class CouponDetails extends ActionBarActivity {
     public void showConfirmPopup(String pin) {
 
         final PopupWindow confirmPopup = getNewPopupWindow(detailsLayout, R.layout.checkin_pin_confirm);
-        final LinearLayout displayView = (LinearLayout) confirmPopup.getContentView();
+        final LinearLayout displayView = ((LinearLayout)((CardView)((LinearLayout)(confirmPopup.getContentView())).
+                                            getChildAt(0)).getChildAt(0));
 
 
         for (int i = 0; i < displayView.getChildCount(); ++i) {
             View child = displayView.getChildAt(i);
             switch(child.getId()) {
-                case R.id.confirmButton: child.setOnClickListener
-                        (new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                               // Intent homeIntent = new Intent(getApplicationContext(), Home.class);
-                               // homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                              //  getApplicationContext().startActivity(homeIntent);
-                                CouponDetails.this.finish();
-                            }
-                        });
+                case R.id.confirmFrameLayout:
+                    child.findViewById(R.id.confirmButton).setOnClickListener(
+                            new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    // Intent homeIntent = new Intent(getApplicationContext(), Home.class);
+                                    // homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    //  getApplicationContext().startActivity(homeIntent);
+                                    CouponDetails.this.finish();
+                                }
+                            });
+                    break;
+                case R.id.dateTimeLayout:
+                    // TODO display date and time
+                    String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis())),
+                           time = new SimpleDateFormat("HH:mm").format(new Date(System.currentTimeMillis())) + " hrs";
+                    ((TextView)(child.findViewById(R.id.timeView))).setText(time);
+                    ((TextView)(child.findViewById(R.id.dateView))).setText(date);
                     break;
                 case R.id.pinView:  ((TextView) child).setText(pin);
                     break;
                 case R.id.confirmTitleView: ((TextView) child).setText(detailsBundle.getString("vendorTitle"));
+                    break;
+                case R.id.confirmOfferView: ((TextView) child).setText(detailsBundle.getString("offerCaption"));
                     break;
             }
         }

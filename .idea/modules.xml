@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/clozerr-master.iml" filepath="$PROJECT_DIR$/clozerr-master.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/libraries/facebook/facebook.iml" filepath="$PROJECT_DIR$/app/libraries/facebook/facebook.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/libraries/libraries.iml" filepath="$PROJECT_DIR$/app/libraries/libraries.iml" />
       <module fileurl="file://$PROJECT_DIR$/octo-ninja.iml" filepath="$PROJECT_DIR$/octo-ninja.iml" />
     </modules>
   </component>
