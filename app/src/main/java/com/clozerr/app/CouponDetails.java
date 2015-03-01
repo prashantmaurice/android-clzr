@@ -167,7 +167,7 @@ public class CouponDetails extends ActionBarActivity {
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            showCheckinPopup();
+                            showConfirmPopup();
                         }
                     });
 
@@ -478,71 +478,6 @@ public class CouponDetails extends ActionBarActivity {
         return popupWindow;
     }
 
-    public void showCheckinPopup() {
-        final PopupWindow checkinPopup = getNewPopupWindow(detailsLayout, R.layout.checkin_popup);
-        final LinearLayout displayView = (LinearLayout) checkinPopup.getContentView();
-
-        for (int i = 0; i < displayView.getChildCount(); ++i) {
-            View child = displayView.getChildAt(i);
-            class MyWebViewClient extends WebViewClient {
-                @Override
-                public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                    view.loadUrl(url);
-                    return true;
-                }
-            }
-            switch(child.getId()) {
-                case R.id.redeemButton: child.setOnClickListener
-                        (new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                                SharedPreferences status = getSharedPreferences("USER", 0);
-                                String TOKEN = status.getString("token", "");
-
-                                ((Button)displayView.findViewById(R.id.redeemButton)).setEnabled(false);
-                                String url="http://api.clozerr.com/checkin/create?access_token=" + TOKEN + "&vendor_id=" + detailsBundle.getString("vendorId") +"&offer_id=" + detailsBundle.getString("offerId");
-
-                                String gcm_id = GCMRegistrar.getRegistrationId(getApplicationContext());
-                                if( !gcm_id.equals("") )
-                                    url += "&gcm_id=" + gcm_id;
-
-                                Log.e("CouponDetails url", url);
-
-                               // Login.showProgressDialog(getApplicationContext());
-                                new AsyncGet(CouponDetails.this, url, new AsyncGet.AsyncResult() {
-                                    @Override
-                                    public void gotResult(String s) {
-                                        Log.e("pin", s);
-                                        try {
-                                              pinNumber = new JSONObject(s).getJSONObject("checkin").getString("pin");
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                        showConfirmPopup(pinNumber);
-                                        checkinPopup.dismiss();
-                                        if(s==null) {
-                                            Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                });
-                                //showConfirmPopup(pinNumber);
-                                //checkinPopup.dismiss();
-
-                            }
-                        });
-                    break;
-                case R.id.dialogTitleView: ((TextView) child).setText(detailsBundle.getString("vendorTitle"));
-                    break;
-                /*case R.id.dialogOfferView: ((TextView) child).setText(detailsBundle.getString("offerText"));
-                                           break;*/
-                /*case R.id.webview_offer: ((WebView) child).setWebViewClient(new MyWebViewClient());
-                                         ((WebView) child).lo*/
-            }
-        }
-        checkinPopup.showAtLocation(detailsLayout, Gravity.CENTER, 0, 0);
-    }
-
     public void feedback(String checkin_id)
     {
         Context c = getApplicationContext();
@@ -585,44 +520,70 @@ public class CouponDetails extends ActionBarActivity {
 
     }
 
-    public void showConfirmPopup(String pin) {
+    public void showConfirmPopup() {
 
-        final PopupWindow confirmPopup = getNewPopupWindow(detailsLayout, R.layout.checkin_pin_confirm);
-        final LinearLayout displayView = ((LinearLayout)((CardView)((LinearLayout)(confirmPopup.getContentView())).
-                                            getChildAt(0)).getChildAt(0));
+        SharedPreferences status = getSharedPreferences("USER", 0);
+        String TOKEN = status.getString("token", "");
+
+        String url="http://api.clozerr.com/checkin/create?access_token=" + TOKEN + "&vendor_id=" + detailsBundle.getString("vendorId") +"&offer_id=" + detailsBundle.getString("offerId");
+
+        String gcm_id = GCMRegistrar.getRegistrationId(getApplicationContext());
+        if( !gcm_id.equals("") )
+            url += "&gcm_id=" + gcm_id;
+
+        Log.e("CouponDetails url", url);
+
+        // Login.showProgressDialog(getApplicationContext());
+        new AsyncGet(CouponDetails.this, url, new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                Log.e("pin", s);
+                try {
+                    pinNumber = new JSONObject(s).getJSONObject("checkin").getString("pin");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                if(s==null) {
+                    Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
+                } else {
+                    final PopupWindow confirmPopup = getNewPopupWindow(detailsLayout, R.layout.checkin_pin_confirm);
+                    final LinearLayout displayView = ((LinearLayout)((CardView)((LinearLayout)(confirmPopup.getContentView())).
+                            getChildAt(0)).getChildAt(0));
 
 
-        for (int i = 0; i < displayView.getChildCount(); ++i) {
-            View child = displayView.getChildAt(i);
-            switch(child.getId()) {
-                case R.id.confirmFrameLayout:
-                    child.findViewById(R.id.confirmButton).setOnClickListener(
-                            new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    // Intent homeIntent = new Intent(getApplicationContext(), Home.class);
-                                    // homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    //  getApplicationContext().startActivity(homeIntent);
-                                    CouponDetails.this.finish();
-                                }
-                            });
-                    break;
-                case R.id.dateTimeLayout:
-                    // TODO display date and time
-                    String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis())),
-                           time = new SimpleDateFormat("HH:mm").format(new Date(System.currentTimeMillis())) + " hrs";
-                    ((TextView)(child.findViewById(R.id.timeView))).setText(time);
-                    ((TextView)(child.findViewById(R.id.dateView))).setText(date);
-                    break;
-                case R.id.pinView:  ((TextView) child).setText(pin);
-                    break;
-                case R.id.confirmTitleView: ((TextView) child).setText(detailsBundle.getString("vendorTitle"));
-                    break;
-                case R.id.confirmOfferView: ((TextView) child).setText(detailsBundle.getString("offerCaption"));
-                    break;
+                    for (int i = 0; i < displayView.getChildCount(); ++i) {
+                        View child = displayView.getChildAt(i);
+                        switch(child.getId()) {
+                            case R.id.confirmFrameLayout:
+                                child.findViewById(R.id.confirmButton).setOnClickListener(
+                                        new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                // Intent homeIntent = new Intent(getApplicationContext(), Home.class);
+                                                // homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                //  getApplicationContext().startActivity(homeIntent);
+                                                CouponDetails.this.finish();
+                                            }
+                                        });
+                                break;
+                            case R.id.dateTimeLayout:
+                                String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis())),
+                                        time = new SimpleDateFormat("HH:mm").format(new Date(System.currentTimeMillis())) + " hrs";
+                                ((TextView)(child.findViewById(R.id.timeView))).setText(time);
+                                ((TextView)(child.findViewById(R.id.dateView))).setText(date);
+                                break;
+                            case R.id.pinView:  ((TextView) child).setText(pinNumber);
+                                break;
+                            case R.id.confirmTitleView: ((TextView) child).setText(detailsBundle.getString("vendorTitle"));
+                                break;
+                            case R.id.confirmOfferView: ((TextView) child).setText(detailsBundle.getString("offerCaption"));
+                                break;
+                        }
+                    }
+                    confirmPopup.showAtLocation(detailsLayout, Gravity.CENTER, 0, 0);
+                }
             }
-        }
-        confirmPopup.showAtLocation(detailsLayout, Gravity.CENTER, 0, 0);
+        });
     }
 
     /*public void JSONParseCheckin(String input)

@@ -161,28 +161,58 @@
                 android:orientation="horizontal"
                 android:gravity="center"
                 android:id="@+id/dateTimeLayout"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:paddingLeft="90dp"
-                android:paddingRight="90dp">
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:paddingLeft="60dp"
+                android:paddingRight="60dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="time"
-                    android:id="@+id/timeView"
-                    android:textSize="15sp"
-                    android:textColor="#888888"
-                    android:layout_gravity="left|center_vertical"/>
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_gravity="start|center_vertical">
 
-                <TextView
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginRight="5dp"
+                        android:src="@drawable/clock_icon"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="time"
+                        android:id="@+id/timeView"
+                        android:textSize="15sp"
+                        android:textColor="#888888"
+                        android:layout_gravity="center_vertical"/>
+
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="date"
-                    android:id="@+id/dateView"
-                    android:textSize="15sp"
-                    android:textColor="#888888"
-                    android:layout_gravity="right|center_vertical"/>
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_gravity="end|center_vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginRight="5dp"
+                        android:src="@drawable/calendar_icon"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="date"
+                        android:id="@+id/dateView"
+                        android:textSize="15sp"
+                        android:textColor="#888888"
+                        android:layout_gravity="center_vertical"/>
+
+                </LinearLayout>
 
             </FrameLayout>
 
