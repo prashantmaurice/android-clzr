@@ -17,12 +17,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.format.Time;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -466,6 +468,7 @@ public class CouponDetails extends ActionBarActivity {
         popupWindow.setFocusable(true);
         popupWindow.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
         popupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         popupWindow.setAnimationStyle(R.style.PopupWindowAnimation);
         popupWindow.setContentView(displayView);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
