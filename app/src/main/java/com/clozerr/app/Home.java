@@ -210,6 +210,8 @@ public class Home  extends ActionBarActivity {
             }
 
         });
+
+        new BeaconFinder(getApplicationContext()).findBeacons();
         slidingMyCards();
     }
 

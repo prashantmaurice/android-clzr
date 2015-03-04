@@ -1,6 +1,7 @@
 package com.clozerr.app;
 
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -73,6 +74,7 @@ public class CouponDetails extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_coupon_details);
         System.out.println("set content view");
+
         Intent callingIntent = getIntent();
         initViews();
         String checkin_id_review;
