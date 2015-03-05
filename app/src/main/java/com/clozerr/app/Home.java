@@ -211,7 +211,7 @@ public class Home  extends ActionBarActivity {
 
         });
 
-        new BeaconFinder(getApplicationContext()).findBeacons();
+        startService(new Intent(Home.this, BeaconFinderService.class));
         slidingMyCards();
     }
 
