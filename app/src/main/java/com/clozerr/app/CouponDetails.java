@@ -1,5 +1,6 @@
 package com.clozerr.app;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -53,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -161,12 +163,13 @@ public class CouponDetails extends ActionBarActivity {
 
                     titleView.setText(detailsBundle.getString("vendorTitle"));
                     nextOfferView.setText(detailsBundle.getString("offerText"));
-                    //TODO get description
                     detailsView.setText(detailsBundle.getString("description"));
-                    //ScrollView scroller = new ScrollView(this);
-                    //detailsView.setText(detailsBundle.getString("Restaurant Description"));
-                    //  scroller.addView(detailsView);
                     locView.setText(detailsBundle.getString("distance"));
+
+                    /* TODO pass the specific UUID(s) of this vendor's beacon(s) as second parameter
+                    *  This must be obtained from the same url (url_coupon) and put in detailsBundle.
+                    */
+                    BeaconFinderService.startOneTimeScan(getApplicationContext(), null);
 
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -250,7 +253,7 @@ public class CouponDetails extends ActionBarActivity {
             }
 
         });
-}
+    }
 
     private void initViews() {
         detailsLayout = (FrameLayout) findViewById(R.id.detailsLayout);
@@ -298,7 +301,7 @@ public class CouponDetails extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-   /* private void slidingMyCards() {
+    /* private void slidingMyCards() {
         SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer);
         final RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.sliding_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -335,8 +338,6 @@ public class CouponDetails extends ActionBarActivity {
             }
 
         });
-
-
     }*/
     private List<MyOffer> convertRowMyCard(String s) {
         List<MyOffer> rowItems;
@@ -360,118 +361,119 @@ public class CouponDetails extends ActionBarActivity {
         return rowItems;
     }
 
-  /*  private void slidingMyCards() {
-        SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer);
-        final ListView mListView= (ListView) findViewById(R.id.sliding_list);
+    /*  private void slidingMyCards() {
+            SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer);
+            final ListView mListView= (ListView) findViewById(R.id.sliding_list);
 
-        drawer.setOnDrawerOpenListener(new SlidingDrawer.OnDrawerOpenListener() {
+            drawer.setOnDrawerOpenListener(new SlidingDrawer.OnDrawerOpenListener() {
 
-            @Override
-            public void onDrawerOpened() {
-                SharedPreferences status = getSharedPreferences("USER", 0);
-                String TOKEN = status.getString("token", "");
+                @Override
+                public void onDrawerOpened() {
+                    SharedPreferences status = getSharedPreferences("USER", 0);
+                    String TOKEN = status.getString("token", "");
 
-                String myoffers = "http://api.clozerr.com/vendor/get/vendor_id=" + detailsBundle.getString("vendorId");
-                Toast.makeText(getApplicationContext(),myoffers,Toast.LENGTH_SHORT);
-                Log.e("myoffer", myoffers);
+                    String myoffers = "http://api.clozerr.com/vendor/get/vendor_id=" + detailsBundle.getString("vendorId");
+                    Toast.makeText(getApplicationContext(),myoffers,Toast.LENGTH_SHORT);
+                    Log.e("myoffer", myoffers);
 
-                new AsyncGet(CouponDetails.this, myoffers, new AsyncGet.AsyncResult() {
-                    @Override
-                    public void gotResult(String s) {
-                        //  t1.setText(s);
+                    new AsyncGet(CouponDetails.this, myoffers, new AsyncGet.AsyncResult() {
+                        @Override
+                        public void gotResult(String s) {
+                            //  t1.setText(s);
 
-                        Log.e("resultSlide", s);
+                            Log.e("resultSlide", s);
 
-                        /*ArrayAdapter<MyOffer> offAdapter = new ArrayAdapter<MyOffer>(getApplicationContext(),R.layout.offer_list,convertRowMyCard(s));//offerAdapter(convertRowMyCard(s),CouponDetails.this);
-                        offAdapter.add(new MyOffer("dummy",2));
-                        offAdapter.add(new MyOffer("dummy",2));
-                        MyOfferAdapter offerAdapter = new MyOfferAdapter(convertRowMyCard(s),getApplicationContext());
-                        mListView.setAdapter(offerAdapter);
-                    }
-                });
-            }
-        });
-
-
-    }*/
-  private void slidingMyCards() {
-      SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer1);
-      final RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.sliding_list);
-      mRecyclerView.setLayoutManager(new LinearLayoutManager(CouponDetails.this));
-      mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-      mRecyclerView.setHasFixedSize(true);
-      drawer.setOnDrawerOpenListener(new SlidingDrawer.OnDrawerOpenListener() {
-
-          @Override
-
-          public void onDrawerOpened() {
-
-              Button offers_menu = (Button) findViewById(R.id.myoffers);
-              offers_menu.setText(RecyclerViewAdapter.vendor_name_temp);
-              offers_menu.setTextColor(Color.parseColor("#FFFFFF"));
-              offers_menu.setBackgroundColor(Color.parseColor("#EF6C00"));
-              SharedPreferences status = getSharedPreferences("USER", 0);
-              String TOKEN = status.getString("token", "");
-
-              String urlVisited ="http://api.clozerr.com/vendor/get?vendor_id=" + detailsBundle.getString("vendorId")+"&access_token="+TOKEN;
-              String urlUser = "http://api.clozerr.com/auth?fid="+detailsBundle.getString("fid")+"&access_token=" + TOKEN;
-
-              Log.e("urlslide", urlVisited);
-              //Toast.makeText(getApplicationContext(),urlVisited,Toast.LENGTH_SHORT).show();
-
-              new AsyncGet(CouponDetails.this, urlVisited , new AsyncGet.AsyncResult() {
-                  @Override
-                  public void gotResult(String s) {
-                      //  t1.setText(s);
-
-                      Log.e("resultSlide", s);
-                     // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
-
-
-                      /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyCard(s), CouponDetails.this);
-                      mRecyclerView.setAdapter(Cardadapter);*/
-
-                      List<MyOffer> myOffers = convertRowMyCard(s);
-                      MyOffer currentOffer = getCurrentOffer(s);
-
-                      MyOffersRecyclerViewAdapter myOffersAdapter = new MyOffersRecyclerViewAdapter(myOffers, currentOffer, CouponDetails.this);
-                      mRecyclerView.setAdapter(myOffersAdapter);
-
-                      //l1.setAdapter(adapter);
-                      if(s==null) {
-                          Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
-                      }
-                  }
-              });
+                            /*ArrayAdapter<MyOffer> offAdapter = new ArrayAdapter<MyOffer>(getApplicationContext(),R.layout.offer_list,convertRowMyCard(s));//offerAdapter(convertRowMyCard(s),CouponDetails.this);
+                            offAdapter.add(new MyOffer("dummy",2));
+                            offAdapter.add(new MyOffer("dummy",2));
+                            MyOfferAdapter offerAdapter = new MyOfferAdapter(convertRowMyCard(s),getApplicationContext());
+                            mListView.setAdapter(offerAdapter);
+                        }
+                    });
                 }
+            });
+    }*/
+    private void slidingMyCards() {
+          SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer1);
+          final RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.sliding_list);
+          mRecyclerView.setLayoutManager(new LinearLayoutManager(CouponDetails.this));
+          mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+          mRecyclerView.setHasFixedSize(true);
+          drawer.setOnDrawerOpenListener(new SlidingDrawer.OnDrawerOpenListener() {
 
-      });
-        drawer.setOnDrawerCloseListener(new SlidingDrawer.OnDrawerCloseListener() {
-            @Override
-            public void onDrawerClosed() {
-                Button offers_menu = (Button) findViewById(R.id.myoffers);
-                offers_menu.setText("My Offers");
-                offers_menu.setTextColor(Color.parseColor("#EF6C00"));
-                offers_menu.setBackgroundColor(Color.parseColor("#FFFFFF"));
-            }
-        });
+              @Override
+
+              public void onDrawerOpened() {
+
+                  Button offers_menu = (Button) findViewById(R.id.myoffers);
+                  offers_menu.setText(RecyclerViewAdapter.vendor_name_temp);
+                  offers_menu.setTextColor(Color.parseColor("#FFFFFF"));
+                  offers_menu.setBackgroundColor(Color.parseColor("#EF6C00"));
+                  SharedPreferences status = getSharedPreferences("USER", 0);
+                  String TOKEN = status.getString("token", "");
+
+                  String urlVisited ="http://api.clozerr.com/vendor/get?vendor_id=" + detailsBundle.getString("vendorId")+"&access_token="+TOKEN;
+                  String urlUser = "http://api.clozerr.com/auth?fid="+detailsBundle.getString("fid")+"&access_token=" + TOKEN;
+
+                  Log.e("urlslide", urlVisited);
+                  //Toast.makeText(getApplicationContext(),urlVisited,Toast.LENGTH_SHORT).show();
+
+                  new AsyncGet(CouponDetails.this, urlVisited , new AsyncGet.AsyncResult() {
+                      @Override
+                      public void gotResult(String s) {
+                          //  t1.setText(s);
+
+                          Log.e("resultSlide", s);
+                         // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
 
 
-  }
+                          /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyCard(s), CouponDetails.this);
+                          mRecyclerView.setAdapter(Cardadapter);*/
+
+                          List<MyOffer> myOffers = convertRowMyCard(s);
+                          MyOffer currentOffer = getCurrentOffer(s);
+
+                          MyOffersRecyclerViewAdapter myOffersAdapter = new MyOffersRecyclerViewAdapter(myOffers, currentOffer, CouponDetails.this);
+                          mRecyclerView.setAdapter(myOffersAdapter);
+
+                          //l1.setAdapter(adapter);
+                          if(s==null) {
+                              Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
+                          }
+                      }
+                  });
+                    }
+
+          });
+            drawer.setOnDrawerCloseListener(new SlidingDrawer.OnDrawerCloseListener() {
+                @Override
+                public void onDrawerClosed() {
+                    Button offers_menu = (Button) findViewById(R.id.myoffers);
+                    offers_menu.setText("My Offers");
+                    offers_menu.setTextColor(Color.parseColor("#EF6C00"));
+                    offers_menu.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                }
+            });
+
+
+    }
 
 
     public PopupWindow getNewPopupWindow(final FrameLayout parent, int layoutId)
     {
         parent.getForeground().setAlpha(Color.alpha(getResources().getColor(R.color.dimmer)));
         final PopupWindow popupWindow = new PopupWindow(this);
+
         LayoutInflater inflater = (LayoutInflater)getApplicationContext().
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View displayView = inflater.inflate(layoutId, null);
+
         popupWindow.setFocusable(true);
         popupWindow.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
         popupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
         popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         popupWindow.setAnimationStyle(R.style.PopupWindowAnimation);
+
         popupWindow.setContentView(displayView);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
@@ -554,8 +556,6 @@ public class CouponDetails extends ActionBarActivity {
                     final PopupWindow confirmPopup = getNewPopupWindow(detailsLayout, R.layout.checkin_pin_confirm);
                     final LinearLayout displayView = ((LinearLayout)((CardView)((LinearLayout)(confirmPopup.getContentView())).
                             getChildAt(0)).getChildAt(0));
-
-
                     for (int i = 0; i < displayView.getChildCount(); ++i) {
                         View child = displayView.getChildAt(i);
                         switch(child.getId()) {
@@ -613,6 +613,13 @@ public class CouponDetails extends ActionBarActivity {
 
         //DrawerLayout d1 = (DrawerLayout) findViewById(R.id.drawerLayout);
     }*/
+
+    // ALTERNATE
+    @Override
+    public void onPause() {
+        super.onPause();
+        BeaconFinderService.stopOneTimeScan(getApplicationContext());
+    }
 
     public MyOffer getCurrentOffer(String data) {
         try {
