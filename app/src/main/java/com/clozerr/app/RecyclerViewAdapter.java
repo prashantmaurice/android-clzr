@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -216,5 +217,27 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         };
     }
 
+    public abstract static class EndlessRecyclerOnScrollListener extends
+            RecyclerView.OnScrollListener {
+
+        int lastVisibleItem, totalItemCount;
+        private LinearLayoutManager mLinearLayoutManager;
+
+        public EndlessRecyclerOnScrollListener(
+                LinearLayoutManager linearLayoutManager) {
+            this.mLinearLayoutManager = linearLayoutManager;
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+
+            totalItemCount = mLinearLayoutManager.getItemCount();
+            lastVisibleItem = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
+            if (totalItemCount == lastVisibleItem + 1) onLoadMore();
+        }
+
+        public abstract void onLoadMore();
+    }
 
 }

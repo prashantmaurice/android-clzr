@@ -73,6 +73,13 @@ public class Home  extends ActionBarActivity {
     private NavDrawAdapter nav;
     private String[] leftSliderData = {"ABOUT US","FAQ'S","LIKE/FOLLOW CLOZERR","RATE CLOZERR", "LOGOUT"};
     //private boolean nav_drawer_open = false;
+    private RecyclerViewAdapter mMainPageAdapter;
+    private ArrayList<CardModel> mMainCardsList;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerViewAdapter.EndlessRecyclerOnScrollListener mOnScrollListener;
+    private int mOffset;
+    private boolean mCardsLeft = true;
+    private final int ITEMS_PER_PAGE = 4, INITIAL_LOAD_LIMIT = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +123,16 @@ public class Home  extends ActionBarActivity {
         mRecyclerView.setHasFixedSize(true);
         Log.d("app", "inited recycler");
 
+        mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mOnScrollListener = new RecyclerViewAdapter.EndlessRecyclerOnScrollListener(
+                (LinearLayoutManager)mLayoutManager) {
+            @Override
+            public void onLoadMore() {
+                loadMoreItems();
+            }
+        };
+
         TextView username = (TextView)findViewById(R.id.nav_text);
         if(USERNAME.length()!=0)
             username.setText(USERNAME);
@@ -132,16 +149,17 @@ public class Home  extends ActionBarActivity {
 
 
         SharedPreferences status = getSharedPreferences("USER", 0);
-        String cards = status.getString("home_cards", "");
+        final String cards = status.getString("home_cards", "");
         Log.d("app", "got home cards");
         if(!cards.equals("")){
             Log.e("Cached Card", cards);
-            RecyclerViewAdapter adapter = new RecyclerViewAdapter(convertRow(cards), Home.this);
-            mRecyclerView.setAdapter(adapter);
-
-        }else {
-
-            String url = "http://api.clozerr.com/vendor/get/near?latitude=" + lat + "&longitude=" + longi + "&access_token=" + TOKEN;
+            mMainCardsList = convertRow(cards);
+            mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, Home.this);
+            mRecyclerView.setAdapter(mMainPageAdapter);
+        } else {
+            mOffset = 0;
+            String url = "http://api.clozerr.com/vendor/get/near?latitude=" + lat + "&longitude=" + longi + "&access_token=" + TOKEN
+                    + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
             Log.e("url", url);
             new AsyncGet(Home.this, url, new AsyncGet.AsyncResult() {
                 @Override
@@ -151,19 +169,22 @@ public class Home  extends ActionBarActivity {
                         Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
                     }
 
-                    List<CardModel> CardList = convertRow(s);
+                    ArrayList<CardModel> CardList = convertRow(s);
                     if (CardList.size() != 0) {
-                        Log.e("app", "setting adapter");
-                        RecyclerViewAdapter adapter = new RecyclerViewAdapter(convertRow(s), Home.this);
-                        Log.e("app", "adapter made");
-                        mRecyclerView.setAdapter(adapter);
-                        Log.e("app", "adapter set");
+                        mMainCardsList = CardList;
+                        mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, Home.this);
+                        mRecyclerView.setAdapter(mMainPageAdapter);
+                        mRecyclerView.setOnScrollListener(mOnScrollListener);
                         final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                         editor.putString("home_cards", s);
                         editor.apply();
                         Log.e("app", "editing done");
                     }
-                    else Log.d("app", "no cards to show");
+                    else {
+                        Log.d("app", "no cards to show");
+                        mCardsLeft = false;
+                        mMainCardsList.size();
+                    }
                 }
             });
         }
@@ -184,23 +205,32 @@ public class Home  extends ActionBarActivity {
                 SharedPreferences status = getSharedPreferences("USER", 0);
                 TOKEN = status.getString("token", "");
                 String url;
+                mOffset = 0;
                 if(!TOKEN.equals(""))
-                    url = "http://api.clozerr.com/vendor/get/near?latitude="+lat+"&longitude="+longi+"&access_token="+TOKEN;
+                    url = "http://api.clozerr.com/vendor/get/near?latitude="+lat+"&longitude="+longi+"&access_token="+TOKEN
+                            + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
                 else
-                    url = "http://api.clozerr.com/vendor/get/near?latitude="+lat+"&longitude="+longi ;
+                    url = "http://api.clozerr.com/vendor/get/near?latitude="+lat+"&longitude="+longi
+                            + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
                 Log.e("url", url);
 
                 new AsyncGet(Home.this, url, new AsyncGet.AsyncResult() {
                     @Override
                     public void gotResult(String s) {
-                        List<CardModel> CardList = convertRow(s);
+                        ArrayList<CardModel> CardList = convertRow(s);
                         if(CardList.size()!=0){
-                            RecyclerViewAdapter adapter = new RecyclerViewAdapter(convertRow(s), Home.this);
-                            mRecyclerView.setAdapter(adapter);
+                            mMainCardsList = CardList;
+                            mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, Home.this);
+                            mRecyclerView.setAdapter(mMainPageAdapter);
+                            mRecyclerView.setOnScrollListener(mOnScrollListener);
 
                             final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                             editor.putString("home_cards", s);
                             editor.apply();
+                        }
+                        else {
+                            mCardsLeft = false;
+                            mOffset = mMainCardsList.size();
                         }
                         if(s==null) {
                             Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
@@ -488,8 +518,8 @@ public class Home  extends ActionBarActivity {
 
 
 
-    private List<CardModel> convertRow(String s) {
-        List<CardModel> rowItems = new ArrayList<>();
+    private ArrayList<CardModel> convertRow(String s) {
+        ArrayList<CardModel> rowItems = new ArrayList<>();
         JSONArray array;
         try {
             array = new JSONArray(s);
@@ -512,12 +542,6 @@ public class Home  extends ActionBarActivity {
                 }
                 Log.e("description", vendorDescription);
                 CardModel item = new CardModel(
-                        /*array.getJSONObject(i).getJSONObject("vendor").getString("image"),
-                        array.getJSONObject(i).getJSONObject("vendor").getString("caption"),
-                        array.getJSONObject(i).getJSONObject("coupon").getString("caption"),
-                        array.getJSONObject(i).getJSONObject("vendor").getJSONObject("props").getInt("rating"),
-                        array.getJSONObject(i).getJSONObject("vendor").getJSONObject("props").getInt("rating")*/
-                        // name, offers, image, fid, _id
                         array.getJSONObject(i).getString("name"),
                         phonenumber, vendorDescription,
                         array.getJSONObject(i).getJSONArray("offers"),
@@ -533,8 +557,8 @@ public class Home  extends ActionBarActivity {
         }
         return rowItems;
     }
-    private List<CardModel> convertRowMyCard(String s) {
-        List<CardModel> rowItems = new ArrayList<>();
+    private ArrayList<CardModel> convertRowMyCard(String s) {
+        ArrayList<CardModel> rowItems = new ArrayList<>();
         JSONObject temp;
         JSONArray array;
         try {
@@ -684,8 +708,44 @@ public class Home  extends ActionBarActivity {
             //Button cancel=(Button)findViewById(R.id.cancel);
 
         }
-
-
     }
 
+    public void loadMoreItems() {
+        Log.e("load", "in loadMoreItems()");
+        if (mCardsLeft) {
+            mOffset += (mOffset == 0) ? INITIAL_LOAD_LIMIT : ITEMS_PER_PAGE;
+            String url = "";
+            if (!TOKEN.equals(""))
+                url = "http://api.clozerr.com/vendor/get/near?latitude=" + lat + "&longitude=" + longi + "&access_token=" + TOKEN
+                    + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
+            else
+                url = "http://api.clozerr.com/vendor/get/near?latitude=" + lat + "&longitude=" + longi
+                        + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
+            Log.e("url", url);
+            new AsyncGet(Home.this, url, new AsyncGet.AsyncResult() {
+                @Override
+                public void gotResult(String s) {
+                    Log.e("result", s);
+                    if (s == null) {
+                        Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+                    }
+                    ArrayList<CardModel> CardList = convertRow(s);
+                    if (CardList.size() != 0) {
+                        mMainCardsList.addAll(convertRow(s));
+                        mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, Home.this);
+                        final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
+                        editor.putString("home_cards", s);
+                        editor.apply();
+                        Log.e("app", "editing done");
+                        mMainPageAdapter.notifyDataSetChanged();
+                        Toast.makeText(getApplicationContext(), "More items ready", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.d("app", "no cards to show");
+                        mCardsLeft = false;
+                        mOffset = mMainCardsList.size();
+                    }
+                }
+            });
+        }
+    }
 }

@@ -59,9 +59,8 @@ public class AsyncGet extends AsyncTask<String, String, String> {
     }
     @Override
     protected void onPostExecute(String result) {
-        pDialog.hide();
         asyncResult.gotResult(result);
-
+        pDialog.hide();
     }
 
     public static abstract class AsyncResult{
