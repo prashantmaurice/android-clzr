@@ -112,7 +112,9 @@
         </receiver>
 
         <service android:name=".GCMIntentService" />
-        <service android:name=".BeaconFinderService" />
+        <service android:name=".BeaconFinderService"
+            android:enabled="true"
+            android:exported="true"/>
 
         <meta-data
             android:name="com.google.android.gms.version"

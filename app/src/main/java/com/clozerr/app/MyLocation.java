@@ -144,6 +144,4 @@ public class MyLocation {
         public void onStatusChanged(String provider, int status, Bundle extras) {
         }
     };
-
-
 }

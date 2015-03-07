@@ -732,7 +732,7 @@ public class Home  extends ActionBarActivity {
                     ArrayList<CardModel> CardList = convertRow(s);
                     if (CardList.size() != 0) {
                         mMainCardsList.addAll(convertRow(s));
-                        mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, Home.this);
+                        //mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, Home.this);
                         final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                         editor.putString("home_cards", s);
                         editor.apply();

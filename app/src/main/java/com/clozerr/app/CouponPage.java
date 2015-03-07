@@ -26,11 +26,6 @@ import android.widget.Toast;
 
 import com.facebook.Session;
 
-import org.json.JSONArray;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /*
  * Created by Girish on 1/4/2015.
  */
