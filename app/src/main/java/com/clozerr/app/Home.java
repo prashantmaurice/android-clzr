@@ -71,7 +71,7 @@ public class Home  extends ActionBarActivity {
     private ListView leftDrawerList;
     //private ArrayAdapter<String> navigationDrawerAdapter;
     private NavDrawAdapter nav;
-    private String[] leftSliderData = {"ABOUT US","FAQ'S","LIKE/FOLLOW CLOZERR","RATE CLOZERR", "LOGOUT"};
+    private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Log out"};
     //private boolean nav_drawer_open = false;
     private RecyclerViewAdapter mMainPageAdapter;
     private ArrayList<CardModel> mMainCardsList;
