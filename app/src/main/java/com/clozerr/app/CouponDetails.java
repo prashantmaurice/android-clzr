@@ -31,8 +31,13 @@ import android.widget.SlidingDrawer;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.ksoichiro.android.observablescrollview.ObservableScrollView;
+import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
+import com.github.ksoichiro.android.observablescrollview.ScrollState;
+import com.github.ksoichiro.android.observablescrollview.ScrollUtils;
 import com.google.android.gcm.GCMRegistrar;
 import com.koushikdutta.ion.Ion;
+import com.nineoldandroids.view.ViewHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,10 +51,12 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
-public class CouponDetails extends ActionBarActivity {
+public class CouponDetails extends ActionBarActivity implements ObservableScrollViewCallbacks {
 
     private FrameLayout detailsLayout;
-    private Toolbar backToolbar;
+    private View mToolbarView;
+    private ObservableScrollView mScrollView;
+    private int mParallaxImageHeight;
     private TextView titleView, locView, nextOfferView, detailsView;
     private ImageView itemImageView;
     private CircleImageView callButton, dirButton, rateButton;
@@ -244,7 +251,7 @@ public class CouponDetails extends ActionBarActivity {
     private void initViews() {
         detailsLayout = (FrameLayout) findViewById(R.id.detailsLayout);
         detailsLayout.getForeground().setAlpha(0);
-        backToolbar = (Toolbar) findViewById(R.id.backToolbar);
+
         itemImageView = (ImageView) findViewById(R.id.itemImageView);
         titleView = (TextView) findViewById(R.id.itemTitleView);
         locView = (TextView) findViewById(R.id.itemLocView);
@@ -254,12 +261,40 @@ public class CouponDetails extends ActionBarActivity {
         callButton = (CircleImageView) findViewById(R.id.itemCallButton);
         dirButton = (CircleImageView) findViewById(R.id.itemDirButton);
         //rateButton = (CircleImageView) findViewById(R.id.itemRateButton);
-        setSupportActionBar(backToolbar);
+        setSupportActionBar((Toolbar) findViewById(R.id.backToolbar));
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         slidingMyCards();
+        mToolbarView = findViewById(R.id.backToolbar);
+        mToolbarView.setBackgroundColor(ScrollUtils.getColorWithAlpha(0, getResources().getColor(R.color.colorPrimary)));
+
+        mScrollView = (ObservableScrollView) findViewById(R.id.scroll);
+        mScrollView.setScrollViewCallbacks(this);
+        mParallaxImageHeight = getResources().getDimensionPixelSize(R.dimen.parallax_image_height);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        onScrollChanged(mScrollView.getCurrentScrollY(), false, false);
+    }
+
+    @Override
+    public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {
+        int baseColor = getResources().getColor(R.color.colorPrimary);
+        float alpha = 1 - (float) Math.max(0, mParallaxImageHeight - scrollY) / mParallaxImageHeight;
+        mToolbarView.setBackgroundColor(ScrollUtils.getColorWithAlpha(alpha, baseColor));
+        ViewHelper.setTranslationY(itemImageView, scrollY / 2);
+    }
+
+    @Override
+    public void onDownMotionEvent() {
+    }
+
+    @Override
+    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
     }
 
     @Override

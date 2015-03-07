@@ -6,6 +6,6 @@
     <dimen name="item_width">192dp</dimen>
     <dimen name="item_height">192dp</dimen>
     <dimen name="spacing_large">16dp</dimen>
-
+    <dimen name="parallax_image_height">180dp</dimen>
     <dimen name="navdrawer_width">260dp</dimen>
 </resources>
