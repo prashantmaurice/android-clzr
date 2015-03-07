@@ -245,7 +245,7 @@ public class Home  extends ActionBarActivity {
         // reboot start won't happen in this case.
         // If the phone reboot scan has already started, this won't do anything -
         // refer the code for this function.
-        BeaconFinderService.startPeriodicScan(getApplicationContext());
+        //BeaconFinderService.startPeriodicScan(getApplicationContext());
         slidingMyCards();
     }
 
@@ -732,13 +732,12 @@ public class Home  extends ActionBarActivity {
                     ArrayList<CardModel> CardList = convertRow(s);
                     if (CardList.size() != 0) {
                         mMainCardsList.addAll(convertRow(s));
-                        //mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, Home.this);
                         final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                         editor.putString("home_cards", s);
                         editor.apply();
                         Log.e("app", "editing done");
                         mMainPageAdapter.notifyDataSetChanged();
-                        Toast.makeText(getApplicationContext(), "More items ready", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(), "More items ready", Toast.LENGTH_SHORT).show();
                     } else {
                         Log.d("app", "no cards to show");
                         mCardsLeft = false;

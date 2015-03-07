@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.le.BluetoothLeScanner;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -194,6 +195,7 @@ public class BeaconFinderService extends Service {
                 Log.e("scan", "Enabled bluetooth-" + mFlag.toString());
             }
             mBeaconFound = false;
+
             // TODO use startScan() when API 21 libraries are available - this is deprecated
             if (mUUIDs == null)
                 mBluetoothAdapter.startLeScan(mLeScanCallback);
