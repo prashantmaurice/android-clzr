@@ -13,9 +13,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by saipraveenb on 19/01/15.
- */
 public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRecyclerViewAdapter.ListItemViewHolder> {
 
     private List<MyOffersCardModel> items;
@@ -34,12 +31,15 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
         c = context;
         items = new ArrayList<>();
         Log.e("offerlist", String.valueOf(allOffers.size()));
-        MyOffersCardModel model = new MyOffersCardModel("USED", c, allOffers.subList(0, currentOffer.getStamps() - 1));
-        if (model.getMyOfferAdapter().getItemCount() > 0) items.add(model);
-        model = new MyOffersCardModel("UPCOMING", c, allOffers.subList(currentOffer.getStamps() - 1, currentOffer.getStamps()));
-        if (model.getMyOfferAdapter().getItemCount() > 0) items.add(model);
-        model = new MyOffersCardModel("LATER", c, allOffers.subList(currentOffer.getStamps(), allOffers.size()));
-        if (model.getMyOfferAdapter().getItemCount() > 0) items.add(model);
+        if (currentOffer != null) {
+            MyOffersCardModel model = new MyOffersCardModel("USED", c, allOffers.subList(0, currentOffer.getStamps() - 1));
+            if (model.getMyOfferAdapter().getItemCount() > 0) items.add(model);
+            model = new MyOffersCardModel("UPCOMING", c, allOffers.subList(currentOffer.getStamps() - 1, currentOffer.getStamps()));
+            if (model.getMyOfferAdapter().getItemCount() > 0) items.add(model);
+            model = new MyOffersCardModel("LATER", c, allOffers.subList(currentOffer.getStamps(), allOffers.size()));
+            if (model.getMyOfferAdapter().getItemCount() > 0) items.add(model);
+        }
+        else items.add(new MyOffersCardModel("USED", c, allOffers)); // no offers left
     }
 
     @Override
