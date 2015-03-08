@@ -32,7 +32,8 @@ public class BeaconFinderService extends Service {
     private static boolean isPeriodicScanRunning = false;
 
     private static final long INTERVAL = 1000 * 60 * /*no. of minutes*/1; // TODO make this 10 min
-    private static final long SCAN_PERIOD = 1000 * /*no. of seconds*/10; // TODO modify as required, as low as possible
+    private static final long SCAN_PERIOD = 1000 * /*no. of seconds*/5; // TODO modify as required, as low as possible
+    private static final long SCAN_START_DELAY = 1000 * /*no. of seconds*/5; // TODO modify as required, as low as possible
     private static int BEACON_FOUND_LIMIT = 2; // TODO make this 3
 
     private static boolean isBluetoothLESupported;
@@ -189,11 +190,6 @@ public class BeaconFinderService extends Service {
 
     public class CheckForBeacons extends TimerTask {
         public void startScanning() {
-            if (!mBluetoothAdapter.isEnabled()) {
-                mBluetoothAdapter.enable();
-                //Toast.makeText(mContext, "Enabled Bluetooth", Toast.LENGTH_SHORT).show();
-                Log.e("scan", "Enabled bluetooth-" + mFlag.toString());
-            }
             mBeaconFound = false;
 
             // TODO use startScan() when API 21 libraries are available - this is deprecated
@@ -225,13 +221,32 @@ public class BeaconFinderService extends Service {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    startScanning();
+                    if (!mBluetoothAdapter.isEnabled()) {
+                        mBluetoothAdapter.enable();
+                        //Toast.makeText(mContext, "Enabled Bluetooth", Toast.LENGTH_SHORT).show();
+                        Log.e("scan", "Enabled bluetooth-" + mFlag.toString());
+                    }
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            startScanning();
+                            // ALTERNATE (just the if condition alone)
+                            if (mFlag == FLAG.PERIODIC_SCAN)
+                                mHandler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        stopScanning();
+                                    }
+                                }, SCAN_PERIOD);
+                        }
+                    }, SCAN_START_DELAY);
+                    /*startScanning();
                     //ALTERNATE (just the if condition alone)
                     if (mFlag == FLAG.PERIODIC_SCAN)
                         mHandler.postDelayed(new Runnable() {
                             @Override
                             public void run() { stopScanning(); }
-                        }, SCAN_PERIOD);
+                        }, SCAN_PERIOD);*/
                 }
             });
         }
