@@ -382,7 +382,7 @@ public class Home  extends ActionBarActivity {
 
                 else if(i==4) {
                     Intent textShareIntent = new Intent(Intent.ACTION_SEND);
-                    textShareIntent.putExtra(Intent.EXTRA_TEXT, "Try out Clozerr, an app which lets you try out new restaurants near you and rewards you for your loyalty. https://play.google.com/store/apps/developer?id=Clozerr ");
+                    textShareIntent.putExtra(Intent.EXTRA_TEXT, "Try out Clozerr, an app which lets you try out new restaurants near you and rewards you for your loyalty. https://play.google.com/store/apps/details?id=com.clozerr.app ");
                     textShareIntent.setType("text/plain");
                     startActivity(Intent.createChooser(textShareIntent, "Share with..."));
                 }
