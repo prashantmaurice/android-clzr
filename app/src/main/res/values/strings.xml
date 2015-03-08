@@ -23,5 +23,7 @@
     <string name="title_activity_login_new">login_new</string>
     <string name="title_activity_splashscreen">splashscreen</string>
     <string name="title_activity_settings">SettingsActivity</string>
+    <string name="share_subject">Tell Friends About Clozerr</string>
+    <string name="share_title">Clozerr</string>
 
 </resources>

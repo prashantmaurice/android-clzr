@@ -71,7 +71,7 @@ public class Home  extends ActionBarActivity {
     private ListView leftDrawerList;
     //private ArrayAdapter<String> navigationDrawerAdapter;
     private NavDrawAdapter nav;
-    private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Log out"};
+    private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Tell Friends about Clozerr", "Log out"};
     //private boolean nav_drawer_open = false;
     private RecyclerViewAdapter mMainPageAdapter;
     private ArrayList<CardModel> mMainCardsList;
@@ -379,6 +379,15 @@ public class Home  extends ActionBarActivity {
                 else if(i==0){
                     startActivity(new Intent(Home.this,AboutUs.class));
                 }
+
+                else if(i==4) {
+                    Intent textShareIntent = new Intent(Intent.ACTION_SEND);
+                    textShareIntent.putExtra(Intent.EXTRA_TEXT, "Try out Clozerr, an app which lets you try out new restaurants near you and rewards you for your loyalty. https://play.google.com/store/apps/developer?id=Clozerr ");
+                    textShareIntent.setType("text/plain");
+                    startActivity(Intent.createChooser(textShareIntent, "Share with..."));
+                }
+
+
                 else if(i==2) {
                     Uri uri = null;
                     if (Login.googleOrFb == 1)
