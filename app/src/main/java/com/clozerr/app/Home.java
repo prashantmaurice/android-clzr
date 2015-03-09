@@ -287,12 +287,14 @@ public class Home  extends ActionBarActivity {
             USERID = status.getString("fb_id", "");
             USERNAME = status.getString("fb_name", "");
             USER_PIC_URL = "https://graph.facebook.com/" + USERID + "/picture?type=large&width=200&height=200";
+            Login.googleOrFb = 1;
         }
         else if (status.contains("gplus_id"))
         {
             USERID = status.getString("gplus_id", "");
             USERNAME = status.getString("gplus_name", "");
             USER_PIC_URL = status.getString("gplus_pic", "");
+            Login.googleOrFb = 2;
         }
         Log.i("all saved prefs", status.getAll().toString());
         String loginskipped = status.getString("loginskip", "false");
@@ -398,10 +400,11 @@ public class Home  extends ActionBarActivity {
                     {
                         uri = Uri.parse("https://plus.google.com/112342093373744098489/about");
                     }
+                    if (uri == null) Log.e("navdraw", "null" + Login.googleOrFb);
                     Intent intent = new Intent(Intent.ACTION_VIEW,uri);
-                    // Create and start the chooser
-                    Intent chooser = Intent.createChooser(intent, "Open with");
-                    startActivity(chooser);
+                    /*// Create and start the chooser
+                    Intent chooser = Intent.createChooser(intent, "Open with");*/
+                    startActivity(intent/*chooser*/);
                 }
                 else if(i==3) {
                     final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
