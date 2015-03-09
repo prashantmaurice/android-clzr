@@ -162,7 +162,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     /* TODO pass the specific UUID(s) of this vendor's beacon(s) as second parameter
                     *  This must be obtained from the same url (url_coupon) and put in detailsBundle.
                     */
-                    //BeaconFinderService.startOneTimeScan(getApplicationContext(), null);
+                    BeaconFinderService.startOneTimeScan(getApplicationContext(), null);
 
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -639,7 +639,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     @Override
     public void onPause() {
         super.onPause();
-        //BeaconFinderService.stopOneTimeScan(getApplicationContext());
+        BeaconFinderService.stopOneTimeScan(getApplicationContext());
     }
 
     public MyOffer getCurrentOffer(String data) {

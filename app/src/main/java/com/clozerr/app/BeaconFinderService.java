@@ -19,7 +19,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -29,18 +28,16 @@ import java.util.UUID;
  */
 @TargetApi(18)
 public class BeaconFinderService extends Service {
-    private static enum FLAG { PERIODIC_SCAN, ONE_TIME_SCAN };
+    private static enum ScanType { PERIODIC_SCAN, ONE_TIME_SCAN };
     private static boolean isPeriodicScanRunning = false;
-
     private static final long INTERVAL = 1000 * 60 * /*no. of minutes*/1/3; // TODO make this 10 min
     private static final long SCAN_PERIOD = 1000 * /*no. of seconds*/8; // TODO modify as required
     private static final long SCAN_START_DELAY = 1000 * /*no. of seconds*/2; // TODO modify as required
-    private static int BEACON_FOUND_LIMIT;
-
+    private static int PERIODIC_SCAN_BEACON_LIMIT = 3;
     private static boolean isBluetoothLESupported;
     private static final int NOTIFICATION_ID = 0;
+    private static HashMap<BluetoothDevice, DeviceParams> periodicScanDeviceMap = new HashMap<>();
 
-    //private int mBeaconFoundCount;
     private Timer mTimer;
     private CheckForBeacons mChecker;
     private BluetoothAdapter mBluetoothAdapter;
@@ -49,11 +46,8 @@ public class BeaconFinderService extends Service {
     private NotificationCompat.Builder mNotificationBuilder;
     private NotificationManager mNotificationManager;
     private BluetoothAdapter.LeScanCallback mLeScanCallback;
-    //private String mLastFoundBeaconAddress;
-    //private boolean mBeaconFound;
-    private FLAG mFlag;
+    private ScanType mScanType;
     private UUID[] mUUIDs;
-    private HashMap<BluetoothDevice, DeviceParams> mDeviceMap;
 
     @Override
     public void onCreate() {
@@ -69,7 +63,8 @@ public class BeaconFinderService extends Service {
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle(getResources().getString(R.string.app_name))
                 .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setSound(soundUri);
+                // TODO set sound
+                /*.setSound(soundUri)*/;
     }
 
     @Override
@@ -77,9 +72,9 @@ public class BeaconFinderService extends Service {
         super.onStartCommand(intent, flags, startId);
         if (intent != null) {
             if (intent.getExtras() != null)
-                mFlag = (FLAG) (intent.getExtras().get("FLAG"));
+                mScanType = (ScanType) (intent.getExtras().get("ScanType"));
         }
-        else mFlag = FLAG.PERIODIC_SCAN;    // default
+        else mScanType = ScanType.PERIODIC_SCAN;    // default
         // TODO set this to the array of UUIDs returned
         mUUIDs = /*(intent.hasExtra("UUIDs")) ? (UUID[])(intent.getExtras().get("UUIDs")) : null*/
                 null;
@@ -110,51 +105,39 @@ public class BeaconFinderService extends Service {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            /*mBeaconFound = true;
-                            Log.i("found", "Device found:" + device.getAddress() + ";lastaddr-" + mLastFoundBeaconAddress + ";count-" + mBeaconFoundCount);
-                            if (mLastFoundBeaconAddress.equals(device.getAddress())) {
-                                ++mBeaconFoundCount;
-                            } else {
-                                mBeaconFoundCount = 1;
-                                mLastFoundBeaconAddress = device.getAddress();
-                            }
-                            if (mBeaconFoundCount == BEACON_FOUND_LIMIT) {
-                                mBeaconFoundCount = 0;
-                                mLastFoundBeaconAddress = "";
+
+                            if (mScanType == ScanType.ONE_TIME_SCAN) {
+                                // TODO DON'T put pending intent for CouponDetails page here. Put something else.
                                 setNotification("You're in a restaurant. Check in with Clozerr?", null);
-                            }*/
-                            if (mDeviceMap.containsKey(device)) {
-                                if (!mDeviceMap.get(device).foundInThisScan) {
-                                    ++(mDeviceMap.get(device).count);
-                                    mDeviceMap.get(device).foundInThisScan = true;
+                                mChecker.stopScanning();
+                            }
+                            else if (mScanType == ScanType.PERIODIC_SCAN) {
+                                if (periodicScanDeviceMap.containsKey(device)) {
+                                    if (!periodicScanDeviceMap.get(device).foundInThisScan) {
+                                        ++(periodicScanDeviceMap.get(device).count);
+                                        periodicScanDeviceMap.get(device).foundInThisScan = true;
+                                    }
                                 }
-                            }
-                            else {
-                                mDeviceMap.put(device, new DeviceParams(1, true));
-                            }
-
-                            if (mDeviceMap.get(device).count == BEACON_FOUND_LIMIT) {
-                                mDeviceMap.get(device).count = 0;
-
-                                // TODO put pending intent for CouponDetails page here, based on beacon UUID/Address
-                                setNotification("You're in a restaurant. Check in with Clozerr?", null);
+                                else {
+                                    periodicScanDeviceMap.put(device, new DeviceParams(1, true));
+                                }
+                                Log.e("Callback", "count-"+ periodicScanDeviceMap.get(device).count+";lim-"+ PERIODIC_SCAN_BEACON_LIMIT);
+                                if (periodicScanDeviceMap.get(device).count == PERIODIC_SCAN_BEACON_LIMIT) {
+                                    periodicScanDeviceMap.get(device).count = 0;
+                                    // TODO put pending intent for CouponDetails page here, based on beacon UUID/Address
+                                    setNotification("You're in a restaurant. Check in with Clozerr?", null);
+                                }
                             }
                         }
                     });
                 }
             };
-            /*mLastFoundBeaconAddress = "";
-            mBeaconFound = false;
-            mBeaconFoundCount = 0;*/
-            mDeviceMap = new HashMap<>();
             mChecker = new CheckForBeacons();
-            if (mFlag == FLAG.PERIODIC_SCAN) {
-                BEACON_FOUND_LIMIT = 3;
+            if (mScanType == ScanType.PERIODIC_SCAN) {
                 isPeriodicScanRunning = true;
                 mTimer.schedule(mChecker, 0, INTERVAL);
             }
-            else if (mFlag == FLAG.ONE_TIME_SCAN) {
-                BEACON_FOUND_LIMIT = 1;
+            else if (mScanType == ScanType.ONE_TIME_SCAN) {
                 mTimer.schedule(mChecker, 0);
             }
         }
@@ -180,14 +163,14 @@ public class BeaconFinderService extends Service {
     public static void startPeriodicScan(Context context) {
         if (!isPeriodicScanRunning) {
             Intent service = new Intent(context, BeaconFinderService.class);
-            service.putExtra("FLAG", BeaconFinderService.FLAG.PERIODIC_SCAN);
+            service.putExtra("ScanType", ScanType.PERIODIC_SCAN);
             context.startService(service);
         }
     }
 
     public static void startOneTimeScan(Context context, UUID[] serviceUUIDs) {
         Intent service = new Intent(context, BeaconFinderService.class);
-        service.putExtra("FLAG", BeaconFinderService.FLAG.ONE_TIME_SCAN);
+        service.putExtra("ScanType", ScanType.ONE_TIME_SCAN);
         service.putExtra("UUIDs", serviceUUIDs);
         context.stopService(new Intent(context, BeaconFinderService.class));
         isPeriodicScanRunning = false;
@@ -209,9 +192,9 @@ public class BeaconFinderService extends Service {
 
     private class CheckForBeacons extends TimerTask {
         public void startScanning() {
-            //mBeaconFound = false;
-            for (DeviceParams params : mDeviceMap.values())
-                params.foundInThisScan = false;
+            if (mScanType == ScanType.PERIODIC_SCAN)
+                for (DeviceParams params : periodicScanDeviceMap.values())
+                    params.foundInThisScan = false;
 
             if (mUUIDs == null)
                 mBluetoothAdapter.startLeScan(mLeScanCallback);
@@ -222,20 +205,12 @@ public class BeaconFinderService extends Service {
         public void stopScanning() {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
             mBluetoothAdapter.disable();
+            Log.e("scan", "Disabled bluetooth-" + mScanType.toString());
 
-            Log.e("scan", "Disabled bluetooth-" + mFlag.toString());
-            /*if (!mBeaconFound) {
-                mBeaconFoundCount = 0;
-                mLastFoundBeaconAddress = "";
-            }*/
-            for (BluetoothDevice device : mDeviceMap.keySet())
-                if (!mDeviceMap.get(device).foundInThisScan)
-                    mDeviceMap.remove(device);
-
-            if (mFlag == FLAG.ONE_TIME_SCAN) {
-                mDeviceMap.clear();
-                startPeriodicScan(getApplicationContext());
-            }
+            if (mScanType == ScanType.PERIODIC_SCAN)
+                for (BluetoothDevice device : periodicScanDeviceMap.keySet())
+                    if (!periodicScanDeviceMap.get(device).foundInThisScan)
+                        periodicScanDeviceMap.remove(device);
         }
 
         @Override
@@ -246,13 +221,13 @@ public class BeaconFinderService extends Service {
                     if (!mBluetoothAdapter.isEnabled()) {
                         mBluetoothAdapter.enable();
                     }
-                    Log.e("scan", "Enabled bluetooth-" + mFlag.toString());
+                    Log.e("scan", "Enabled bluetooth-" + mScanType.toString());
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             startScanning();
                             // ALTERNATE (just the if condition alone)
-                            if (mFlag == FLAG.PERIODIC_SCAN)
+                            if (mScanType == ScanType.PERIODIC_SCAN)
                                 mHandler.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {

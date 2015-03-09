@@ -241,12 +241,13 @@ public class Home  extends ActionBarActivity {
 
         });
 
-        // This scan start is done when the user has just installed the app - the phone
-        // reboot start won't happen in this case.
-        // If the phone reboot scan has already started, this won't do anything -
-        // refer the code for this function.
-        //BeaconFinderService.startPeriodicScan(getApplicationContext());
         slidingMyCards();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        BeaconFinderService.startPeriodicScan(getApplicationContext());
     }
 
     private void locationEnabledCheck() {
