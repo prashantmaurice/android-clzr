@@ -162,7 +162,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     /* TODO pass the specific UUID(s) of this vendor's beacon(s) as second parameter
                     *  This must be obtained from the same url (url_coupon) and put in detailsBundle.
                     */
-                    BeaconFinderService.startOneTimeScan(getApplicationContext(), null);
+                    //BeaconFinderService.startOneTimeScan(getApplicationContext(), null);
 
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override

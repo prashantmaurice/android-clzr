@@ -245,7 +245,7 @@ public class Home  extends ActionBarActivity {
         // reboot start won't happen in this case.
         // If the phone reboot scan has already started, this won't do anything -
         // refer the code for this function.
-        BeaconFinderService.startPeriodicScan(getApplicationContext());
+        //BeaconFinderService.startPeriodicScan(getApplicationContext());
         slidingMyCards();
     }
 

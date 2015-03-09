@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.le.BluetoothLeScanner;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,6 +18,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -31,15 +32,15 @@ public class BeaconFinderService extends Service {
     private static enum FLAG { PERIODIC_SCAN, ONE_TIME_SCAN };
     private static boolean isPeriodicScanRunning = false;
 
-    private static final long INTERVAL = 1000 * 60 * /*no. of minutes*/1; // TODO make this 10 min
-    private static final long SCAN_PERIOD = 1000 * /*no. of seconds*/5; // TODO modify as required, as low as possible
-    private static final long SCAN_START_DELAY = 1000 * /*no. of seconds*/5; // TODO modify as required, as low as possible
-    private static int BEACON_FOUND_LIMIT = 2; // TODO make this 3
+    private static final long INTERVAL = 1000 * 60 * /*no. of minutes*/1/3; // TODO make this 10 min
+    private static final long SCAN_PERIOD = 1000 * /*no. of seconds*/8; // TODO modify as required
+    private static final long SCAN_START_DELAY = 1000 * /*no. of seconds*/2; // TODO modify as required
+    private static int BEACON_FOUND_LIMIT;
 
     private static boolean isBluetoothLESupported;
     private static final int NOTIFICATION_ID = 0;
 
-    private int mBeaconFoundCount = 0;
+    //private int mBeaconFoundCount;
     private Timer mTimer;
     private CheckForBeacons mChecker;
     private BluetoothAdapter mBluetoothAdapter;
@@ -48,10 +49,11 @@ public class BeaconFinderService extends Service {
     private NotificationCompat.Builder mNotificationBuilder;
     private NotificationManager mNotificationManager;
     private BluetoothAdapter.LeScanCallback mLeScanCallback;
-    private String mLastFoundBeaconAddress;
-    private boolean mBeaconFound;
+    //private String mLastFoundBeaconAddress;
+    //private boolean mBeaconFound;
     private FLAG mFlag;
     private UUID[] mUUIDs;
+    private HashMap<BluetoothDevice, DeviceParams> mDeviceMap;
 
     @Override
     public void onCreate() {
@@ -102,32 +104,49 @@ public class BeaconFinderService extends Service {
         }
         else isBluetoothLESupported = true;
         if (isBluetoothLESupported) {
-            mLastFoundBeaconAddress = "";
-            mBeaconFound = false;
             mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
                 @Override
                 public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            mBeaconFound = true;
-                            //Toast.makeText(mContext, "Device found:" + device.getAddress(), Toast.LENGTH_SHORT).show();
-                            Log.i("found", "Device found:" + device.getAddress());
+                            /*mBeaconFound = true;
+                            Log.i("found", "Device found:" + device.getAddress() + ";lastaddr-" + mLastFoundBeaconAddress + ";count-" + mBeaconFoundCount);
                             if (mLastFoundBeaconAddress.equals(device.getAddress())) {
                                 ++mBeaconFoundCount;
-                                if (mBeaconFoundCount == BEACON_FOUND_LIMIT) {
-                                    mBeaconFoundCount = 0;
-                                    mLastFoundBeaconAddress = "";
-                                    setNotification("You're in a restaurant. Check in with Clozerr?", null);
-                                }
                             } else {
                                 mBeaconFoundCount = 1;
                                 mLastFoundBeaconAddress = device.getAddress();
+                            }
+                            if (mBeaconFoundCount == BEACON_FOUND_LIMIT) {
+                                mBeaconFoundCount = 0;
+                                mLastFoundBeaconAddress = "";
+                                setNotification("You're in a restaurant. Check in with Clozerr?", null);
+                            }*/
+                            if (mDeviceMap.containsKey(device)) {
+                                if (!mDeviceMap.get(device).foundInThisScan) {
+                                    ++(mDeviceMap.get(device).count);
+                                    mDeviceMap.get(device).foundInThisScan = true;
+                                }
+                            }
+                            else {
+                                mDeviceMap.put(device, new DeviceParams(1, true));
+                            }
+
+                            if (mDeviceMap.get(device).count == BEACON_FOUND_LIMIT) {
+                                mDeviceMap.get(device).count = 0;
+
+                                // TODO put pending intent for CouponDetails page here, based on beacon UUID/Address
+                                setNotification("You're in a restaurant. Check in with Clozerr?", null);
                             }
                         }
                     });
                 }
             };
+            /*mLastFoundBeaconAddress = "";
+            mBeaconFound = false;
+            mBeaconFoundCount = 0;*/
+            mDeviceMap = new HashMap<>();
             mChecker = new CheckForBeacons();
             if (mFlag == FLAG.PERIODIC_SCAN) {
                 BEACON_FOUND_LIMIT = 3;
@@ -188,31 +207,34 @@ public class BeaconFinderService extends Service {
         super.onDestroy();
     }
 
-    public class CheckForBeacons extends TimerTask {
+    private class CheckForBeacons extends TimerTask {
         public void startScanning() {
-            mBeaconFound = false;
+            //mBeaconFound = false;
+            for (DeviceParams params : mDeviceMap.values())
+                params.foundInThisScan = false;
 
-            // TODO use startScan() when API 21 libraries are available - this is deprecated
             if (mUUIDs == null)
                 mBluetoothAdapter.startLeScan(mLeScanCallback);
             else
                 mBluetoothAdapter.startLeScan(mUUIDs, mLeScanCallback);
-            Log.i("startparams", "beaconFound-" + mBeaconFound + ";count-" + mBeaconFoundCount + ";last addr-" + mLastFoundBeaconAddress);
         }
 
         public void stopScanning() {
-            if (mBluetoothAdapter.isEnabled()) {
-                mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                mBluetoothAdapter.disable();
-                //Toast.makeText(mContext, "Disabled Bluetooth", Toast.LENGTH_SHORT).show();
-                Log.e("scan", "Disabled bluetooth-" + mFlag.toString());
-                if (!mBeaconFound) {
-                    mBeaconFoundCount = 0;
-                    mLastFoundBeaconAddress = "";
-                }
-                if (mFlag != FLAG.PERIODIC_SCAN)
-                    startPeriodicScan(getApplicationContext());
-                Log.i("endparams", "beaconFound-" + mBeaconFound + ";count-" + mBeaconFoundCount + ";last addr-" + mLastFoundBeaconAddress);
+            mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            mBluetoothAdapter.disable();
+
+            Log.e("scan", "Disabled bluetooth-" + mFlag.toString());
+            /*if (!mBeaconFound) {
+                mBeaconFoundCount = 0;
+                mLastFoundBeaconAddress = "";
+            }*/
+            for (BluetoothDevice device : mDeviceMap.keySet())
+                if (!mDeviceMap.get(device).foundInThisScan)
+                    mDeviceMap.remove(device);
+
+            if (mFlag == FLAG.ONE_TIME_SCAN) {
+                mDeviceMap.clear();
+                startPeriodicScan(getApplicationContext());
             }
         }
 
@@ -223,9 +245,8 @@ public class BeaconFinderService extends Service {
                 public void run() {
                     if (!mBluetoothAdapter.isEnabled()) {
                         mBluetoothAdapter.enable();
-                        //Toast.makeText(mContext, "Enabled Bluetooth", Toast.LENGTH_SHORT).show();
-                        Log.e("scan", "Enabled bluetooth-" + mFlag.toString());
                     }
+                    Log.e("scan", "Enabled bluetooth-" + mFlag.toString());
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -240,15 +261,18 @@ public class BeaconFinderService extends Service {
                                 }, SCAN_PERIOD);
                         }
                     }, SCAN_START_DELAY);
-                    /*startScanning();
-                    //ALTERNATE (just the if condition alone)
-                    if (mFlag == FLAG.PERIODIC_SCAN)
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() { stopScanning(); }
-                        }, SCAN_PERIOD);*/
                 }
             });
+        }
+    }
+
+    private class DeviceParams {
+        public int count;
+        public boolean foundInThisScan;
+
+        public DeviceParams(int count, boolean foundInThisScan) {
+            this.count = count;
+            this.foundInThisScan = foundInThisScan;
         }
     }
 }
