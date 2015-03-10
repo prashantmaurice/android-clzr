@@ -1,18 +1,14 @@
 package com.clozerr.app;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.koushikdutta.ion.Ion;
 
@@ -30,7 +26,7 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
                     "modelData must not be null");
         }
         this.items = modelData;
-        this.c = c;
+        MyCardRecyclerViewAdapter.c = c;
     }
 
     @Override
@@ -51,7 +47,7 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
         viewHolder.currentItem = items.get(position);
         CardModel model = items.get(position);
         viewHolder.txtTitle.setText(model.getTitle());
-        viewHolder.txtStamps.setText(model.getStamps()+" stamp(s)");
+        viewHolder.txtStamps.setText(model.getStampString());
         viewHolder.txtDist.setText(model.getDistance());
         Ion.with((viewHolder.imageView))
              //   .placeholder(R.drawable.call)
@@ -59,9 +55,7 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
                         //    .animateLoad(spinAnimation)
                         //    .animateIn(fadeInAnimation)
                 .load(model.getImageId());
-        // viewHolder.txtDist.setText(model.getDesc());
-
-    }
+            }
 
     @Override
     public int getItemCount() {

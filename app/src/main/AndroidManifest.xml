@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.clozerr.app"
-    android:versionCode="2"
-    android:versionName="2"
-    >
+    package="com.clozerr.app" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
@@ -11,6 +8,13 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="false" />
 
     <permission
         android:name="com.clozerr.app.permission.C2D_MESSAGE"
@@ -38,9 +42,11 @@
             android:screenOrientation="portrait" >
         </activity>
 
-        <!--<service
+        <!--
+            <service
             android:name=".LocationService"
-            android:label="Service for Location" />-->
+            android:label="Service for Location" />
+        -->
 
         <activity
             android:name=".Home"
@@ -106,6 +112,9 @@
         </receiver>
 
         <service android:name=".GCMIntentService" />
+        <service android:name=".BeaconFinderService"
+            android:enabled="true"
+            android:exported="true"/>
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -120,6 +129,20 @@
         <activity
             android:name=".splashscreen"
             android:label="@string/title_activity_splashscreen" >
+        </activity>
+
+        <receiver
+            android:name=".PhoneStartupReceiver"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" >
         </activity>
     </application>
 

@@ -7,16 +7,21 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.os.Bundle;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.graphics.*;
-import android.util.Log;
 
 import com.facebook.Session;
 import com.koushikdutta.ion.Ion;
@@ -54,8 +59,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return new ListItemViewHolder(itemView);
     }
 
-
-
     @Override
     public void onBindViewHolder(final ListItemViewHolder viewHolder, int position) {
         viewHolder.currentItem = items.get(position);
@@ -70,7 +73,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         Ion.with(c).load(model.getImageId()).withBitmap().placeholder(R.drawable.defoffer).transform(new com.koushikdutta.ion.bitmap.Transform() {
             public Bitmap transform(Bitmap bitmap) {
-                Log.d("Bitmap tranform", "wd:" + viewHolder.imageView.getWidth() + " ht:" + viewHolder.imageView.getHeight() );
+                Log.d("Bitmap transform", "wd:" + viewHolder.imageView.getWidth() + " ht:" + viewHolder.imageView.getHeight() );
                 Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(output);
 
@@ -151,6 +154,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         vendor_name_temp = currentItem.getTitle();
                         detailIntent.putExtra("vendor_id", currentItem.getVendorId());
                         detailIntent.putExtra("offer_id", currentItem.getOfferId());
+                        detailIntent.putExtra("offer_caption", currentItem.getCaption());
                         detailIntent.putExtra("offer_text", currentItem.getOfferDescription());
 
                         c.startActivity(detailIntent);
@@ -215,5 +219,27 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         };
     }
 
+    public abstract static class EndlessRecyclerOnScrollListener extends
+            RecyclerView.OnScrollListener {
+
+        int lastVisibleItem, totalItemCount;
+        private LinearLayoutManager mLinearLayoutManager;
+
+        public EndlessRecyclerOnScrollListener(
+                LinearLayoutManager linearLayoutManager) {
+            this.mLinearLayoutManager = linearLayoutManager;
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+
+            totalItemCount = mLinearLayoutManager.getItemCount();
+            lastVisibleItem = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
+            if (totalItemCount == lastVisibleItem + 1) onLoadMore();
+        }
+
+        public abstract void onLoadMore();
+    }
 
 }

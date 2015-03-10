@@ -1,19 +1,6 @@
 package com.clozerr.app;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,22 +8,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.facebook.Session;
-import com.koushikdutta.ion.Ion;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
-/**
- * Created by saipraveenb on 19/01/15.
- */
 public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRecyclerViewAdapter.ListItemViewHolder> {
 
     private List<MyOffersCardModel> items;
@@ -55,12 +31,15 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
         c = context;
         items = new ArrayList<>();
         Log.e("offerlist", String.valueOf(allOffers.size()));
-        MyOffersCardModel model = new MyOffersCardModel("USED", c, allOffers.subList(0, currentOffer.getStamps() - 1));
-        if (model.getMyOfferAdapter().getItemCount() > 0) items.add(model);
-        model = new MyOffersCardModel("UPCOMING", c, allOffers.subList(currentOffer.getStamps() - 1, currentOffer.getStamps()));
-        if (model.getMyOfferAdapter().getItemCount() > 0) items.add(model);
-        model = new MyOffersCardModel("LATER", c, allOffers.subList(currentOffer.getStamps(), allOffers.size()));
-        if (model.getMyOfferAdapter().getItemCount() > 0) items.add(model);
+        if (currentOffer != null) {
+            MyOffersCardModel model = new MyOffersCardModel("USED", c, allOffers.subList(0, currentOffer.getStamps() - 1));
+            if (model.getMyOfferAdapter().getItemCount() > 0) items.add(model);
+            model = new MyOffersCardModel("UPCOMING", c, allOffers.subList(currentOffer.getStamps() - 1, currentOffer.getStamps()));
+            if (model.getMyOfferAdapter().getItemCount() > 0) items.add(model);
+            model = new MyOffersCardModel("LATER", c, allOffers.subList(currentOffer.getStamps(), allOffers.size()));
+            if (model.getMyOfferAdapter().getItemCount() > 0) items.add(model);
+        }
+        else items.add(new MyOffersCardModel("USED", c, allOffers)); // no offers left
     }
 
     @Override

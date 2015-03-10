@@ -14,13 +14,16 @@
     <string name="dialog_checkin_title">Confirm Check In</string>
     <string name="dialog_checkin_redeem">Redeem</string>
     <string name="your_pin">Your unique 4-digit PIN is:</string>
-    <string name="please_confirm">Please Show This Code to the Store Staff</string>
-    <string name="confirm">DONE!</string>
+    <string name="please_confirm">show this to restaurant staff</string>
+    <string name="confirm">REDEEM</string>
     <string name="dummy_json">{
         \"pin\":\"1234\",
         \"gcm_id\":\"19849987\"
     }</string>
     <string name="title_activity_login_new">login_new</string>
     <string name="title_activity_splashscreen">splashscreen</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="share_subject">Tell Friends About Clozerr</string>
+    <string name="share_title">Clozerr</string>
 
 </resources>

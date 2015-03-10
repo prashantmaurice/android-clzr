@@ -1,7 +1,6 @@
 package com.clozerr.app;
 
 import android.location.Location;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,6 +23,7 @@ public class CardModel {
     private String phonenumber;
     private String vendorDescription;
     private int stamps;
+    private String stampString;
     public CardModel(String title, String phonenumber,  String vendorDescription, JSONArray offers,  double lat, double longi, String imageId, String fId, String vId,int stamps) {
         this.imageId = imageId;
         this.title = title;
@@ -35,10 +35,12 @@ public class CardModel {
                 this.offerDescription = offers.getJSONObject(0).getString("description");
             } catch (JSONException e) {
                 e.printStackTrace();
-                //Log.i("shit", this.offerId);
             }
             this.stamps=stamps;
-
+            if (stamps < offers.length())
+                this.stampString = stamps + " stamp(s)";
+            else
+                this.stampString = "All Offers Done";
         }
         Location location = new Location("Vendor " + vendorId + " location");
         location.setLatitude(lat);
@@ -103,7 +105,8 @@ public class CardModel {
     public String getVendorDescription() {
         return vendorDescription;
     }
-    public String getStamps() {
-        return stamps+" ";
+    public String getStampString() {
+        return stampString;
     }
+    public int getStamps() {return stamps; }
 }

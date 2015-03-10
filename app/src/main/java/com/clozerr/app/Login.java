@@ -1,4 +1,5 @@
 package com.clozerr.app;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
@@ -22,6 +23,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
@@ -32,6 +34,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 

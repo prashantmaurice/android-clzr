@@ -3,242 +3,274 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/detailsLayout"
-    android:foreground="@drawable/dimmer"
+    android:foreground="#33000000"
     tools:context="com.clozerr.app.CouponDetails">
 
+    <include layout="@layout/gradient_header" />
 
-    <RelativeLayout
+    <com.github.ksoichiro.android.observablescrollview.ObservableScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <LinearLayout
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+            android:layout_height="match_parent">
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="210dp">
-
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/linearLayout2">
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="175dp"
                     android:scaleType="centerCrop"
+                    android:src="@drawable/defoffer"
                     android:id="@+id/itemImageView"
                     android:contentDescription="@string/descr_item_image"
                     android:adjustViewBounds="true"
                     />
 
 
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-30dp"
+                    android:id="@+id/checkinLayout">
 
-               <TextView android:layout_width="60dp"
-                android:layout_height="60dp"
-                 android:text="check in"
-                   android:textSize="15sp"
-                    android:textColor="#FFFFFF"
-                android:id="@+id/checkinButton"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:layout_gravity="center"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                style="@style/Circle_offer"/>
 
-            </RelativeLayout>
-        </LinearLayout>
-        <include layout="@layout/back_toolbar"
-            android:id="@+id/backToolbar"
-            />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="185dp"
-            android:id="@+id/linearLayout">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Restaurant Name"
-                android:id="@+id/itemTitleView"
-                android:textStyle="bold"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textStyle="bold"
-                android:text="Restaurant City (Restaurant Distance)"
-                android:id="@+id/itemLocView"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"/>
 
-            <View
-                style="@style/DividerHorizontal"
-                android:layout_marginTop="10dp"/>
+                    <TextView android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:text="check in"
+                        android:textSize="15sp"
+                        android:textColor="#FFFFFF"
+                        android:id="@+id/checkinButton"
+                        android:layout_marginRight="@dimen/activity_horizontal_margin"
+                        android:layout_gravity="center"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        style="@style/Circle_offer"
+                        android:layout_alignParentTop="true" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:gravity="center_horizontal"
-                android:text="Next Offer Available"
-                android:textStyle="bold"
-                android:id="@+id/itemNextOfferView"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="5dp"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+                </RelativeLayout>
 
-            <View
-                style="@style/DividerHorizontal"
-                android:layout_marginTop="5dp"/>
+            </LinearLayout>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:gravity="center_horizontal"
-                android:text="Restaurant Description"
-                android:id="@+id/itemDetailsView"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="5dp"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:maxLines = "4"
-                android:scrollbars = "vertical"/>
 
-            <View
-                style="@style/DividerHorizontal"
-                android:layout_marginTop="5dp"/>
-
-        </LinearLayout>
-
-        <View
-            style="@style/DividerHorizontal"
-            android:layout_marginBottom="5dp"/>
-        <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_horizontal"
-                android:id="@+id/itemButtonsLayout"
-                android:layout_marginBottom="40dp"
-                android:layout_alignParentBottom="true"
+                android:orientation="vertical"
+                android:layout_below="@id/linearLayout2"
+
+                android:id="@+id/linearLayout"
                 >
-
-                <LinearLayout
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Restaurant Name"
+                    android:id="@+id/itemTitleView"
+                    android:textStyle="bold"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"/>
 
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/call"
-                        android:id="@+id/itemCallButton"
-                        android:layout_gravity="center"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="call"
-                        android:layout_gravity="center"/>
-
-                </LinearLayout>
-
-                <LinearLayout
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginLeft="80dp"
-                    android:layout_marginRight="10dp">
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textStyle="bold"
+                    android:text="Restaurant City (Restaurant Distance)"
+                    android:id="@+id/itemLocView"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"/>
 
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/directions"
-                        android:id="@+id/itemDirButton"
-                        android:layout_gravity="center"/>
+                <View
+                    style="@style/DividerHorizontal"
+                    android:layout_marginTop="10dp"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="directions"
-                        android:layout_gravity="center"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:gravity="center_horizontal"
+                    android:text="Next Offer Available"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorPrimary"
+                    android:id="@+id/itemNextOfferView"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"/>
 
-                </LinearLayout>
+                <View
+                    style="@style/DividerHorizontal"
+                    android:layout_marginTop="5dp"/>
 
-<!--
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/desc_roundrect"
+                    android:padding="10dp"
+
+                    android:gravity="left"
+
+                    android:text="Restaurant Description"
+                    android:id="@+id/itemDetailsView"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"
+                    android:textSize="15sp"
+                    android:scrollbars = "vertical"/>
+
+                <View
+                    style="@style/DividerHorizontal"
+                    android:layout_marginTop="5dp"/>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginLeft="80dp"
-                    android:layout_marginRight="10dp">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="60dp"
+                    android:layout_marginTop="15dp"
+                    android:gravity="center_horizontal"
+                    android:id="@+id/itemButtonsLayout"
+                    android:layout_gravity="bottom"
+                    >
 
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/directions"
-                        android:id="@+id/itemRateButton"
-                        android:layout_gravity="center"/>
-
-                    <TextView
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="rate"
-                        android:layout_gravity="center"/>
+                        android:orientation="vertical"
+                        android:layout_marginLeft="5dp">
 
-                </LinearLayout>
--->
-                <!--<LinearLayout-->
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/call"
+                            android:id="@+id/itemCallButton"
+                            android:layout_gravity="center"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:text="call"
+                            android:layout_gravity="center"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginLeft="40dp"
+                        >
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/directions"
+                            android:id="@+id/itemDirButton"
+                            android:layout_gravity="center"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:text="directions"
+                            android:layout_gravity="center"/>
+
+                    </LinearLayout>
+
+                    <!--
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="vertical"
+                                        android:layout_marginLeft="80dp"
+                                        android:layout_marginRight="10dp">
+
+                                        <de.hdodenhof.circleimageview.CircleImageView
+                                            android:layout_width="40dp"
+                                            android:layout_height="40dp"
+                                            android:src="@drawable/directions"
+                                            android:id="@+id/itemRateButton"
+                                            android:layout_gravity="center"/>
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textAppearance="?android:attr/textAppearanceSmall"
+                                            android:text="rate"
+                                            android:layout_gravity="center"/>
+
+                                    </LinearLayout>
+                    -->
+                    <!--<LinearLayout-->
                     <!--android:layout_width="wrap_content"-->
                     <!--android:layout_height="wrap_content"-->
                     <!--android:orientation="vertical">-->
 
                     <!--<de.hdodenhof.circleimageview.CircleImageView-->
-                        <!--android:layout_width="40dp"-->
-                        <!--android:layout_height="40dp"-->
-                        <!--android:src="@drawable/rate"-->
-                        <!--android:id="@+id/itemRateButton"-->
-                        <!--android:layout_gravity="center"/>-->
+                    <!--android:layout_width="40dp"-->
+                    <!--android:layout_height="40dp"-->
+                    <!--android:src="@drawable/rate"-->
+                    <!--android:id="@+id/itemRateButton"-->
+                    <!--android:layout_gravity="center"/>-->
 
                     <!--<TextView-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
-                        <!--android:text="rate"-->
-                        <!--android:layout_gravity="center"/>-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
+                    <!--android:text="rate"-->
+                    <!--android:layout_gravity="center"/>-->
 
-                <!--</LinearLayout>-->
+                    <!--</LinearLayout>-->
 
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <include layout="@layout/my_offers_sliding"
-                android:id="@+id/myOffersSliding"
-                />
 
+            <View
+                style="@style/DividerHorizontal"
+                android:layout_marginBottom="5dp"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+
+
+
+
+
+
+
+            </RelativeLayout>
 
 
         </RelativeLayout>
+    </com.github.ksoichiro.android.observablescrollview.ObservableScrollView>
 
+    <include layout="@layout/my_offers_sliding"
+        android:id="@+id/myOffersSliding"
+        />
 
-    </RelativeLayout>
-
+    <include layout="@layout/back_toolbar"
+        android:id="@+id/backToolbar"
+        />
 
 </FrameLayout>
