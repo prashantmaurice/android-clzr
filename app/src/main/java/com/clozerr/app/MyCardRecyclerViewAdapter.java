@@ -47,7 +47,7 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
         viewHolder.currentItem = items.get(position);
         CardModel model = items.get(position);
         viewHolder.txtTitle.setText(model.getTitle());
-        viewHolder.txtStamps.setText(model.getStamps()+" stamp(s)");
+        viewHolder.txtStamps.setText(model.getStampString());
         viewHolder.txtDist.setText(model.getDistance());
         Ion.with((viewHolder.imageView))
              //   .placeholder(R.drawable.call)
@@ -55,9 +55,7 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
                         //    .animateLoad(spinAnimation)
                         //    .animateIn(fadeInAnimation)
                 .load(model.getImageId());
-        // viewHolder.txtDist.setText(model.getDesc());
-
-    }
+            }
 
     @Override
     public int getItemCount() {

@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.CardView;
@@ -87,7 +88,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         detailsBundle.putString("offerId", offer_id);
         detailsBundle.putString("offerText", offer_text);
         detailsBundle.putString("offerCaption", offer_caption);
-        final ArrayList<String> ques_arr = new ArrayList<String>();
+        final ArrayList<String> ques_arr = new ArrayList<>();
 
 
         //Toast.makeText(this, "id - " + vendor_id, Toast.LENGTH_SHORT).show();
@@ -162,7 +163,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     /* TODO pass the specific UUID(s) of this vendor's beacon(s) as second parameter
                     *  This must be obtained from the same url (url_coupon) and put in detailsBundle.
                     */
-                    BeaconFinderService.startOneTimeScan(getApplicationContext(), null);
+                    //BeaconFinderService.startOneTimeScan(getApplicationContext(), null);
 
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -361,10 +362,8 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         });
     }*/
     private List<MyOffer> convertRowMyCard(String s) {
-        List<MyOffer> rowItems;
-        rowItems = new ArrayList<MyOffer>();
-        JSONObject temp;
-        temp = null;
+        List<MyOffer> rowItems = new ArrayList<>();
+        JSONObject temp = null;
         JSONArray array = null;
         try {
             Log.e("stringfunction", s);
@@ -482,7 +481,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
 
     public PopupWindow getNewPopupWindow(final FrameLayout parent, int layoutId)
     {
-        parent.getForeground().setAlpha(Color.alpha(getResources().getColor(R.color.dimmer)));
+        parent.getForeground().mutate().setAlpha(255);
         final PopupWindow popupWindow = new PopupWindow(this);
 
         LayoutInflater inflater = (LayoutInflater)getApplicationContext().
@@ -513,7 +512,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         View feedbackView = lf.inflate(R.layout.dialog_reviews,null);
         RecyclerView rv = (RecyclerView) feedbackView.findViewById(R.id.list_questions);
 
-        ArrayList<String> ques_arr = new ArrayList<String>();
+        ArrayList<String> ques_arr = new ArrayList<>();
 
         ReviewQuestionsAdapter rqa = new ReviewQuestionsAdapter(ques_arr,c);
         rv.setAdapter(rqa);
@@ -577,10 +576,11 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     final PopupWindow confirmPopup = getNewPopupWindow(detailsLayout, R.layout.checkin_pin_confirm);
                     final LinearLayout displayView = ((LinearLayout)((CardView)((LinearLayout)(confirmPopup.getContentView())).
                             getChildAt(0)).getChildAt(0));
+                    detailsLayout.getForeground().mutate().setAlpha(255);
                     for (int i = 0; i < displayView.getChildCount(); ++i) {
                         View child = displayView.getChildAt(i);
                         switch(child.getId()) {
-                            case R.id.confirmFrameLayout:
+                            /*case R.id.confirmFrameLayout:
                                 child.findViewById(R.id.confirmButton).setOnClickListener(
                                         new View.OnClickListener() {
                                             @Override
@@ -591,7 +591,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                                                 CouponDetails.this.finish();
                                             }
                                         });
-                                break;
+                                break;*/
                             case R.id.dateTimeLayout:
                                 String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis())),
                                         time = new SimpleDateFormat("HH:mm").format(new Date(System.currentTimeMillis())) + " hrs";
@@ -639,7 +639,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     @Override
     public void onPause() {
         super.onPause();
-        BeaconFinderService.stopOneTimeScan(getApplicationContext());
+        //BeaconFinderService.stopOneTimeScan(getApplicationContext());
     }
 
     public MyOffer getCurrentOffer(String data) {

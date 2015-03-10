@@ -79,7 +79,7 @@ public class Home  extends ActionBarActivity {
     private RecyclerViewAdapter.EndlessRecyclerOnScrollListener mOnScrollListener;
     private int mOffset;
     private boolean mCardsLeft = true;
-    private final int ITEMS_PER_PAGE = 4, INITIAL_LOAD_LIMIT = 5;
+    private final int ITEMS_PER_PAGE = 7, INITIAL_LOAD_LIMIT = 8;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -247,7 +247,7 @@ public class Home  extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        BeaconFinderService.startPeriodicScan(getApplicationContext());
+        //BeaconFinderService.startPeriodicScan(getApplicationContext());
     }
 
     private void locationEnabledCheck() {
