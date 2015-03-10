@@ -22,7 +22,7 @@ public class GCMIntentService extends GCMBaseIntentService {
         super(SENDER_ID);
     }
 
-    private static final String TAG = "===GCMIntentService The manual===";
+    private static final String TAG = "GCMIntentService";
 
     @Override
     protected void onRegistered(Context arg0, String registrationId) {

@@ -72,13 +72,18 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         System.out.println("set content view");
 
         Intent callingIntent = getIntent();
-        initViews();
-        String checkin_id_review;
         if(callingIntent.getBooleanExtra("from_notify_review",false)) {
-            checkin_id_review = callingIntent.getStringExtra("checkin_id");
-            feedback(checkin_id_review);
+            final String checkin_id_review = callingIntent.getStringExtra("checkin_id");
+            // load dialogs only when context is valid
+            findViewById(R.id.detailsLayout).post(new Runnable() {
+                @Override
+                public void run() {
+                    feedback(checkin_id_review);
+                }
+            });
         }
 
+        initViews();
         detailsBundle = new Bundle();
         String vendor_id = callingIntent.getStringExtra("vendor_id");
         String offer_id = callingIntent.getStringExtra("offer_id");
@@ -507,9 +512,9 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
 
     public void feedback(String checkin_id)
     {
-        Context c = getApplicationContext();
+        Context c = CouponDetails.this;
         LayoutInflater lf = LayoutInflater.from(c);
-        View feedbackView = lf.inflate(R.layout.dialog_reviews,null);
+        View feedbackView = lf.inflate(R.layout.dialog_reviews,detailsLayout);
         RecyclerView rv = (RecyclerView) feedbackView.findViewById(R.id.list_questions);
 
         ArrayList<String> ques_arr = new ArrayList<>();
