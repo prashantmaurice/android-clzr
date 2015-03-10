@@ -36,16 +36,18 @@ public class MyLocation {
         }
 
         //don't start listeners if no provider is enabled
-        if (!gps_enabled && !network_enabled)
-            return false;
+        //if (!gps_enabled && !network_enabled)
+        //    return false;
 
-        if (gps_enabled)
+        // Starting listeners even if location is turned off: in order to get notified when user turns on location.
+
+        //if (gps_enabled)
             try {
                 lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListenerGps);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        if (network_enabled)
+        //if (network_enabled)
             try {
                 lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListenerNetwork);
             } catch (Exception e) {

@@ -21,6 +21,7 @@ import android.util.Log;
 import com.facebook.Session;
 import com.koushikdutta.ion.Ion;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -32,7 +33,7 @@ public class ReviewQuestionsAdapter extends RecyclerView.Adapter<ReviewQuestions
 
     private List<String> items;
     static Context c;
-    static List<Integer> stars;
+    private List<Integer> stars;
 
     ReviewQuestionsAdapter(List<String> modelData, Context c) {
         if (modelData == null) {
@@ -40,7 +41,7 @@ public class ReviewQuestionsAdapter extends RecyclerView.Adapter<ReviewQuestions
                     "modelData must not be null");
         }
         this.items = modelData;
-        this.c = c;
+        this.stars = new ArrayList<>();
     }
 
     @Override
@@ -68,7 +69,7 @@ public class ReviewQuestionsAdapter extends RecyclerView.Adapter<ReviewQuestions
                 viewHolder.star3.setImageResource(R.drawable.star_outline);
                 viewHolder.star4.setImageResource(R.drawable.star_outline);
                 viewHolder.star5.setImageResource(R.drawable.star_outline);
-                //stars.add(viewHolder.getPosition(),1);
+                stars.add(viewHolder.getPosition(),1);
             }
         });
         viewHolder.star2.setOnClickListener(new View.OnClickListener() {
@@ -79,7 +80,7 @@ public class ReviewQuestionsAdapter extends RecyclerView.Adapter<ReviewQuestions
                 viewHolder.star3.setImageResource(R.drawable.star_outline);
                 viewHolder.star4.setImageResource(R.drawable.star_outline);
                 viewHolder.star5.setImageResource(R.drawable.star_outline);
-                //stars.add(viewHolder.getPosition(),2);
+                stars.add(viewHolder.getPosition(),2);
             }
         });
         viewHolder.star3.setOnClickListener(new View.OnClickListener() {
@@ -90,7 +91,7 @@ public class ReviewQuestionsAdapter extends RecyclerView.Adapter<ReviewQuestions
                 viewHolder.star3.setImageResource(R.drawable.star_glow);
                 viewHolder.star4.setImageResource(R.drawable.star_outline);
                 viewHolder.star5.setImageResource(R.drawable.star_outline);
-                //stars.add(viewHolder.getPosition(),3);
+                stars.add(viewHolder.getPosition(),3);
             }
         });
         viewHolder.star4.setOnClickListener(new View.OnClickListener() {
@@ -101,7 +102,7 @@ public class ReviewQuestionsAdapter extends RecyclerView.Adapter<ReviewQuestions
                 viewHolder.star3.setImageResource(R.drawable.star_glow);
                 viewHolder.star4.setImageResource(R.drawable.star_glow);
                 viewHolder.star5.setImageResource(R.drawable.star_outline);
-                //stars.add(viewHolder.getPosition(),4);
+                stars.add(viewHolder.getPosition(),4);
             }
         });
         viewHolder.star5.setOnClickListener(new View.OnClickListener() {
@@ -112,10 +113,11 @@ public class ReviewQuestionsAdapter extends RecyclerView.Adapter<ReviewQuestions
                 viewHolder.star3.setImageResource(R.drawable.star_glow);
                 viewHolder.star4.setImageResource(R.drawable.star_glow);
                 viewHolder.star5.setImageResource(R.drawable.star_glow);
-                //stars.add(viewHolder.getPosition(),5);
+                stars.add(viewHolder.getPosition(),5);
             }
         });
-            }
+        viewHolder.txtQuestion.setText(items.get(position));
+    }
 
     @Override
     public int getItemCount() {
@@ -123,6 +125,7 @@ public class ReviewQuestionsAdapter extends RecyclerView.Adapter<ReviewQuestions
     }
 
     public int getStarCount(int position) {
+
         return stars.get(position);
     }
 

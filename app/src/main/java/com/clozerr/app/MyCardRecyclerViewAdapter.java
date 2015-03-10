@@ -94,8 +94,8 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
                         Intent detailIntent = new Intent(c, CouponDetails.class);
                         detailIntent.putExtra("vendor_id", currentItem.getVendorId());
                         detailIntent.putExtra("stamps", currentItem.getStamps());
-                        detailIntent.putExtra("offer_id", 0);
-                        detailIntent.putExtra("offer_text", "Please use home screen to see current offer");
+                        detailIntent.putExtra("offer_id", currentItem.getOfferId());
+                        detailIntent.putExtra("offer_text", currentItem.getOfferDescription());
                         RecyclerViewAdapter.vendor_name_temp = currentItem.getTitle();
                         c.startActivity(detailIntent);
                     }

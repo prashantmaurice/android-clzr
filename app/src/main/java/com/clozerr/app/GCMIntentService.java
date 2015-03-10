@@ -82,14 +82,16 @@ public class GCMIntentService extends GCMBaseIntentService {
         if( type.equals("STANDARD") ) {
             notify(title, message);
         }
+
         else if(type.equals("REVIEW")) {
             String checkin_id = intent.getStringExtra("checkin_id");
-            notifyreview(title,message,checkin_id);
+            String vendor_id = intent.getStringExtra("vendor_id");
+            notifyreview( title, message, checkin_id, vendor_id );
         }
 
     }
 
-    private void notifyreview(String title, String message, String checkin_id) {
+    private void notifyreview(String title, String message, String checkin_id, String vendor_id) {
         Uri sound_uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         //builder.setSound(alarmSound);
         NotificationCompat.Builder mBuilder =
@@ -97,11 +99,14 @@ public class GCMIntentService extends GCMBaseIntentService {
                         .setSmallIcon( R.drawable.ic_launcher )
                         .setContentTitle( title )
                         .setContentText( message )
-                        .setSound( sound_uri );
+                        .setSound( sound_uri )
+                        .setAutoCancel( true );
+
 // Creates an explicit intent for an Activity in your app
         Intent resultIntent = new Intent(this, CouponDetails.class);
         resultIntent.putExtra("from_notify_review",true);
         resultIntent.putExtra("checkin_id",checkin_id);
+        resultIntent.putExtra("vendor_id", vendor_id);
 
 // The stack builder object will contain an artificial back stack for the
 // started Activity.

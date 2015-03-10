@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -79,19 +80,7 @@ public class Home  extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         Log.i("create", "Creation of Home");
 
-        GCMRegistrar.checkDevice(this);
-        GCMRegistrar.checkManifest(this);
-        final String regId = GCMRegistrar.getRegistrationId(this);
-        if (regId.equals("")) {
-            GCMRegistrar.register(this, SENDER_ID);
-        }else{
-            new AsyncGet(Home.this, "http://api.clozerr.com/auth/update/gcm?gcm_id=" + regId, new AsyncGet.AsyncResult() {
-                @Override
-                public void gotResult(String s) {
-                    Log.e("gcm_update_result",s);
-                }
-            });
-        }
+
 
         if (logincheck()==0)
             return;
@@ -211,6 +200,22 @@ public class Home  extends ActionBarActivity {
 
         });
         slidingMyCards();
+
+        GCMRegistrar.checkDevice(this);
+        GCMRegistrar.checkManifest(this);
+        final String regId = GCMRegistrar.getRegistrationId(this);
+        if (regId.equals("")) {
+            GCMRegistrar.register(this, SENDER_ID);
+        }else{
+            SharedPreferences status2 = getSharedPreferences("USER", 0);
+            TOKEN = status2.getString("token", "");
+            new AsyncGet(Home.this, "http://api.clozerr.com/auth/update/gcm?gcm_id=" + regId + "&access_token=" + TOKEN, new AsyncGet.AsyncResult() {
+                @Override
+                public void gotResult(String s) {
+                    Log.e("gcm_update_result",s);
+                }
+            });
+        }
     }
 
     private void locationEnabledCheck() {
@@ -242,7 +247,9 @@ public class Home  extends ActionBarActivity {
             builder.create().show();
         }
     }
-
+    public String resetImageSize( String url ){
+        return url.split("\\?")[0] + "?sz=200";
+    }
     public int logincheck(){
         SharedPreferences status = getSharedPreferences("USER", 0);
         TOKEN = status.getString("token", "");
@@ -257,6 +264,7 @@ public class Home  extends ActionBarActivity {
             USERID = status.getString("gplus_id", "");
             USERNAME = status.getString("gplus_name", "");
             USER_PIC_URL = status.getString("gplus_pic", "");
+            USER_PIC_URL = resetImageSize( USER_PIC_URL );
         }
         Log.i("all saved prefs", status.getAll().toString());
         String loginskipped = status.getString("loginskip", "false");
@@ -284,7 +292,7 @@ public class Home  extends ActionBarActivity {
                 SharedPreferences status = getSharedPreferences("USER", 0);
                 String TOKEN = status.getString("token", "");
 
-                String urlVisited = "http://api.clozerr.com/vendor/get/visited?access_token="+TOKEN;
+                String urlVisited = "http://api.clozerr.com/vendor/get/visitedV2?access_token="+TOKEN;
                 Log.e("urlslide", urlVisited);
 
                 new AsyncGet(Home.this, urlVisited , new AsyncGet.AsyncResult() {
@@ -617,10 +625,19 @@ public class Home  extends ActionBarActivity {
 
         // create alert dialog
         final AlertDialog alertDialog = alertDialogBuilder.create();
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(alertDialog.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+        //alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        alertDialog.show();
+        alertDialog.getWindow().setAttributes(lp);
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        //alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
 
         // show it
-        alertDialog.show();
+        //alertDialog.show();
         Button submitButton = (Button) promptsView.findViewById(R.id.submit);
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override

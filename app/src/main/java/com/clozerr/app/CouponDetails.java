@@ -26,6 +26,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -43,6 +44,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,11 +71,15 @@ public class CouponDetails extends ActionBarActivity {
         System.out.println("set content view");
         Intent callingIntent = getIntent();
         initViews();
-        String checkin_id_review;
+        String checkin_id_review = "";
+
+        final boolean fromreview = callingIntent.getBooleanExtra("from_notify_review",false);
         if(callingIntent.getBooleanExtra("from_notify_review",false)) {
             checkin_id_review = callingIntent.getStringExtra("checkin_id");
-            feedback(checkin_id_review);
+            //feedback(checkin_id_review);
         }
+
+        final String chec = checkin_id_review;
 
         detailsBundle = new Bundle();
         String vendor_id = callingIntent.getStringExtra("vendor_id");
@@ -115,6 +121,18 @@ public class CouponDetails extends ActionBarActivity {
                             object.getString("fid"),object.getString("_id"),
                             0
                     );
+                    ArrayList<String> stringArray = new ArrayList<String>();
+                    JSONArray jsonArray = object.getJSONArray("question");
+                    for(int i = 0, count = jsonArray.length(); i< count; i++)
+                    {
+                        try {
+                            stringArray.add(jsonArray.getString(i));
+                        }
+                        catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    detailsBundle.putStringArrayList("questions",stringArray);
                      /*JSONArray question= object.getJSONArray("question");
                     for(int i=0;i<question.length();i++){
                       ques_arr.add(question.getString(i));
@@ -131,6 +149,7 @@ public class CouponDetails extends ActionBarActivity {
                     detailsBundle.putDouble("longitude", currentItem.getLong());
                     detailsBundle.putString("distance", currentItem.getDistance());
                     detailsBundle.putString("phonenumber", phonenumber);
+                    //currentItem.getQuestions();
 
                     Log.i("fvgh",detailsBundle.toString());
 
@@ -234,6 +253,10 @@ public class CouponDetails extends ActionBarActivity {
                             });
                         }
                     });*/
+
+                    if(fromreview) {
+                        feedback(chec);
+                    }
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -538,27 +561,35 @@ public class CouponDetails extends ActionBarActivity {
         checkinPopup.showAtLocation(detailsLayout, Gravity.CENTER, 0, 0);
     }
 
-    public void feedback(String checkin_id)
+    public void feedback(final String checkin_id)
     {
         Context c = getApplicationContext();
         LayoutInflater lf = LayoutInflater.from(c);
         View feedbackView = lf.inflate(R.layout.dialog_reviews,null);
         RecyclerView rv = (RecyclerView) feedbackView.findViewById(R.id.list_questions);
+        final EditText tv = (EditText) feedbackView.findViewById(R.id.text_remarks);
 
-        ArrayList<String> ques_arr = new ArrayList<String>();
+        final ArrayList<String> ques_arr = detailsBundle.getStringArrayList("questions");
 
-        ReviewQuestionsAdapter rqa = new ReviewQuestionsAdapter(ques_arr,c);
+        final ReviewQuestionsAdapter rqa = new ReviewQuestionsAdapter(ques_arr,c);
         rv.setAdapter(rqa);
+        rv.setLayoutManager(new MyLinearLayoutManager(CouponDetails.this, LinearLayoutManager.VERTICAL, false ));
 
-        final AlertDialog.Builder adbuilder = new AlertDialog.Builder(c);
+        final AlertDialog.Builder adbuilder = new AlertDialog.Builder(CouponDetails.this);
         adbuilder.setView(feedbackView);
 
         adbuilder.setCancelable(true);
         final AlertDialog alertDialog = adbuilder.create();
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(alertDialog.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+        //alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        alertDialog.show();
+        alertDialog.getWindow().setAttributes(lp);
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        // show it
-        alertDialog.show();
         Button submitButton = (Button) feedbackView.findViewById(R.id.submit_feedback);
 
         submitButton.setOnClickListener(new View.OnClickListener() {
@@ -566,12 +597,26 @@ public class CouponDetails extends ActionBarActivity {
             public void onClick(View v) {
                 alertDialog.dismiss();
                 //submit the reviews
-                final String url_review = "";           //fill the url - use function getStarCount(position) to get the stars
+
+                SharedPreferences status = getSharedPreferences("USER", 0);
+                String TOKEN = status.getString("token", "");
+                String remarks = tv.getText().toString();
+                String url_review = "http://api.clozerr.com/review/create?access_token=" + TOKEN + "&checkin_id=" + checkin_id ;           //fill the url - use function getStarCount(position) to get the stars
+                try{
+                    url_review += "&remarks=" + URLEncoder.encode( remarks, "UTF-8");
+                }catch( Exception e ){
+                    e.printStackTrace();
+                }
+
+                for( int i = 0; i < ques_arr.size(); i ++ ) {
+                    url_review += "&stars=" + rqa.getStarCount(i);
+                }
                 new AsyncGet(CouponDetails.this, url_review, new AsyncGet.AsyncResult() {
 
                     @Override
                     public void gotResult(String s) {
-                        Toast.makeText(getApplicationContext(),"Thank you for your reviews",Toast.LENGTH_SHORT).show();
+                        Log.e("review_response",s);
+                        //Toast.makeText(getApplicationContext(),"Thank you for your reviews",Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 });
