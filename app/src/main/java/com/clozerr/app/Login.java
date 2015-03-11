@@ -59,7 +59,7 @@ public class Login extends FragmentActivity implements
     private static final int DIALOG_PLAY_SERVICES_ERROR = 0;
     private static final String SAVED_PROGRESS = "sign_in_progress";
     // GoogleApiClient wraps our service connection to Google Play services and
-// provides access to the users sign in state and Google's APIs.
+    // provides access to the users sign in state and Google's APIs.
     public static GoogleApiClient mGoogleApiClient;
     // We use mSignInProgress to track whether user has clicked sign in.
 // mSignInProgress can be one of three values:
@@ -171,7 +171,7 @@ public class Login extends FragmentActivity implements
             }
         }.start();
     }
-    private GoogleApiClient buildGoogleApiClient() {
+    public GoogleApiClient buildGoogleApiClient() {
 // When we build the GoogleApiClient we specify where connected and
 // connection failed callbacks should be returned, which Google APIs our
 // app uses and which OAuth 2.0 scopes our app requests.

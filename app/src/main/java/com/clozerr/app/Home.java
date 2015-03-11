@@ -441,11 +441,10 @@ public class Home  extends ActionBarActivity {
                     SharedPreferences.Editor editor = example.edit();
                     editor.clear();
                     editor.apply();
-                    if (Login.googleOrFb == 2 && Login.mGoogleApiClient.isConnected())
+                    if (Login.googleOrFb == 2 && Login.mGoogleApiClient != null)
                     {
                         Plus.AccountApi.clearDefaultAccount(Login.mGoogleApiClient);
                         Login.mGoogleApiClient.disconnect();
-                        //Login.mGoogleApiClient.connect();
                     }
                     else if (Login.googleOrFb == 1)
                     {

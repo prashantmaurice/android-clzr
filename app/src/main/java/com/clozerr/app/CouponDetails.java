@@ -73,18 +73,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         setContentView(R.layout.activity_coupon_details);
         System.out.println("set content view");
 
-        Intent callingIntent = getIntent();
-        if(callingIntent.getBooleanExtra("from_notify_review",false)) {
-            final String checkin_id_review = callingIntent.getStringExtra("checkin_id");
-            // load dialogs only when context is valid
-            findViewById(R.id.detailsLayout).post(new Runnable() {
-                @Override
-                public void run() {
-                    feedback(checkin_id_review);
-                }
-            });
-        }
-
+        final Intent callingIntent = getIntent();
         initViews();
         detailsBundle = new Bundle();
         String vendor_id = callingIntent.getStringExtra("vendor_id");
@@ -261,8 +250,15 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                         }
                     });*/
 
-                    if(fromreview) {
-                        feedback(chec);
+                    if(callingIntent.getBooleanExtra("from_notify_review",false)) {
+                        final String checkin_id_review = callingIntent.getStringExtra("checkin_id");
+                        // load dialogs only when context is valid
+                        findViewById(R.id.detailsLayout).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                feedback(checkin_id_review);
+                            }
+                        });
                     }
 
                 } catch (Exception e) {
@@ -529,7 +525,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         return popupWindow;
     }
 
-    public void showCheckinPopup() {
+    /*public void showCheckinPopup() {
         final PopupWindow checkinPopup = getNewPopupWindow(detailsLayout, R.layout.checkin_popup);
         final LinearLayout displayView = (LinearLayout) checkinPopup.getContentView();
 
@@ -585,20 +581,20 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     break;
                 case R.id.dialogTitleView: ((TextView) child).setText(detailsBundle.getString("vendorTitle"));
                     break;
-                /*case R.id.dialogOfferView: ((TextView) child).setText(detailsBundle.getString("offerText"));
-                                           break;*/
-                /*case R.id.webview_offer: ((WebView) child).setWebViewClient(new MyWebViewClient());
-                                         ((WebView) child).lo*/
+                *//*case R.id.dialogOfferView: ((TextView) child).setText(detailsBundle.getString("offerText"));
+                                           break;*//*
+                *//*case R.id.webview_offer: ((WebView) child).setWebViewClient(new MyWebViewClient());
+                                         ((WebView) child).lo*//*
             }
         }
         checkinPopup.showAtLocation(detailsLayout, Gravity.CENTER, 0, 0);
-    }
+    }*/
 
     public void feedback(final String checkin_id)
     {
         Context c = CouponDetails.this;
         LayoutInflater lf = LayoutInflater.from(c);
-        View feedbackView = lf.inflate(R.layout.dialog_reviews,detailsLayout);
+        View feedbackView = lf.inflate(R.layout.dialog_reviews,null);
         RecyclerView rv = (RecyclerView) feedbackView.findViewById(R.id.list_questions);
         final EditText tv = (EditText) feedbackView.findViewById(R.id.text_remarks);
 
@@ -612,15 +608,15 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         adbuilder.setView(feedbackView);
 
         adbuilder.setCancelable(true);
-        final AlertDialog alertDialog = adbuilder.create();
+        final AlertDialog alertDialog = adbuilder.show();
 
-        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        /*WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.copyFrom(alertDialog.getWindow().getAttributes());
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
         lp.height = WindowManager.LayoutParams.MATCH_PARENT;
         //alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         alertDialog.show();
-        alertDialog.getWindow().setAttributes(lp);
+        alertDialog.getWindow().setAttributes(lp);*/
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         Button submitButton = (Button) feedbackView.findViewById(R.id.submit_feedback);
