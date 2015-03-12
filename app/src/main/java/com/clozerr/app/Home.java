@@ -252,7 +252,7 @@ public class Home  extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //BeaconFinderService.startPeriodicScan(getApplicationContext());
+        BeaconFinderService.startPeriodicScan(getApplicationContext());
     }
 
     private void locationEnabledCheck() {

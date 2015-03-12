@@ -6,8 +6,10 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -31,10 +33,9 @@ public class BeaconFinderService extends Service {
     private static enum ScanType { PERIODIC_SCAN, ONE_TIME_SCAN };
     private static boolean isPeriodicScanRunning = false;
     private static final long INTERVAL = 1000 * 60 * /*no. of minutes*/1/3; // TODO make this 10 min
-    private static final long SCAN_PERIOD = 1000 * /*no. of seconds*/8; // TODO modify as required
+    private static final long SCAN_PERIOD = 1000 * /*no. of seconds*/10; // TODO modify as required
     private static final long SCAN_START_DELAY = 1000 * /*no. of seconds*/2; // TODO modify as required
     private static int PERIODIC_SCAN_BEACON_LIMIT = 3;
-    private static boolean isBluetoothLESupported;
     private static final int NOTIFICATION_ID = 0;
     private static HashMap<BluetoothDevice, DeviceParams> periodicScanDeviceMap = new HashMap<>();
 
@@ -85,6 +86,7 @@ public class BeaconFinderService extends Service {
     public BeaconFinderService() {}
 
     private void findBeacons() {
+        boolean isBluetoothLESupported;
         if (mBluetoothAdapter == null) {
             isBluetoothLESupported = false;
             Toast.makeText(mContext, "Sorry, but your device doesn't support Bluetooth." +
@@ -113,17 +115,17 @@ public class BeaconFinderService extends Service {
                             }
                             else if (mScanType == ScanType.PERIODIC_SCAN) {
                                 if (periodicScanDeviceMap.containsKey(device)) {
-                                    if (!periodicScanDeviceMap.get(device).foundInThisScan) {
-                                        ++(periodicScanDeviceMap.get(device).count);
-                                        periodicScanDeviceMap.get(device).foundInThisScan = true;
+                                    if (!periodicScanDeviceMap.get(device).mFoundInThisScan) {
+                                        ++(periodicScanDeviceMap.get(device).mCount);
+                                        periodicScanDeviceMap.get(device).mFoundInThisScan = true;
                                     }
                                 }
                                 else {
                                     periodicScanDeviceMap.put(device, new DeviceParams(1, true));
                                 }
-                                Log.e("Callback", "count-"+ periodicScanDeviceMap.get(device).count+";lim-"+ PERIODIC_SCAN_BEACON_LIMIT);
-                                if (periodicScanDeviceMap.get(device).count == PERIODIC_SCAN_BEACON_LIMIT) {
-                                    periodicScanDeviceMap.get(device).count = 0;
+                                Log.e("Callback", "count-"+ periodicScanDeviceMap.get(device).mCount +";lim-"+ PERIODIC_SCAN_BEACON_LIMIT);
+                                if (periodicScanDeviceMap.get(device).mCount == PERIODIC_SCAN_BEACON_LIMIT) {
+                                    periodicScanDeviceMap.get(device).mCount = 0;
                                     // TODO put pending intent for CouponDetails page here, based on beacon UUID/Address
                                     setNotification("You're in a restaurant. Check in with Clozerr?", null);
                                 }
@@ -191,10 +193,55 @@ public class BeaconFinderService extends Service {
     }
 
     private class CheckForBeacons extends TimerTask {
+        /*private BroadcastReceiver mBluetoothStateReceiver;
+        private IntentFilter mBluetoothStateIntentFilter;*/
+        private Runnable mScanningRunnable;
+        private boolean mHasUserTurnedOnBluetooth;
+
+        public CheckForBeacons() {
+            mScanningRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    startScanning();
+                    // ALTERNATE (just the if condition alone)
+                    if (mScanType == ScanType.PERIODIC_SCAN)
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                stopScanning();
+                            }
+                        }, SCAN_PERIOD);
+                }
+            };
+            // code for checking when bluetooth is ready for scan, but not working consistently
+            /*mBluetoothStateReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(final Context context, final Intent intent) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            final String action = intent.getAction();
+                            Log.v("Broadcast called", "in service");
+                            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED))
+                            {
+                                Log.v("Broadcast called", "state changed");
+                                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
+                                if (state == BluetoothAdapter.STATE_ON) {
+                                    Log.v("Broadcast called", "state on");
+                                    mHandler.post(mScanningRunnable);
+                                }
+                            }
+                        }
+                    });
+                }
+            };
+            mBluetoothStateIntentFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);*/
+        }
+
         public void startScanning() {
             if (mScanType == ScanType.PERIODIC_SCAN)
                 for (DeviceParams params : periodicScanDeviceMap.values())
-                    params.foundInThisScan = false;
+                    params.mFoundInThisScan = false;
 
             if (mUUIDs == null)
                 mBluetoothAdapter.startLeScan(mLeScanCallback);
@@ -204,12 +251,13 @@ public class BeaconFinderService extends Service {
 
         public void stopScanning() {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
-            mBluetoothAdapter.disable();
-            Log.e("scan", "Disabled bluetooth-" + mScanType.toString());
+            if (!mHasUserTurnedOnBluetooth) // if user turned on BT, don't disable it as user might need it
+                mBluetoothAdapter.disable();
+            Log.e("scan", "End of " + mScanType.toString());
 
             if (mScanType == ScanType.PERIODIC_SCAN)
                 for (BluetoothDevice device : periodicScanDeviceMap.keySet())
-                    if (!periodicScanDeviceMap.get(device).foundInThisScan)
+                    if (!periodicScanDeviceMap.get(device).mFoundInThisScan)
                         periodicScanDeviceMap.remove(device);
         }
 
@@ -218,36 +266,26 @@ public class BeaconFinderService extends Service {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (!mBluetoothAdapter.isEnabled()) {
+                    mHasUserTurnedOnBluetooth = mBluetoothAdapter.isEnabled();  // check if user has already enabled BT
+                    if (!mHasUserTurnedOnBluetooth)                             // disabled, so enable BT
                         mBluetoothAdapter.enable();
-                    }
-                    Log.e("scan", "Enabled bluetooth-" + mScanType.toString());
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            startScanning();
-                            // ALTERNATE (just the if condition alone)
-                            if (mScanType == ScanType.PERIODIC_SCAN)
-                                mHandler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        stopScanning();
-                                    }
-                                }, SCAN_PERIOD);
-                        }
-                    }, SCAN_START_DELAY);
+                    Log.e("scan", "Start of " + mScanType.toString());
+
+                    mHandler.postDelayed(mScanningRunnable, SCAN_START_DELAY);  // delay required as scanning will not work
+                                                                                // right upon enabling BT
+                    //registerReceiver(mBluetoothStateReceiver, mBluetoothStateIntentFilter);
                 }
             });
         }
     }
 
     private class DeviceParams {
-        public int count;
-        public boolean foundInThisScan;
+        public int mCount;
+        public boolean mFoundInThisScan;
 
         public DeviceParams(int count, boolean foundInThisScan) {
-            this.count = count;
-            this.foundInThisScan = foundInThisScan;
+            mCount = count;
+            mFoundInThisScan = foundInThisScan;
         }
     }
 }

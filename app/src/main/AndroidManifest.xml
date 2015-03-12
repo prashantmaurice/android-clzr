@@ -112,9 +112,10 @@
         </receiver>
 
         <service android:name=".GCMIntentService" />
-        <service android:name=".BeaconFinderService"
+        <service
+            android:name=".BeaconFinderService"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="true" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -144,6 +145,12 @@
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
+
+        <!--<receiver
+            android:name=".BluetoothStateReceiver"
+            android:enabled="true"
+            android:exported="true" >
+        </receiver>-->
     </application>
 
 </manifest>
