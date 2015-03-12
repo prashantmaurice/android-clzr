@@ -647,6 +647,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                         Log.e("review_response",s);
                         //Toast.makeText(getApplicationContext(),"Thank you for your reviews",Toast.LENGTH_SHORT).show();
                         finish();
+                        System.exit(0);
                     }
                 });
             }
