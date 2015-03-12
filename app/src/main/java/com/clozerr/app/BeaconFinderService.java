@@ -6,10 +6,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -20,6 +18,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -32,12 +32,14 @@ import java.util.UUID;
 public class BeaconFinderService extends Service {
     private static enum ScanType { PERIODIC_SCAN, ONE_TIME_SCAN };
     private static boolean isPeriodicScanRunning = false;
-    private static final long INTERVAL = 1000 * 60 * /*no. of minutes*/1/3; // TODO make this 10 min
-    private static final long SCAN_PERIOD = 1000 * /*no. of seconds*/10; // TODO modify as required
-    private static final long SCAN_START_DELAY = 1000 * /*no. of seconds*/2; // TODO modify as required
-    private static int PERIODIC_SCAN_BEACON_LIMIT = 3;
+    private static final long INTERVAL = 1000 * 60 * /*no. of minutes*/1/3;     // TODO make this 10 min
+    private static final long SCAN_PERIOD = 1000 * /*no. of seconds*/10;        // TODO modify as required
+    private static final long SCAN_START_DELAY = 1000 * /*no. of seconds*/2;    // TODO modify as required
+    private static final int PERIODIC_SCAN_BEACON_LIMIT = 3;
     private static final int NOTIFICATION_ID = 0;
-    private static HashMap<BluetoothDevice, DeviceParams> periodicScanDeviceMap = new HashMap<>();
+    private static final HashMap<String, DeviceParams> periodicScanDeviceMap = new HashMap<>();
+    private static final String mapContentsFileName = "mapconts.txt";
+    private static final String valueSeparator = " ", lineSeparator = "\n";
 
     private Timer mTimer;
     private CheckForBeacons mChecker;
@@ -48,11 +50,13 @@ public class BeaconFinderService extends Service {
     private NotificationManager mNotificationManager;
     private BluetoothAdapter.LeScanCallback mLeScanCallback;
     private ScanType mScanType;
+    // TODO remove this field; only one UUID required for one-time scan and none for periodic
     private UUID[] mUUIDs;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        readHashMapFromFile();
         mTimer = new Timer();
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         mContext = getApplicationContext();
@@ -71,6 +75,7 @@ public class BeaconFinderService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+
         if (intent != null) {
             if (intent.getExtras() != null)
                 mScanType = (ScanType) (intent.getExtras().get("ScanType"));
@@ -83,7 +88,37 @@ public class BeaconFinderService extends Service {
         return START_STICKY;
     }
 
-    public BeaconFinderService() {}
+    private void readHashMapFromFile() {
+        try {
+            FileInputStream fileInputStream = openFileInput(mapContentsFileName);
+            byte[] dataBytes = new byte[fileInputStream.available()];
+            fileInputStream.read(dataBytes);
+            fileInputStream.close();
+            String[] hashMapData = new String(dataBytes).split(lineSeparator);
+            for (String line : hashMapData) {
+                String[] values = line.split(valueSeparator);
+                String address = values[0];
+                DeviceParams params = new DeviceParams(Integer.parseInt(values[1]), false);
+                periodicScanDeviceMap.put(address, params);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeHashMapToFile() {
+        try {
+            FileOutputStream fileOutputStream = openFileOutput(mapContentsFileName, Context.MODE_PRIVATE);
+            String hashMapData = "";
+            for (String deviceAddress : periodicScanDeviceMap.keySet())
+                hashMapData += deviceAddress + valueSeparator +
+                        periodicScanDeviceMap.get(deviceAddress).mCount + lineSeparator;
+            fileOutputStream.write(hashMapData.getBytes());
+            fileOutputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private void findBeacons() {
         boolean isBluetoothLESupported;
@@ -107,28 +142,31 @@ public class BeaconFinderService extends Service {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-
+                            String address = device.getAddress();
                             if (mScanType == ScanType.ONE_TIME_SCAN) {
                                 // TODO DON'T put pending intent for CouponDetails page here. Put something else.
                                 setNotification("You're in a restaurant. Check in with Clozerr?", null);
                                 mChecker.stopScanning();
                             }
                             else if (mScanType == ScanType.PERIODIC_SCAN) {
-                                if (periodicScanDeviceMap.containsKey(device)) {
-                                    if (!periodicScanDeviceMap.get(device).mFoundInThisScan) {
-                                        ++(periodicScanDeviceMap.get(device).mCount);
-                                        periodicScanDeviceMap.get(device).mFoundInThisScan = true;
+                                if (periodicScanDeviceMap.containsKey(address)) {
+                                    if (!periodicScanDeviceMap.get(address).mFoundInThisScan) {
+                                        ++(periodicScanDeviceMap.get(address).mCount);
+                                        periodicScanDeviceMap.get(address).mFoundInThisScan = true;
                                     }
+                                    else return;
                                 }
                                 else {
-                                    periodicScanDeviceMap.put(device, new DeviceParams(1, true));
+                                    periodicScanDeviceMap.put(address, new DeviceParams(1, true));
                                 }
-                                Log.e("Callback", "count-"+ periodicScanDeviceMap.get(device).mCount +";lim-"+ PERIODIC_SCAN_BEACON_LIMIT);
-                                if (periodicScanDeviceMap.get(device).mCount == PERIODIC_SCAN_BEACON_LIMIT) {
-                                    periodicScanDeviceMap.get(device).mCount = 0;
+                                Log.e("Callback", "count-" + periodicScanDeviceMap.get(address).mCount +
+                                        ";lim-" + PERIODIC_SCAN_BEACON_LIMIT);
+                                if (periodicScanDeviceMap.get(address).mCount == PERIODIC_SCAN_BEACON_LIMIT) {
+                                    periodicScanDeviceMap.get(address).mCount = 0;
                                     // TODO put pending intent for CouponDetails page here, based on beacon UUID/Address
                                     setNotification("You're in a restaurant. Check in with Clozerr?", null);
                                 }
+                                writeHashMapToFile();
                             }
                         }
                     });
@@ -256,9 +294,9 @@ public class BeaconFinderService extends Service {
             Log.e("scan", "End of " + mScanType.toString());
 
             if (mScanType == ScanType.PERIODIC_SCAN)
-                for (BluetoothDevice device : periodicScanDeviceMap.keySet())
-                    if (!periodicScanDeviceMap.get(device).mFoundInThisScan)
-                        periodicScanDeviceMap.remove(device);
+                for (String deviceAddress : periodicScanDeviceMap.keySet())
+                    if (!periodicScanDeviceMap.get(deviceAddress).mFoundInThisScan)
+                        periodicScanDeviceMap.remove(deviceAddress);
         }
 
         @Override

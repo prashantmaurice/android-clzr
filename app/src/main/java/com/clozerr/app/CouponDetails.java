@@ -746,8 +746,8 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     // ALTERNATE
     @Override
     public void onPause() {
-        super.onPause();
         BeaconFinderService.stopOneTimeScan(getApplicationContext());
+        super.onPause();
     }
 
     public MyOffer getCurrentOffer(String data) {

@@ -146,11 +146,6 @@
             android:label="@string/title_activity_settings" >
         </activity>
 
-        <!--<receiver
-            android:name=".BluetoothStateReceiver"
-            android:enabled="true"
-            android:exported="true" >
-        </receiver>-->
     </application>
 
 </manifest>
