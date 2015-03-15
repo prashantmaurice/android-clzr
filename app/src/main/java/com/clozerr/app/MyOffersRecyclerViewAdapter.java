@@ -157,7 +157,7 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
                         vendorBundle.putDouble("latitude", currentItem.getLat());
                         vendorBundle.putDouble("longitude", currentItem.getLong());
                         vendorBundle.putString("distance", currentItem.getDistance());
-                        vendorBundle.putString("phonenumber", currentItem.getPhonenumber());
+                        vendorBundle.putString("phonenumber", currentItem.getPhoneNumber());
                         vendor_name_temp = currentItem.getTitle();
                         detailIntent.putExtra("detailsBundle", vendorBundle);*//*
                         vendor_name_temp = currentItem.getTitle();

@@ -252,7 +252,7 @@ public class Home  extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        BeaconFinderService.startPeriodicScan(getApplicationContext());
+        //BeaconFinderService.startPeriodicScan(getApplicationContext());
     }
 
     private void locationEnabledCheck() {
@@ -441,10 +441,11 @@ public class Home  extends ActionBarActivity {
                     SharedPreferences.Editor editor = example.edit();
                     editor.clear();
                     editor.apply();
-                    if (Login.googleOrFb == 2 && Login.mGoogleApiClient != null)
-                    {
-                        Plus.AccountApi.clearDefaultAccount(Login.mGoogleApiClient);
-                        Login.mGoogleApiClient.disconnect();
+                    if (Login.googleOrFb == 2 && Login.mGoogleApiClient != null) {
+                        if (Login.mGoogleApiClient.isConnected()) {
+                            Plus.AccountApi.clearDefaultAccount(Login.mGoogleApiClient);
+                            Login.mGoogleApiClient.disconnect();
+                        }
                     }
                     else if (Login.googleOrFb == 1)
                     {

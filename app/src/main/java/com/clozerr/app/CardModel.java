@@ -24,10 +24,13 @@ public class CardModel {
     private String vendorDescription;
     private int stamps;
     private String stampString;
-    public CardModel(String title, String phonenumber,  String vendorDescription, JSONArray offers,  double lat, double longi, String imageId, String fId, String vId,int stamps) {
+    public CardModel(String title, String phoneNumber,  String vendorDescription, JSONArray offers,  double lat, double longi, String imageId, String fId, String vId,int stamps) {
         this.imageId = imageId;
         this.title = title;
-        if (offers.length() == 0) this.caption = "No offers available";
+        if (offers.length() == 0) {
+            this.caption = "No offers available";
+            this.stampString = "All Offers Done";
+        }
         else {
             try {
                 this.caption = offers.getJSONObject(0).getString("caption");
@@ -36,12 +39,10 @@ public class CardModel {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            this.stamps=stamps;
-            if (stamps < offers.length())
-                this.stampString = stamps + " stamp(s)";
-            else
-                this.stampString = "All Offers Done";
+            this.stampString = stamps + " stamp(s)";
         }
+        this.stamps=stamps;
+
         Location location = new Location("Vendor " + vendorId + " location");
         location.setLatitude(lat);
         location.setLongitude(longi);
@@ -56,7 +57,7 @@ public class CardModel {
         this.vendorId = vId;
         this.lat = lat;
         this.longi = longi;
-        this.phonenumber = phonenumber;
+        this.phonenumber = phoneNumber;
         this.vendorDescription = vendorDescription;
 
     }
@@ -99,7 +100,7 @@ public class CardModel {
     public String getOfferId() {
         return offerId;
     }
-    public String getPhonenumber() {
+    public String getPhoneNumber() {
         return phonenumber;
     }
     public String getVendorDescription() {
