@@ -10,6 +10,7 @@ public class PhoneStartupReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        // TODO pass all downloaded UUIDs as parameter
         //BeaconFinderService.startPeriodicScan(context);
         Log.e("startup", "at phone startup");
     }

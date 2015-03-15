@@ -67,6 +67,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     private Bundle detailsBundle;
     private String pinNumber, gcmId;
     private int MaxOffer=0;
+    private SlidingDrawer mMyOffersDrawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -352,8 +353,10 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
             return true;
         }*/
 
-        if (id == R.id.home) {
-            NavUtils.navigateUpFromSameTask(this);
+        if (id == android.R.id.home) {
+            //NavUtils.navigateUpFromSameTask(this);
+            onBackPressed();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -451,12 +454,12 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
             });
     }*/
     private void slidingMyCards() {
-          SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer1);
+          mMyOffersDrawer = (SlidingDrawer) findViewById(R.id.sliding_drawer1);
           final RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.sliding_list);
           mRecyclerView.setLayoutManager(new LinearLayoutManager(CouponDetails.this));
           mRecyclerView.setItemAnimator(new DefaultItemAnimator());
           mRecyclerView.setHasFixedSize(true);
-          drawer.setOnDrawerOpenListener(new SlidingDrawer.OnDrawerOpenListener() {
+          mMyOffersDrawer.setOnDrawerOpenListener(new SlidingDrawer.OnDrawerOpenListener() {
 
               @Override
 
@@ -469,19 +472,19 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                   SharedPreferences status = getSharedPreferences("USER", 0);
                   String TOKEN = status.getString("token", "");
 
-                  String urlVisited ="http://api.clozerr.com/vendor/get?vendor_id=" + detailsBundle.getString("vendorId")+"&access_token="+TOKEN;
-                  String urlUser = "http://api.clozerr.com/auth?fid="+detailsBundle.getString("fid")+"&access_token=" + TOKEN;
+                  String urlVisited = "http://api.clozerr.com/vendor/get?vendor_id=" + detailsBundle.getString("vendorId") + "&access_token=" + TOKEN;
+                  String urlUser = "http://api.clozerr.com/auth?fid=" + detailsBundle.getString("fid") + "&access_token=" + TOKEN;
 
                   Log.e("urlslide", urlVisited);
                   //Toast.makeText(getApplicationContext(),urlVisited,Toast.LENGTH_SHORT).show();
 
-                  new AsyncGet(CouponDetails.this, urlVisited , new AsyncGet.AsyncResult() {
+                  new AsyncGet(CouponDetails.this, urlVisited, new AsyncGet.AsyncResult() {
                       @Override
                       public void gotResult(String s) {
                           //  t1.setText(s);
 
                           Log.e("resultSlide", s);
-                         // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
+                          // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
 
 
                           /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyCard(s), CouponDetails.this);
@@ -494,15 +497,15 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                           mRecyclerView.setAdapter(myOffersAdapter);
 
                           //l1.setAdapter(adapter);
-                          if(s==null) {
-                              Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
+                          if (s == null) {
+                              Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
                           }
                       }
                   });
-                    }
+              }
 
           });
-            drawer.setOnDrawerCloseListener(new SlidingDrawer.OnDrawerCloseListener() {
+            mMyOffersDrawer.setOnDrawerCloseListener(new SlidingDrawer.OnDrawerCloseListener() {
                 @Override
                 public void onDrawerClosed() {
                     Button offers_menu = (Button) findViewById(R.id.myoffers);
@@ -763,7 +766,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     // ALTERNATE
     @Override
     public void onPause() {
-        //BeaconFinderService.stopOneTimeScan(getApplicationContext());
+        //BeaconFinderService.stopScan(getApplicationContext());
         super.onPause();
     }
 
@@ -781,13 +784,20 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     @Override
     public void onStop(){
         Log.d("destroy","destroy");
-        startService(new Intent(this,LocationService.class));
+        //startService(new Intent(this,LocationService.class));
         super.onStop();
     }
     @Override
     public void onStart(){
         Log.d("destroyonstart","onstart");
-        stopService(new Intent(this, LocationService.class));
+        //stopService(new Intent(this, LocationService.class));
         super.onStart();
+    }
+    @Override
+    public void onBackPressed() {
+        if (!mMyOffersDrawer.isOpened())
+            super.onBackPressed();
+        else
+            mMyOffersDrawer.animateClose();
     }
 }

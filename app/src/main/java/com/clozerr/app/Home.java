@@ -85,7 +85,7 @@ public class Home  extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        stopService(new Intent(this, LocationService.class));
+        //stopService(new Intent(this, LocationService.class));
         Log.i("create", "Creation of Home");
 
 
@@ -255,6 +255,7 @@ public class Home  extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // TODO pass all downloaded UUIDs as second parameter
         //BeaconFinderService.startPeriodicScan(getApplicationContext());
     }
 
@@ -520,7 +521,7 @@ public class Home  extends ActionBarActivity {
             Log.i("GCM Error", "device not registered yet");
         }*/
         Log.d("destroyHome","destroy");
-        startService(new Intent(this, LocationService.class));
+        //startService(new Intent(this, LocationService.class));
         super.onDestroy();
     }
 
@@ -733,11 +734,14 @@ public class Home  extends ActionBarActivity {
         //boolean superBackPressed = false;
         SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer);
         if(drawer.isOpened()) {
-            drawer.close();
+            drawer.animateClose();
         }
         /*else if(drawerLayout.isDrawerOpen(Gravity.LEFT | Gravity.START)) {
             drawerLayout.closeDrawer(Gravity.LEFT | Gravity.START);
         }*/
+        else if (drawerLayout.isDrawerOpen(findViewById(R.id.navDrawerContentLayout))) {
+            drawerLayout.closeDrawer(findViewById(R.id.navDrawerContentLayout));
+        }
         else{
             super.onBackPressed();
             //Button cancel=(Button)findViewById(R.id.cancel);

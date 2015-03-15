@@ -30,7 +30,7 @@ import java.util.UUID;
  */
 @TargetApi(18)
 public class BeaconFinderService extends Service {
-    private static enum ScanType { PERIODIC_SCAN, ONE_TIME_SCAN };
+    public static enum ScanType { PERIODIC_SCAN, ONE_TIME_SCAN };
     private static boolean isPeriodicScanRunning = false;
     private static final long INTERVAL = 1000 * 60 * /*no. of minutes*/1/3;     // TODO make this 10 min
     private static final long SCAN_PERIOD = 1000 * /*no. of seconds*/10;        // TODO modify as required
@@ -76,14 +76,15 @@ public class BeaconFinderService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
+        // TODO default values - used when service restarts as app closes. Modify to downloaded UUIDs
+        mScanType = ScanType.PERIODIC_SCAN;
+        mUUIDs = null;
+
         if (intent != null) {
-            if (intent.getExtras() != null)
-                mScanType = (ScanType) (intent.getExtras().get("ScanType"));
+            mScanType = (ScanType) (intent.getExtras().get("ScanType"));
+            mUUIDs = (UUID[])(intent.getExtras().get("UUIDs"));
         }
-        else mScanType = ScanType.PERIODIC_SCAN;    // default
-        // TODO set this to the array of UUIDs returned
-        mUUIDs = /*(intent.hasExtra("UUIDs")) ? (UUID[])(intent.getExtras().get("UUIDs")) : null*/
-                null;
+
         findBeacons();
         return START_STICKY;
     }
@@ -200,10 +201,20 @@ public class BeaconFinderService extends Service {
         return null;
     }
 
-    public static void startPeriodicScan(Context context) {
+    public static void startScan(Context context, ScanType scanType, UUID[] serviceUUIDs)
+            throws InstantiationError {
+        switch (scanType) {
+            case PERIODIC_SCAN: startPeriodicScan(context, serviceUUIDs); break;
+            case ONE_TIME_SCAN: startOneTimeScan(context, serviceUUIDs); break;
+            default: throw new InstantiationError("No scan mode set");
+        }
+    }
+
+    public static void startPeriodicScan(Context context, UUID[] serviceUUIDs) {
         if (!isPeriodicScanRunning) {
             Intent service = new Intent(context, BeaconFinderService.class);
             service.putExtra("ScanType", ScanType.PERIODIC_SCAN);
+            service.putExtra("UUIDs", serviceUUIDs);
             context.startService(service);
         }
     }
@@ -218,7 +229,7 @@ public class BeaconFinderService extends Service {
     }
 
     // ALTERNATE
-    public static void stopOneTimeScan(Context context) {
+    public static void stopScan(Context context) {
         context.stopService(new Intent(context, BeaconFinderService.class));
     }
 
