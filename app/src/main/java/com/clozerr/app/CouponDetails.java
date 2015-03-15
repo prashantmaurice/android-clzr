@@ -1,6 +1,7 @@
 package com.clozerr.app;
 
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,7 +9,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.CardView;
@@ -66,6 +66,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     private TextView checkinButton;
     private Bundle detailsBundle;
     private String pinNumber, gcmId;
+    private int MaxOffer=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +75,12 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         System.out.println("set content view");
 
         final Intent callingIntent = getIntent();
+        if(callingIntent.getBooleanExtra("Notification",false)){
+            NotificationManager mNotificationManager;
+            mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.cancel(0);
+
+        }
         initViews();
         detailsBundle = new Bundle();
         String vendor_id = callingIntent.getStringExtra("vendor_id");
@@ -85,7 +92,11 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         detailsBundle.putString("offerText", offer_text);
         detailsBundle.putString("offerCaption", offer_caption);
         final ArrayList<String> ques_arr = new ArrayList<>();
-
+        SharedPreferences status = getSharedPreferences("USER", 0);
+        if(status.contains("latitude") && status.contains("longitude")){
+            Home.lat=Double.parseDouble(status.getString("latitude",""));
+            Home.longi=Double.parseDouble(status.getString("longitude",""));
+        }
 
         //Toast.makeText(this, "id - " + vendor_id, Toast.LENGTH_SHORT).show();
         //Log.e("idvendor", vendor_id);
@@ -105,7 +116,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     phonenumber = object.getString("phone");
                     vendorDescription = object.getString("description");
                     Log.e("description", vendorDescription);
-                    CardModel currentItem = new CardModel(
+                    final CardModel currentItem = new CardModel(
                             object.getString("name"),
                             phonenumber,
                             vendorDescription,
@@ -177,7 +188,11 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            showConfirmPopup();
+                           if(currentItem.getStamps()<MaxOffer) {
+                               showConfirmPopup();
+                           }
+                            else
+                               Toast.makeText(getApplicationContext(),"No Offers Available",Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -385,17 +400,19 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         List<MyOffer> rowItems = new ArrayList<>();
         JSONObject temp = null;
         JSONArray array = null;
+        int i=0;
         try {
             Log.e("stringfunction", s);
             temp = new JSONObject(s);
             array = temp.getJSONArray("offers");
 
-            for(int i = 0 ; i < array.length() ; i++){
+            for(i = 0 ; i < array.length() ; i++){
                 MyOffer item = new MyOffer(array.getJSONObject(i).getString("caption"),i+1);
                 rowItems.add(item);
                 System.out.println(item);
             }
         } catch (Exception e) {
+            MaxOffer=i;
             e.printStackTrace();
         }
         return rowItems;
@@ -760,5 +777,17 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
             e.printStackTrace();
         }
         return null;
+    }
+    @Override
+    public void onStop(){
+        Log.d("destroy","destroy");
+        startService(new Intent(this,LocationService.class));
+        super.onStop();
+    }
+    @Override
+    public void onStart(){
+        Log.d("destroyonstart","onstart");
+        stopService(new Intent(this, LocationService.class));
+        super.onStart();
     }
 }

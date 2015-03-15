@@ -85,6 +85,7 @@ public class Home  extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        stopService(new Intent(this, LocationService.class));
         Log.i("create", "Creation of Home");
 
 
@@ -232,6 +233,7 @@ public class Home  extends ActionBarActivity {
 
         slidingMyCards();
 
+
         GCMRegistrar.checkDevice(this);
         GCMRegistrar.checkManifest(this);
         final String regId = GCMRegistrar.getRegistrationId(this);
@@ -247,6 +249,7 @@ public class Home  extends ActionBarActivity {
                 }
             });
         }
+
     }
 
     @Override
@@ -509,14 +512,16 @@ public class Home  extends ActionBarActivity {
 
     @Override
     protected void onDestroy(){
-        super.onDestroy();
+
        /* try{
             GCMRegistrar.onDestroy(this);
             Log.i("onDestroy", "Peacefull");
         }catch(Exception e){
             Log.i("GCM Error", "device not registered yet");
         }*/
-        //stopService(new Intent(this, LocationService.class));
+        Log.d("destroyHome","destroy");
+        startService(new Intent(this, LocationService.class));
+        super.onDestroy();
     }
 
     @Override
