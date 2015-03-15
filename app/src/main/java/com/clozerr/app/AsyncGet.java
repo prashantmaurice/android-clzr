@@ -1,5 +1,6 @@
 package com.clozerr.app;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -20,20 +21,24 @@ public class AsyncGet extends AsyncTask<String, String, String> {
 
     AsyncResult asyncResult;
     String Url;
+    Context c;
     ProgressDialog pDialog;
     public AsyncGet(Context context, String url, AsyncResult as) {
         if(isNetworkAvailable(context)) {
+            c=context;
             asyncResult=as;
             this.Url = url;
+            if (context instanceof Activity) {
+                pDialog = new ProgressDialog(context);
+                pDialog.setMessage("Loading...");
+                //pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                pDialog.setCancelable(false);
+                pDialog.show();
+            }
+                this.execute(url);
 
-            pDialog = new ProgressDialog(context);
-            pDialog.setMessage("Loading...");
-            //pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            pDialog.setCancelable(false);
-            pDialog.show();
-            this.execute(url);
         }
-        else Toast.makeText(context,"Network error. Check your network connections and try again.",Toast.LENGTH_LONG).show();
+        else if (context instanceof Activity) Toast.makeText(context,"Network error. Check your network connections and try again.",Toast.LENGTH_LONG).show();
     }
 
     private boolean isNetworkAvailable(Context context) {
@@ -60,7 +65,8 @@ public class AsyncGet extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String result) {
         asyncResult.gotResult(result);
-        pDialog.hide();
+        if (c instanceof Activity)
+            pDialog.hide();
     }
 
     public static abstract class AsyncResult{
