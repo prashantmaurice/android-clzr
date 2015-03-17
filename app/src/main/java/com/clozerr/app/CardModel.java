@@ -23,10 +23,12 @@ public class CardModel {
     private String phonenumber;
     private String vendorDescription;
     private int stamps;
+    private JSONArray offers;
     private String stampString;
     public CardModel(String title, String phonenumber,  String vendorDescription, JSONArray offers,  double lat, double longi, String imageId, String fId, String vId,int stamps) {
         this.imageId = imageId;
         this.title = title;
+        this.offers=offers;
         if (offers.length() == 0) this.caption = "No offers available";
         else {
             try {
@@ -107,6 +109,19 @@ public class CardModel {
     }
     public String getStampString() {
         return stampString;
+    }
+    public int getMaxStamps(){
+        int i=0;
+        try {
+            for(i = 0 ; i < offers.length() ; i++){
+                String cap=offers.getJSONObject(i).getString("caption");
+            }
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            return i;
+        }
+        return 0;
     }
     public int getStamps() {return stamps; }
 }

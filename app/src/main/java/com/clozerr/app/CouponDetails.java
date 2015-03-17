@@ -66,7 +66,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     private TextView checkinButton;
     private Bundle detailsBundle;
     private String pinNumber, gcmId;
-    private int MaxOffer=0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,7 +188,10 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                           if(currentItem.getStamps()<MaxOffer) {
+                            int c=currentItem.getStamps();
+                            int d=currentItem.getMaxStamps();
+                           if(c<d)
+                           {
                                showConfirmPopup();
                            }
                             else
@@ -412,7 +415,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                 System.out.println(item);
             }
         } catch (Exception e) {
-            MaxOffer=i;
+
             e.printStackTrace();
         }
         return rowItems;
