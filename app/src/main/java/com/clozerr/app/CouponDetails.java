@@ -183,7 +183,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     /* TODO pass the specific UUID(s) of this vendor's beacon(s) as second parameter
                     *  This must be obtained from the same url (url_coupon) and put in detailsBundle.
                     */
-                    BeaconFinderService.startOneTimeScan(getApplicationContext(), null);
+                    //BeaconFinderService.startOneTimeScan(getApplicationContext(), null);
 
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -356,8 +356,10 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
             return true;
         }*/
 
-        if (id == R.id.home) {
-            NavUtils.navigateUpFromSameTask(this);
+        if (id == android.R.id.home) {
+            /*NavUtils.navigateUpFromSameTask(this);*/
+            onBackPressed();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -751,25 +753,24 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
             e.printStackTrace();
             Toast.makeText(this, "String is not JSON", Toast.LENGTH_SHORT).show();
         }
-    }
+    }*/
+    @Override
     public void onBackPressed() {
         SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer1);
         if(drawer.isOpened()) {
-            drawer.close();
+            drawer.animateClose();
         }
         else {
             super.onBackPressed();
         }
-
-        //DrawerLayout d1 = (DrawerLayout) findViewById(R.id.drawerLayout);
-    }*/
+    }
 
     // ALTERNATE
     @Override
     public void onPause() {
-        BeaconFinderService.stopOneTimeScan(getApplicationContext());
+        //BeaconFinderService.stopOneTimeScan(getApplicationContext());
         Log.d("HOME","destroy");
-        startService(new Intent(this, LocationService.class));
+        //startService(new Intent(this, LocationService.class));
         super.onPause();
     }
 
@@ -789,7 +790,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     @Override
     public void onResume(){
         Log.d("destroyonstart","onstart");
-        stopService(new Intent(this, LocationService.class));
+        //stopService(new Intent(this, LocationService.class));
         super.onResume();
     }
 }

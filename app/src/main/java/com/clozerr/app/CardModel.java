@@ -29,7 +29,11 @@ public class CardModel {
         this.imageId = imageId;
         this.title = title;
         this.offers=offers;
-        if (offers.length() == 0) this.caption = "No offers available";
+        this.stamps=stamps;
+        if (offers.length() == 0) {
+            this.caption = "No offers available";
+            this.stampString = "All Offers Done";
+        }
         else {
             try {
                 this.caption = offers.getJSONObject(0).getString("caption");
@@ -38,11 +42,7 @@ public class CardModel {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            this.stamps=stamps;
-            if (stamps < offers.length())
-                this.stampString = stamps + " stamp(s)";
-            else
-                this.stampString = "All Offers Done";
+            this.stampString = stamps + " stamp(s)";
         }
         Location location = new Location("Vendor " + vendorId + " location");
         location.setLatitude(lat);

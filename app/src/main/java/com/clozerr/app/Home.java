@@ -172,7 +172,7 @@ public class Home  extends ActionBarActivity {
                     else {
                         Log.d("app", "no cards to show");
                         mCardsLeft = false;
-                        mMainCardsList.size();
+                        mOffset = mMainCardsList.size();
                     }
                 }
             });
@@ -253,10 +253,10 @@ public class Home  extends ActionBarActivity {
 
     @Override
     protected void onResume() {
-        stopService(new Intent(this, LocationService.class));
+        //stopService(new Intent(this, LocationService.class));
         Log.d("HOME","start");
         super.onResume();
-        BeaconFinderService.startPeriodicScan(getApplicationContext());
+        //BeaconFinderService.startPeriodicScan(getApplicationContext());
     }
 
     private void locationEnabledCheck() {
@@ -481,15 +481,6 @@ public class Home  extends ActionBarActivity {
 
             @Override
             public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-
-            }
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                //new code
-                super.onDrawerOpened( drawerView );
-
                 int draw= rest1;
                 Random rand=new Random();
                 int test=rand.nextInt(7)+1;
@@ -505,6 +496,16 @@ public class Home  extends ActionBarActivity {
                 //imageView.setColorFilter(lcf);
                 user.setBackground(getResources().getDrawable(draw));
                 user.getBackground().setColorFilter(lcf);
+                super.onDrawerClosed(drawerView);
+
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                //new code
+                super.onDrawerOpened( drawerView );
+
+
             }
         };
         drawerLayout.setDrawerListener(drawerToggle);
@@ -520,7 +521,7 @@ public class Home  extends ActionBarActivity {
             Log.i("GCM Error", "device not registered yet");
         }*/
         Log.d("HOME","destroy");
-        startService(new Intent(this, LocationService.class));
+        //startService(new Intent(this, LocationService.class));
         super.onPause();
     }
 
@@ -733,11 +734,13 @@ public class Home  extends ActionBarActivity {
         //boolean superBackPressed = false;
         SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer);
         if(drawer.isOpened()) {
-            drawer.close();
+            drawer.animateClose();
         }
         /*else if(drawerLayout.isDrawerOpen(Gravity.LEFT | Gravity.START)) {
             drawerLayout.closeDrawer(Gravity.LEFT | Gravity.START);
         }*/
+        else if (drawerLayout.isDrawerOpen(findViewById(R.id.drawerContentLayout)))
+            drawerLayout.closeDrawer(findViewById(R.id.drawerContentLayout));
         else{
             super.onBackPressed();
             //Button cancel=(Button)findViewById(R.id.cancel);
