@@ -87,6 +87,8 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         String offer_id = callingIntent.getStringExtra("offer_id");
         String offer_text = callingIntent.getStringExtra("offer_text");
         String offer_caption = callingIntent.getStringExtra("offer_caption");
+        if (offer_text == null || offer_text.equals(""))
+            offer_text = "No further offers available";
 
         detailsBundle.putString("offerId", offer_id);
         detailsBundle.putString("offerText", offer_text);
@@ -188,15 +190,19 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            int c=currentItem.getStamps();
-                            int d=currentItem.getMaxStamps();
+                           /*int c=currentItem.getStamps();
+                           int d=currentItem.getMaxStamps();
                            if(c<d)
                            {
                                showConfirmPopup();
 
                            }
                             else
-                               Toast.makeText(getApplicationContext(),"No Offers Available",Toast.LENGTH_SHORT).show();
+                               Toast.makeText(getApplicationContext(),"No Offers Available",Toast.LENGTH_SHORT).show();*/
+                           if (detailsBundle.getString("offerId") == null)
+                               Toast.makeText(getApplicationContext(),"No further offers available.",Toast.LENGTH_SHORT).show();
+                           else
+                               showConfirmPopup();
                         }
                     });
 
@@ -684,7 +690,6 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         String TOKEN = status.getString("token", "");
 
         String url="http://api.clozerr.com/checkin/create?access_token=" + TOKEN + "&vendor_id=" + detailsBundle.getString("vendorId") +"&offer_id=" + detailsBundle.getString("offerId");
-
         String gcm_id = GCMRegistrar.getRegistrationId(getApplicationContext());
         if( !gcm_id.equals("") )
             url += "&gcm_id=" + gcm_id;
