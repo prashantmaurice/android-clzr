@@ -85,7 +85,6 @@ public class Home  extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        stopService(new Intent(this, LocationService.class));
         Log.i("create", "Creation of Home");
 
 
@@ -254,6 +253,8 @@ public class Home  extends ActionBarActivity {
 
     @Override
     protected void onResume() {
+        stopService(new Intent(this, LocationService.class));
+        Log.d("HOME","start");
         super.onResume();
         BeaconFinderService.startPeriodicScan(getApplicationContext());
     }
@@ -510,7 +511,7 @@ public class Home  extends ActionBarActivity {
     }
 
     @Override
-    protected void onDestroy(){
+    protected void onPause(){
 
        /* try{
             GCMRegistrar.onDestroy(this);
@@ -518,9 +519,9 @@ public class Home  extends ActionBarActivity {
         }catch(Exception e){
             Log.i("GCM Error", "device not registered yet");
         }*/
-        Log.d("destroyHome","destroy");
+        Log.d("HOME","destroy");
         startService(new Intent(this, LocationService.class));
-        super.onDestroy();
+        super.onPause();
     }
 
     @Override
@@ -781,4 +782,6 @@ public class Home  extends ActionBarActivity {
             });
         }
     }
+
+
 }

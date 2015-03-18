@@ -193,6 +193,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                            if(c<d)
                            {
                                showConfirmPopup();
+
                            }
                             else
                                Toast.makeText(getApplicationContext(),"No Offers Available",Toast.LENGTH_SHORT).show();
@@ -767,6 +768,8 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     @Override
     public void onPause() {
         BeaconFinderService.stopOneTimeScan(getApplicationContext());
+        Log.d("HOME","destroy");
+        startService(new Intent(this, LocationService.class));
         super.onPause();
     }
 
@@ -781,16 +784,12 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         }
         return null;
     }
+
+
     @Override
-    public void onStop(){
-        Log.d("destroy","destroy");
-        startService(new Intent(this,LocationService.class));
-        super.onStop();
-    }
-    @Override
-    public void onStart(){
+    public void onResume(){
         Log.d("destroyonstart","onstart");
         stopService(new Intent(this, LocationService.class));
-        super.onStart();
+        super.onResume();
     }
 }

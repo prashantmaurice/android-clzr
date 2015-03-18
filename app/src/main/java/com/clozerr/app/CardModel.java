@@ -121,7 +121,7 @@ public class CardModel {
             e.printStackTrace();
             return i;
         }
-        return 0;
+        return i;
     }
     public int getStamps() {return stamps; }
 }
