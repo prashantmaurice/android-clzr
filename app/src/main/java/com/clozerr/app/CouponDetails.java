@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -38,6 +37,9 @@ import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCal
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.github.ksoichiro.android.observablescrollview.ScrollUtils;
 import com.google.android.gcm.GCMRegistrar;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.koushikdutta.ion.Ion;
 import com.nineoldandroids.view.ViewHelper;
 
@@ -84,6 +86,18 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         initViews();
         detailsBundle = new Bundle();
         String vendor_id = callingIntent.getStringExtra("vendor_id");
+        try
+        {
+            Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
+
+            t.setScreenName(vendor_id+"_screen");
+
+            t.send(new HitBuilders.AppViewBuilder().build());
+        }
+        catch(Exception  e)
+        {
+            Toast.makeText(getApplicationContext(), "Error"+e.getMessage(), Toast.LENGTH_LONG).show();
+        }
         String offer_id = callingIntent.getStringExtra("offer_id");
         String offer_text = callingIntent.getStringExtra("offer_text");
         String offer_caption = callingIntent.getStringExtra("offer_caption");
@@ -797,5 +811,15 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         Log.d("destroyonstart","onstart");
         //stopService(new Intent(this, LocationService.class));
         super.onResume();
+    }
+    @Override
+    protected void onStart(){
+        super.onStart();
+        GoogleAnalytics.getInstance(this).reportActivityStart(this);
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 }
