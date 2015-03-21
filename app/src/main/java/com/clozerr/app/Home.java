@@ -80,7 +80,7 @@ public class Home  extends ActionBarActivity {
     private RecyclerViewAdapter mMainPageAdapter;
     private ArrayList<CardModel> mMainCardsList;
     private RecyclerView.LayoutManager mLayoutManager;
-    private RecyclerViewAdapter.EndlessRecyclerOnScrollListener mOnScrollListener;
+    private EndlessRecyclerOnScrollListener mOnScrollListener;
     private int mOffset;
     private boolean mCardsLeft = true;
     private final int ITEMS_PER_PAGE = 7, INITIAL_LOAD_LIMIT = 8;
@@ -124,13 +124,14 @@ public class Home  extends ActionBarActivity {
 
         mLayoutManager = new LinearLayoutManager(getApplicationContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mOnScrollListener = new RecyclerViewAdapter.EndlessRecyclerOnScrollListener(
+        mOnScrollListener = new EndlessRecyclerOnScrollListener(
                 (LinearLayoutManager)mLayoutManager) {
             @Override
             public void onLoadMore() {
                 loadMoreItems();
             }
         };
+        mRecyclerView.setOnScrollListener(mOnScrollListener);
 
         TextView username = (TextView)findViewById(R.id.nav_text);
         if(USERNAME.length()!=0)
@@ -171,7 +172,6 @@ public class Home  extends ActionBarActivity {
                         mMainCardsList = CardList;
                         mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, Home.this);
                         mRecyclerView.setAdapter(mMainPageAdapter);
-                        mRecyclerView.setOnScrollListener(mOnScrollListener);
                         final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                         editor.putString("home_cards", s);
                         editor.apply();
@@ -219,7 +219,6 @@ public class Home  extends ActionBarActivity {
                             mMainCardsList = CardList;
                             mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, Home.this);
                             mRecyclerView.setAdapter(mMainPageAdapter);
-                            mRecyclerView.setOnScrollListener(mOnScrollListener);
 
                             final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                             editor.putString("home_cards", s);
@@ -265,7 +264,7 @@ public class Home  extends ActionBarActivity {
         Log.d("HOME","start");
         super.onResume();
         //BeaconFinderService.startPeriodicScan(getApplicationContext(), false);
-        PeriodicBFS.startScan(getApplicationContext());
+        //PeriodicBFS.startScan(getApplicationContext());
     }
 
     private void locationEnabledCheck() {

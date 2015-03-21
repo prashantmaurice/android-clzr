@@ -133,8 +133,10 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     JSONObject object = new JSONObject(s);
                     phonenumber = object.getString("phone");
                     vendorDescription = object.getString("description");
-                    if (object.getJSONArray("UUID").length() > 0)
+                    if (object.getJSONArray("UUID").length() > 0) {
                         uuid = UUID.fromString(object.getJSONArray("UUID").getString(0));
+                        Log.e("UUID", uuid.toString());
+                    }
                     Log.e("description", vendorDescription);
                     final CardModel currentItem = new CardModel(
                             object.getString("name"),
@@ -203,10 +205,10 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     // TODO pass the specific UUID(s) of this vendor's beacon(s) as second parameter
                     /*BeaconFinderService.startOneTimeScan(getApplicationContext(),
                                                             new UUID[]{uuid});*/
-                    if (uuid != null)
+                    /*if (uuid != null)
                         OneTimeBFS.startScan(getApplicationContext(), new UUID[]{uuid});
                     else
-                        OneTimeBFS.startScan(getApplicationContext(), null);
+                        OneTimeBFS.startScan(getApplicationContext(), null);*/
 
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -806,7 +808,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     @Override
     public void onPause() {
         //BeaconFinderService.stopOneTimeScan(getApplicationContext());
-        OneTimeBFS.stopScan(getApplicationContext());
+        //OneTimeBFS.stopScan(getApplicationContext());
         Log.d("HOME","destroy");
         //startService(new Intent(this, LocationService.class));
         super.onPause();
