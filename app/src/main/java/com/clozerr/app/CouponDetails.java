@@ -207,8 +207,8 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                                                             new UUID[]{uuid});*/
                     /*if (uuid != null)
                         OneTimeBFS.startScan(getApplicationContext(), new UUID[]{uuid});
-                    else
-                        OneTimeBFS.startScan(getApplicationContext(), null);*/
+                    else*/
+                        OneTimeBFS.startScan(getApplicationContext(), null);
 
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -808,7 +808,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     @Override
     public void onPause() {
         //BeaconFinderService.stopOneTimeScan(getApplicationContext());
-        //OneTimeBFS.stopScan(getApplicationContext());
+        OneTimeBFS.stopScan(getApplicationContext());
         Log.d("HOME","destroy");
         //startService(new Intent(this, LocationService.class));
         super.onPause();

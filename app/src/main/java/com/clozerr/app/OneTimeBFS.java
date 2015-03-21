@@ -10,6 +10,10 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.jaalee.sdk.Beacon;
+import com.jaalee.sdk.Region;
+
+import java.util.List;
 import java.util.UUID;
 
 @TargetApi(18)
@@ -24,14 +28,15 @@ public class OneTimeBFS extends BeaconFinderService {
         super.onDestroy();
     }
 
-    @Override
+    /*@Override
     protected BluetoothAdapter.LeScanCallback createLeScanCallback() {
         return new BluetoothAdapter.LeScanCallback() {
             @Override
-            public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+            public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
+                        getUUIDFromDevice(device);
                         // TODO Auto Check-in
                         putToast("Near this restaurant. Check in?", Toast.LENGTH_LONG);
                         bluetoothAdapter.stopLeScan(mLeScanCallback);
@@ -42,6 +47,26 @@ public class OneTimeBFS extends BeaconFinderService {
                 });
             }
         };
+    }*/
+
+    @Override
+    protected Region createRegion() {
+        // TODO set the UUID to the region
+        return new Region(REGION_UNIQUE_ID, null, null, null);
+    }
+
+    @Override
+    protected void onRangedBeacons(final List<Beacon> beaconList) {
+        for (Beacon beacon : beaconList) {
+            // TODO put condition to check if this is the beacon for the vendor
+            putToast("Near this restaurant. Check in?", Toast.LENGTH_LONG);
+            //bluetoothAdapter.stopLeScan(mLeScanCallback);
+            mBeaconManager.stopRanging(mRegion);
+            turnOffBluetooth();
+            Log.e(TAG, "Stopped Scan");
+            isRunning = false;
+            return;
+        }
     }
 
     @Override
@@ -52,10 +77,11 @@ public class OneTimeBFS extends BeaconFinderService {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (mUUIDs == null)
+                /*if (mUUIDs == null)
                     bluetoothAdapter.startLeScan(mLeScanCallback);
                 else
-                    bluetoothAdapter.startLeScan(mUUIDs, mLeScanCallback);
+                    bluetoothAdapter.startLeScan(mUUIDs, mLeScanCallback);*/
+                mBeaconManager.startRangingAndDiscoverDevice(mRegion);
             }
         }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
     }

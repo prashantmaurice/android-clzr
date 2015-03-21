@@ -1,28 +1,24 @@
 package com.clozerr.app;
 
 import android.annotation.TargetApi;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
+import com.jaalee.sdk.Beacon;
+import com.jaalee.sdk.BeaconManager;
+import com.jaalee.sdk.RangingListener;
+import com.jaalee.sdk.Region;
+import com.jaalee.sdk.ServiceReadyCallback;
+
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -354,6 +350,7 @@ public abstract class BeaconFinderService extends Service {
     }*/
 
     private static final String TAG = "BFS";
+    protected static final String REGION_UNIQUE_ID = "BeaconFinderServiceRegionUniqueID";
 
     // TODO get this from Settings
     protected static boolean isScanningAllowed = true;
@@ -364,14 +361,19 @@ public abstract class BeaconFinderService extends Service {
     protected static BluetoothAdapter bluetoothAdapter;
 
     protected Handler mHandler;
-    protected BluetoothAdapter.LeScanCallback mLeScanCallback;
+    //protected BluetoothAdapter.LeScanCallback mLeScanCallback;
     protected UUID[] mUUIDs;
+    /*private BluetoothGatt mBluetoothGatt;
+    private BluetoothGattCallback mBluetoothGattCallback;*/
+    protected BeaconManager mBeaconManager;
+    protected Region mRegion;
 
     @Override
     public void onCreate() {
         super.onCreate();
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         mHandler = new Handler(Looper.getMainLooper());
+        mBeaconManager = new BeaconManager(getApplicationContext());
     }
 
     @Override
@@ -394,12 +396,61 @@ public abstract class BeaconFinderService extends Service {
 
     protected void findBeacons() {
         if (canScanStart()) {
-            mLeScanCallback = createLeScanCallback();
-            scan();
+            //mLeScanCallback = createLeScanCallback();
+            mRegion = createRegion();
+            mBeaconManager.setRangingListener(new RangingListener() {
+                @Override
+                public void onBeaconsDiscovered(Region region, final List list) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            onRangedBeacons((List<Beacon>)list);
+                        }
+                    });
+                }
+            });
+            mBeaconManager.connect(new ServiceReadyCallback() {
+                @Override
+                public void onServiceReady() {
+                    scan();
+                }
+            });
         }
     }
 
-    protected abstract BluetoothAdapter.LeScanCallback createLeScanCallback();
+    /*protected void getUUIDFromDevice(final BluetoothDevice device) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mBluetoothGattCallback = new BluetoothGattCallback() {
+                    @Override
+                    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+                        super.onConnectionStateChange(gatt, status, newState);
+                        if (newState == BluetoothProfile.STATE_CONNECTED) {
+                            gatt.discoverServices();
+                            Log.e(TAG, "started discovery");
+                        }
+                    }
+
+                    @Override
+                    public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+                        super.onServicesDiscovered(gatt, status);
+                        ArrayList<BluetoothGattService> services = (ArrayList<BluetoothGattService>)gatt.getServices();
+                        Log.e(TAG, "Services length - " + services.size());
+                        for (BluetoothGattService service : services)
+                            Log.e(TAG, "UUID: " + service.getUuid().toString());
+                        gatt.disconnect();
+                        gatt.close();
+                    }
+                };
+                mBluetoothGatt = device.connectGatt(getApplicationContext(), false, mBluetoothGattCallback);
+            }
+        });
+    }*/
+
+    //protected abstract BluetoothAdapter.LeScanCallback createLeScanCallback();
+    protected abstract Region createRegion();
+    protected abstract void onRangedBeacons(final List<Beacon> beaconList);
     protected abstract void scan();
 
     // This function is just for putting toasts, but required as work is done on a background thread

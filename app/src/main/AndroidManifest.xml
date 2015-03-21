@@ -154,6 +154,8 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+        <service android:name="com.jaalee.sdk.service.BeaconService"
+            android:exported="false"/>
     </application>
 
 </manifest>
