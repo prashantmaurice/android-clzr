@@ -16,9 +16,13 @@ import android.widget.Toast;
 import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.Region;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -80,13 +84,14 @@ public class PeriodicBFS extends BeaconFinderService {
             byte[] dataBytes = new byte[fileInputStream.available()];
             fileInputStream.read(dataBytes);
             fileInputStream.close();
-            String[] hashMapData = new String(dataBytes).split(lineSeparator);
-            for (String line : hashMapData) {
-                String[] values = line.split(valueSeparator);
-                String uuid = values[0];
-                DeviceParams params = new DeviceParams(Integer. parseInt(values[1]), false);
+            JSONObject rootObject = new JSONObject(new String(dataBytes));
+            JSONObject hashMapObject = rootObject.getJSONObject("hashMap");
+            for (Iterator<String> iterator = hashMapObject.keys(); iterator.hasNext(); ) {
+                String uuid = iterator.next();
+                DeviceParams params = new DeviceParams(hashMapObject.getInt(uuid), false);
                 periodicScanDeviceMap.put(uuid, params);
             }
+            // TODO if any, read other stored parameters
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -95,12 +100,14 @@ public class PeriodicBFS extends BeaconFinderService {
     private void writeHashMapToFile() {
         try {
             FileOutputStream fileOutputStream = openFileOutput(mapContentsFileName, Context.MODE_PRIVATE);
-            String hashMapData = "";
+            JSONObject hashMapObject = new JSONObject("{}");
             for (String uuid : periodicScanDeviceMap.keySet())
-                // storage format: "UUID1 count1\nUUID2 count2\n" etc etc.
-                hashMapData += uuid + valueSeparator +
-                        periodicScanDeviceMap.get(uuid).mCount + lineSeparator;
-            fileOutputStream.write(hashMapData.getBytes());
+                hashMapObject.put(uuid, periodicScanDeviceMap.get(uuid).mCount);
+            JSONObject rootObject = new JSONObject("{}");
+            rootObject.put("hashMap", hashMapObject);
+            // TODO if any, put other parameters to be stored
+            String fileData = rootObject.toString();
+            fileOutputStream.write(fileData.getBytes());
             fileOutputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
