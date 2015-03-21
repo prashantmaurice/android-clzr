@@ -87,7 +87,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         initViews();
         detailsBundle = new Bundle();
         String vendor_id = callingIntent.getStringExtra("vendor_id");
-        /*try
+        try
         {
             Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
 
@@ -98,7 +98,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         catch(Exception  e)
         {
             Toast.makeText(getApplicationContext(), "Error"+e.getMessage(), Toast.LENGTH_LONG).show();
-        }*/
+        }
         String offer_id = callingIntent.getStringExtra("offer_id");
         String offer_text = callingIntent.getStringExtra("offer_text");
         String offer_caption = callingIntent.getStringExtra("offer_caption");
@@ -525,7 +525,18 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
 
                           MyOffersRecyclerViewAdapter myOffersAdapter = new MyOffersRecyclerViewAdapter(myOffers, currentOffer, CouponDetails.this);
                           mRecyclerView.setAdapter(myOffersAdapter);
+                          try
+                          {
+                              Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
 
+                              t.setScreenName(detailsBundle.getString("vendorId")+"_offer");
+
+                              t.send(new HitBuilders.AppViewBuilder().build());
+                          }
+                          catch(Exception  e)
+                          {
+                              Toast.makeText(getApplicationContext(), "Error"+e.getMessage(), Toast.LENGTH_LONG).show();
+                          }
                           //l1.setAdapter(adapter);
                           if(s==null) {
                               Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
