@@ -32,7 +32,7 @@ public class PeriodicBFS extends BeaconFinderService {
 
     private static final long INTERVAL = TimeUnit.MILLISECONDS.convert(1L, TimeUnit.MINUTES);
                                     // TODO make this 10 min
-    private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(25L, TimeUnit.SECONDS);
+    private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(5L, TimeUnit.SECONDS);
                                     // TODO modify as required
 
     private static final int PERIODIC_SCAN_BEACON_LIMIT = 3;
@@ -119,44 +119,6 @@ public class PeriodicBFS extends BeaconFinderService {
         notificationManager.cancel(NOTIFICATION_ID);
     }
 
-    /*@Override
-    protected BluetoothAdapter.LeScanCallback createLeScanCallback() {
-        return new BluetoothAdapter.LeScanCallback() {
-            @Override
-            public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            getUUIDFromDevice(device);
-                            //UUID uuid = device.getUuids()[0].getUuid();
-                            String address = device.getAddress();
-                            //Log.i("UUIDs", device.getUuids().toString());
-                            if (periodicScanDeviceMap.containsKey(address)) {
-                                if (!periodicScanDeviceMap.get(address).mFoundInThisScan) {
-                                    ++(periodicScanDeviceMap.get(address).mCount);
-                                    periodicScanDeviceMap.get(address).mFoundInThisScan = true;
-                                } else return;
-                            } else {
-                                periodicScanDeviceMap.put(address, new DeviceParams(1, true));
-                            }
-                            Log.e("Callback", "count-" + periodicScanDeviceMap.get(address).mCount +
-                                    ";lim-" + PERIODIC_SCAN_BEACON_LIMIT);
-                            if (periodicScanDeviceMap.get(address).mCount == PERIODIC_SCAN_BEACON_LIMIT) {
-                                periodicScanDeviceMap.get(address).mCount = 0;
-                                // TODO put pending intent for CouponDetails page here, based on beacon UUID
-                                setNotification("You're in a restaurant. Check in with Clozerr?", null);
-                            }
-                            writeHashMapToFile();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            }
-        };
-    }*/
-
     @Override
     protected Region createRegion() {
         return new Region(REGION_UNIQUE_ID, null, null, null);  // search for multiple beacons, so no rules
@@ -231,17 +193,12 @@ public class PeriodicBFS extends BeaconFinderService {
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    /*if (mUUIDs == null)
-                        bluetoothAdapter.startLeScan(mLeScanCallback);
-                    else
-                        bluetoothAdapter.startLeScan(mUUIDs, mLeScanCallback);*/
                     mBeaconManager.startRangingAndDiscoverDevice(mRegion);
                 }
             }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
         }
 
         public void stopScanning() {
-            //bluetoothAdapter.stopLeScan(mLeScanCallback);
             mBeaconManager.stopRanging(mRegion);
             turnOffBluetooth();
             Log.e(TAG, "Stopped Scan");

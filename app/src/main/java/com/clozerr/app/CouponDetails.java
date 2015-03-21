@@ -127,15 +127,15 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                 //Toast.makeText(CouponDetails.this, "Inside gotResult()", Toast.LENGTH_SHORT).show();
                 String phonenumber="0123456789";
                 String vendorDescription="No Restaurant Description Available Now";
-                UUID uuid = null;
+                String uuid = null;
                 try {
                     Log.e("resultAsync", s);
                     JSONObject object = new JSONObject(s);
                     phonenumber = object.getString("phone");
                     vendorDescription = object.getString("description");
                     if (object.getJSONArray("UUID").length() > 0) {
-                        uuid = UUID.fromString(object.getJSONArray("UUID").getString(0));
-                        Log.e("UUID", uuid.toString());
+                        uuid = object.getJSONArray("UUID").getString(0);
+                        Log.e("UUID", uuid);
                     }
                     Log.e("description", vendorDescription);
                     final CardModel currentItem = new CardModel(
@@ -202,26 +202,14 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     detailsView.setText(detailsBundle.getString("description"));
                     locView.setText(detailsBundle.getString("distance"));
 
-                    // TODO pass the specific UUID(s) of this vendor's beacon(s) as second parameter
-                    /*BeaconFinderService.startOneTimeScan(getApplicationContext(),
-                                                            new UUID[]{uuid});*/
-                    /*if (uuid != null)
-                        OneTimeBFS.startScan(getApplicationContext(), new UUID[]{uuid});
-                    else*/
+                    if (uuid != null)
+                        OneTimeBFS.startScan(getApplicationContext(), new String[]{uuid});
+                    else
                         OneTimeBFS.startScan(getApplicationContext(), null);
 
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                           /*int c=currentItem.getStamps();
-                           int d=currentItem.getMaxStamps();
-                           if(c<d)
-                           {
-                               showConfirmPopup();
-
-                           }
-                            else
-                               Toast.makeText(getApplicationContext(),"No Offers Available",Toast.LENGTH_SHORT).show();*/
                            if (detailsBundle.getString("offerId") == null)
                                Toast.makeText(getApplicationContext(),"No further offers available.",Toast.LENGTH_SHORT).show();
                            else
