@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by S.ARAVIND on 3/3/2015.
@@ -32,13 +33,18 @@ import java.util.UUID;
 public class BeaconFinderService extends Service {
     private static enum ScanType { PERIODIC_SCAN, ONE_TIME_SCAN };
     private static boolean isPeriodicScanRunning = false;
-    private static final long INTERVAL = 1000 * 60 * /*no. of minutes*/1/3;     // TODO make this 10 min
-    private static final long SCAN_PERIOD = 1000 * /*no. of seconds*/10;        // TODO modify as required
-    private static final long SCAN_START_DELAY = 1000 * /*no. of seconds*/2;    // TODO modify as required
+
+    private static final long INTERVAL = TimeUnit.MILLISECONDS.convert(10L, TimeUnit.MINUTES);
+                                                // TODO make this 10 min
+    private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(3L, TimeUnit.SECONDS);
+                                                // TODO modify as required
+    private static final long SCAN_START_DELAY = TimeUnit.MILLISECONDS.convert(2L, TimeUnit.SECONDS);
+                                                // TODO modify as required
+
     private static final int PERIODIC_SCAN_BEACON_LIMIT = 3;
     private static final int NOTIFICATION_ID = 0;
-    private static final HashMap<String, DeviceParams> periodicScanDeviceMap = new HashMap<>();
-    private static final String mapContentsFileName = "mapconts.txt";
+    private static final HashMap<UUID, DeviceParams> periodicScanDeviceMap = new HashMap<>();
+    public static final String mapContentsFileName = "mapconts.txt";
     private static final String valueSeparator = " ", lineSeparator = "\n";
 
     private Timer mTimer;
@@ -50,7 +56,6 @@ public class BeaconFinderService extends Service {
     private NotificationManager mNotificationManager;
     private BluetoothAdapter.LeScanCallback mLeScanCallback;
     private ScanType mScanType;
-    // TODO remove this field; only one UUID required for one-time scan and none for periodic
     private UUID[] mUUIDs;
 
     @Override
@@ -69,7 +74,7 @@ public class BeaconFinderService extends Service {
                 .setContentTitle(getResources().getString(R.string.app_name))
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 // TODO set sound
-                /*.setSound(soundUri)*/;
+                .setSound(soundUri);
     }
 
     @Override
@@ -77,13 +82,14 @@ public class BeaconFinderService extends Service {
         super.onStartCommand(intent, flags, startId);
 
         if (intent != null) {
-            if (intent.getExtras() != null)
-                mScanType = (ScanType) (intent.getExtras().get("ScanType"));
+            mScanType = (ScanType) (intent.getExtras().get("ScanType"));
+            mUUIDs = (intent.hasExtra("UUIDs")) ? (UUID[])(intent.getExtras().get("UUIDs")) : null;
         }
-        else mScanType = ScanType.PERIODIC_SCAN;    // default
-        // TODO set this to the array of UUIDs returned
-        mUUIDs = /*(intent.hasExtra("UUIDs")) ? (UUID[])(intent.getExtras().get("UUIDs")) : null*/
-                null;
+        else {                                     // scan has started on closing app - null intent
+            mScanType = ScanType.PERIODIC_SCAN;    // default
+            // TODO do something to get back the UUID array
+            mUUIDs = null;
+        }
         findBeacons();
         return START_STICKY;
     }
@@ -97,9 +103,9 @@ public class BeaconFinderService extends Service {
             String[] hashMapData = new String(dataBytes).split(lineSeparator);
             for (String line : hashMapData) {
                 String[] values = line.split(valueSeparator);
-                String address = values[0];
+                String uuid = values[0];
                 DeviceParams params = new DeviceParams(Integer.parseInt(values[1]), false);
-                periodicScanDeviceMap.put(address, params);
+                periodicScanDeviceMap.put(UUID.fromString(uuid), params);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -110,9 +116,10 @@ public class BeaconFinderService extends Service {
         try {
             FileOutputStream fileOutputStream = openFileOutput(mapContentsFileName, Context.MODE_PRIVATE);
             String hashMapData = "";
-            for (String deviceAddress : periodicScanDeviceMap.keySet())
-                hashMapData += deviceAddress + valueSeparator +
-                        periodicScanDeviceMap.get(deviceAddress).mCount + lineSeparator;
+            for (UUID uuid : periodicScanDeviceMap.keySet())
+                // storage format: "UUID1 count1\nUUID2 count2\n" etc etc.
+                hashMapData += uuid.toString() + valueSeparator +
+                        periodicScanDeviceMap.get(uuid).mCount + lineSeparator;
             fileOutputStream.write(hashMapData.getBytes());
             fileOutputStream.close();
         } catch (Exception e) {
@@ -142,28 +149,26 @@ public class BeaconFinderService extends Service {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            String address = device.getAddress();
                             if (mScanType == ScanType.ONE_TIME_SCAN) {
-                                // TODO DON'T put pending intent for CouponDetails page here. Put something else.
+                                // TODO Auto Check-in
                                 setNotification("You're in a restaurant. Check in with Clozerr?", null);
                                 mChecker.stopScanning();
-                            }
-                            else if (mScanType == ScanType.PERIODIC_SCAN) {
-                                if (periodicScanDeviceMap.containsKey(address)) {
-                                    if (!periodicScanDeviceMap.get(address).mFoundInThisScan) {
-                                        ++(periodicScanDeviceMap.get(address).mCount);
-                                        periodicScanDeviceMap.get(address).mFoundInThisScan = true;
-                                    }
-                                    else return;
+                            } else if (mScanType == ScanType.PERIODIC_SCAN) {
+                                UUID uuid = device.getUuids()[0].getUuid();
+                                Log.i("UUIDs", device.getUuids().toString());
+                                if (periodicScanDeviceMap.containsKey(uuid)) {
+                                    if (!periodicScanDeviceMap.get(uuid).mFoundInThisScan) {
+                                        ++(periodicScanDeviceMap.get(uuid).mCount);
+                                        periodicScanDeviceMap.get(uuid).mFoundInThisScan = true;
+                                    } else return;
+                                } else {
+                                    periodicScanDeviceMap.put(uuid, new DeviceParams(1, true));
                                 }
-                                else {
-                                    periodicScanDeviceMap.put(address, new DeviceParams(1, true));
-                                }
-                                Log.e("Callback", "count-" + periodicScanDeviceMap.get(address).mCount +
+                                Log.e("Callback", "count-" + periodicScanDeviceMap.get(uuid).mCount +
                                         ";lim-" + PERIODIC_SCAN_BEACON_LIMIT);
-                                if (periodicScanDeviceMap.get(address).mCount == PERIODIC_SCAN_BEACON_LIMIT) {
-                                    periodicScanDeviceMap.get(address).mCount = 0;
-                                    // TODO put pending intent for CouponDetails page here, based on beacon UUID/Address
+                                if (periodicScanDeviceMap.get(uuid).mCount == PERIODIC_SCAN_BEACON_LIMIT) {
+                                    periodicScanDeviceMap.get(uuid).mCount = 0;
+                                    // TODO put pending intent for CouponDetails page here, based on beacon UUID
                                     setNotification("You're in a restaurant. Check in with Clozerr?", null);
                                 }
                                 writeHashMapToFile();
@@ -215,6 +220,11 @@ public class BeaconFinderService extends Service {
         context.stopService(new Intent(context, BeaconFinderService.class));
         isPeriodicScanRunning = false;
         context.startService(service);
+    }
+
+    public static void stopPeriodicScan(Context context) {
+        isPeriodicScanRunning = false;
+        context.stopService(new Intent(context, BeaconFinderService.class));
     }
 
     // ALTERNATE
@@ -294,26 +304,26 @@ public class BeaconFinderService extends Service {
             Log.e("scan", "End of " + mScanType.toString());
 
             if (mScanType == ScanType.PERIODIC_SCAN)
-                for (String deviceAddress : periodicScanDeviceMap.keySet())
-                    if (!periodicScanDeviceMap.get(deviceAddress).mFoundInThisScan)
-                        periodicScanDeviceMap.remove(deviceAddress);
+                for (UUID uuid : periodicScanDeviceMap.keySet())
+                    if (!periodicScanDeviceMap.get(uuid).mFoundInThisScan)
+                        periodicScanDeviceMap.remove(uuid);
         }
 
         @Override
         public void run() {
             mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mHasUserTurnedOnBluetooth = mBluetoothAdapter.isEnabled();  // check if user has already enabled BT
-                    if (!mHasUserTurnedOnBluetooth)                             // disabled, so enable BT
-                        mBluetoothAdapter.enable();
-                    Log.e("scan", "Start of " + mScanType.toString());
+                    @Override
+                    public void run() {
+                        mHasUserTurnedOnBluetooth = mBluetoothAdapter.isEnabled();  // check if user has already enabled BT
+                        if (!mHasUserTurnedOnBluetooth)                             // disabled, so enable BT
+                            mBluetoothAdapter.enable();
+                        Log.e("scan", "Start of " + mScanType.toString());
 
-                    mHandler.postDelayed(mScanningRunnable, SCAN_START_DELAY);  // delay required as scanning will not work
-                                                                                // right upon enabling BT
-                    //registerReceiver(mBluetoothStateReceiver, mBluetoothStateIntentFilter);
-                }
-            });
+                        mHandler.postDelayed(mScanningRunnable, SCAN_START_DELAY);  // delay required as scanning will not work
+                                                                                    // right upon enabling BT
+                        //registerReceiver(mBluetoothStateReceiver, mBluetoothStateIntentFilter);
+                    }
+                });
         }
     }
 

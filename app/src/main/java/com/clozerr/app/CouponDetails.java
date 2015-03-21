@@ -50,6 +50,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -102,7 +103,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
 
         //Toast.makeText(this, "id - " + vendor_id, Toast.LENGTH_SHORT).show();
         //Log.e("idvendor", vendor_id);
-        String url_coupon = "http://api.clozerr.com/vendor/get?vendor_id=" + vendor_id;
+        final String url_coupon = "http://api.clozerr.com/vendor/get?vendor_id=" + vendor_id;
         //Toast.makeText(this, "url - " + url_coupon, Toast.LENGTH_SHORT).show();
         //Log.e("urlcoupon", url_coupon);
         new AsyncGet(CouponDetails.this, url_coupon, new AsyncGet.AsyncResult() {
@@ -112,11 +113,13 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                 //Toast.makeText(CouponDetails.this, "Inside gotResult()", Toast.LENGTH_SHORT).show();
                 String phonenumber="0123456789";
                 String vendorDescription="No Restaurant Description Available Now";
+                UUID uuid = null;
                 try {
                     Log.e("resultAsync", s);
                     JSONObject object = new JSONObject(s);
                     phonenumber = object.getString("phone");
                     vendorDescription = object.getString("description");
+                    uuid = UUID.fromString(object.getJSONArray("UUID").getString(0));
                     Log.e("description", vendorDescription);
                     final CardModel currentItem = new CardModel(
                             object.getString("name"),
@@ -182,10 +185,9 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     detailsView.setText(detailsBundle.getString("description"));
                     locView.setText(detailsBundle.getString("distance"));
 
-                    /* TODO pass the specific UUID(s) of this vendor's beacon(s) as second parameter
-                    *  This must be obtained from the same url (url_coupon) and put in detailsBundle.
-                    */
-                    //BeaconFinderService.startOneTimeScan(getApplicationContext(), null);
+                    // TODO pass the specific UUID(s) of this vendor's beacon(s) as second parameter
+                    BeaconFinderService.startOneTimeScan(getApplicationContext(),
+                                                            new UUID[]{uuid});
 
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -773,7 +775,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     // ALTERNATE
     @Override
     public void onPause() {
-        //BeaconFinderService.stopOneTimeScan(getApplicationContext());
+        BeaconFinderService.stopOneTimeScan(getApplicationContext());
         Log.d("HOME","destroy");
         //startService(new Intent(this, LocationService.class));
         super.onPause();

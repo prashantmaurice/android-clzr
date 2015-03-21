@@ -85,9 +85,6 @@ public class Home  extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i("create", "Creation of Home");
-
-
 
         if (logincheck()==0)
             return;
@@ -104,13 +101,10 @@ public class Home  extends ActionBarActivity {
 
         }
         initDrawer();
-        /*Toast.makeText(this, "inited drawer", Toast.LENGTH_SHORT).show();*/
-        Log.d("app", "inited drawer");
         final RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
-        Log.d("app", "inited recycler");
 
         mLayoutManager = new LinearLayoutManager(getApplicationContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -131,7 +125,6 @@ public class Home  extends ActionBarActivity {
         new DownloadImageTask((de.hdodenhof.circleimageview.CircleImageView)findViewById(R.id.nav_image))
                 .execute(USER_PIC_URL);
 
-        Log.d("app", "dld img");
         //startService(new Intent(this, LocationService.class));
         lat = 13;
         longi = 80.2;
@@ -139,7 +132,6 @@ public class Home  extends ActionBarActivity {
 
         SharedPreferences status = getSharedPreferences("USER", 0);
         final String cards = status.getString("home_cards", "");
-        Log.d("app", "got home cards");
         if(!cards.equals("")){
             Log.e("Cached Card", cards);
             mMainCardsList = convertRow(cards);
@@ -256,7 +248,7 @@ public class Home  extends ActionBarActivity {
         //stopService(new Intent(this, LocationService.class));
         Log.d("HOME","start");
         super.onResume();
-        //BeaconFinderService.startPeriodicScan(getApplicationContext());
+        BeaconFinderService.startPeriodicScan(getApplicationContext());
     }
 
     private void locationEnabledCheck() {
