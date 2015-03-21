@@ -28,7 +28,8 @@ public class LocationService extends Service {
     public static int NO_OF_MINUTES = 30;
     public static long INTERVAL = 5000;//NO_OF_MINUTES * ONE_MINUTE;
     public static float MIN_DISTANCE=0;
-    public static float RADIUS=200;
+    public float RADIUS=200;
+    public static int MIN_NEAR_VENDOR=5;
     // no. of providers available
     private static enum PROVIDER_STATUS { BOTH_AVAILABLE, ONE_AVAILABLE, UNAVAILABLE };
     // id numbers for notifications
@@ -131,7 +132,7 @@ public class LocationService extends Service {
         public void onLocationChanged(final Location location) {
             Log.d("change","location");
             Log.d("accuracy",""+location.getAccuracy());
-            String url ="http://api.clozerr.com/vendor/get/near?latitude=" + location.getLatitude() + "&longitude=" + location.getLongitude() + "&limit=" + 1;
+            String url ="http://api.clozerr.com/vendor/get/near?latitude=" + location.getLatitude() + "&longitude=" + location.getLongitude() + "&limit=" + MIN_NEAR_VENDOR;
             new AsyncGet(LocationService.this, url , new AsyncGet.AsyncResult() {
                 @Override
                 public void gotResult(String s) {
@@ -147,8 +148,19 @@ public class LocationService extends Service {
                             loc.setLatitude(lat);
                             loc.setLongitude(longi);
                             float d=loc.distanceTo(location)/1000;
+                            try {
+                                JSONObject neighbour = jsonObject.getJSONObject("settings").getJSONObject("neighbourhoodperks");
+
+                            if(!neighbour.getBoolean("activated")){
+                                continue;
+                            }
+                            RADIUS=neighbour.getInt("distance");
                             if(d > RADIUS){
-                                break;
+                                continue;
+                            }
+                            }
+                            catch (Exception e){
+                                continue;
                             }
                             SharedPreferences example = getSharedPreferences("USER", 0);
                             SharedPreferences.Editor editor = example.edit();
@@ -157,9 +169,15 @@ public class LocationService extends Service {
                             editor.apply();
                             Intent intent = new Intent(LocationService.this, CouponDetails.class);
                             intent.putExtra("vendor_id", jsonObject.getString("_id"));
-                            intent.putExtra("offer_id", jsonObject.getJSONArray("offers").getJSONObject(0).getString("_id"));
-                            intent.putExtra("offer_caption",jsonObject.getJSONArray("offers").getJSONObject(0).getString("caption") );
-                            intent.putExtra("offer_text", jsonObject.getJSONArray("offers").getJSONObject(0).getString("description"));
+                            JSONArray jsonArray=jsonObject.getJSONArray("offers");
+                            if(jsonArray.length()==0){
+                                intent.putExtra("offer_caption","No offers available");
+                            }
+                            else {
+                                intent.putExtra("offer_id", jsonArray.getJSONObject(0).getString("_id"));
+                                intent.putExtra("offer_caption", jsonArray.getJSONObject(0).getString("caption"));
+                                intent.putExtra("offer_text", jsonArray.getJSONObject(0).getString("description"));
+                            }
                             intent.putExtra("Notification",true);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                                     Intent.FLAG_ACTIVITY_SINGLE_TOP |

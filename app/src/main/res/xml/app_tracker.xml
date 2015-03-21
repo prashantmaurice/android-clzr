@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <resources xmlns:tools="http://schemas.android.com/tools"
+        tools:ignore="TypographyDashes">
+    <integer name="ga_sessionTimeout">300</integer>
+    <bool name="ga_autoActivityTracking">false</bool>
+    <!--<screenName name="com.clozerr.app.Home">
+        home
+    </screenName>
+    <screenName name="com.clozerr.app.CouponDetails">
+        coupon details
+    </screenName>-->
+    <string name="ga_trackingId">UA-59529735-1
+    </string>
+</resources>

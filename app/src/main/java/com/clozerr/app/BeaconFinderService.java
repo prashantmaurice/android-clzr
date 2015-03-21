@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 public class BeaconFinderService extends Service {
     private static enum ScanType { PERIODIC_SCAN, ONE_TIME_SCAN };
     private static boolean isPeriodicScanRunning = false;
+    private static boolean isScanningAllowed = true;
 
     private static final long INTERVAL = TimeUnit.MILLISECONDS.convert(10L, TimeUnit.MINUTES);
                                                 // TODO make this 10 min
@@ -205,8 +206,21 @@ public class BeaconFinderService extends Service {
         return null;
     }
 
-    public static void startPeriodicScan(Context context) {
-        if (!isPeriodicScanRunning) {
+    /**
+     * Starts the periodic scan for beacons - if it is not already running <b>and</b> it has
+     * permission to run, i.e. it hasn't been prohibited by the user in his Settings page.
+     * @param context Calling context, required to start the service.
+     * @param override Whether or not to override the user's setting to allow this service -
+     *                 this should only be set as <code><b>true</b></code> from the Settings
+     *                 page itself, where the user has explicitly allowed it.
+     *                 All other calls to this function must have
+     *                 this parameter set to <code><b>false</b></code>.
+     */
+    public static void startPeriodicScan(Context context, boolean override) {
+        if (override)
+            isScanningAllowed = true;
+
+        if (!isPeriodicScanRunning && isScanningAllowed) {
             Intent service = new Intent(context, BeaconFinderService.class);
             service.putExtra("ScanType", ScanType.PERIODIC_SCAN);
             context.startService(service);
@@ -214,16 +228,19 @@ public class BeaconFinderService extends Service {
     }
 
     public static void startOneTimeScan(Context context, UUID[] serviceUUIDs) {
-        Intent service = new Intent(context, BeaconFinderService.class);
-        service.putExtra("ScanType", ScanType.ONE_TIME_SCAN);
-        service.putExtra("UUIDs", serviceUUIDs);
-        context.stopService(new Intent(context, BeaconFinderService.class));
-        isPeriodicScanRunning = false;
-        context.startService(service);
+        if (isScanningAllowed) {
+            Intent service = new Intent(context, BeaconFinderService.class);
+            service.putExtra("ScanType", ScanType.ONE_TIME_SCAN);
+            service.putExtra("UUIDs", serviceUUIDs);
+            context.stopService(new Intent(context, BeaconFinderService.class));
+            isPeriodicScanRunning = false;
+            context.startService(service);
+        }
     }
 
     public static void stopPeriodicScan(Context context) {
         isPeriodicScanRunning = false;
+        isScanningAllowed = false;
         context.stopService(new Intent(context, BeaconFinderService.class));
     }
 

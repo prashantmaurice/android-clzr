@@ -38,6 +38,7 @@ import android.widget.Toast;
 
 import com.facebook.Session;
 import com.google.android.gcm.GCMRegistrar;
+import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.plus.Plus;
 
 import org.json.JSONArray;
@@ -85,6 +86,19 @@ public class Home  extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /*try
+        {
+            Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
+
+            t.setScreenName("home");
+
+            t.send(new HitBuilders.AppViewBuilder().build());
+        }
+        catch(Exception  e)
+        {
+            Toast.makeText(getApplicationContext(), "Error"+e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+        */
 
         if (logincheck()==0)
             return;
@@ -248,7 +262,7 @@ public class Home  extends ActionBarActivity {
         //stopService(new Intent(this, LocationService.class));
         Log.d("HOME","start");
         super.onResume();
-        BeaconFinderService.startPeriodicScan(getApplicationContext());
+        BeaconFinderService.startPeriodicScan(getApplicationContext(), false);
     }
 
     private void locationEnabledCheck() {
@@ -776,6 +790,16 @@ public class Home  extends ActionBarActivity {
                 }
             });
         }
+    }
+    @Override
+    protected void onStart(){
+        super.onStart();
+        GoogleAnalytics.getInstance(this).reportActivityStart(this);
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
 
