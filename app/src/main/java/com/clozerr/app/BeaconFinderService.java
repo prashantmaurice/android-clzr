@@ -444,13 +444,13 @@ public abstract class BeaconFinderService extends Service {
         Log.e(TAG, "BT Off");
     }
 
-    public void disallowScanning(Context context) {
+    public static void disallowScanning(Context context) {
         isScanningAllowed = false;
-        context.stopService(new Intent(context,
-                (this instanceof PeriodicBFS) ? PeriodicBFS.class : OneTimeBFS.class));
+        context.stopService(new Intent(context, PeriodicBFS.class));
+        context.stopService(new Intent(context, OneTimeBFS.class));
     }
 
-    public void allowScanning(Context context) {
+    public static void allowScanning(Context context) {
         isScanningAllowed = true;
         PeriodicBFS.startScan(context);
     }
