@@ -16,6 +16,13 @@ import java.util.UUID;
 public class OneTimeBFS extends BeaconFinderService {
 
     private static final String TAG = "OTBFS";
+    public static boolean isRunning = false;
+
+    @Override
+    public void onDestroy() {
+        isRunning = false;
+        super.onDestroy();
+    }
 
     @Override
     protected BluetoothAdapter.LeScanCallback createLeScanCallback() {
@@ -30,6 +37,7 @@ public class OneTimeBFS extends BeaconFinderService {
                         bluetoothAdapter.stopLeScan(mLeScanCallback);
                         turnOffBluetooth();
                         Log.e(TAG, "Stopped Scan");
+                        isRunning = false;
                     }
                 });
             }
@@ -40,6 +48,7 @@ public class OneTimeBFS extends BeaconFinderService {
     protected void scan() {
         turnOnBluetooth();
         Log.e(TAG, "Started Scan");
+        isRunning = true;
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {

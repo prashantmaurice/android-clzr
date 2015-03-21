@@ -446,8 +446,10 @@ public abstract class BeaconFinderService extends Service {
 
     public static void disallowScanning(Context context) {
         isScanningAllowed = false;
-        context.stopService(new Intent(context, PeriodicBFS.class));
-        context.stopService(new Intent(context, OneTimeBFS.class));
+        if (PeriodicBFS.isRunning)
+            context.stopService(new Intent(context, PeriodicBFS.class));
+        else if (OneTimeBFS.isRunning)
+            context.stopService(new Intent(context, OneTimeBFS.class));
     }
 
     public static void allowScanning(Context context) {
