@@ -10,7 +10,8 @@ public class PhoneStartupReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        BeaconFinderService.startPeriodicScan(context, false);
+        //BeaconFinderService.startPeriodicScan(context, false);
+        PeriodicBFS.startScan(context);
         Log.e("startup", "at phone startup");
     }
 }

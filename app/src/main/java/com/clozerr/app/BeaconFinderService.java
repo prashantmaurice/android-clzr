@@ -30,8 +30,8 @@ import java.util.concurrent.TimeUnit;
  * Created by S.ARAVIND on 3/3/2015.
  */
 @TargetApi(18)
-public class BeaconFinderService extends Service {
-    private static enum ScanType { PERIODIC_SCAN, ONE_TIME_SCAN };
+public abstract class BeaconFinderService extends Service {
+    /*private static enum ScanType { PERIODIC_SCAN, ONE_TIME_SCAN };
     private static boolean isPeriodicScanRunning = false;
     private static boolean isScanningAllowed = true;
 
@@ -74,7 +74,6 @@ public class BeaconFinderService extends Service {
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle(getResources().getString(R.string.app_name))
                 .setPriority(NotificationCompat.PRIORITY_MAX)
-                // TODO set sound
                 .setSound(soundUri);
     }
 
@@ -206,7 +205,7 @@ public class BeaconFinderService extends Service {
         return null;
     }
 
-    /**
+    *//**
      * Starts the periodic scan for beacons - if it is not already running <b>and</b> it has
      * permission to run, i.e. it hasn't been prohibited by the user in his Settings page.
      * @param context Calling context, required to start the service.
@@ -215,7 +214,7 @@ public class BeaconFinderService extends Service {
      *                 page itself, where the user has explicitly allowed it.
      *                 All other calls to this function must have
      *                 this parameter set to <code><b>false</b></code>.
-     */
+     *//*
     public static void startPeriodicScan(Context context, boolean override) {
         if (override)
             isScanningAllowed = true;
@@ -258,8 +257,8 @@ public class BeaconFinderService extends Service {
     }
 
     private class CheckForBeacons extends TimerTask {
-        /*private BroadcastReceiver mBluetoothStateReceiver;
-        private IntentFilter mBluetoothStateIntentFilter;*/
+        *//*private BroadcastReceiver mBluetoothStateReceiver;
+        private IntentFilter mBluetoothStateIntentFilter;*//*
         private Runnable mScanningRunnable;
         private boolean mHasUserTurnedOnBluetooth;
 
@@ -279,7 +278,7 @@ public class BeaconFinderService extends Service {
                 }
             };
             // code for checking when bluetooth is ready for scan, but not working consistently
-            /*mBluetoothStateReceiver = new BroadcastReceiver() {
+            *//*mBluetoothStateReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(final Context context, final Intent intent) {
                     mHandler.post(new Runnable() {
@@ -300,7 +299,7 @@ public class BeaconFinderService extends Service {
                     });
                 }
             };
-            mBluetoothStateIntentFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);*/
+            mBluetoothStateIntentFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);*//*
         }
 
         public void startScanning() {
@@ -352,5 +351,107 @@ public class BeaconFinderService extends Service {
             mCount = count;
             mFoundInThisScan = foundInThisScan;
         }
+    }*/
+
+    private static final String TAG = "BFS";
+
+    // TODO get this from Settings
+    protected static boolean isScanningAllowed = true;
+
+    protected static boolean hasUserActivatedBluetooth = false;
+    protected static final long SCAN_START_DELAY = TimeUnit.MILLISECONDS.convert(2L, TimeUnit.SECONDS);
+                                                // TODO modify as required
+    protected static BluetoothAdapter bluetoothAdapter;
+
+    protected Handler mHandler;
+    protected BluetoothAdapter.LeScanCallback mLeScanCallback;
+    protected UUID[] mUUIDs;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        mHandler = new Handler(Looper.getMainLooper());
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // TODO do something to get back the UUID array if not obtained here
+        if (intent != null) {
+            mUUIDs = (intent.hasExtra("UUIDs")) ? (UUID[])(intent.getExtras().get("UUIDs")) : null;
+        }
+        else {                                     // scan has started on closing app - null intent
+            mUUIDs = null;
+        }
+        findBeacons();
+        return START_STICKY;
+    }
+
+    protected void findBeacons() {
+        if (canScanStart()) {
+            mLeScanCallback = createLeScanCallback();
+            scan();
+        }
+    }
+
+    protected abstract BluetoothAdapter.LeScanCallback createLeScanCallback();
+    protected abstract void scan();
+
+    // This function is just for putting toasts, but required as work is done on a background thread
+    // so if a toast is directly put, the app will crash (Toasts must be put in the UI thread)
+    protected void putToast(final CharSequence text, final int duration) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), text, duration).show();
+            }
+        });
+    }
+
+    protected boolean canScanStart() {
+        if (isScanningAllowed) {
+            if (bluetoothAdapter == null) {
+                putToast("Sorry, but your device doesn't support Bluetooth." +
+                        " Clozerr beacon-finding services won\'t work now.", Toast.LENGTH_LONG);
+                return false;
+            }
+            else if (!getApplicationContext().getPackageManager().
+                        hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+                putToast("Sorry, but your device doesn't support Bluetooth Low Energy." +
+                        " Clozerr beacon-finding services won\'t work now.", Toast.LENGTH_LONG);
+                return false;
+            }
+            else return true;
+        }
+        else return false;
+    }
+
+    protected void turnOnBluetooth() {
+        hasUserActivatedBluetooth = bluetoothAdapter.isEnabled();  // check if user has already enabled BT
+        if (!hasUserActivatedBluetooth)                            // disabled, so enable BT
+            bluetoothAdapter.enable();
+        Log.e(TAG, "BT On");
+    }
+
+    protected void turnOffBluetooth() {
+        if (!hasUserActivatedBluetooth) // if user turned on BT, don't disable it as user might need it
+            bluetoothAdapter.disable();
+        Log.e(TAG, "BT Off");
+    }
+
+    public void disallowScanning(Context context) {
+        isScanningAllowed = false;
+        context.stopService(new Intent(context,
+                (this instanceof PeriodicBFS) ? PeriodicBFS.class : OneTimeBFS.class));
+    }
+
+    public void allowScanning(Context context) {
+        isScanningAllowed = true;
+        PeriodicBFS.startScan(context);
     }
 }

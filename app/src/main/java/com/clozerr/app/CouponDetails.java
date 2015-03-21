@@ -87,7 +87,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         initViews();
         detailsBundle = new Bundle();
         String vendor_id = callingIntent.getStringExtra("vendor_id");
-        try
+        /*try
         {
             Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
 
@@ -98,7 +98,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         catch(Exception  e)
         {
             Toast.makeText(getApplicationContext(), "Error"+e.getMessage(), Toast.LENGTH_LONG).show();
-        }
+        }*/
         String offer_id = callingIntent.getStringExtra("offer_id");
         String offer_text = callingIntent.getStringExtra("offer_text");
         String offer_caption = callingIntent.getStringExtra("offer_caption");
@@ -133,7 +133,8 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     JSONObject object = new JSONObject(s);
                     phonenumber = object.getString("phone");
                     vendorDescription = object.getString("description");
-                    uuid = UUID.fromString(object.getJSONArray("UUID").getString(0));
+                    if (object.getJSONArray("UUID").length() > 0)
+                        uuid = UUID.fromString(object.getJSONArray("UUID").getString(0));
                     Log.e("description", vendorDescription);
                     final CardModel currentItem = new CardModel(
                             object.getString("name"),
@@ -200,8 +201,12 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     locView.setText(detailsBundle.getString("distance"));
 
                     // TODO pass the specific UUID(s) of this vendor's beacon(s) as second parameter
-                    BeaconFinderService.startOneTimeScan(getApplicationContext(),
-                                                            new UUID[]{uuid});
+                    /*BeaconFinderService.startOneTimeScan(getApplicationContext(),
+                                                            new UUID[]{uuid});*/
+                    if (uuid != null)
+                        OneTimeBFS.startScan(getApplicationContext(), new UUID[]{uuid});
+                    else
+                        OneTimeBFS.startScan(getApplicationContext(), null);
 
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -789,7 +794,8 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     // ALTERNATE
     @Override
     public void onPause() {
-        BeaconFinderService.stopOneTimeScan(getApplicationContext());
+        //BeaconFinderService.stopOneTimeScan(getApplicationContext());
+        OneTimeBFS.stopScan(getApplicationContext());
         Log.d("HOME","destroy");
         //startService(new Intent(this, LocationService.class));
         super.onPause();

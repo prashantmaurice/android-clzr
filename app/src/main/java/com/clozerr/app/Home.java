@@ -262,7 +262,8 @@ public class Home  extends ActionBarActivity {
         //stopService(new Intent(this, LocationService.class));
         Log.d("HOME","start");
         super.onResume();
-        BeaconFinderService.startPeriodicScan(getApplicationContext(), false);
+        //BeaconFinderService.startPeriodicScan(getApplicationContext(), false);
+        PeriodicBFS.startScan(getApplicationContext());
     }
 
     private void locationEnabledCheck() {
