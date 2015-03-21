@@ -133,8 +133,13 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     JSONObject object = new JSONObject(s);
                     phonenumber = object.getString("phone");
                     vendorDescription = object.getString("description");
-                    uuid = UUID.fromString(object.getJSONArray("UUID").getString(0));
-                    Log.e("description", vendorDescription);
+                    try {
+                        uuid = UUID.fromString(object.getJSONArray("UUID").getString(0));
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
+                        Log.e("description", vendorDescription);
                     final CardModel currentItem = new CardModel(
                             object.getString("name"),
                             phonenumber,
@@ -520,7 +525,18 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
 
                           MyOffersRecyclerViewAdapter myOffersAdapter = new MyOffersRecyclerViewAdapter(myOffers, currentOffer, CouponDetails.this);
                           mRecyclerView.setAdapter(myOffersAdapter);
+                          try
+                          {
+                              Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
 
+                              t.setScreenName(detailsBundle.getString("vendorId")+"_offer");
+
+                              t.send(new HitBuilders.AppViewBuilder().build());
+                          }
+                          catch(Exception  e)
+                          {
+                              Toast.makeText(getApplicationContext(), "Error"+e.getMessage(), Toast.LENGTH_LONG).show();
+                          }
                           //l1.setAdapter(adapter);
                           if(s==null) {
                               Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();

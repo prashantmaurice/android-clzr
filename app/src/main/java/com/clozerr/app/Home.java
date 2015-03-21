@@ -39,6 +39,8 @@ import android.widget.Toast;
 import com.facebook.Session;
 import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.plus.Plus;
 
 import org.json.JSONArray;
@@ -353,7 +355,18 @@ public class Home  extends ActionBarActivity {
 
                         MyCardRecyclerViewAdapter Cardadapter = new MyCardRecyclerViewAdapter(convertRowMyCard(s), Home.this);
                         mRecyclerView.setAdapter(Cardadapter);
+                        try
+                        {
+                            Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
 
+                            t.setScreenName("MyCards");
+
+                            t.send(new HitBuilders.AppViewBuilder().build());
+                        }
+                        catch(Exception  e)
+                        {
+                            Toast.makeText(getApplicationContext(), "Error"+e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
                         if(s==null) {
                             Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
                         }
