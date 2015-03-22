@@ -50,6 +50,7 @@ public class PeriodicBFS extends BeaconFinderService {
     public static final String mapContentsFileName = "mapContents.txt";
 
     private Timer mTimer;
+    private BeaconCheckTask mCheckTask;
 
     @Override
     public void onCreate() {
@@ -57,6 +58,7 @@ public class PeriodicBFS extends BeaconFinderService {
         readHashMapFromFile();
 
         mTimer = new Timer();
+        mCheckTask = new BeaconCheckTask();
 
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -71,6 +73,8 @@ public class PeriodicBFS extends BeaconFinderService {
     public void onDestroy() {
         dismissNotification();
         isRunning = false;
+        mCheckTask.stopScanning();
+        mTimer.cancel();
         if (!isScanningAllowed) {               // if this was because scanning was disallowed by settings
             periodicScanDeviceMap.clear();
             writeHashMapToFile();               // next time scan starts, start with an empty hash map
@@ -159,7 +163,7 @@ public class PeriodicBFS extends BeaconFinderService {
     @Override
     protected void scan() {
         isRunning = true;
-        mTimer.schedule(new BeaconCheckTask(), 0, INTERVAL);
+        mTimer.schedule(mCheckTask, 0, INTERVAL);
     }
 
     public static void startScan(Context context) {
