@@ -32,11 +32,11 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
         items = new ArrayList<>();
         Log.e("offerlist", String.valueOf(allOffers.size()));
         if (currentOffer != null) {
-            List<MyOffer> usedOffersList = (currentOffer.getStamps() - 1 > 0 && currentOffer.getStamps() - 1 < allOffers.size()) ?
+            List<MyOffer> usedOffersList = (currentOffer.getStamps() - 1 > 0 && currentOffer.getStamps() - 1 - 1 < allOffers.size()) ?
                     allOffers.subList(0, currentOffer.getStamps() - 1) : null;
-            List<MyOffer> upcomingOffersList = (currentOffer.getStamps() < allOffers.size()) ?
+            List<MyOffer> upcomingOffersList = (currentOffer.getStamps() - 1 < allOffers.size()) ?
                     allOffers.subList(currentOffer.getStamps() - 1, currentOffer.getStamps()) : null;
-            List<MyOffer> laterOffersList = (currentOffer.getStamps()  < allOffers.size()) ?
+            List<MyOffer> laterOffersList = (currentOffer.getStamps() < allOffers.size()) ?
                     allOffers.subList(currentOffer.getStamps(), allOffers.size()) : null;
             if (usedOffersList != null) items.add(new MyOffersCardModel("USED", c, usedOffersList));
             if (upcomingOffersList != null) items.add(new MyOffersCardModel("UPCOMING", c, upcomingOffersList));
