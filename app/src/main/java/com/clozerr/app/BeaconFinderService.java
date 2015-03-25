@@ -151,4 +151,5 @@ public abstract class BeaconFinderService extends Service {
         isScanningAllowed = true;
         PeriodicBFS.startScan(context);
     }
+
 }

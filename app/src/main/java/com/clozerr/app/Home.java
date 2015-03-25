@@ -88,6 +88,7 @@ public class Home  extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new AlarmTester(this).execute(this);
         /*try
         {
             Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
@@ -180,7 +181,6 @@ public class Home  extends ActionBarActivity {
                     else {
                         Log.d("app", "no cards to show");
                         mCardsLeft = false;
-                        mOffset = mMainCardsList.size();
                     }
                 }
             });

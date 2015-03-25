@@ -3,6 +3,7 @@ package com.clozerr.app;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -299,6 +300,17 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
 
                 } catch (Exception e) {
                     e.printStackTrace();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(CouponDetails.this);
+                    builder.setTitle("Error")
+                           .setCancelable(false)
+                           .setMessage("Sorry, but the details could not be loaded.")
+                           .setNeutralButton("Go back", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            CouponDetails.this.onBackPressed();
+                        }
+                    });
+                    builder.show();
                 }
             }
 

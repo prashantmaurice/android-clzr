@@ -154,8 +154,15 @@
             android:enabled="true"
             android:exported="true" >
         </service>
-        <service android:name="com.jaalee.sdk.service.BeaconService"
-            android:exported="false"/>
+        <service
+            android:name="com.jaalee.sdk.service.BeaconService"
+            android:exported="false" />
+
+        <receiver
+            android:name="com.clozerr.app.AlarmReceiver"
+            android:enabled="true"
+            android:exported="true" >
+        </receiver>
     </application>
 
 </manifest>

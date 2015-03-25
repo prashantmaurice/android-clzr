@@ -137,6 +137,7 @@ public class PeriodicBFS extends BeaconFinderService {
 
     @Override
     protected void onRangedBeacons(final List<Beacon> beaconList) {
+        Log.e(TAG, "Ranged");
         for (Beacon beacon : beaconList) {
             String uuid = beacon.getProximityUUID();    // TODO modify this if major, minor also required
             if (periodicScanDeviceMap.containsKey(uuid)) {
