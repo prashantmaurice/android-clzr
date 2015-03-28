@@ -36,9 +36,9 @@ public class UUIDDownloader extends BroadcastReceiver {
                     fileOutputStream.write(s.getBytes());
                     fileOutputStream.close();
                     isDownloadDone = true;
-                    Intent updateIntent = new Intent(context, BeaconFinderService.UUIDUpdateReceiver.class);
+                    /*Intent updateIntent = new Intent(context, BeaconFinderService.UUIDUpdateReceiver.class);
                     updateIntent.setAction(BeaconFinderService.ACTION_UPDATE_UUID_DATABASE);
-                    context.sendBroadcast(updateIntent);
+                    context.sendBroadcast(updateIntent);*/
                     Log.e(TAG, "disabled UUIDDownloader");
                     ComponentName receiver = new ComponentName(context, UUIDDownloader.class);
                     context.getPackageManager().setComponentEnabledSetting(receiver,

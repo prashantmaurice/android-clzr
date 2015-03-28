@@ -32,7 +32,7 @@ public class PeriodicBFS extends BeaconFinderService {
 
     private static final long INTERVAL = TimeUnit.MILLISECONDS.convert(20L, TimeUnit.SECONDS);
                                     // TODO make this 10 min
-    private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(10L, TimeUnit.SECONDS);
+    private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(6L, TimeUnit.SECONDS);
                                     // TODO modify as required
 
     private static final int PERIODIC_SCAN_BEACON_LIMIT = 3;
@@ -127,9 +127,11 @@ public class PeriodicBFS extends BeaconFinderService {
             Log.e(TAG, "root - " + rootArray.toString());
             VendorParams vendorParams = null;
             for (int i = 0; i < rootArray.length(); ++i) {
-                if (rootArray.getJSONObject(i) != null) {
+                try {
                     vendorParams = new VendorParams(rootArray.getJSONObject(i));
                     if (vendorParams.mUUID.equalsIgnoreCase(uuid)) break;
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             String title = "Clozerr - " + vendorParams.mName;
@@ -141,7 +143,8 @@ public class PeriodicBFS extends BeaconFinderService {
             detailIntent.putExtra("offer_text", vendorParams.mNextOfferDescription);
             detailIntent.putExtra("from_periodic_scan", true);
             PendingIntent notificationIntent = PendingIntent.getActivity(context, 1234,
-                                                                         detailIntent, 0);
+                                                                         detailIntent,
+                                                                         PendingIntent.FLAG_ONE_SHOT);
             notificationBuilder.setContentTitle(title)
                                .setContentText(contentText)
                                .setContentIntent(notificationIntent)
@@ -176,7 +179,7 @@ public class PeriodicBFS extends BeaconFinderService {
                         periodicScanDeviceMap.get(uuid).mFoundInThisScan = true;
                     } else continue;
                 } else {
-                    periodicScanDeviceMap.put(uuid, new DeviceParams(3, true));
+                    periodicScanDeviceMap.put(uuid, new DeviceParams(1, true));
                 }
                 Log.e(TAG, "count-" + periodicScanDeviceMap.get(uuid).mCount +
                         ";lim-" + PERIODIC_SCAN_BEACON_LIMIT);

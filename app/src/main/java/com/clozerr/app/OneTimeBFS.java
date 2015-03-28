@@ -77,7 +77,9 @@ public class OneTimeBFS extends BeaconFinderService {
     }
 
     public static void checkAndStopScan(Context context) {
-        if (running)
+        if (running) {
             context.stopService(new Intent(context, OneTimeBFS.class));
+            PeriodicBFS.checkAndStartScan(context);
+        }
     }
 }

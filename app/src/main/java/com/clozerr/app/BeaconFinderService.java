@@ -39,7 +39,7 @@ public abstract class BeaconFinderService extends Service {
     private static final String TAG = "BFS";
     protected static final String REGION_UNIQUE_ID = "BeaconFinderServiceRegionUniqueID";
     protected static final long SCAN_START_DELAY = TimeUnit.MILLISECONDS.convert(2L, TimeUnit.SECONDS);
-    public static final String ACTION_UPDATE_UUID_DATABASE = "UpdateUUIDDatabase";
+    //public static final String ACTION_UPDATE_UUID_DATABASE = "UpdateUUIDDatabase";
 
     protected static boolean isBLESupported = true;
     // TODO get isScanningAllowed from Settings
@@ -70,7 +70,10 @@ public abstract class BeaconFinderService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        findBeacons();
+        if (intent == null)
+            PeriodicBFS.checkAndStartScan(getApplicationContext());
+        else
+            findBeacons();
         return START_STICKY;
     }
 
@@ -129,8 +132,8 @@ public abstract class BeaconFinderService extends Service {
             }
             else {
                 isBLESupported = true;
-                getApplicationContext().registerReceiver(new UUIDUpdateReceiver(),
-                        new IntentFilter(ACTION_UPDATE_UUID_DATABASE));
+                /*getApplicationContext().registerReceiver(new UUIDUpdateReceiver(),
+                        new IntentFilter(ACTION_UPDATE_UUID_DATABASE));*/
                 UUIDDownloadBaseReceiver.scheduleDownload(getApplicationContext());
                 if (uuidDatabase == null) {
                     try {
@@ -155,12 +158,15 @@ public abstract class BeaconFinderService extends Service {
             JSONArray rootArray = new JSONArray(new String(dataBytes));
             uuidDatabase = new ArrayList<String>();
             for (int i = 0; i < rootArray.length(); ++i)
-                if (rootArray.getJSONObject(i).getJSONArray("UUID").length() > 0)
+                try {
+                    if (rootArray.getJSONObject(i).getJSONArray("UUID").length() > 0)
                     uuidDatabase.add(rootArray.getJSONObject(i).getJSONArray("UUID").getString(0));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
         } catch (Exception e) {
-            if (e instanceof FileNotFoundException)
-                readUUIDsFromFile(context);
-            else throw e;
+            if (!(e instanceof FileNotFoundException))
+                throw e;
         }
     }
 
@@ -212,7 +218,7 @@ public abstract class BeaconFinderService extends Service {
         }
     }
 
-    public class UUIDUpdateReceiver extends BroadcastReceiver {
+    /*public class UUIDUpdateReceiver extends BroadcastReceiver {
         private static final String TAG = "UUIDUpdateReceiver";
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -220,14 +226,14 @@ public abstract class BeaconFinderService extends Service {
             if (intent.getAction() != null && intent.getAction().equals(ACTION_UPDATE_UUID_DATABASE)) {
                 try {
                     readUUIDsFromFile(context);
-                    /*if (BeaconFinderService.this.mIsWaitingForUpdate) {
-                        *//*synchronized (BeaconFinderService.this.mIsWaitingForUpdate) {
+                    *//*if (BeaconFinderService.this.mIsWaitingForUpdate) {
+                        *//**//*synchronized (BeaconFinderService.this.mIsWaitingForUpdate) {
                             BeaconFinderService.this.mIsWaitingForUpdate = false;
                             BeaconFinderService.this.mIsWaitingForUpdate.notify();
-                        }*//*
+                        }*//**//*
                         BeaconFinderService.this.mIsWaitingForUpdate = false;
                         BeaconFinderService.this.notify();
-                    }*/
+                    }*//*
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -235,5 +241,5 @@ public abstract class BeaconFinderService extends Service {
                 }
             }
         }
-    }
+    }*/
 }
