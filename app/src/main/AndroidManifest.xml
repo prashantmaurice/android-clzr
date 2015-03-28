@@ -159,9 +159,17 @@
             android:exported="false" />
 
         <receiver
-            android:name="com.clozerr.app.AlarmReceiver"
+            android:name=".UUIDDownloadBaseReceiver"
             android:enabled="true"
             android:exported="true" >
+        </receiver>
+        <receiver
+            android:name=".UUIDDownloader"
+            android:enabled="false"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
         </receiver>
     </application>
 

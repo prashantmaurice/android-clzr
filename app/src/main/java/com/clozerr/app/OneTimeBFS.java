@@ -20,33 +20,36 @@ import java.util.UUID;
 public class OneTimeBFS extends BeaconFinderService {
 
     private static final String TAG = "OTBFS";
-    public static boolean isRunning = false;
+    private static String uuid = "";
+    private static boolean running = false;
 
     @Override
     public void onDestroy() {
-        isRunning = false;
+        running = false;
         super.onDestroy();
     }
 
+    public static boolean isRunning() { return running; }
+
     @Override
     protected Region createRegion() {
-        // TODO set the UUID to the region
-        if (mUUIDs != null)
-            return new Region(REGION_UNIQUE_ID, mUUIDs[0], null, null);
-        else
-            return new Region(REGION_UNIQUE_ID, null, null, null);
+        String regionUUID = "";
+        for (char c : uuid.toCharArray())
+            if (c != '-') regionUUID += String.valueOf(c);
+        Log.e(TAG, "uuids - " + uuid + " & " + regionUUID);
+        return new Region(REGION_UNIQUE_ID, regionUUID, null, null);
     }
 
     @Override
     protected void onRangedBeacons(final List<Beacon> beaconList) {
         for (Beacon beacon : beaconList) {
-            // TODO put condition to check if this is the beacon for the vendor
-            if (mUUIDs != null && beacon.getProximityUUID().equalsIgnoreCase(mUUIDs[0])) {
+            if (beacon.getProximityUUID().equalsIgnoreCase(uuid)) {
+                // TODO Auto check-in
                 putToast("Near this restaurant. Check in?", Toast.LENGTH_LONG);
                 mBeaconManager.stopRanging(mRegion);
                 turnOffBluetooth();
                 Log.e(TAG, "Stopped Scan");
-                isRunning = false;
+                running = false;
                 return;
             }
         }
@@ -56,7 +59,7 @@ public class OneTimeBFS extends BeaconFinderService {
     protected void scan() {
         turnOnBluetooth();
         Log.e(TAG, "Started Scan");
-        isRunning = true;
+        running = true;
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -65,14 +68,16 @@ public class OneTimeBFS extends BeaconFinderService {
         }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
     }
 
-    public static void startScan(Context context, String[] UUIDs) {
-        context.stopService(new Intent(context, PeriodicBFS.class));
-        Intent service = new Intent(context, OneTimeBFS.class);
-        service.putExtra("UUIDs", UUIDs);
-        context.startService(service);
+    public static void checkAndStartScan(Context context, String vendorUuid) {
+        if (vendorUuid != null && !vendorUuid.isEmpty() && isBLESupported) {
+            context.stopService(new Intent(context, PeriodicBFS.class));
+            uuid = vendorUuid;
+            context.startService(new Intent(context, OneTimeBFS.class));
+        }
     }
 
-    public static void stopScan(Context context) {
-        context.stopService(new Intent(context, OneTimeBFS.class));
+    public static void checkAndStopScan(Context context) {
+        if (running)
+            context.stopService(new Intent(context, OneTimeBFS.class));
     }
 }

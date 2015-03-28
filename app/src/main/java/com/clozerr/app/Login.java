@@ -453,10 +453,12 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                 resolveSignInError();
             }
         }
-        onSignedOut();
+        else onSignedOut();
+        mSignInButton.setEnabled(true);
     }
     private void onSignedOut() {
-        mSignInButton.setEnabled(true);
+        Toast.makeText(this, "An error occurred while signing in... please try signing in again.",
+                Toast.LENGTH_LONG).show();
     }
     private void resolveSignInError() {
         if (mSignInIntent != null) {

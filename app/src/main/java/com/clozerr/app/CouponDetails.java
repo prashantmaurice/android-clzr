@@ -53,7 +53,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -203,10 +202,9 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     detailsView.setText(detailsBundle.getString("description"));
                     locView.setText(detailsBundle.getString("distance"));
 
-                    if (uuid != null)
-                        OneTimeBFS.startScan(getApplicationContext(), new String[]{uuid});
-                    else
-                        OneTimeBFS.startScan(getApplicationContext(), null);
+                    if (!callingIntent.getBooleanExtra("from_periodic_scan", false))
+                        OneTimeBFS.checkAndStartScan(getApplicationContext(), uuid);
+                    else PeriodicBFS.dismissNotification(CouponDetails.this);
 
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -498,7 +496,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
               public void onDrawerOpened() {
 
                   Button offers_menu = (Button) findViewById(R.id.myoffers);
-                  offers_menu.setText(RecyclerViewAdapter.vendor_name_temp);
+                  offers_menu.setText(detailsBundle.getString("vendorTitle"));
                   offers_menu.setTextColor(Color.parseColor("#FFFFFF"));
                   offers_menu.setBackgroundColor(Color.parseColor("#EF6C00"));
                   SharedPreferences status = getSharedPreferences("USER", 0);
@@ -807,8 +805,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     // ALTERNATE
     @Override
     public void onPause() {
-        //BeaconFinderService.stopOneTimeScan(getApplicationContext());
-        OneTimeBFS.stopScan(getApplicationContext());
+        OneTimeBFS.checkAndStopScan(getApplicationContext());
         Log.d("HOME","destroy");
         //startService(new Intent(this, LocationService.class));
         super.onPause();

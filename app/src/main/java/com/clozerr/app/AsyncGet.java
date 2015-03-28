@@ -6,6 +6,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Toast;
 
 import org.apache.http.client.HttpClient;
@@ -23,25 +25,32 @@ public class AsyncGet extends AsyncTask<String, String, String> {
     String Url;
     Context c;
     ProgressDialog pDialog;
+    Handler handler;
     public AsyncGet(Context context, String url, AsyncResult as) {
+        handler = new Handler(Looper.getMainLooper());
         if(isNetworkAvailable(context)) {
             c=context;
             asyncResult=as;
             this.Url = url;
             if (context instanceof Activity) {
-                pDialog = new ProgressDialog(context);
-                pDialog.setMessage("Loading...");
-                //pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                pDialog.setCancelable(false);
-                pDialog.show();
+                try {
+                    pDialog = new ProgressDialog(context);
+                    pDialog.setMessage("Loading...");
+                    //pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                    pDialog.setCancelable(false);
+                    pDialog.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
                 this.execute(url);
 
         }
-        else if (context instanceof Activity) Toast.makeText(context,"Network error. Check your network connections and try again.",Toast.LENGTH_LONG).show();
+        else if (context instanceof Activity)
+            Toast.makeText(context,"Network error. Check your network connections and try again.",Toast.LENGTH_LONG).show();
     }
 
-    private boolean isNetworkAvailable(Context context) {
+    static boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
@@ -58,6 +67,13 @@ public class AsyncGet extends AsyncTask<String, String, String> {
             content = hc.execute(hGet,rHand);
         } catch (Exception e) {
             e.printStackTrace();
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(c, "Network error. Check your network connections and try again.",
+                            Toast.LENGTH_LONG).show();
+                }
+            });
         }
 
         return content;

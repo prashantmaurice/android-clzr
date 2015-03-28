@@ -88,7 +88,7 @@ public class Home  extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new AlarmTester(this).execute(this);
+
         /*try
         {
             Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
@@ -226,10 +226,6 @@ public class Home  extends ActionBarActivity {
                         }
                         else {
                             mCardsLeft = false;
-                            mOffset = mMainCardsList.size();
-                        }
-                        if(s==null) {
-                            Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -263,8 +259,7 @@ public class Home  extends ActionBarActivity {
         //stopService(new Intent(this, LocationService.class));
         Log.d("HOME","start");
         super.onResume();
-        //BeaconFinderService.startPeriodicScan(getApplicationContext(), false);
-        PeriodicBFS.startScan(getApplicationContext());
+        PeriodicBFS.checkAndStartScan(getApplicationContext());
     }
 
     private void locationEnabledCheck() {
@@ -466,8 +461,10 @@ public class Home  extends ActionBarActivity {
                     editor.apply();
                     if (Login.googleOrFb == 2 && Login.mGoogleApiClient != null)
                     {
-                        Plus.AccountApi.clearDefaultAccount(Login.mGoogleApiClient);
-                        Login.mGoogleApiClient.disconnect();
+                        if (Login.mGoogleApiClient.isConnected()) {
+                            Plus.AccountApi.clearDefaultAccount(Login.mGoogleApiClient);
+                            Login.mGoogleApiClient.disconnect();
+                        }
                     }
                     else if (Login.googleOrFb == 1)
                     {
