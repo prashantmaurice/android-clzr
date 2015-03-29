@@ -23,7 +23,7 @@
         android:textStyle="bold"
         android:textSize="14sp"
         android:id="@+id/textView"
-        android:textColor="@color/primary_dark_material_light"
+        android:textColor="#FFFFFF"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginLeft="32dp"

@@ -30,7 +30,7 @@ public class NavDrawAdapter extends ArrayAdapter<String> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         int navlist[];
-        navlist = new int[]{R.drawable.aboutclozerr, R.drawable.aboutus, R.drawable.facebooklike, R.drawable.rate, R.drawable.share, R.drawable.logout};
+        navlist = new int[]{R.drawable.aboutclozerr, R.drawable.aboutus, R.drawable.facebooklike, R.drawable.rate, R.drawable.share, R.drawable.settings, R.drawable.logout};
         if (convertView == null) {
             // This a new view we inflate the new layout
             navinflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
