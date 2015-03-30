@@ -53,7 +53,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -69,7 +68,8 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     private CircleImageView callButton, dirButton, rateButton;
     private TextView checkinButton;
     private Bundle detailsBundle;
-    private String pinNumber, gcmId;
+    private String pinNumber, gcmId,someNickname;
+    private Intent i;
 
 
     @Override
@@ -79,6 +79,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         System.out.println("set content view");
 
         final Intent callingIntent = getIntent();
+        i=callingIntent;
         if(callingIntent.getBooleanExtra("Notification",false)){
             NotificationManager mNotificationManager;
             mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -87,7 +88,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         }
         initViews();
         detailsBundle = new Bundle();
-        String vendor_id = callingIntent.getStringExtra("vendor_id");
+        final String vendor_id = callingIntent.getStringExtra("vendor_id");
         try
         {
             Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
@@ -100,9 +101,12 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         {
             Toast.makeText(getApplicationContext(), "Error"+e.getMessage(), Toast.LENGTH_LONG).show();
         }
-        String offer_id = callingIntent.getStringExtra("offer_id");
+        final String offer_id = callingIntent.getStringExtra("offer_id");
         String offer_text = callingIntent.getStringExtra("offer_text");
-        String offer_caption = callingIntent.getStringExtra("offer_caption");
+        final String offer_caption = callingIntent.getStringExtra("offer_caption");
+
+
+
         if (offer_text == null || offer_text.equals(""))
             offer_text = "No further offers available";
 
@@ -211,10 +215,10 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                           if (detailsBundle.getString("offerId") == null)
-                               Toast.makeText(getApplicationContext(),"No further offers available.",Toast.LENGTH_SHORT).show();
-                           else
-                               showConfirmPopup();
+                            if (detailsBundle.getString("offerId") == null)
+                                Toast.makeText(getApplicationContext(),"No further offers available.",Toast.LENGTH_SHORT).show();
+                            else
+                                showConfirmPopup();
                         }
                     });
 
@@ -302,14 +306,14 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     e.printStackTrace();
                     AlertDialog.Builder builder = new AlertDialog.Builder(CouponDetails.this);
                     builder.setTitle("Error")
-                           .setCancelable(false)
-                           .setMessage("Sorry, but the details could not be loaded.")
-                           .setNeutralButton("Go back", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            CouponDetails.this.onBackPressed();
-                        }
-                    });
+                            .setCancelable(false)
+                            .setMessage("Sorry, but the details could not be loaded.")
+                            .setNeutralButton("Go back", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    CouponDetails.this.onBackPressed();
+                                }
+                            });
                     builder.show();
                 }
             }
@@ -379,7 +383,27 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
+        if(id==R.id.imageView2){
+            Intent shortcutIntent = new Intent(getApplicationContext(), CouponDetails.class);
+            shortcutIntent.putExtra("vendor_id", i.getStringExtra("vendor_id"));
+            shortcutIntent.putExtra("offer_id", i.getStringExtra("offer_id"));
+            shortcutIntent.putExtra("offer_caption", i.getStringExtra("offer_caption"));
+            shortcutIntent.putExtra("offer_text", i.getStringExtra("offer_text"));
+            SharedPreferences example = getSharedPreferences("USER", 0);
+            SharedPreferences.Editor editor = example.edit();
+            editor.putString("latitude", Home.lat+"");
+            editor.putString("longitude", Home.longi+"");
+            editor.apply();
+            shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            Intent addIntent = new Intent();
+            addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+            addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, detailsBundle.getString("vendorTitle"));
+            addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, Intent.ShortcutIconResource.fromContext(getApplicationContext(), R.drawable.ic_launcher));
+            addIntent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+            getApplicationContext().sendBroadcast(addIntent);
+            Toast.makeText(getApplicationContext(),"Pinned To Home Screen",Toast.LENGTH_SHORT).show();
+        }
         //noinspection SimplifiableIfStatement
         /*if (id == R.id.action_settings) {
             return true;
@@ -486,77 +510,77 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
             });
     }*/
     private void slidingMyCards() {
-          SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer1);
-          final RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.sliding_list);
-          mRecyclerView.setLayoutManager(new LinearLayoutManager(CouponDetails.this));
-          mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-          mRecyclerView.setHasFixedSize(true);
-          drawer.setOnDrawerOpenListener(new SlidingDrawer.OnDrawerOpenListener() {
+        SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer1);
+        final RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.sliding_list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(CouponDetails.this));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setHasFixedSize(true);
+        drawer.setOnDrawerOpenListener(new SlidingDrawer.OnDrawerOpenListener() {
 
-              @Override
+            @Override
 
-              public void onDrawerOpened() {
+            public void onDrawerOpened() {
 
-                  Button offers_menu = (Button) findViewById(R.id.myoffers);
-                  offers_menu.setText(RecyclerViewAdapter.vendor_name_temp);
-                  offers_menu.setTextColor(Color.parseColor("#FFFFFF"));
-                  offers_menu.setBackgroundColor(Color.parseColor("#EF6C00"));
-                  SharedPreferences status = getSharedPreferences("USER", 0);
-                  String TOKEN = status.getString("token", "");
+                Button offers_menu = (Button) findViewById(R.id.myoffers);
+                offers_menu.setText(RecyclerViewAdapter.vendor_name_temp);
+                offers_menu.setTextColor(Color.parseColor("#FFFFFF"));
+                offers_menu.setBackgroundColor(Color.parseColor("#EF6C00"));
+                SharedPreferences status = getSharedPreferences("USER", 0);
+                String TOKEN = status.getString("token", "");
 
-                  String urlVisited ="http://api.clozerr.com/vendor/get?vendor_id=" + detailsBundle.getString("vendorId")+"&access_token="+TOKEN;
-                  String urlUser = "http://api.clozerr.com/auth?fid="+detailsBundle.getString("fid")+"&access_token=" + TOKEN;
+                String urlVisited ="http://api.clozerr.com/vendor/get?vendor_id=" + detailsBundle.getString("vendorId")+"&access_token="+TOKEN;
+                String urlUser = "http://api.clozerr.com/auth?fid="+detailsBundle.getString("fid")+"&access_token=" + TOKEN;
 
-                  Log.e("urlslide", urlVisited);
-                  //Toast.makeText(getApplicationContext(),urlVisited,Toast.LENGTH_SHORT).show();
+                Log.e("urlslide", urlVisited);
+                //Toast.makeText(getApplicationContext(),urlVisited,Toast.LENGTH_SHORT).show();
 
-                  new AsyncGet(CouponDetails.this, urlVisited , new AsyncGet.AsyncResult() {
-                      @Override
-                      public void gotResult(String s) {
-                          //  t1.setText(s);
+                new AsyncGet(CouponDetails.this, urlVisited , new AsyncGet.AsyncResult() {
+                    @Override
+                    public void gotResult(String s) {
+                        //  t1.setText(s);
 
-                          Log.e("resultSlide", s);
-                         // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
+                        Log.e("resultSlide", s);
+                        // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
 
 
                           /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyCard(s), CouponDetails.this);
                           mRecyclerView.setAdapter(Cardadapter);*/
 
-                          List<MyOffer> myOffers = convertRowMyCard(s);
-                          MyOffer currentOffer = getCurrentOffer(s);
+                        List<MyOffer> myOffers = convertRowMyCard(s);
+                        MyOffer currentOffer = getCurrentOffer(s);
 
-                          MyOffersRecyclerViewAdapter myOffersAdapter = new MyOffersRecyclerViewAdapter(myOffers, currentOffer, CouponDetails.this);
-                          mRecyclerView.setAdapter(myOffersAdapter);
-                          try
-                          {
-                              Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
+                        MyOffersRecyclerViewAdapter myOffersAdapter = new MyOffersRecyclerViewAdapter(myOffers, currentOffer, CouponDetails.this);
+                        mRecyclerView.setAdapter(myOffersAdapter);
+                        try
+                        {
+                            Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
 
-                              t.setScreenName(detailsBundle.getString("vendorId")+"_offer");
+                            t.setScreenName(detailsBundle.getString("vendorId")+"_offer");
 
-                              t.send(new HitBuilders.AppViewBuilder().build());
-                          }
-                          catch(Exception  e)
-                          {
-                              Toast.makeText(getApplicationContext(), "Error"+e.getMessage(), Toast.LENGTH_LONG).show();
-                          }
-                          //l1.setAdapter(adapter);
-                          if(s==null) {
-                              Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
-                          }
-                      }
-                  });
+                            t.send(new HitBuilders.AppViewBuilder().build());
+                        }
+                        catch(Exception  e)
+                        {
+                            Toast.makeText(getApplicationContext(), "Error"+e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                        //l1.setAdapter(adapter);
+                        if(s==null) {
+                            Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
+                        }
                     }
+                });
+            }
 
-          });
-            drawer.setOnDrawerCloseListener(new SlidingDrawer.OnDrawerCloseListener() {
-                @Override
-                public void onDrawerClosed() {
-                    Button offers_menu = (Button) findViewById(R.id.myoffers);
-                    offers_menu.setText("My Offers");
-                    offers_menu.setTextColor(Color.parseColor("#EF6C00"));
-                    offers_menu.setBackgroundColor(Color.parseColor("#FFFFFF"));
-                }
-            });
+        });
+        drawer.setOnDrawerCloseListener(new SlidingDrawer.OnDrawerCloseListener() {
+            @Override
+            public void onDrawerClosed() {
+                Button offers_menu = (Button) findViewById(R.id.myoffers);
+                offers_menu.setText("My Offers");
+                offers_menu.setTextColor(Color.parseColor("#EF6C00"));
+                offers_menu.setBackgroundColor(Color.parseColor("#FFFFFF"));
+            }
+        });
 
 
     }
