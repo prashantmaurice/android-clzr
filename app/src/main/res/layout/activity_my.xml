@@ -1,34 +1,37 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
+    android:id="@+id/drawerLayout"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    style="rect_answer">
+    style="rect_answer"
+    android:background="@drawable/homebg">
 
-    <include layout="@layout/toolbar" />
 
 
-    <android.support.v4.widget.DrawerLayout
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:id="@+id/drawerLayout"
+
+        android:orientation="vertical"
         android:layout_height="match_parent">
+        <include layout="@layout/toolbar" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:background="#ffffff">
+            >
 
 
             <Button
                 android:layout_width="match_parent"
                 android:text="SUGGEST A RESTAURANT"
                 android:textSize="13sp"
-                android:textColor="#ff434444"
+                android:textColor="#BBEF6C00"
                 android:onClick="prompt"
                 android:layout_height="35dp"
-                android:background="#FFFFFF"
+                android:background="@drawable/partial_rounded_rect"
                 android:elevation="5dp"
                 android:layout_marginTop="0dp"
                 android:layout_marginBottom="0dp"
@@ -37,7 +40,7 @@
         <!-- activity view -->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:background="#fff"
+
             android:layout_height="match_parent">
 
 
@@ -52,6 +55,7 @@
             <include layout="@layout/mycards_sliding"/>
         </RelativeLayout>
         </LinearLayout>
+    </LinearLayout>
         <include layout="@layout/navdrawer_content"/>
         <!-- navigation drawer -->
         <!--<RelativeLayout-->
@@ -69,6 +73,6 @@
         <!--android:dividerHeight="1dp" />-->
         <!--</RelativeLayout>-->
 
+
     </android.support.v4.widget.DrawerLayout>
 
-</LinearLayout>

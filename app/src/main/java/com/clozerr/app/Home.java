@@ -14,6 +14,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -75,7 +76,7 @@ public class Home  extends ActionBarActivity {
     private ListView leftDrawerList;
     //private ArrayAdapter<String> navigationDrawerAdapter;
     private NavDrawAdapter nav;
-    private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Tell Friends about Clozerr", "Log out"};
+    private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Tell Friends about Clozerr", "Settings", "Log out"};
     //private boolean nav_drawer_open = false;
     private RecyclerViewAdapter mMainPageAdapter;
     private ArrayList<CardModel> mMainCardsList;
@@ -260,6 +261,21 @@ public class Home  extends ActionBarActivity {
         Log.d("HOME","start");
         super.onResume();
         PeriodicBFS.checkAndStartScan(getApplicationContext());
+        /*//BeaconFinderService.startPeriodicScan(getApplicationContext(), false);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        //BeaconFinderService.startPeriodicScan(getApplicationContext(), false);
+        if(sharedPref.getBoolean("beacon_detection", true)) {
+            Log.d("Preferences", "read");
+
+            PeriodicBFS.allowScanning(getApplicationContext());
+        }
+        else
+        {
+
+            PeriodicBFS.disallowScanning(getApplicationContext());
+
+        }*/
+
     }
 
     private void locationEnabledCheck() {
@@ -407,6 +423,10 @@ public class Home  extends ActionBarActivity {
                 }
                 else if(i==0){
                     startActivity(new Intent(Home.this,AboutUs.class));
+                }
+
+                else if(i==5){
+                    startActivity(new Intent(Home.this,SettingsActivity.class));
                 }
 
                 else if(i==4) {

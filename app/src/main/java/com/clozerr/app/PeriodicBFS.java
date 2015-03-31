@@ -36,7 +36,7 @@ public class PeriodicBFS extends BeaconFinderService {
                                     // TODO modify as required
 
     private static final int PERIODIC_SCAN_BEACON_LIMIT = 3;
-    private static final int NOTIFICATION_ID = 0;
+    private static final int BASE_NOTIFICATION_ID = 0;
     private static final HashMap<String, DeviceParams> periodicScanDeviceMap = new HashMap<>();
     private static NotificationCompat.Builder notificationBuilder;
     private static NotificationManager notificationManager;
@@ -61,7 +61,7 @@ public class PeriodicBFS extends BeaconFinderService {
 
     @Override
     public void onDestroy() {
-        dismissNotification(getApplicationContext());
+        dismissNotifications(getApplicationContext());
         running = false;
         mCheckTask.stopScanning();
         mTimer.cancel();
@@ -74,16 +74,22 @@ public class PeriodicBFS extends BeaconFinderService {
 
     private void readHashMapFromFile() {
         try {
+            FileOutputStream dummyOutputStream = openFileOutput(MAP_CONTENTS_FILE_NAME, MODE_APPEND);
+                                                // create file if not created yet
+            dummyOutputStream.close();
             FileInputStream fileInputStream = openFileInput(MAP_CONTENTS_FILE_NAME);
             byte[] dataBytes = new byte[fileInputStream.available()];
             fileInputStream.read(dataBytes);
             fileInputStream.close();
-            JSONObject rootObject = new JSONObject(new String(dataBytes));
-            JSONObject hashMapObject = rootObject.getJSONObject("hashMap");
-            for (Iterator<String> iterator = hashMapObject.keys(); iterator.hasNext(); ) {
-                String uuid = iterator.next();
-                DeviceParams params = new DeviceParams(hashMapObject.getInt(uuid), false);
-                periodicScanDeviceMap.put(uuid, params);
+            String data = new String(dataBytes);
+            if (!data.isEmpty()) {
+                JSONObject rootObject = new JSONObject(data);
+                JSONObject hashMapObject = rootObject.getJSONObject("hashMap");
+                for (Iterator<String> iterator = hashMapObject.keys(); iterator.hasNext(); ) {
+                    String uuid = iterator.next();
+                    DeviceParams params = new DeviceParams(hashMapObject.getInt(uuid), false);
+                    periodicScanDeviceMap.put(uuid, params);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -114,10 +120,10 @@ public class PeriodicBFS extends BeaconFinderService {
                 .setSound(soundUri);
     }
 
-    private static void setNotificationForVendor(String uuid, Context context)
+    private static void setNotificationForVendor(String uuid, Context context, int notificationId)
     {
         Log.e(TAG, "UUID for notification - " + uuid);
-        dismissNotification(context);
+        dismissNotifications(context);
         try {
             FileInputStream fileInputStream = context.openFileInput(UUIDDownloader.UUID_FILE_NAME);
             byte[] dataBytes = new byte[fileInputStream.available()];
@@ -135,6 +141,7 @@ public class PeriodicBFS extends BeaconFinderService {
                 }
             }
             String title = "Clozerr - " + vendorParams.mName;
+            Log.e(TAG, "vendor - " + vendorParams.mName);
             String contentText = vendorParams.mNextOfferCaption;
             Intent detailIntent = new Intent(context, CouponDetails.class);
             detailIntent.putExtra("vendor_id", vendorParams.mVendorID);
@@ -145,20 +152,21 @@ public class PeriodicBFS extends BeaconFinderService {
             PendingIntent notificationIntent = PendingIntent.getActivity(context, 1234,
                                                                          detailIntent,
                                                                          PendingIntent.FLAG_ONE_SHOT);
+            notificationBuilder = getDefaultNotificationBuilder(context);
             notificationBuilder.setContentTitle(title)
                                .setContentText(contentText)
                                .setContentIntent(notificationIntent)
                                .setAutoCancel(true)
                                .setWhen(System.currentTimeMillis())
                                .addAction(R.drawable.ic_action_accept, "Check In", notificationIntent);
-            notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+            notificationManager.notify(notificationId, notificationBuilder.build());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void dismissNotification(Context context) {
-        notificationManager.cancel(NOTIFICATION_ID);
+    public static void dismissNotifications(Context context) {
+        notificationManager.cancelAll();
         notificationBuilder = getDefaultNotificationBuilder(context);
     }
 
@@ -169,8 +177,9 @@ public class PeriodicBFS extends BeaconFinderService {
 
     @Override
     protected void onRangedBeacons(final List<Beacon> beaconList) {
-        Log.e(TAG, "Ranged");
-        for (Beacon beacon : beaconList) {
+        Log.e(TAG, "Ranged; size - " + beaconList.size());
+        for (int i = 0; i < beaconList.size(); ++i) {
+            Beacon beacon = beaconList.get(i);
             String uuid = beacon.getProximityUUID();    // TODO modify this if major, minor also required
             if (uuidDatabase.contains(uuid.toUpperCase())) {
                 if (periodicScanDeviceMap.containsKey(uuid)) {
@@ -185,7 +194,7 @@ public class PeriodicBFS extends BeaconFinderService {
                         ";lim-" + PERIODIC_SCAN_BEACON_LIMIT);
                 if (periodicScanDeviceMap.get(uuid).mCount == PERIODIC_SCAN_BEACON_LIMIT) {
                     periodicScanDeviceMap.get(uuid).mCount = 0;
-                    setNotificationForVendor(uuid, getApplicationContext());
+                    setNotificationForVendor(uuid, getApplicationContext(), BASE_NOTIFICATION_ID + i);
                 }
                 writeHashMapToFile();
             }
@@ -194,8 +203,10 @@ public class PeriodicBFS extends BeaconFinderService {
 
     @Override
     protected void scan() {
-        running = true;
-        mTimer.schedule(mCheckTask, 0, INTERVAL);
+        if (!running) {
+            running = true;
+            mTimer.schedule(mCheckTask, 0, INTERVAL);
+        }
     }
 
     public static boolean isRunning() { return running; }
@@ -249,6 +260,7 @@ public class PeriodicBFS extends BeaconFinderService {
 
         @Override
         public void run() {
+            readUUIDsFromFile(getApplicationContext());
             if (uuidDatabase != null)
                 mHandler.post(mScanningRunnable);
         }

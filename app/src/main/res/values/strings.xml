@@ -16,10 +16,8 @@
     <string name="your_pin">Your unique 4-digit PIN is:</string>
     <string name="please_confirm">show this to restaurant staff</string>
     <string name="confirm">REDEEM</string>
-    <string name="dummy_json">{
-        \"pin\":\"1234\",
-        \"gcm_id\":\"19849987\"
-    }</string>
+    <string name="beacon_detection">beacon_detection</string>
+    <string name="nbd_detection">nbd_detect</string>
     <string name="title_activity_login_new">login_new</string>
     <string name="title_activity_splashscreen">splashscreen</string>
     <string name="title_activity_settings">SettingsActivity</string>

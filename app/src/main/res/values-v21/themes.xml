@@ -6,7 +6,7 @@
         <item name="android:windowAllowReturnTransitionOverlap">true</item>
         <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
         <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
-        <item name="android:statusBarColor">#bc5500</item>
+        <item name="android:statusBarColor">#000000</item>
 
     </style>
 </resources>

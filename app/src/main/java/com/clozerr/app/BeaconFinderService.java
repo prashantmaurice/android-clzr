@@ -7,10 +7,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -26,10 +28,12 @@ import org.json.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.prefs.Preferences;
 
 /**
  * Created by S.ARAVIND on 3/3/2015.
@@ -42,7 +46,6 @@ public abstract class BeaconFinderService extends Service {
     //public static final String ACTION_UPDATE_UUID_DATABASE = "UpdateUUIDDatabase";
 
     protected static boolean isBLESupported = true;
-    // TODO get isScanningAllowed from Settings
     protected static boolean isScanningAllowed = true;
     protected static boolean hasUserActivatedBluetooth = false;
 
@@ -61,6 +64,8 @@ public abstract class BeaconFinderService extends Service {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         mHandler = new Handler(Looper.getMainLooper());
         mBeaconManager = new BeaconManager(getApplicationContext());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        isScanningAllowed = sharedPreferences.getBoolean(getResources().getString(R.string.beacon_detection), true);
     }
 
     @Override
@@ -135,38 +140,38 @@ public abstract class BeaconFinderService extends Service {
                 /*getApplicationContext().registerReceiver(new UUIDUpdateReceiver(),
                         new IntentFilter(ACTION_UPDATE_UUID_DATABASE));*/
                 UUIDDownloadBaseReceiver.scheduleDownload(getApplicationContext());
-                if (uuidDatabase == null) {
-                    try {
+                if (uuidDatabase == null)
                         readUUIDsFromFile(getApplicationContext());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
                 return true;
             }
         }
         else return false;
     }
 
-    protected void readUUIDsFromFile(Context context) throws IOException, JSONException {
+    protected void readUUIDsFromFile(Context context) {
         try {
+            FileOutputStream dummyOutputStream = context.openFileOutput(UUIDDownloader.UUID_FILE_NAME, MODE_APPEND);
+                                                // for creating the file if not present
+            dummyOutputStream.close();
             FileInputStream fileInputStream = context.openFileInput(UUIDDownloader.UUID_FILE_NAME);
             byte[] dataBytes = new byte[fileInputStream.available()];
             fileInputStream.read(dataBytes);
             fileInputStream.close();
             // TODO change format if JSON changes
-            JSONArray rootArray = new JSONArray(new String(dataBytes));
-            uuidDatabase = new ArrayList<String>();
-            for (int i = 0; i < rootArray.length(); ++i)
-                try {
-                    if (rootArray.getJSONObject(i).getJSONArray("UUID").length() > 0)
-                    uuidDatabase.add(rootArray.getJSONObject(i).getJSONArray("UUID").getString(0));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+            String data = new String(dataBytes);
+            if (!data.isEmpty()) {
+                JSONArray rootArray = new JSONArray(data);
+                uuidDatabase = new ArrayList<String>();
+                for (int i = 0; i < rootArray.length(); ++i)
+                    try {
+                        if (rootArray.getJSONObject(i).getJSONArray("UUID").length() > 0)
+                            uuidDatabase.add(rootArray.getJSONObject(i).getJSONArray("UUID").getString(0));
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+            }
         } catch (Exception e) {
-            if (!(e instanceof FileNotFoundException))
-                throw e;
+            e.printStackTrace();
         }
     }
 

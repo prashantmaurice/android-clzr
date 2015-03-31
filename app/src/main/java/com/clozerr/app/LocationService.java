@@ -11,6 +11,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -183,10 +184,14 @@ public class LocationService extends Service {
                                     Intent.FLAG_ACTIVITY_SINGLE_TOP |
                                     Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             PendingIntent pIntent = PendingIntent.getActivity(LocationService.this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-                            //dismissNotification(NOTIFICATION_ID.LOCATION_CHANGE);
+
                             Intent intent1 = new Intent(LocationService.this, Home.class);
                             PendingIntent pIntent1 = PendingIntent.getActivity(LocationService.this, 0, intent1, 0);
-                            setNotification(NOTIFICATION_ID.LOCATION_CHANGE, jsonObject.getString("name") + " is near you. Would you like to Checkin? ", pIntent1,pIntent);
+                            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                            if(sharedPref.getBoolean("nbd_detect", true)) {
+                                Log.d("Preferences", "read");
+                                setNotification(NOTIFICATION_ID.LOCATION_CHANGE, jsonObject.getString("name") + " is near you. Would you like to Checkin? ", pIntent1,pIntent);
+                            }
                         }
                     }catch (Exception e){
                         Log.d("JSON","exception");
@@ -228,7 +233,7 @@ public class LocationService extends Service {
       //          mLocationManager.requestLocationUpdates(mProvider, INTERVAL, MIN_DISTANCE, this);
             }
 
-                //dismissNotification(NOTIFICATION_ID.PROVIDER_ENABLED);
+
 
         }
     }

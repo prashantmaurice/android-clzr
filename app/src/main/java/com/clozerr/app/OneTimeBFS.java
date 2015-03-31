@@ -42,7 +42,9 @@ public class OneTimeBFS extends BeaconFinderService {
 
     @Override
     protected void onRangedBeacons(final List<Beacon> beaconList) {
+        Log.e(TAG, "Ranged; size - " + beaconList.size());
         for (Beacon beacon : beaconList) {
+            Log.e(TAG, "uuid found: " + beacon.getProximityUUID());
             if (beacon.getProximityUUID().equalsIgnoreCase(uuid)) {
                 // TODO Auto check-in
                 putToast("Near this restaurant. Check in?", Toast.LENGTH_LONG);
