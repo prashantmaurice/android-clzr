@@ -43,7 +43,7 @@ public class RecyclerViewAdapter1 extends RecyclerView.Adapter<RecyclerViewAdapt
     public void onBindViewHolder(ListItemViewHolder viewHolder, int position) {
         ///viewHolder.currentItem = items.get(position);
         MyOffer model = items.get(position);
-        viewHolder.txtvisitno.setText(model.getStamps()+"");
+        //viewHolder.txtvisitno.setText(model.getStamps()+"");
         viewHolder.txtoffer.setText(model.getCaption());
 
         // viewHolder.txtDist.setText(model.getDesc());
@@ -65,7 +65,7 @@ public class RecyclerViewAdapter1 extends RecyclerView.Adapter<RecyclerViewAdapt
 
         public ListItemViewHolder(View itemView) {
             super(itemView);
-            txtvisitno = (TextView) itemView.findViewById(R.id.txtNum);
+            //txtvisitno = (TextView) itemView.findViewById(R.id.txtNum);
             txtoffer = (TextView) itemView.findViewById(R.id.txtOffer);
         }
     }

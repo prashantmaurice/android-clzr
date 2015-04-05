@@ -39,11 +39,11 @@ public class MyOfferAdapter extends ArrayAdapter<MyOffer> {
         // Now we can fill the layout with the right values
         else
         {
-            TextView txtNum = (TextView) convertView.findViewById(R.id.txtNum);
+            //TextView txtNum = (TextView) convertView.findViewById(R.id.txtNum);
             TextView txtOffer = (TextView) convertView.findViewById(R.id.txtOffer);
 
             MyOffer off = offerList.get(position);
-            txtNum.setText(off.getStamps());
+            //txtNum.setText(off.getStamps());
             txtOffer.setText(off.getCaption());
 
             return convertView;
