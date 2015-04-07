@@ -30,7 +30,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             tools:context=".CouponDetails"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="0dp"
             android:layout_marginTop="10dp">
         </android.support.v7.widget.RecyclerView>
 

@@ -1,46 +1,176 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:background="#00EEEEEE">
 
-    <TextView
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:padding="0dp"
-        android:layout_marginLeft="25dp"
-        android:layout_marginStart="25dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginEnd="10dp"
-        android:text="0"
-        android:textColor="#ffffff"
-        android:textSize="20sp"
-        style="@style/Circle_offer"
-        android:textStyle="bold"
-        android:id="@+id/txtNum"/>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="#00EEEEEE"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp">
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:gravity="center_vertical"
-        android:padding="0dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="25dp"
-        android:layout_marginRight="25dp"
-        android:text="This is my offer"
-        android:textColor="#000000"
-        android:textSize="15sp"
-        android:id="@+id/txtOffer"
-        android:textStyle="normal" />
+        android:background="#00EEEEEE"
+        android:orientation="horizontal"
+        android:paddingTop="5dp">
+
+        <ImageView
+            android:id="@+id/offer_label"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="0dp"
+            android:layout_weight="1"
+
+            android:scaleType="centerCrop"
+
+            android:src="@drawable/offer_label" />
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="0dp"
+            android:layout_weight="4"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtOffer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="25dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginStart="5dp"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:padding="0dp"
+                android:text="This is my offer"
+                android:textColor="#EF6C00"
+
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtDesc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="25dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="7dp"
+                android:gravity="center_vertical"
+                android:padding="0dp"
+                android:text="Offer Description"
+                android:textColor="#000000"
+                android:textSize="15sp"
+                android:textStyle="normal" />
 
         </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_gravity="bottom"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/stamps"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/circulartext_offer"
+                    android:gravity="center"
+                    android:text="100"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold|italic" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="STAMPS"
+                    android:textColor="#EF6C00"
+                    android:textSize="7sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/sxStampStatus1"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/circulartext_stampstatus1"
+                    android:gravity="center"
+                    android:text="100"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold|italic" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="STATUS 1"
+                    android:textColor="#0000FF"
+                    android:textSize="7sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/sxStampStatus2"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/circulartext_stampstatus2"
+                    android:gravity="center"
+                    android:text="100"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold|italic" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="STATUS 2"
+                    android:textColor="#FF0000"
+                    android:textSize="7sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        style="@style/DividerHorizontal"
+        android:layout_marginTop="3dp" />
 
 
 </LinearLayout>

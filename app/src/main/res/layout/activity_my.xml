@@ -1,21 +1,21 @@
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:id="@+id/drawerLayout"
+    android:orientation="vertical"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     style="rect_answer"
     android:background="@drawable/homebg">
 
+    <include layout="@layout/toolbar_translucent" />
 
 
-
-    <LinearLayout
+    <android.support.v4.widget.DrawerLayout
         android:layout_width="match_parent"
+        android:id="@+id/drawerLayout"
 
-        android:orientation="vertical"
         android:layout_height="match_parent">
-        <include layout="@layout/toolbar" />
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -37,25 +37,25 @@
                 android:layout_marginBottom="0dp"
                 style="@style/rect_answer"
                 android:textStyle="bold" />
-        <!-- activity view -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-
-            android:layout_height="match_parent">
-
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/list"
+            <!-- activity view -->
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:context=".Home"
-                android:layout_marginBottom="55dp"
-                />
 
-            <include layout="@layout/mycards_sliding"/>
-        </RelativeLayout>
+                android:layout_height="match_parent">
+
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:context=".Home"
+                    android:layout_marginBottom="55dp"
+                    />
+
+                <include layout="@layout/mycards_sliding"/>
+            </RelativeLayout>
         </LinearLayout>
-    </LinearLayout>
+
         <include layout="@layout/navdrawer_content"/>
         <!-- navigation drawer -->
         <!--<RelativeLayout-->
@@ -75,4 +75,4 @@
 
 
     </android.support.v4.widget.DrawerLayout>
-
+</LinearLayout>
