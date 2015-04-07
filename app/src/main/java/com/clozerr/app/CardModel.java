@@ -52,7 +52,10 @@ public class CardModel {
 
         userLocation.setLatitude(Home.lat);
         userLocation.setLongitude(Home.longi);
-        this.distance = String.format("%.2f", userLocation.distanceTo(location)/1000)+" km";
+        if (lat > 0.0 && longi > 0.0)
+            this.distance = String.format("%.2f", userLocation.distanceTo(location)/1000)+" km";
+        else
+            this.distance = "";
 
         this.franchiseId = fId;
         this.vendorId = vId;

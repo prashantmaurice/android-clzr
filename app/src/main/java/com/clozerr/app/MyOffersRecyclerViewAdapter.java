@@ -8,26 +8,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.koushikdutta.ion.Ion;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRecyclerViewAdapter.ListItemViewHolder> {
-
-    private List<MyOffersCardModel> items;
+    private static final String TAG = "MyOffersRVAdapter";
+    //private List<MyOffersCardModel> items;
+    private ArrayList<MyOffer> mItems;
     static Context c;
 
-    /*MyOffersRecyclerViewAdapter(List<MyOffersCardModel> modelData, Activity a) {
-        if (modelData == null) {
-            throw new IllegalArgumentException(
-                    "modelData must not be null");
-        }
-        this.items = modelData;
-        activity = a;
-    }*/
-
-    MyOffersRecyclerViewAdapter(List<MyOffer> allOffers, MyOffer currentOffer, Context context) {
+    /*MyOffersRecyclerViewAdapter(List<MyOffer> allOffers, MyOffer currentOffer, Context context) {
         c = context;
         items = new ArrayList<>();
         Log.e("offerlist", String.valueOf(allOffers.size()));
@@ -43,6 +38,12 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
             if (laterOffersList != null) items.add(new MyOffersCardModel("LATER", c, laterOffersList));
         }
         else items.add(new MyOffersCardModel("USED", c, allOffers)); // no offers left
+    }*/
+
+    public MyOffersRecyclerViewAdapter(ArrayList<MyOffer> offers, Context context) {
+        c = context;
+        Log.e(TAG, "size - " + offers.size());
+        mItems = offers;
     }
 
     @Override
@@ -50,7 +51,8 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
             ViewGroup viewGroup, int viewType) {
         View itemView = LayoutInflater.
                 from(viewGroup.getContext()).
-                inflate(R.layout.offers_card,
+                /*inflate(R.layout.offers_card,*/
+                inflate(R.layout.offer_list,
                         viewGroup,
                         false);
         return new ListItemViewHolder(itemView);
@@ -60,10 +62,10 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
 
     @Override
     public void onBindViewHolder(final ListItemViewHolder viewHolder, int position) {
-        Log.e("nullptr", "pos " + String.valueOf(position) + " - " + items.get(position).getHeading());
+        /*Log.e("nullptr", "pos " + String.valueOf(position) + " - " + items.get(position).getHeading());
         viewHolder.currentItem = items.get(position);
         viewHolder.headingView.setText(viewHolder.currentItem.getHeading());
-        viewHolder.listRecyclerView.setAdapter(viewHolder.currentItem.getMyOfferAdapter());
+        viewHolder.listRecyclerView.setAdapter(viewHolder.currentItem.getMyOfferAdapter());*/
 
         /*viewHolder.txtTitle.setText(model.getTitle());
         viewHolder.txtCaption.setText(model.getCaption());
@@ -102,21 +104,36 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
                 return "rounded_rect_40";
             }
         }).intoImageView(viewHolder.imageView);*/
+        MyOffer currentItem = mItems.get(position);
+        viewHolder.mCaptionView.setText(currentItem.getCaption());
+        viewHolder.mDescriptionView.setText(currentItem.getDescription());
+        if (currentItem.getImageUrl() != null)
+            Ion.with(c).load(currentItem.getImageUrl()).withBitmap()
+                    .intoImageView(viewHolder.mMainImageView);
+        if (currentItem.getOptionalImageUrl() != null)
+            Ion.with(c).load(currentItem.getOptionalImageUrl()).withBitmap()
+                    .intoImageView(viewHolder.mOptionalImageView);
     }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return mItems.size();
     }
 
-    public final static class ListItemViewHolder
-            extends RecyclerView.ViewHolder {
+    public final static class ListItemViewHolder extends RecyclerView.ViewHolder {
+        public ImageView mMainImageView, mOptionalImageView;
+        public TextView mCaptionView, mDescriptionView;
+
+        public ListItemViewHolder(final View itemView) {
+            super(itemView);
+
+        }
         /*ImageView imageView;
         TextView txtTitle;
         TextView txtDist;
         TextView txtCaption;*/
         //TextView txtrating;
-        public MyOffersCardModel currentItem;
+        /*public MyOffersCardModel currentItem;
         public TextView headingView;
         public RecyclerView listRecyclerView;
 
@@ -129,13 +146,13 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
 
 
             headingView = (TextView) itemView.findViewById(R.id.cardHeadingView);
-            /*txtDist = (TextView) itemView.findViewById(R.id.textDistance);
+            *//*txtDist = (TextView) itemView.findViewById(R.id.textDistance);
             txtTitle = (TextView) itemView.findViewById(R.id.textTitle);
             txtCaption = (TextView) itemView.findViewById(R.id.txtCaption);
-            imageView = (ImageView) itemView.findViewById(R.id.imageView);*/
+            imageView = (ImageView) itemView.findViewById(R.id.imageView);*//*
             //txtrating=(TextView) itemView.findViewById(R.id.txtrating);
 
-            /*itemView.setOnClickListener(new View.OnClickListener() {
+            *//*itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     SharedPreferences status = c.getSharedPreferences("USER", 0);
@@ -144,14 +161,14 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
                     {
                         Intent detailIntent = new Intent(c, CouponDetails.class);
                         // pass selected vendor's image to details activity to avoid re-download
-                        *//*imageView.buildDrawingCache();
+                        *//**//*imageView.buildDrawingCache();
                         Bitmap image = imageView.getDrawingCache();
                         Bundle vendorBundle = new Bundle();
                       // vendorBundle.putParcelable("vendorImage", image);
 
                     vendorBundle.putString("phoneNumber", phone number);
                     vendorBundle.putString("location", location);
-                    vendorBundle.putString("description", description);*//**//*
+                    vendorBundle.putString("description", description);*//**//**//**//*
                         vendorBundle.putString("vendorTitle", currentItem.getTitle());
                         vendorBundle.putString("offerText", currentItem.getOfferDescription() );
                         vendorBundle.putString("vendorId", currentItem.getVendorId());
@@ -162,7 +179,7 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
                         vendorBundle.putString("distance", currentItem.getDistance());
                         vendorBundle.putString("phonenumber", currentItem.getPhonenumber());
                         vendor_name_temp = currentItem.getTitle();
-                        detailIntent.putExtra("detailsBundle", vendorBundle);*//*
+                        detailIntent.putExtra("detailsBundle", vendorBundle);*//**//*
                         vendor_name_temp = currentItem.getTitle();
                         detailIntent.putExtra("vendor_id", currentItem.getVendorId());
                         detailIntent.putExtra("offer_id", currentItem.getOfferId());
@@ -181,53 +198,8 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
 
                     }
                 }
-            });*/
-        }
-        //suggest rest
-        //border -- lines
-        /*DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE:
-                        SharedPreferences example = c.getSharedPreferences("USER", 0);
-                        SharedPreferences.Editor editor = example.edit();
-                        editor.putString("notNow", "false");
-                        editor.apply();
-                        //Yes button clicked
-                           *//* Intent mStartActivity = new Intent(c,Login.class);
-                            int mPendingIntentId = 123456;
-                            PendingIntent mPendingIntent = PendingIntent.getActivity(c, mPendingIntentId,    mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
-                            AlarmManager mgr = (AlarmManager)c.getSystemService(Context.ALARM_SERVICE);
-                            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
-                            System.exit(0);*//*
-                        // Toast.makeText(c, "Logging out", Toast.LENGTH_SHORT).show();
-
-                        Session session = Session.getActiveSession();
-                        if (session != null) {
-                            if (!session.isClosed()) {
-                                session.closeAndClearTokenInformation();
-                            }
-                        } else {
-                            session = new Session(c);
-                            Session.setActiveSession(session);
-                            session.closeAndClearTokenInformation();
-                        }
-
-                        c.startActivity(new Intent(c, Login.class));
-
-                        if(c instanceof Activity)
-                            ((Activity)c).finish();
-                        else
-                            Toast.makeText(c, "Error", Toast.LENGTH_SHORT);
-                        break;
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //Toast.makeText(Home.this, "Thanks for staying. You are awesome.", Toast.LENGTH_SHORT).show();
-                        //No button clicked
-                        break;
-                }
-            }
-        };*/
+            });*//*
+        }*/
     }
 
 

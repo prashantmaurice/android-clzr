@@ -59,6 +59,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CouponDetails extends ActionBarActivity implements ObservableScrollViewCallbacks {
 
+    private static final String TAG = "CouponDetails";
     private FrameLayout detailsLayout;
     private View mToolbarView;
     private ObservableScrollView mScrollView;
@@ -130,14 +131,30 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
             public void gotResult(String s) {
                 //Log.i("ghfv","Inside gotResu");
                 //Toast.makeText(CouponDetails.this, "Inside gotResult()", Toast.LENGTH_SHORT).show();
-                String phonenumber="0123456789";
-                String vendorDescription="No Restaurant Description Available Now";
+                String phonenumber="";
+                String vendorDescription="";
                 String uuid = null;
+                double latitude = 0.0, longitude = 0.0;
                 try {
                     Log.e("resultAsync", s);
                     JSONObject object = new JSONObject(s);
-                    phonenumber = object.getString("phone");
-                    vendorDescription = object.getString("description");
+                    try {
+                        phonenumber = object.getString("phone");
+                        if (phonenumber.equalsIgnoreCase("undefined"))
+                            phonenumber = "";
+                        vendorDescription = object.getString("description");
+                        if (vendorDescription.equalsIgnoreCase("undefined"))
+                            vendorDescription = "";
+                        latitude = object.getJSONArray("location").getDouble(0);
+                        if (latitude <= 0.0)
+                            latitude = 0.0;
+                        longitude = object.getJSONArray("location").getDouble(1);
+                        if (longitude <= 0.0)
+                            longitude = 0.0;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(CouponDetails.this, "Error - " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                    }
                     if (object.getJSONArray("UUID").length() > 0) {
                         uuid = object.getJSONArray("UUID").getString(0);
                         Log.e("UUID", uuid);
@@ -148,8 +165,8 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                             phonenumber,
                             vendorDescription,
                             object.getJSONArray("offers"),
-                            object.getJSONArray("location").getDouble(0),
-                            object.getJSONArray("location").getDouble(1),
+                            latitude,
+                            longitude,
                             object.getString("image"),
                             object.getString("fid"),object.getString("_id"),
                             0
@@ -178,8 +195,8 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     detailsBundle.putString("description", vendorDescription);
                     //detailsBundle.putString("offerId", currentItem.getOfferId());
                     detailsBundle.putString("vendorImage", currentItem.getImageId());
-                    detailsBundle.putDouble("latitude", currentItem.getLat());
-                    detailsBundle.putDouble("longitude", currentItem.getLong());
+                    detailsBundle.putDouble("latitude", latitude);
+                    detailsBundle.putDouble("longitude", longitude);
                     detailsBundle.putString("distance", currentItem.getDistance());
                     detailsBundle.putString("phonenumber", phonenumber);
                     //currentItem.getQuestions();
@@ -207,9 +224,9 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     detailsView.setText(detailsBundle.getString("description"));
                     locView.setText(detailsBundle.getString("distance"));
 
-                    if (!callingIntent.getBooleanExtra("from_periodic_scan", false))
+                    /*if (!callingIntent.getBooleanExtra("from_periodic_scan", false))
                         OneTimeBFS.checkAndStartScan(getApplicationContext(), uuid);
-                    else PeriodicBFS.dismissNotifications(CouponDetails.this);
+                    else PeriodicBFS.dismissNotifications(CouponDetails.this);*/
 
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -224,18 +241,28 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     callButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent dialIntent = new Intent(Intent.ACTION_DIAL);
-                            dialIntent.setData(Uri.parse("tel:"+detailsBundle.getString("phonenumber")));
-                            startActivity(dialIntent);
+                            if (!detailsBundle.getString("phonenumber").isEmpty()) {
+                                Intent dialIntent = new Intent(Intent.ACTION_DIAL);
+                                dialIntent.setData(Uri.parse("tel:" + detailsBundle.getString("phonenumber")));
+                                startActivity(dialIntent);
+                            }
+                            else
+                                Toast.makeText(CouponDetails.this, "Sorry, the phone number is unavailable now...",
+                                        Toast.LENGTH_SHORT).show();
                         }
                     });
 
                     dirButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                                    Uri.parse("http://maps.google.com/maps?daddr="+detailsBundle.getDouble("latitude")+","+detailsBundle.getDouble("longitude")));
-                            startActivity(intent);
+                            if (!currentItem.getDistance().isEmpty()) {
+                                Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                                        Uri.parse("http://maps.google.com/maps?daddr=" + detailsBundle.getDouble("latitude") + "," + detailsBundle.getDouble("longitude")));
+                                startActivity(intent);
+                            }
+                            else
+                                Toast.makeText(CouponDetails.this, "Sorry, the location details haven't been provided by the vendor.",
+                                        Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -454,9 +481,9 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
 
         });
     }*/
-    private List<MyOffer> convertRowMyCard(String s) {
-        List<MyOffer> rowItems = new ArrayList<>();
-        JSONObject temp = null;
+    private ArrayList<MyOffer> convertRowMyCard(String s) {
+        ArrayList<MyOffer> rowItems = new ArrayList<>();
+        /*JSONObject temp = null;
         JSONArray array = null;
         int i=0;
         try {
@@ -471,6 +498,31 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
             }
         } catch (Exception e) {
 
+            e.printStackTrace();
+        }*/
+        MyOffer item = null;
+        try {
+            Log.e(TAG, "json passed - " + s);
+            JSONObject offerObject = null;
+            JSONArray array = new JSONArray(s);
+            MyOffer.SXOfferExtras extras = null;
+            for (int i = 0; i < array.length(); ++i) {
+                offerObject = array.getJSONObject(i);
+                extras = null;
+                String type = offerObject.getString("type");
+                if (type.equalsIgnoreCase("SX"))
+                    extras = new MyOffer.SXOfferExtras(offerObject.getJSONObject("stampStatus").getInt("total"),
+                            offerObject.getDouble("billAmt"));
+                item = new MyOffer(type,
+                                   offerObject.getString("image"),
+                                   offerObject.getString("optionalImage"),
+                                   offerObject.getString("caption"),
+                                   offerObject.getString("description"),
+                                   offerObject.getInt("stamps"),
+                                   extras);
+                rowItems.add(item);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return rowItems;
@@ -538,7 +590,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
 
 */
 
-                String urlVisited ="http://api.clozerr.com/vendor/get?vendor_id=" + detailsBundle.getString("vendorId")+"&access_token="+TOKEN;
+                String urlVisited ="http://api.clozerr.com/vendor/offers/myofferspage?vendor_id=" + detailsBundle.getString("vendorId")+"&access_token="+TOKEN;
                 String urlUser = "http://api.clozerr.com/auth?fid="+detailsBundle.getString("fid")+"&access_token=" + TOKEN;
 
                 Log.e("urlslide", urlVisited);
@@ -556,11 +608,13 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                           /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyCard(s), CouponDetails.this);
                           mRecyclerView.setAdapter(Cardadapter);*/
 
-                        List<MyOffer> myOffers = convertRowMyCard(s);
-                        MyOffer currentOffer = getCurrentOffer(s);
+                        ArrayList<MyOffer> myOffers = convertRowMyCard(s);
+                        /*MyOffer currentOffer = getCurrentOffer(s);
 
                         MyOffersRecyclerViewAdapter myOffersAdapter = new MyOffersRecyclerViewAdapter(myOffers, currentOffer, CouponDetails.this);
-                        mRecyclerView.setAdapter(myOffersAdapter);
+                        mRecyclerView.setAdapter(myOffersAdapter);*/
+                        MyOffersRecyclerViewAdapter adapter = new MyOffersRecyclerViewAdapter(myOffers, CouponDetails.this);
+                        mRecyclerView.setAdapter(adapter);
                         try
                         {
                             Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
@@ -841,13 +895,13 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     // ALTERNATE
     @Override
     public void onPause() {
-        OneTimeBFS.checkAndStopScan(getApplicationContext());
+        //OneTimeBFS.checkAndStopScan(getApplicationContext());
         Log.d("HOME","destroy");
         //startService(new Intent(this, LocationService.class));
         super.onPause();
     }
 
-    public MyOffer getCurrentOffer(String data) {
+    /*public MyOffer getCurrentOffer(String data) {
         try {
             JSONObject currentOfferJson = new JSONObject(data).getJSONArray("offers_qualified").getJSONObject(0);
             MyOffer currentOffer = new MyOffer(currentOfferJson.getString("caption"),
@@ -857,7 +911,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
             e.printStackTrace();
         }
         return null;
-    }
+    }*/
 
 
     @Override
