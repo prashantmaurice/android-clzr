@@ -10,8 +10,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.facebook.Settings;
-
 
 public class SettingsActivity extends ActionBarActivity {
     private Toolbar toolbar;

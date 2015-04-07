@@ -52,7 +52,6 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -365,7 +364,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        slidingMyCards();
+        slidingMyOffers();
         mToolbarView = findViewById(R.id.backToolbar);
         mToolbarView.setBackgroundColor(ScrollUtils.getColorWithAlpha(0, getResources().getColor(R.color.colorPrimary)));
 
@@ -443,7 +442,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         return super.onOptionsItemSelected(item);
     }
 
-    /* private void slidingMyCards() {
+    /* private void slidingMyOffers() {
         SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer);
         final RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.sliding_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -469,7 +468,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                         Log.e("resultSlide", s);
 
                         //MyCardRecyclerViewAdapter Cardadapter = new
-                        offer_recyclerAdapter Cardadapter = new offer_recyclerViewAdapter(convertRowMyCard(s), CouponDetails.this);
+                        offer_recyclerAdapter Cardadapter = new offer_recyclerViewAdapter(convertRowMyOffers(s), CouponDetails.this);
                         ;
                         mRecyclerView.setAdapter(Cardadapter);
 
@@ -481,7 +480,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
 
         });
     }*/
-    private ArrayList<MyOffer> convertRowMyCard(String s) {
+    private ArrayList<MyOffer> convertRowMyOffers(String s) {
         ArrayList<MyOffer> rowItems = new ArrayList<>();
         /*JSONObject temp = null;
         JSONArray array = null;
@@ -528,7 +527,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         return rowItems;
     }
 
-    /*  private void slidingMyCards() {
+    /*  private void slidingMyOffers() {
             SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer);
             final ListView mListView= (ListView) findViewById(R.id.sliding_list);
 
@@ -550,17 +549,17 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
 
                             Log.e("resultSlide", s);
 
-                            /*ArrayAdapter<MyOffer> offAdapter = new ArrayAdapter<MyOffer>(getApplicationContext(),R.layout.offer_list,convertRowMyCard(s));//offerAdapter(convertRowMyCard(s),CouponDetails.this);
+                            /*ArrayAdapter<MyOffer> offAdapter = new ArrayAdapter<MyOffer>(getApplicationContext(),R.layout.offer_list,convertRowMyOffers(s));//offerAdapter(convertRowMyOffers(s),CouponDetails.this);
                             offAdapter.add(new MyOffer("dummy",2));
                             offAdapter.add(new MyOffer("dummy",2));
-                            MyOfferAdapter offerAdapter = new MyOfferAdapter(convertRowMyCard(s),getApplicationContext());
+                            MyOfferAdapter offerAdapter = new MyOfferAdapter(convertRowMyOffers(s),getApplicationContext());
                             mListView.setAdapter(offerAdapter);
                         }
                     });
                 }
             });
     }*/
-    private void slidingMyCards() {
+    private void slidingMyOffers() {
         SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer1);
         final RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.sliding_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(CouponDetails.this));
@@ -605,10 +604,10 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                         // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
 
 
-                          /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyCard(s), CouponDetails.this);
+                          /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
                           mRecyclerView.setAdapter(Cardadapter);*/
 
-                        ArrayList<MyOffer> myOffers = convertRowMyCard(s);
+                        ArrayList<MyOffer> myOffers = convertRowMyOffers(s);
                         /*MyOffer currentOffer = getCurrentOffer(s);
 
                         MyOffersRecyclerViewAdapter myOffersAdapter = new MyOffersRecyclerViewAdapter(myOffers, currentOffer, CouponDetails.this);

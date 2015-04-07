@@ -3,10 +3,8 @@ package com.clozerr.app;
 import android.annotation.TargetApi;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Handler;
@@ -27,13 +25,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.prefs.Preferences;
 
 /**
  * Created by S.ARAVIND on 3/3/2015.

@@ -1,12 +1,8 @@
 package com.clozerr.app;
 
 import android.annotation.TargetApi;
-import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
-import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -14,7 +10,6 @@ import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.Region;
 
 import java.util.List;
-import java.util.UUID;
 
 @TargetApi(18)
 public class OneTimeBFS extends BeaconFinderService {

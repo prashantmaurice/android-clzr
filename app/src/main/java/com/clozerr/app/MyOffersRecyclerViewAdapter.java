@@ -1,8 +1,6 @@
 package com.clozerr.app;
 
 import android.content.Context;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,7 +12,6 @@ import android.widget.TextView;
 import com.koushikdutta.ion.Ion;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRecyclerViewAdapter.ListItemViewHolder> {
     private static final String TAG = "MyOffersRVAdapter";
@@ -107,10 +104,12 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
         MyOffer currentItem = mItems.get(position);
         viewHolder.mCaptionView.setText(currentItem.getCaption());
         viewHolder.mDescriptionView.setText(currentItem.getDescription());
-        if (currentItem.getImageUrl() != null)
+        if (currentItem.getImageUrl() != null && !currentItem.getImageUrl().isEmpty() &&
+                !currentItem.getImageUrl().equalsIgnoreCase("null"))
             Ion.with(c).load(currentItem.getImageUrl()).withBitmap()
                     .intoImageView(viewHolder.mMainImageView);
-        if (currentItem.getOptionalImageUrl() != null)
+        if (currentItem.getOptionalImageUrl() != null && !currentItem.getOptionalImageUrl().isEmpty() &&
+                !currentItem.getOptionalImageUrl().equalsIgnoreCase("null"))
             Ion.with(c).load(currentItem.getOptionalImageUrl()).withBitmap()
                     .intoImageView(viewHolder.mOptionalImageView);
     }
@@ -127,6 +126,10 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
         public ListItemViewHolder(final View itemView) {
             super(itemView);
 
+            mMainImageView = (ImageView) itemView.findViewById(R.id.offer_label);
+            // find optional view
+            mCaptionView = (TextView) itemView.findViewById(R.id.txtOffer);
+            mDescriptionView = (TextView) itemView.findViewById(R.id.txtDesc);
         }
         /*ImageView imageView;
         TextView txtTitle;

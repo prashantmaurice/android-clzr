@@ -60,7 +60,7 @@ public class MyOffer {
     }
 
     public MyOffer(String type, String imageUrl, String optionalImageUrl, String caption,
-            String description, int stamps, SXOfferExtras sxOfferExtras) throws IllegalArgumentException {
+            String description, int stamps, SXOfferExtras sxOfferExtras) {
         this.mType = type;
         this.mImageUrl = imageUrl;
         this.mOptionalImageUrl = optionalImageUrl;
