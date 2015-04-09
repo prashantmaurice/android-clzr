@@ -17,13 +17,13 @@
             android:id="@+id/offer_label"
             android:layout_width="0dp"
             android:layout_height="50dp"
+            android:layout_gravity="center"
             android:layout_marginEnd="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginStart="25dp"
-            android:layout_marginTop="0dp"
-            android:scaleType="fitXY"
             android:layout_weight="1"
+            android:scaleType="fitXY"
             android:src="@drawable/offer_label" />
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="0dp"
-            android:layout_weight="4"
+            android:layout_weight="5.333"
             android:orientation="vertical">
 
             <TextView
@@ -68,18 +68,18 @@
                 android:textStyle="normal" />
 
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:layout_gravity="bottom"
+            android:layout_gravity="bottom|end"
+            android:layout_weight="0.666"
             android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_weight="1"
+                android:layout_gravity="right"
                 android:orientation="vertical">
 
                 <TextView
@@ -104,75 +104,75 @@
                     android:textStyle="bold" />
 
             </LinearLayout>
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_weight="1"
-                android:orientation="vertical">
+            <!--<LinearLayout-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="bottom"-->
+            <!--android:layout_weight="1"-->
+            <!--android:orientation="vertical">-->
 
-                <TextView
-                    android:id="@+id/sxStampStatus1"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/circulartext_stampstatus1"
-                    android:gravity="center"
-                    android:text="100"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp"
-                    android:textStyle="bold|italic" />
+            <!--<TextView-->
+            <!--android:id="@+id/sxStampStatus1"-->
+            <!--android:layout_width="30dp"-->
+            <!--android:layout_height="30dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:background="@drawable/circulartext_stampstatus1"-->
+            <!--android:gravity="center"-->
+            <!--android:text="100"-->
+            <!--android:textColor="#FFFFFF"-->
+            <!--android:textSize="15sp"-->
+            <!--android:textStyle="bold|italic" />-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="STATUS 1"
-                    android:textColor="#0000FF"
-                    android:textSize="7sp"
-                    android:textStyle="bold" />
+            <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:text="STATUS 1"-->
+            <!--android:textColor="#0000FF"-->
+            <!--android:textSize="7sp"-->
+            <!--android:textStyle="bold" />-->
 
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_weight="1"
-                android:orientation="vertical">
+            <!--</LinearLayout>-->
+            <!--<LinearLayout-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="bottom"-->
+            <!--android:layout_weight="1"-->
+            <!--android:orientation="vertical">-->
 
-                <TextView
-                    android:id="@+id/sxStampStatus2"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/circulartext_stampstatus2"
-                    android:gravity="center"
-                    android:text="100"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp"
-                    android:textStyle="bold|italic" />
+            <!--<TextView-->
+            <!--android:id="@+id/sxStampStatus2"-->
+            <!--android:layout_width="30dp"-->
+            <!--android:layout_height="30dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:background="@drawable/circulartext_stampstatus2"-->
+            <!--android:gravity="center"-->
+            <!--android:text="100"-->
+            <!--android:textColor="#FFFFFF"-->
+            <!--android:textSize="15sp"-->
+            <!--android:textStyle="bold|italic" />-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="STATUS 2"
-                    android:textColor="#FF0000"
-                    android:textSize="7sp"
-                    android:textStyle="bold" />
+            <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:text="STATUS 2"-->
+            <!--android:textColor="#FF0000"-->
+            <!--android:textSize="7sp"-->
+            <!--android:textStyle="bold" />-->
 
-            </LinearLayout>
+            <!--</LinearLayout>-->
         </LinearLayout>
 
     </LinearLayout>
 
     <View
         style="@style/DividerHorizontal"
-        android:layout_marginTop="3dp"
-        android:layout_marginRight="0dp"
         android:layout_marginEnd="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
         android:layout_marginStart="0dp"
-        android:layout_marginLeft="0dp"/>
+        android:layout_marginTop="3dp" />
 
 
 </LinearLayout>

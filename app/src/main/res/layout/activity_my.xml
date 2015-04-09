@@ -1,62 +1,58 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity"
     style="rect_answer"
-    android:background="@drawable/homebg">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
 
-    <include layout="@layout/toolbar_translucent" />
+    <include layout="@layout/toolbar" />
 
 
     <android.support.v4.widget.DrawerLayout
-        android:layout_width="match_parent"
         android:id="@+id/drawerLayout"
-
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
-
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            >
+            android:background="#ffffff"
+            android:orientation="vertical">
 
 
             <Button
-                android:layout_width="match_parent"
-                android:text="SUGGEST A RESTAURANT"
-                android:textSize="13sp"
-                android:textColor="#BBEF6C00"
-                android:onClick="prompt"
-                android:layout_height="35dp"
-                android:background="@drawable/partial_rounded_rect"
-                android:elevation="5dp"
-                android:layout_marginTop="0dp"
-                android:layout_marginBottom="0dp"
                 style="@style/rect_answer"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginBottom="0dp"
+                android:layout_marginTop="0dp"
+                android:background="#FFFFFF"
+                android:elevation="5dp"
+                android:onClick="prompt"
+                android:text="SUGGEST A RESTAURANT"
+                android:textColor="#ff434444"
+                android:textSize="13sp"
                 android:textStyle="bold" />
             <!-- activity view -->
             <RelativeLayout
                 android:layout_width="match_parent"
-
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:background="#fff">
 
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    tools:context=".Home"
                     android:layout_marginBottom="55dp"
-                    />
+                    tools:context=".Home" />
 
-                <include layout="@layout/mycards_sliding"/>
+                <include layout="@layout/mycards_sliding" />
             </RelativeLayout>
         </LinearLayout>
 
-        <include layout="@layout/navdrawer_content"/>
+        <include layout="@layout/navdrawer_content" />
         <!-- navigation drawer -->
         <!--<RelativeLayout-->
         <!--android:layout_gravity="left|start"-->
@@ -73,6 +69,6 @@
         <!--android:dividerHeight="1dp" />-->
         <!--</RelativeLayout>-->
 
-
     </android.support.v4.widget.DrawerLayout>
+
 </LinearLayout>

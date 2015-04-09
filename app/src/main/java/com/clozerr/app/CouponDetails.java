@@ -346,6 +346,16 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         });
     }
 
+    private void initToolbar() {
+        setSupportActionBar((Toolbar) findViewById(R.id.backToolbar));
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        mToolbarView = findViewById(R.id.backToolbar);
+        mToolbarView.setBackgroundColor(ScrollUtils.getColorWithAlpha(0, getResources().getColor(R.color.colorPrimary)));
+    }
+
     private void initViews() {
         detailsLayout = (FrameLayout) findViewById(R.id.detailsLayout);
         detailsLayout.getForeground().setAlpha(0);
@@ -359,14 +369,10 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         callButton = (CircleImageView) findViewById(R.id.itemCallButton);
         dirButton = (CircleImageView) findViewById(R.id.itemDirButton);
         //rateButton = (CircleImageView) findViewById(R.id.itemRateButton);
-        setSupportActionBar((Toolbar) findViewById(R.id.backToolbar));
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        initToolbar();
+
         slidingMyOffers();
-        mToolbarView = findViewById(R.id.backToolbar);
-        mToolbarView.setBackgroundColor(ScrollUtils.getColorWithAlpha(0, getResources().getColor(R.color.colorPrimary)));
+
 
         mScrollView = (ObservableScrollView) findViewById(R.id.scroll);
         mScrollView.setScrollViewCallbacks(this);
@@ -578,6 +584,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                   offers_menu.setBackgroundColor(Color.parseColor("#EF6C00"));
                   SharedPreferences status = getSharedPreferences("USER", 0);
                   String TOKEN = status.getString("token", "");
+                  CouponDetails.this.getSupportActionBar().hide();
 /*
 
                 Button offers_menu = (Button) findViewById(R.id.myoffers);
@@ -642,6 +649,8 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                 offers_menu.setText("My Offers");
                 offers_menu.setTextColor(Color.parseColor("#EF6C00"));
                 offers_menu.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                //initToolbar();
+                CouponDetails.this.getSupportActionBar().show();
             }
         });
 

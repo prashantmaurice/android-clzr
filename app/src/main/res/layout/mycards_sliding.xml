@@ -18,6 +18,8 @@
         <Button
             android:layout_width="match_parent"
             android:text="My Cards"
+            android:textAllCaps="false"
+            android:textStyle="normal"
             android:id="@+id/mycards"
             android:textSize="20sp"
             android:textColor="#EF6C00"
