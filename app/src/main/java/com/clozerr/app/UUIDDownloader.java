@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.util.Log;
 
 import java.io.FileOutputStream;
@@ -26,7 +27,6 @@ public class UUIDDownloader extends BroadcastReceiver {
         String token = context.getSharedPreferences("USER", 0).getString("token", "");
         final String url = DOWNLOAD_URL + token;
         Log.e(TAG, "downloading; url - " + url);
-        // TODO put request to URL to get UUIDs once ready; store results in file based on result
         new AsyncGet(context, DOWNLOAD_URL + token, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
@@ -36,9 +36,6 @@ public class UUIDDownloader extends BroadcastReceiver {
                     fileOutputStream.write(s.getBytes());
                     fileOutputStream.close();
                     isDownloadDone = true;
-                    /*Intent updateIntent = new Intent(context, BeaconFinderService.UUIDUpdateReceiver.class);
-                    updateIntent.setAction(BeaconFinderService.ACTION_UPDATE_UUID_DATABASE);
-                    context.sendBroadcast(updateIntent);*/
                     Log.e(TAG, "disabled UUIDDownloader");
                     ComponentName receiver = new ComponentName(context, UUIDDownloader.class);
                     context.getPackageManager().setComponentEnabledSetting(receiver,
@@ -57,7 +54,10 @@ public class UUIDDownloader extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction() != null && intent.getAction().equals(ACTION_INITIATE_DOWNLOADER)) {
+        if (intent.getAction() != null &&
+            (intent.getAction().equals(ACTION_INITIATE_DOWNLOADER) ||
+                (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)))
+            ) {
             Log.e(TAG, "received");
             if (isNetworkAvailable(context))
                 if (!isDownloadDone)

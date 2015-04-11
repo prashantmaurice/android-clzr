@@ -57,12 +57,12 @@ public class SettingsActivity extends ActionBarActivity {
         }
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            /*if (key.equals(getString(R.string.beacon_detection))) {
+            if (key.equals(getString(R.string.beacon_detection))) {
                 if (sharedPreferences.getBoolean(key, true))
                     BeaconFinderService.allowScanning(getActivity());
                 else
                     BeaconFinderService.disallowScanning(getActivity());
-            }*/
+            }
         }
 
 

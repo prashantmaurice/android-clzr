@@ -75,6 +75,7 @@ public class UUIDDownloadBaseReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, final Intent intent) {
         if (intent.getAction() != null && intent.getAction().equals(ACTION_FIRE_ALARM)) {
+            mContext = context;
             mHandler = new Handler(Looper.myLooper());
             mHandler.post(new Runnable() {
                 @Override
@@ -93,7 +94,13 @@ public class UUIDDownloadBaseReceiver extends BroadcastReceiver {
                                     setNewAlarm();
                                 }
                             }
-                            else alarmInterval = MAXIMUM_ALARM_INTERVAL;
+                            else{
+                                Log.e(TAG, "Download for this session completed successfully.");
+                                if (alarmInterval < MAXIMUM_ALARM_INTERVAL) {
+                                    alarmInterval = MAXIMUM_ALARM_INTERVAL;
+                                    setNewAlarm();
+                                }
+                            }
                         }
                     }, CONNECTIVITY_SCAN_PERIOD);
                 }

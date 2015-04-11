@@ -152,7 +152,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                             longitude = 0.0;
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Toast.makeText(CouponDetails.this, "Error - " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                        //Toast.makeText(CouponDetails.this, "Error - " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                     }
                     if (object.getJSONArray("UUID").length() > 0) {
                         uuid = object.getJSONArray("UUID").getString(0);
@@ -223,9 +223,9 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     detailsView.setText(detailsBundle.getString("description"));
                     locView.setText(detailsBundle.getString("distance"));
 
-                    /*if (!callingIntent.getBooleanExtra("from_periodic_scan", false))
+                    if (!callingIntent.getBooleanExtra("from_periodic_scan", false))
                         OneTimeBFS.checkAndStartScan(getApplicationContext(), uuid);
-                    else PeriodicBFS.dismissNotifications(CouponDetails.this);*/
+                    else PeriodicBFS.dismissNotifications(CouponDetails.this);
 
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -894,7 +894,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     // ALTERNATE
     @Override
     public void onPause() {
-        //OneTimeBFS.checkAndStopScan(getApplicationContext());
+        OneTimeBFS.checkAndStopScan(getApplicationContext());
         Log.d("HOME","destroy");
         //startService(new Intent(this, LocationService.class));
         super.onPause();

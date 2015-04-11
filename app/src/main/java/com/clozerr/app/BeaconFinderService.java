@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.prefs.Preferences;
 
 /**
  * Created by S.ARAVIND on 3/3/2015.
@@ -38,29 +39,25 @@ public abstract class BeaconFinderService extends Service {
     private static final String TAG = "BFS";
     protected static final String REGION_UNIQUE_ID = "BeaconFinderServiceRegionUniqueID";
     protected static final long SCAN_START_DELAY = TimeUnit.MILLISECONDS.convert(2L, TimeUnit.SECONDS);
-    //public static final String ACTION_UPDATE_UUID_DATABASE = "UpdateUUIDDatabase";
 
     protected static boolean isBLESupported = true;
     protected static boolean isScanningAllowed = true;
     protected static boolean hasUserActivatedBluetooth = false;
+    protected static boolean isUserLoggedIn = false;
 
     protected static BluetoothAdapter bluetoothAdapter;
     protected static ArrayList<String> uuidDatabase = null;
+    protected static Handler uiThreadHandler;
 
-    protected Handler mHandler;
-    //protected String[] mUUIDs;
     protected BeaconManager mBeaconManager;
     protected Region mRegion;
-    //protected Boolean mIsWaitingForUpdate = false;
 
     @Override
     public void onCreate() {
         super.onCreate();
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        mHandler = new Handler(Looper.getMainLooper());
+        uiThreadHandler = new Handler(Looper.getMainLooper());
         mBeaconManager = new BeaconManager(getApplicationContext());
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        isScanningAllowed = sharedPreferences.getBoolean(getResources().getString(R.string.beacon_detection), true);
     }
 
     @Override
@@ -83,7 +80,7 @@ public abstract class BeaconFinderService extends Service {
             mBeaconManager.setRangingListener(new RangingListener() {
                 @Override
                 public void onBeaconsDiscovered(Region region, final List list) {
-                    mHandler.post(new Runnable() {
+                    uiThreadHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             onRangedBeacons((List<Beacon>) list);
@@ -106,34 +103,51 @@ public abstract class BeaconFinderService extends Service {
 
     // This function is just for putting toasts, but required as work is done on a background thread
     // so if a toast is directly put, the app will crash (Toasts must be put in the UI thread)
-    protected void putToast(final CharSequence text, final int duration) {
-        mHandler.post(new Runnable() {
+    protected static void putToast(final Context context, final CharSequence text, final int duration) {
+        uiThreadHandler.post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getApplicationContext(), text, duration).show();
+                Toast.makeText(context, text, duration).show();
             }
         });
     }
 
+    protected static String getUuidWithoutHyphens(String uuidWithHyphens) {
+        String resultUuid = "";
+        for (char c : uuidWithHyphens.toCharArray())
+            if (c != '-') resultUuid += String.valueOf(c);
+        return resultUuid;
+    }
+
+    protected static boolean areUuidsEqual(String uuid1, String uuid2) {
+        return (getUuidWithoutHyphens(uuid1).equalsIgnoreCase(getUuidWithoutHyphens(uuid2)));
+    }
+
     protected boolean canScanStart() {
-        if (isScanningAllowed) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        isScanningAllowed = sharedPreferences.getBoolean(getResources().getString(R.string.beacon_detection), true);
+        sharedPreferences = getSharedPreferences("USER", 0);
+        isUserLoggedIn = !sharedPreferences.getString("token", "").isEmpty();
+        if (isScanningAllowed && isUserLoggedIn) {
             if (bluetoothAdapter == null) {
-                putToast("Sorry, but your device doesn't support Bluetooth." +
-                        " Clozerr beacon-finding services won\'t work now.", Toast.LENGTH_LONG);
+                putToast(getApplicationContext(),
+                        "Sorry, but your device doesn't support Bluetooth." +
+                        " Clozerr beacon-finding services won\'t work now.",
+                        Toast.LENGTH_LONG);
                 isBLESupported = false;
                 return false;
             }
             else if (!getApplicationContext().getPackageManager().
                         hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-                putToast("Sorry, but your device doesn't support Bluetooth Low Energy." +
-                        " Clozerr beacon-finding services won\'t work now.", Toast.LENGTH_LONG);
+                putToast(getApplicationContext(),
+                        "Sorry, but your device doesn't support Bluetooth Low Energy." +
+                        " Clozerr beacon-finding services won\'t work now.",
+                        Toast.LENGTH_LONG);
                 isBLESupported = false;
                 return false;
             }
             else {
                 isBLESupported = true;
-                /*getApplicationContext().registerReceiver(new UUIDUpdateReceiver(),
-                        new IntentFilter(ACTION_UPDATE_UUID_DATABASE));*/
                 UUIDDownloadBaseReceiver.scheduleDownload(getApplicationContext());
                 if (uuidDatabase == null)
                         readUUIDsFromFile(getApplicationContext());
@@ -216,30 +230,40 @@ public abstract class BeaconFinderService extends Service {
             mNextOfferCaption = (nextOffer == null) ? "" : nextOffer.getString("caption");
             mNextOfferDescription = (nextOffer == null) ? "" : nextOffer.getString("description");
         }
-    }
 
-    /*public class UUIDUpdateReceiver extends BroadcastReceiver {
-        private static final String TAG = "UUIDUpdateReceiver";
-        @Override
-        public void onReceive(final Context context, final Intent intent) {
-            Log.e(TAG, "received");
-            if (intent.getAction() != null && intent.getAction().equals(ACTION_UPDATE_UUID_DATABASE)) {
-                try {
-                    readUUIDsFromFile(context);
-                    *//*if (BeaconFinderService.this.mIsWaitingForUpdate) {
-                        *//**//*synchronized (BeaconFinderService.this.mIsWaitingForUpdate) {
-                            BeaconFinderService.this.mIsWaitingForUpdate = false;
-                            BeaconFinderService.this.mIsWaitingForUpdate.notify();
-                        }*//**//*
-                        BeaconFinderService.this.mIsWaitingForUpdate = false;
-                        BeaconFinderService.this.notify();
-                    }*//*
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    context.unregisterReceiver(this);
-                }
-            }
+        public Intent getDetailsIntent(Context context) {
+            Intent detailIntent = new Intent(context, CouponDetails.class);
+            detailIntent.putExtra("vendor_id", mVendorID);
+            detailIntent.putExtra("offer_id", mNextOfferID);
+            detailIntent.putExtra("offer_caption", mNextOfferCaption);
+            detailIntent.putExtra("offer_text", mNextOfferDescription);
+            return detailIntent;
         }
-    }*/
+
+        public static ArrayList<VendorParams> readVendorParamsFromFile(Context context) {
+            ArrayList<VendorParams> result = null;
+            try {
+                FileInputStream fileInputStream = context.openFileInput(UUIDDownloader.UUID_FILE_NAME);
+                byte[] dataBytes = new byte[fileInputStream.available()];
+                fileInputStream.read(dataBytes);
+                JSONArray rootArray = new JSONArray(new String(dataBytes));
+                Log.e(TAG, "root - " + rootArray.toString());
+                VendorParams vendorParams;
+                result = new ArrayList<VendorParams>();
+                for (int i = 0; i < rootArray.length(); ++i) {
+                    vendorParams = null;
+                    try {
+                        vendorParams = new VendorParams(rootArray.getJSONObject(i));
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    } finally {
+                        if (vendorParams != null) result.add(vendorParams);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return result;
+        }
+    }
 }

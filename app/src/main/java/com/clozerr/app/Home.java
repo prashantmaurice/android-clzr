@@ -259,22 +259,7 @@ public class Home  extends ActionBarActivity {
         //stopService(new Intent(this, LocationService.class));
         Log.d("HOME","start");
         super.onResume();
-        //PeriodicBFS.checkAndStartScan(getApplicationContext());
-        /*//BeaconFinderService.startPeriodicScan(getApplicationContext(), false);
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        //BeaconFinderService.startPeriodicScan(getApplicationContext(), false);
-        if(sharedPref.getBoolean("beacon_detection", true)) {
-            Log.d("Preferences", "read");
-
-            PeriodicBFS.allowScanning(getApplicationContext());
-        }
-        else
-        {
-
-            PeriodicBFS.disallowScanning(getApplicationContext());
-
-        }*/
-
+        PeriodicBFS.checkAndStartScan(getApplicationContext());
     }
 
     private void locationEnabledCheck() {
