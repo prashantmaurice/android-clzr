@@ -14,6 +14,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.internal.util.Predicate;
 import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.BeaconManager;
 import com.jaalee.sdk.RangingListener;
@@ -217,18 +218,20 @@ public abstract class BeaconFinderService extends Service {
         public String mNextOfferID;
         public String mNextOfferCaption;
         public String mNextOfferDescription;
+        public boolean mIsNotifiable;
 
-        public VendorParams(JSONObject object) throws JSONException {
+        public VendorParams(Context context, JSONObject object) throws JSONException {
             Log.e(TAG, "object - " + object.toString());
             mName = object.getString("name");
             mUUID = (object.getJSONArray("UUID").length() > 0) ?
-                        object.getJSONArray("UUID").getString(0) : "";
+                        object.getJSONArray("UUID").getString(0).toLowerCase() : "";
             mVendorID = object.getString("_id");
             JSONObject nextOffer = (object.getJSONArray("offers_qualified").length()) > 0 ?
                                     object.getJSONArray("offers_qualified").getJSONObject(0) : null;
             mNextOfferID = (nextOffer == null) ? "" : nextOffer.getString("_id");
             mNextOfferCaption = (nextOffer == null) ? "" : nextOffer.getString("caption");
             mNextOfferDescription = (nextOffer == null) ? "" : nextOffer.getString("description");
+            mIsNotifiable = isVendorWithThisUUIDNotifiable(context, mUUID);
         }
 
         public Intent getDetailsIntent(Context context) {
@@ -253,7 +256,7 @@ public abstract class BeaconFinderService extends Service {
                 for (int i = 0; i < rootArray.length(); ++i) {
                     vendorParams = null;
                     try {
-                        vendorParams = new VendorParams(rootArray.getJSONObject(i));
+                        vendorParams = new VendorParams(context, rootArray.getJSONObject(i));
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     } finally {
@@ -264,6 +267,19 @@ public abstract class BeaconFinderService extends Service {
                 e.printStackTrace();
             }
             return result;
+        }
+
+        public static VendorParams findVendorParamsInFile(Context context, Predicate<VendorParams> paramsPredicate) {
+            ArrayList<VendorParams> rootArray = readVendorParamsFromFile(context);
+            for (VendorParams params : rootArray)
+                if (paramsPredicate.apply(params))
+                    return params;
+            return null;
+        }
+
+        public static boolean isVendorWithThisUUIDNotifiable(Context context, String uuid) {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            return !preferences.contains(uuid);
         }
     }
 }

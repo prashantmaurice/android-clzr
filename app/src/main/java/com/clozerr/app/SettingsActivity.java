@@ -64,8 +64,7 @@ public class SettingsActivity extends ActionBarActivity {
                     BeaconFinderService.disallowScanning(getActivity());
             }
         }
-
-
+        // TODO implement turning off notifications
     }
 
 

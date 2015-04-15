@@ -4,7 +4,7 @@
         android:key="@string/beacon_detection"
         android:summary="For accurate detection of restaurants"
         android:title="Timed Bluetooth"
-        android:defaultValue="true" />
+        android:defaultValue="true"/>
     <CheckBoxPreference
         android:key="@string/nbd_detection"
         android:summary="I'm living near a Clozerr approved restaurant"

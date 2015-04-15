@@ -7,12 +7,30 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.internal.util.Predicate;
 import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.Region;
 
@@ -21,7 +39,6 @@ import org.json.JSONObject;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
@@ -39,10 +56,10 @@ public class PeriodicBFS extends BeaconFinderService {
                                     // TODO make this 10 min
     private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(6L, TimeUnit.SECONDS);
                                     // TODO modify as required
-    private static final int DIALOG_VIEW_ID = 0; // TODO change to R.layout.dialog_vendor_list
     private static enum RequestCodes {
         CODE_DETAILS_INTENT(1234),
-        CODE_REFUSE_INTENT(1235);
+        CODE_REFUSE_INTENT(1235),
+        CODE_VENDOR_LIST_INTENT(1236);
 
         private int mCode;
 
@@ -132,10 +149,11 @@ public class PeriodicBFS extends BeaconFinderService {
         return new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_notif_logo)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setSound(soundUri);
+                .setSound(soundUri)
+                .setAutoCancel(true);
     }
 
-    private static void setNotificationForVendor(String uuid, Context context)
+    private static void showNotificationForVendor(Context context, String uuid)
     {
         Log.e(TAG, "UUID for notification - " + uuid);
         dismissNotifications(context);
@@ -160,22 +178,22 @@ public class PeriodicBFS extends BeaconFinderService {
                     context.registerReceiver(new BroadcastReceiver() {
                         @Override
                         public void onReceive(Context context, Intent intent) {
-                            // TODO modify files
-                            putToast(context, "Turned off beacon notifications for " + vendorParams.mName,
-                                    Toast.LENGTH_LONG);
-                            notificationManager.cancel(NOTIFICATION_ID);
-                            context.unregisterReceiver(this);
+                            if (intent.getAction().equals(ACTION_REMOVE_VENDOR)) {
+                                turnOffNotificationsForVendor(context, vendorParams);
+                                notificationManager.cancel(NOTIFICATION_ID);
+                                context.unregisterReceiver(this);
+                            }
                         }
                     }, new IntentFilter(ACTION_REMOVE_VENDOR));
 
                     notificationBuilder = getDefaultNotificationBuilder(context);
                     notificationBuilder.setContentTitle(title)
+                            .setTicker(title)
                             .setContentText(contentText)
-                            .setContentIntent(detailPendingIntent)
-                            .setAutoCancel(true)
+                            //.setContentIntent(detailPendingIntent)
                             .setWhen(System.currentTimeMillis())
-                            .addAction(R.drawable.ic_action_accept, "Check in", detailPendingIntent);
-                            //.addAction(R.drawable.ic_refuse, "Turn off for this vendor", refusePendingIntent);
+                            .addAction(R.drawable.ic_action_accept, "Check in", detailPendingIntent)
+                            .addAction(R.drawable.ic_refuse, "Turn off for this vendor", refusePendingIntent);
                     notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
                     break;
                 }
@@ -185,7 +203,7 @@ public class PeriodicBFS extends BeaconFinderService {
         }
     }
 
-    private static void setNotifications(Context context) {
+    private static void showNotifications(Context context) {
         dismissNotifications(context);
         ArrayList<String> uuidList = new ArrayList<>();
         for (String uuid : periodicScanDeviceMap.keySet())
@@ -193,21 +211,64 @@ public class PeriodicBFS extends BeaconFinderService {
                 uuidList.add(uuid);
         if (uuidList.size() > 0) {
             Log.e(TAG, "Setting all notifications");
-            /*if (uuidList.size() == 1)
-                setNotificationForVendor(uuidList.get(0), context);
+            if (uuidList.size() == 1)
+                showNotificationForVendor(context, uuidList.get(0));
             else
-                showDialogForList(context, uuidList);*/
-            setNotificationForVendor(uuidList.get(0), context);
+                showNotificationForVendorList(context, uuidList);
         }
     }
 
-    private static void showDialogForList(Context context, ArrayList<String> uuids) {
-
+    private static void showNotificationForVendorList(Context context, ArrayList<String> uuids) {
+        Log.e(TAG, "Multiple vendors, size " + uuids.size());
+        dismissNotifications(context);
+        try {
+            String title = uuids.size() + " restaurants near you";
+            String contentText = "Tap to view offers and/or check in.";
+            Intent vendorListIntent = new Intent(context, VendorListActivity.class);
+            vendorListIntent.putStringArrayListExtra("uuidList", uuids);
+            PendingIntent vendorListPendingIntent = PendingIntent.getActivity(context,
+                    RequestCodes.CODE_VENDOR_LIST_INTENT.code(),
+                    vendorListIntent, PendingIntent.FLAG_ONE_SHOT);
+            notificationBuilder = getDefaultNotificationBuilder(context);
+            notificationBuilder.setContentTitle(title)
+                    .setTicker(title)
+                    .setContentText(contentText)
+                    .setContentIntent(vendorListPendingIntent)
+                    .setWhen(System.currentTimeMillis());
+            notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void dismissNotifications(Context context) {
         notificationManager.cancelAll();
         notificationBuilder = getDefaultNotificationBuilder(context);
+    }
+
+    public static void turnOffNotificationsForVendor(Context context, VendorParams vendorParams) {
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        editor.putString(vendorParams.mUUID, "don't notify");   // dummy string value
+        editor.apply();
+        vendorParams.mIsNotifiable = false;
+        putToast(context, "Turned off beacon notifications for " + vendorParams.mName,
+                Toast.LENGTH_LONG);
+        if (!areAnyVendorsNotifiable(context))
+            BeaconFinderService.disallowScanning(context);
+    }
+
+    public static void turnOnNotificationsForVendor(Context context, VendorParams vendorParams) {
+
+    }
+
+    private static boolean areAnyVendorsNotifiable(Context context) {
+        if (uuidDatabase != null) {
+            for (String uuid : uuidDatabase)
+                if (VendorParams.isVendorWithThisUUIDNotifiable(context, uuid))
+                    return true;
+            return false;
+        }
+        else return true;
     }
 
     @Override
@@ -220,10 +281,11 @@ public class PeriodicBFS extends BeaconFinderService {
         Log.e(TAG, "Ranged; size - " + beaconList.size());
         for (int i = 0; i < beaconList.size(); ++i) {
             Beacon beacon = beaconList.get(i);
-            String uuid = beacon.getProximityUUID();    // TODO modify this if major, minor also required
+            String uuid = beacon.getProximityUUID();
             Log.e(TAG, "UUID scanned - " + uuid.toUpperCase());
-            if (uuidDatabase.contains(uuid.toUpperCase())) {
-                DeviceParams deviceParams = null;
+            if (uuidDatabase.contains(uuid.toUpperCase()) &&
+                VendorParams.isVendorWithThisUUIDNotifiable(getApplicationContext(), uuid)) {
+                DeviceParams deviceParams;
                 if (periodicScanDeviceMap.containsKey(uuid)) {
                     deviceParams = periodicScanDeviceMap.get(uuid);
                     if (!deviceParams.mFoundInThisScan) {
@@ -239,7 +301,6 @@ public class PeriodicBFS extends BeaconFinderService {
                 if (deviceParams.mCount == PERIODIC_SCAN_BEACON_LIMIT) {
                     deviceParams.mCount = 0;
                     deviceParams.mToBeNotified = true;
-                    //setNotificationForVendor(uuid, getApplicationContext(), NOTIFICATION_ID + i);
                 }
                 writeHashMapToFile();
             }
@@ -257,7 +318,7 @@ public class PeriodicBFS extends BeaconFinderService {
     public static boolean isRunning() { return running; }
 
     public static void checkAndStartScan(Context context) {
-        if (!running && isBLESupported) {
+        if (!running && isBLESupported && areAnyVendorsNotifiable(context)) {
             context.startService(new Intent(context, PeriodicBFS.class));
         }
     }
@@ -301,13 +362,13 @@ public class PeriodicBFS extends BeaconFinderService {
             for (String uuid : periodicScanDeviceMap.keySet())
                 if (!periodicScanDeviceMap.get(uuid).mFoundInThisScan)
                     periodicScanDeviceMap.remove(uuid);
-            setNotifications(getApplicationContext());
+            showNotifications(getApplicationContext());
         }
 
         @Override
         public void run() {
             readUUIDsFromFile(getApplicationContext());
-            if (uuidDatabase != null)
+            if (uuidDatabase != null && areAnyVendorsNotifiable(getApplicationContext()))
                 uiThreadHandler.post(mScanningRunnable);
         }
     }
@@ -321,6 +382,174 @@ public class PeriodicBFS extends BeaconFinderService {
             mCount = count;
             mFoundInThisScan = foundInThisScan;
             mToBeNotified = false;
+        }
+    }
+
+    public static class VendorListActivity extends ActionBarActivity {
+
+        private static final String TAG = "VendorListActivity";
+
+        public static ArrayList<VendorParams> vendorList = null;
+
+        private ListView mVendorListView;
+        private VendorListAdapter mVendorListAdapter;
+        private Button mDismissButton;
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_vendor_list);
+            getVendorListFromIntent();
+            initViews();
+        }
+
+        private void initViews() {
+            mVendorListView = (ListView) findViewById(R.id.vendorListView);
+            mVendorListAdapter = new VendorListAdapter(this, vendorList);
+            mVendorListView.setAdapter(mVendorListAdapter);
+            mDismissButton = (Button) findViewById(R.id.dismissButton);
+            mDismissButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                    System.exit(0);
+                }
+            });
+        }
+
+        private void getVendorListFromIntent() {
+            ArrayList<String> uuids = getIntent().getStringArrayListExtra("uuidList");
+            vendorList = new ArrayList<>();
+            for (final String uuid : uuids) {
+                VendorParams vendorParams = VendorParams.findVendorParamsInFile(this, new Predicate<VendorParams>() {
+                    @Override
+                    public boolean apply(VendorParams vendorParams) {
+                        return areUuidsEqual(vendorParams.mUUID, uuid);
+                    }
+                });
+                if (vendorParams != null && vendorParams.mIsNotifiable) {
+                    vendorList.add(vendorParams);
+                    Log.e(TAG, "vendor added - " + vendorParams.mName);
+                }
+            }
+        }
+
+        @Override
+        public boolean onCreateOptionsMenu(Menu menu) {
+            // Inflate the menu; this adds items to the action bar if it is present.
+            getMenuInflater().inflate(R.menu.menu_vendor_list, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            // Handle action bar item clicks here. The action bar will
+            // automatically handle clicks on the Home/Up button, so long
+            // as you specify a parent activity in AndroidManifest.xml.
+            int id = item.getItemId();
+
+            //noinspection SimplifiableIfStatement
+            if (id == R.id.action_settings) {
+                return true;
+            }
+
+            return super.onOptionsItemSelected(item);
+        }
+
+        private class VendorListAdapter extends BaseAdapter {
+            private static final String TAG = "VendorListAdapter";
+            private static final long REMOVE_ANIMATION_DURATION = 500;
+
+            private ArrayList<VendorParams> mVendorList;
+            private Context mContext;
+            private ViewHolder mViewHolder;
+
+            public VendorListAdapter(Context context, ArrayList<VendorParams> vendorList) {
+                super();
+                mVendorList = vendorList;
+                mContext = context;
+            }
+
+            @Override
+            public int getCount () {
+                return mVendorList.size();
+            }
+
+            @Override
+            public long getItemId (int position) {
+                return position;
+            }
+
+            @Override
+            public Object getItem (int position) {
+                return mVendorList.get(position);
+            }
+
+            @Override
+            public View getView(final int position, View convertView, ViewGroup parent) {
+                if (convertView == null) {
+                    LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    int idToInflate = ((position + 1) % 2 == 0) ? R.layout.vendor_list_item_even :
+                            R.layout.vendor_list_item_odd;
+                    convertView = inflater.inflate(idToInflate, null);
+                }
+
+                final VendorParams params = mVendorList.get(position);
+
+                mViewHolder = new ViewHolder(convertView);
+                mViewHolder.mTitleView.setText(params.mName);
+                mViewHolder.mNextOfferView.setText(params.mNextOfferCaption);
+                mViewHolder.mViewVendorButton.setOnClickListener(new Button.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent detailIntent = params.getDetailsIntent(mContext);
+                        detailIntent.putExtra("from_periodic_scan", true);
+                        mContext.startActivity(detailIntent);
+                    }
+                });
+                mViewHolder.mTurnOffVendorButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        PeriodicBFS.turnOffNotificationsForVendor(mContext, params);
+                        Animation removalAnimation = AnimationUtils.loadAnimation(mContext,
+                                                    android.R.anim.slide_out_right);
+                        removalAnimation.setDuration(REMOVE_ANIMATION_DURATION);
+                        removalAnimation.setAnimationListener(new Animation.AnimationListener() {
+                            @Override
+                            public void onAnimationStart(Animation animation) {}
+
+                            @Override
+                            public void onAnimationEnd(Animation animation) {
+                                mVendorList.remove(params);
+                                mVendorListAdapter.notifyDataSetChanged();
+                                if (mVendorList.isEmpty()) {
+                                    finish();
+                                    System.exit(0);
+                                }
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animation animation) {}
+                        });
+                        mVendorListView.getChildAt(position).startAnimation(removalAnimation);
+                    }
+                });
+                return convertView;
+            }
+
+            private class ViewHolder {
+                public TextView mTitleView;
+                public TextView mNextOfferView;
+                public Button mViewVendorButton;
+                public Button mTurnOffVendorButton;
+
+                public ViewHolder(View parentView) {
+                    mTitleView = (TextView) parentView.findViewById(R.id.vendorNameView);
+                    mNextOfferView = (TextView) parentView.findViewById(R.id.nextOfferView);
+                    mViewVendorButton = (Button) parentView.findViewById(R.id.viewVendorButton);
+                    mTurnOffVendorButton = (Button) parentView.findViewById(R.id.turnOffVendorButton);
+                }
+            }
         }
     }
 }
