@@ -67,9 +67,6 @@ public class SettingsActivity extends ActionBarActivity {
         // TODO implement turning off notifications
     }
 
-
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

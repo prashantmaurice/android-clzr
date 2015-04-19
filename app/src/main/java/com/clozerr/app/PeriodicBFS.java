@@ -1,6 +1,7 @@
 package com.clozerr.app;
 
 import android.annotation.TargetApi;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -251,14 +252,42 @@ public class PeriodicBFS extends BeaconFinderService {
         editor.putString(vendorParams.mUUID, "don't notify");   // dummy string value
         editor.apply();
         vendorParams.mIsNotifiable = false;
-        putToast(context, "Turned off beacon notifications for " + vendorParams.mName,
+        putToast(context, "Turned OFF beacon notifications for " + vendorParams.mName,
                 Toast.LENGTH_LONG);
         if (!areAnyVendorsNotifiable(context))
             BeaconFinderService.disallowScanning(context);
     }
 
     public static void turnOnNotificationsForVendor(Context context, VendorParams vendorParams) {
+        boolean wereAnyVendorsNotifiable = areAnyVendorsNotifiable(context);
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        editor.remove(vendorParams.mUUID);
+        editor.apply();
+        vendorParams.mIsNotifiable = true;
+        putToast(context, "Turned ON beacon notifications for " + vendorParams.mName,
+                Toast.LENGTH_LONG);
+        if (areAnyVendorsNotifiable(context) && !wereAnyVendorsNotifiable)
+            BeaconFinderService.allowScanning(context);
+    }
 
+    public static void turnOnNotificationsForVendor(Context context, final String uuid) {
+        turnOnNotificationsForVendor(context, VendorParams.findVendorParamsInFile(context,
+                            new Predicate<VendorParams>() {
+                                @Override
+                                public boolean apply(VendorParams vendorParams) {
+                                    return areUuidsEqual(uuid, vendorParams.mUUID);
+                                }
+                            }));
+    }
+
+    public static void turnOffNotificationsForVendor(Context context, final String uuid) {
+        turnOffNotificationsForVendor(context, VendorParams.findVendorParamsInFile(context,
+                new Predicate<VendorParams>() {
+                    @Override
+                    public boolean apply(VendorParams vendorParams) {
+                        return areUuidsEqual(uuid, vendorParams.mUUID);
+                    }
+                }));
     }
 
     private static boolean areAnyVendorsNotifiable(Context context) {
@@ -283,6 +312,7 @@ public class PeriodicBFS extends BeaconFinderService {
             Beacon beacon = beaconList.get(i);
             String uuid = beacon.getProximityUUID();
             Log.e(TAG, "UUID scanned - " + uuid.toUpperCase());
+            Log.e(TAG, "major - " + beacon.getMajor() + "; minor - " + beacon.getMinor());
             if (uuidDatabase.contains(uuid.toUpperCase()) &&
                 VendorParams.isVendorWithThisUUIDNotifiable(getApplicationContext(), uuid)) {
                 DeviceParams deviceParams;
