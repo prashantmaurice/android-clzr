@@ -89,8 +89,10 @@ public class UUIDDownloadBaseReceiver extends BroadcastReceiver {
                             if (!UUIDDownloader.isDoneDownloading()) {
                                 Log.e(TAG, "Timeout; disabling UUIDDownloader");
                                 disableUUIDDownloader(context);
-                                if (alarmInterval / REDUCTION_FACTOR >= MINIMUM_ALARM_INTERVAL) {
+                                if (alarmInterval > MINIMUM_ALARM_INTERVAL) {
                                     alarmInterval /= REDUCTION_FACTOR;
+                                    if (alarmInterval < MINIMUM_ALARM_INTERVAL)
+                                        alarmInterval = MINIMUM_ALARM_INTERVAL;
                                     setNewAlarm();
                                 }
                             }
