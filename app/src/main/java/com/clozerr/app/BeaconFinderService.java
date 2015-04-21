@@ -200,6 +200,7 @@ public abstract class BeaconFinderService extends Service {
 
     public static void disallowScanning(Context context) {
         isScanningAllowed = false;
+        UUIDDownloadBaseReceiver.stopDownloads(context);
         if (PeriodicBFS.isRunning())
             context.stopService(new Intent(context, PeriodicBFS.class));
         else if (OneTimeBFS.isRunning())
@@ -219,6 +220,7 @@ public abstract class BeaconFinderService extends Service {
         public String mNextOfferCaption;
         public String mNextOfferDescription;
         public boolean mIsNotifiable;
+        public String mPaymentType;
 
         public VendorParams(Context context, JSONObject object) throws JSONException {
             Log.e(TAG, "object - " + object.toString());
@@ -232,6 +234,8 @@ public abstract class BeaconFinderService extends Service {
             mNextOfferCaption = (nextOffer == null) ? "" : nextOffer.getString("caption");
             mNextOfferDescription = (nextOffer == null) ? "" : nextOffer.getString("description");
             mIsNotifiable = isVendorWithThisUUIDNotifiable(context, mUUID);
+            //mPaymentType = object.getString("paymentType");
+            mPaymentType = "counter";
         }
 
         public Intent getDetailsIntent(Context context) {

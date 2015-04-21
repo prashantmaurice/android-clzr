@@ -483,7 +483,7 @@ public class Home  extends ActionBarActivity {
                             session.closeAndClearTokenInformation();
                         }
                     }
-
+                    BeaconFinderService.disallowScanning(Home.this);
                     startActivity(new Intent(Home.this, Login.class));
                     finish();
                     break;

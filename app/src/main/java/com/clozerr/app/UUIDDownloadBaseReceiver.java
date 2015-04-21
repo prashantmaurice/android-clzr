@@ -38,16 +38,21 @@ public class UUIDDownloadBaseReceiver extends BroadcastReceiver {
         mContext = context;
     }
 
+    private static PendingIntent getUUIDDownloaderPendingIntent(Context context) {
+        Intent intentToSend = new Intent(context, UUIDDownloadBaseReceiver.class);
+        intentToSend.setAction(ACTION_FIRE_ALARM);
+        return PendingIntent.getBroadcast(context, REQUEST_CODE, intentToSend, 0);
+    }
+
     private void setNewAlarm() {
         Log.e(TAG, "setting alarm; interval - " + alarmInterval);
-        Intent intentToSend = new Intent(mContext, UUIDDownloadBaseReceiver.class);
-        intentToSend.setAction(ACTION_FIRE_ALARM);
-        PendingIntent receiverIntent = PendingIntent.getBroadcast(mContext, REQUEST_CODE,
-                                                                  intentToSend, 0);
+        PendingIntent operationIntent = getUUIDDownloaderPendingIntent(mContext);
         if (alarmManager != null)
-            alarmManager.cancel(receiverIntent);
+            alarmManager.cancel(operationIntent);
+        else
+            alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setInexactRepeating(AlarmManager.RTC, System.currentTimeMillis(),
-                                         alarmInterval, receiverIntent);
+                                         alarmInterval, operationIntent);
     }
 
     public static boolean hasStarted() { return alarmManager != null; }
@@ -55,6 +60,11 @@ public class UUIDDownloadBaseReceiver extends BroadcastReceiver {
     public static void scheduleDownload(Context context) {
         if (!UUIDDownloadBaseReceiver.hasStarted())
             new UUIDDownloadBaseReceiver(context).setNewAlarm();
+    }
+
+    public static void stopDownloads(Context context) {
+        if (UUIDDownloadBaseReceiver.hasStarted())
+            alarmManager.cancel(getUUIDDownloaderPendingIntent(context));
     }
 
     private void enableUUIDDownloader(Context context) {
@@ -96,7 +106,7 @@ public class UUIDDownloadBaseReceiver extends BroadcastReceiver {
                                     setNewAlarm();
                                 }
                             }
-                            else{
+                            else {
                                 Log.e(TAG, "Download for this session completed successfully.");
                                 if (alarmInterval < MAXIMUM_ALARM_INTERVAL) {
                                     alarmInterval = MAXIMUM_ALARM_INTERVAL;

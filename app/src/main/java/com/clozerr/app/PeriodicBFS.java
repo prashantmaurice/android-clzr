@@ -310,29 +310,39 @@ public class PeriodicBFS extends BeaconFinderService {
         Log.e(TAG, "Ranged; size - " + beaconList.size());
         for (int i = 0; i < beaconList.size(); ++i) {
             Beacon beacon = beaconList.get(i);
-            String uuid = beacon.getProximityUUID();
+            final String uuid = beacon.getProximityUUID();
             Log.e(TAG, "UUID scanned - " + uuid.toUpperCase());
             Log.e(TAG, "major - " + beacon.getMajor() + "; minor - " + beacon.getMinor());
-            if (uuidDatabase.contains(uuid.toUpperCase()) &&
-                VendorParams.isVendorWithThisUUIDNotifiable(getApplicationContext(), uuid)) {
-                DeviceParams deviceParams;
-                if (periodicScanDeviceMap.containsKey(uuid)) {
-                    deviceParams = periodicScanDeviceMap.get(uuid);
-                    if (!deviceParams.mFoundInThisScan) {
-                        ++(deviceParams.mCount);
-                        deviceParams.mFoundInThisScan = true;
-                    } else continue;
-                } else {
-                    periodicScanDeviceMap.put(uuid, new DeviceParams(1, true));
-                    deviceParams = periodicScanDeviceMap.get(uuid);
+            if (uuidDatabase.contains(uuid.toUpperCase())) {
+                VendorParams vendorParams = VendorParams.findVendorParamsInFile(getApplicationContext(),
+                        new Predicate<VendorParams>() {
+                            @Override
+                            public boolean apply(VendorParams vendorParams) {
+                                return areUuidsEqual(uuid, vendorParams.mUUID);
+                            }
+                        });
+                if (vendorParams.mIsNotifiable) {
+                    DeviceParams deviceParams;
+                    int beaconLimit = (vendorParams.mPaymentType.equalsIgnoreCase("counter")) ? 1 :
+                                        PERIODIC_SCAN_BEACON_LIMIT;
+                    if (periodicScanDeviceMap.containsKey(uuid)) {
+                        deviceParams = periodicScanDeviceMap.get(uuid);
+                        if (!deviceParams.mFoundInThisScan) {
+                            ++(deviceParams.mCount);
+                            deviceParams.mFoundInThisScan = true;
+                        } else continue;
+                    } else {
+                        periodicScanDeviceMap.put(uuid, new DeviceParams(1, true));
+                        deviceParams = periodicScanDeviceMap.get(uuid);
+                    }
+                    Log.e(TAG, "count-" + deviceParams.mCount +
+                            ";lim-" + beaconLimit);
+                    if (deviceParams.mCount == beaconLimit) {
+                        deviceParams.mCount = 0;
+                        deviceParams.mToBeNotified = true;
+                    }
+                    writeHashMapToFile();
                 }
-                Log.e(TAG, "count-" + deviceParams.mCount +
-                        ";lim-" + PERIODIC_SCAN_BEACON_LIMIT);
-                if (deviceParams.mCount == PERIODIC_SCAN_BEACON_LIMIT) {
-                    deviceParams.mCount = 0;
-                    deviceParams.mToBeNotified = true;
-                }
-                writeHashMapToFile();
             }
         }
     }
@@ -350,6 +360,13 @@ public class PeriodicBFS extends BeaconFinderService {
     public static void checkAndStartScan(Context context) {
         if (!running && isBLESupported && areAnyVendorsNotifiable(context)) {
             context.startService(new Intent(context, PeriodicBFS.class));
+        }
+    }
+
+    public static void checkAndStopScan(Context context) {
+        if (running) {
+            context.stopService(new Intent(context, PeriodicBFS.class));
+            UUIDDownloadBaseReceiver.stopDownloads(context);
         }
     }
 
