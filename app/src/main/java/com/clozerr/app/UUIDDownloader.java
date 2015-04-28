@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.FileOutputStream;
@@ -36,15 +37,16 @@ public class UUIDDownloader extends BroadcastReceiver {
                     fileOutputStream.write(s.getBytes());
                     fileOutputStream.close();
                     isDownloadDone = true;
-                    Log.e(TAG, "disabled UUIDDownloader");
+                    UUIDDownloadBaseReceiver.releaseWakeLock();
                     ComponentName receiver = new ComponentName(context, UUIDDownloader.class);
                     context.getPackageManager().setComponentEnabledSetting(receiver,
                             PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+                    Log.e(TAG, "disabled UUIDDownloader");
                 } catch (Exception e) {
                     e.printStackTrace();
                     Intent nextTrialIntent = new Intent(context, UUIDDownloader.class);
                     nextTrialIntent.setAction(ACTION_INITIATE_DOWNLOADER);
-                    context.sendBroadcast(nextTrialIntent);
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(nextTrialIntent);
                 }
             }
         });

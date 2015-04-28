@@ -21,12 +21,13 @@ public class UUIDDownloadBaseReceiver extends BroadcastReceiver {
                                         // TODO change to 1 hr or so
     private static final long CONNECTIVITY_SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(15L, TimeUnit.SECONDS);
                                         // TODO change to 15 min or so
-    private static final String ACTION_FIRE_ALARM = "FireAlarm";
+    private static final String ACTION_FIRE_ALARM_DOWNLOAD = "FireAlarmDownload";
     private static final int REDUCTION_FACTOR = 2;
     private static final int REQUEST_CODE = 1234;
 
     private static long alarmInterval = MAXIMUM_ALARM_INTERVAL;
     private static AlarmManager alarmManager = null;
+    private static WakeLockManager wakeLockManager = null;
 
     private Context mContext = null;
     private Handler mHandler = null;
@@ -40,8 +41,8 @@ public class UUIDDownloadBaseReceiver extends BroadcastReceiver {
 
     private static PendingIntent getUUIDDownloaderPendingIntent(Context context) {
         Intent intentToSend = new Intent(context, UUIDDownloadBaseReceiver.class);
-        intentToSend.setAction(ACTION_FIRE_ALARM);
-        return PendingIntent.getBroadcast(context, REQUEST_CODE, intentToSend, 0);
+        intentToSend.setAction(ACTION_FIRE_ALARM_DOWNLOAD);
+        return PendingIntent.getBroadcast(context, REQUEST_CODE, intentToSend, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 
     private void setNewAlarm() {
@@ -51,7 +52,7 @@ public class UUIDDownloadBaseReceiver extends BroadcastReceiver {
             alarmManager.cancel(operationIntent);
         else
             alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC, System.currentTimeMillis(),
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
                                          alarmInterval, operationIntent);
     }
 
@@ -82,11 +83,17 @@ public class UUIDDownloadBaseReceiver extends BroadcastReceiver {
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
     }
 
+    public static void acquireWakeLock(Context context) { wakeLockManager.acquireWakeLock(context, TAG); }
+
+    public static void releaseWakeLock() { wakeLockManager.releaseWakeLock(); }
+
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        if (intent.getAction() != null && intent.getAction().equals(ACTION_FIRE_ALARM)) {
+        if (intent.getAction() != null && intent.getAction().equals(ACTION_FIRE_ALARM_DOWNLOAD)) {
             mContext = context;
             mHandler = new Handler(Looper.myLooper());
+            wakeLockManager = new WakeLockManager();
+            wakeLockManager.acquireWakeLock(context, TAG);
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -113,6 +120,7 @@ public class UUIDDownloadBaseReceiver extends BroadcastReceiver {
                                     setNewAlarm();
                                 }
                             }
+                            wakeLockManager.releaseWakeLock();
                         }
                     }, CONNECTIVITY_SCAN_PERIOD);
                 }

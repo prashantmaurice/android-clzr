@@ -39,7 +39,7 @@ public class OneTimeBFS extends BeaconFinderService {
             if (beacon.getProximityUUID().equalsIgnoreCase(uuid)) {
                 // TODO Auto check-in
                 putToast(getApplicationContext(), "Near this restaurant. Check in?", Toast.LENGTH_LONG);
-                mBeaconManager.stopRanging(mRegion);
+                beaconManager.stopRanging(scanningRegion);
                 turnOffBluetooth();
                 Log.e(TAG, "Stopped Scan");
                 running = false;
@@ -56,7 +56,7 @@ public class OneTimeBFS extends BeaconFinderService {
         uiThreadHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mBeaconManager.startRangingAndDiscoverDevice(mRegion);
+                beaconManager.startRangingAndDiscoverDevice(scanningRegion);
             }
         }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
     }

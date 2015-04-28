@@ -30,7 +30,6 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.prefs.Preferences;
 
 /**
  * Created by S.ARAVIND on 3/3/2015.
@@ -50,15 +49,15 @@ public abstract class BeaconFinderService extends Service {
     protected static ArrayList<String> uuidDatabase = null;
     protected static Handler uiThreadHandler;
 
-    protected BeaconManager mBeaconManager;
-    protected Region mRegion;
+    protected static BeaconManager beaconManager;
+    protected static Region scanningRegion;
 
     @Override
     public void onCreate() {
         super.onCreate();
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         uiThreadHandler = new Handler(Looper.getMainLooper());
-        mBeaconManager = new BeaconManager(getApplicationContext());
+        beaconManager = new BeaconManager(getApplicationContext());
     }
 
     @Override
@@ -77,8 +76,8 @@ public abstract class BeaconFinderService extends Service {
 
     protected void findBeacons() {
         if (canScanStart()) {
-            mRegion = createRegion();
-            mBeaconManager.setRangingListener(new RangingListener() {
+            scanningRegion = createRegion();
+            beaconManager.setRangingListener(new RangingListener() {
                 @Override
                 public void onBeaconsDiscovered(Region region, final List list) {
                     uiThreadHandler.post(new Runnable() {
@@ -89,7 +88,7 @@ public abstract class BeaconFinderService extends Service {
                     });
                 }
             });
-            mBeaconManager.connect(new ServiceReadyCallback() {
+            beaconManager.connect(new ServiceReadyCallback() {
                 @Override
                 public void onServiceReady() {
                     scan();
@@ -158,7 +157,7 @@ public abstract class BeaconFinderService extends Service {
         else return false;
     }
 
-    protected void readUUIDsFromFile(Context context) {
+    protected static void readUUIDsFromFile(Context context) {
         try {
             FileOutputStream dummyOutputStream = context.openFileOutput(UUIDDownloader.UUID_FILE_NAME, MODE_APPEND);
                                                 // for creating the file if not present
@@ -185,14 +184,14 @@ public abstract class BeaconFinderService extends Service {
         }
     }
 
-    protected void turnOnBluetooth() {
+    protected static void turnOnBluetooth() {
         hasUserActivatedBluetooth = bluetoothAdapter.isEnabled();  // check if user has already enabled BT
         if (!hasUserActivatedBluetooth)                            // disabled, so enable BT
             bluetoothAdapter.enable();
         Log.e(TAG, "BT On");
     }
 
-    protected void turnOffBluetooth() {
+    protected static void turnOffBluetooth() {
         if (!hasUserActivatedBluetooth) // if user turned on BT, don't disable it as user might need it
             bluetoothAdapter.disable();
         Log.e(TAG, "BT Off");
@@ -200,11 +199,8 @@ public abstract class BeaconFinderService extends Service {
 
     public static void disallowScanning(Context context) {
         isScanningAllowed = false;
-        UUIDDownloadBaseReceiver.stopDownloads(context);
-        if (PeriodicBFS.isRunning())
-            context.stopService(new Intent(context, PeriodicBFS.class));
-        else if (OneTimeBFS.isRunning())
-            context.stopService(new Intent(context, OneTimeBFS.class));
+        PeriodicBFS.checkAndStopScan(context);
+        OneTimeBFS.checkAndStopScan(context);
     }
 
     public static void allowScanning(Context context) {

@@ -183,6 +183,10 @@
             android:name=".PeriodicBFS$VendorListActivity"
             android:label="@string/app_name" >
         </activity>
+
+        <receiver android:name=".PeriodicBFS$ScanStarter"
+            android:enabled="false"
+            android:exported="true"/>
     </application>
 
 </manifest>
