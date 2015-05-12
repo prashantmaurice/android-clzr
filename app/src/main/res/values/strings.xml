@@ -24,5 +24,11 @@
     <string name="share_subject">Tell Friends About Clozerr</string>
     <string name="share_title">Clozerr</string>
     <string name="title_activity_vendor_list">VendorListActivity</string>
-
+    <string name="title_activity_my_clubs">MyClubs</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string-array name="tabheadings">
+        <item>CATEGORIES</item>
+        <item>NEARBY</item>
+        <item>MY CLUBS</item>
+    </string-array>
 </resources>

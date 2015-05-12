@@ -10,16 +10,13 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
 import android.graphics.drawable.ColorDrawable;
-import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,7 +26,6 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SlidingDrawer;
@@ -39,12 +35,7 @@ import android.widget.Toast;
 import com.facebook.Session;
 import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.plus.Plus;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -69,7 +60,10 @@ public class Home  extends ActionBarActivity {
     Button button;
     static double lat;
     static double longi;
+
     private Toolbar toolbar;
+    private ViewPager pager;
+    private SlidingTabLayout mtabs;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private ListView leftDrawerList;
@@ -77,13 +71,8 @@ public class Home  extends ActionBarActivity {
     private NavDrawAdapter nav;
     private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Tell Friends about Clozerr", "Settings", "Log out"};
     //private boolean nav_drawer_open = false;
-    private RecyclerViewAdapter mMainPageAdapter;
-    private ArrayList<CardModel> mMainCardsList;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private EndlessRecyclerOnScrollListener mOnScrollListener;
-    private int mOffset;
-    private boolean mCardsLeft = true;
-    private final int ITEMS_PER_PAGE = 7, INITIAL_LOAD_LIMIT = 8;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,22 +107,6 @@ public class Home  extends ActionBarActivity {
 
         }
         initDrawer();
-        final RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setHasFixedSize(true);
-
-        mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mOnScrollListener = new EndlessRecyclerOnScrollListener(
-                (LinearLayoutManager)mLayoutManager) {
-            @Override
-            public void onLoadMore() {
-                loadMoreItems();
-            }
-        };
-        mRecyclerView.setOnScrollListener(mOnScrollListener);
-
         TextView username = (TextView)findViewById(R.id.nav_text);
         if(USERNAME.length()!=0)
             username.setText(USERNAME);
@@ -143,97 +116,13 @@ public class Home  extends ActionBarActivity {
         new DownloadImageTask((de.hdodenhof.circleimageview.CircleImageView)findViewById(R.id.nav_image))
                 .execute(USER_PIC_URL);
 
-        //startService(new Intent(this, LocationService.class));
-        lat = 13;
-        longi = 80.2;
 
 
-        SharedPreferences status = getSharedPreferences("USER", 0);
-        final String cards = status.getString("home_cards", "");
-        if(!cards.equals("")){
-            Log.e("Cached Card", cards);
-            mMainCardsList = convertRow(cards);
-            mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, Home.this);
-            mRecyclerView.setAdapter(mMainPageAdapter);
-        } else {
-            mOffset = 0;
-            String url = "http://api.clozerr.com/vendor/get/near?latitude=" + lat + "&longitude=" + longi + "&access_token=" + TOKEN
-                    + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
-            Log.e("url", url);
-            new AsyncGet(Home.this, url, new AsyncGet.AsyncResult() {
-                @Override
-                public void gotResult(String s) {
-                    Log.e("result",s);
-                    if(s==null) {
-                        Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
-                    }
-
-                    ArrayList<CardModel> CardList = convertRow(s);
-                    if (CardList.size() != 0) {
-                        mMainCardsList = CardList;
-                        mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, Home.this);
-                        mRecyclerView.setAdapter(mMainPageAdapter);
-                        final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-                        editor.putString("home_cards", s);
-                        editor.apply();
-                        Log.e("app", "editing done");
-                    }
-                    else {
-                        Log.d("app", "no cards to show");
-                        mCardsLeft = false;
-                    }
-                }
-            });
-        }
 
 
-        new MyLocation().getLocation(getApplicationContext(), new MyLocation.LocationResult(){
-            @Override
-            public void gotLocation (Location location) {
-                Log.e("location stuff","Location Callback called.");
-                try{
-                    lat=location.getLatitude();
-                    longi=location.getLongitude();
-                    Log.e("lat", lat + "");
-                    Log.e("long", longi + "");
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-                SharedPreferences status = getSharedPreferences("USER", 0);
-                TOKEN = status.getString("token", "");
-                String url;
-                mOffset = 0;
-                if(!TOKEN.equals(""))
-                    url = "http://api.clozerr.com/vendor/get/near?latitude="+lat+"&longitude="+longi+"&access_token="+TOKEN
-                            + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
-                else
-                    url = "http://api.clozerr.com/vendor/get/near?latitude="+lat+"&longitude="+longi
-                            + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
-                Log.e("url", url);
 
-                new AsyncGet(Home.this, url, new AsyncGet.AsyncResult() {
-                    @Override
-                    public void gotResult(String s) {
-                        ArrayList<CardModel> CardList = convertRow(s);
-                        if(CardList.size()!=0){
-                            mMainCardsList = CardList;
-                            mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, Home.this);
-                            mRecyclerView.setAdapter(mMainPageAdapter);
 
-                            final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-                            editor.putString("home_cards", s);
-                            editor.apply();
-                        }
-                        else {
-                            mCardsLeft = false;
-                        }
-                    }
-                });
-            }
-
-        });
-
-        slidingMyCards();
+        //slidingMyCards();
 
 
         GCMRegistrar.checkDevice(this);
@@ -251,6 +140,18 @@ public class Home  extends ActionBarActivity {
                 }
             });
         }
+        pager=(ViewPager)findViewById(R.id.pager);
+        pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager(),Home.this));
+        mtabs=(SlidingTabLayout)findViewById(R.id.tabs);
+        mtabs.setDistributeEvenly(true);
+        mtabs.setCustomTabView(R.layout.custom_tab_view, R.id.tabtitle);
+        mtabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+            @Override
+            public int getIndicatorColor(int position) {
+                return getResources().getColor(R.color.colorAccent);
+            }
+        });
+        mtabs.setViewPager(pager);
 
     }
 
@@ -324,54 +225,7 @@ public class Home  extends ActionBarActivity {
       private void slidingMyCards() {
           SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer);
           Log.e("app", "in slidingmycards");
-        final RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.sliding_list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(Home.this));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setHasFixedSize(true);
-        Log.e("app", "in slidingmycards; set recycler");
-        drawer.setOnDrawerOpenListener(new SlidingDrawer.OnDrawerOpenListener() {
 
-            @Override
-
-            public void onDrawerOpened() {
-
-                SharedPreferences status = getSharedPreferences("USER", 0);
-                String TOKEN = status.getString("token", "");
-
-                String urlVisited = "http://api.clozerr.com/vendor/get/visitedV2?access_token="+TOKEN;
-                Log.e("urlslide", urlVisited);
-
-                new AsyncGet(Home.this, urlVisited , new AsyncGet.AsyncResult() {
-                    @Override
-                    public void gotResult(String s) {
-                        //  t1.setText(s);
-
-                        Log.e("resultSlide", s);
-
-                        MyCardRecyclerViewAdapter Cardadapter = new MyCardRecyclerViewAdapter(convertRowMyCard(s), Home.this);
-                        mRecyclerView.setAdapter(Cardadapter);
-                        try
-                        {
-                            Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
-
-                            t.setScreenName("MyCards");
-
-                            t.send(new HitBuilders.AppViewBuilder().build());
-                        }
-                        catch(Exception  e)
-                        {
-                            Toast.makeText(getApplicationContext(), "Error"+e.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                        if(s==null) {
-                            Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
-                        }
-                        //l1.setAdapter(adapter);
-                    }
-                });
-
-            }
-
-        });
 
     }
     private void nitView() {
@@ -565,84 +419,8 @@ public class Home  extends ActionBarActivity {
 
 
 
-    private ArrayList<CardModel> convertRow(String s) {
-        ArrayList<CardModel> rowItems = new ArrayList<>();
-        JSONArray array;
-        try {
-            array = new JSONArray(s);
-            for(int i = 0 ; i < array.length() ; i++){
-                String phonenumber;
-                try {
-                    phonenumber = array.getJSONObject(i).getString("phonenumber");
-                }
-                catch(Exception e)
-                {
-                    phonenumber="0123456789";
-                }
-                String vendorDescription;
-                try {
-                    vendorDescription = array.getJSONObject(i).getString("description");
-                }
-                catch(Exception e)
-                {
-                    vendorDescription="No Restaurant Description Available Now";
-                }
-                Log.e("description", vendorDescription);
-                CardModel item = new CardModel(
-                        array.getJSONObject(i).getString("name"),
-                        phonenumber, vendorDescription,
-                        array.getJSONObject(i).getJSONArray("offers"),
-                        array.getJSONObject(i).getJSONArray("location").getDouble(0),
-                        array.getJSONObject(i).getJSONArray("location").getDouble(1),
-                        array.getJSONObject(i).getString("image"),
-                        array.getJSONObject(i).getString("fid"),array.getJSONObject(i).getString("_id"),0
-                );
-                rowItems.add(item);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return rowItems;
-    }
-    private ArrayList<CardModel> convertRowMyCard(String s) {
-        ArrayList<CardModel> rowItems = new ArrayList<>();
-        JSONObject temp;
-        JSONArray array;
-        try {
-            //Log.e("stringfunction", s);
-            Log.e("stringfunction", "processing..");
-            temp = new JSONObject(s);
-            array = temp.getJSONArray("data");
 
-            ImageView loyaltyempty=(ImageView)findViewById(R.id.loyaltyempty);
-            if(array.length()==0){
-                Log.e("arrayLength", array.length()+"");
-                loyaltyempty.setVisibility(View.VISIBLE);
-            }
-            for(int i = 0 ; i < array.length() ; i++){
-                loyaltyempty.setVisibility(View.GONE);
-                Log.e("stringfunction", "processing..");
-                CardModel item = new CardModel(
-                        array.getJSONObject(i).getString("name"),
-                        array.getJSONObject(i).getString("phone"),
-                        array.getJSONObject(i).getString("description"),
-                        array.getJSONObject(i).getJSONArray("offers"),
-                        array.getJSONObject(i).getJSONArray("location").getDouble(0),
-                        array.getJSONObject(i).getJSONArray("location").getDouble(1),
-                        array.getJSONObject(i).getString("image"),
-                        array.getJSONObject(i).getString("fid"),
-                        array.getJSONObject(i).getString("_id"),
-                        array.getJSONObject(i).getInt("stamps")
-                );
-                Log.e("stringfunction", "processed");
-                rowItems.add(item);
-            }
-        } catch (Exception e) {
-            Log.e("uhoh",e.getMessage());
-            e.printStackTrace();
-        }
-        return rowItems;
-    }
+
 
     public void prompt(View v)
     { // get prompts.xml view
@@ -768,43 +546,7 @@ public class Home  extends ActionBarActivity {
         }
     }
 
-    public void loadMoreItems() {
-        Log.e("load", "in loadMoreItems()");
-        if (mCardsLeft) {
-            mOffset += (mOffset == 0) ? INITIAL_LOAD_LIMIT : ITEMS_PER_PAGE;
-            String url = "";
-            if (!TOKEN.equals(""))
-                url = "http://api.clozerr.com/vendor/get/near?latitude=" + lat + "&longitude=" + longi + "&access_token=" + TOKEN
-                    + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
-            else
-                url = "http://api.clozerr.com/vendor/get/near?latitude=" + lat + "&longitude=" + longi
-                        + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
-            Log.e("url", url);
-            new AsyncGet(Home.this, url, new AsyncGet.AsyncResult() {
-                @Override
-                public void gotResult(String s) {
-                    Log.e("result", s);
-                    if (s == null) {
-                        Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
-                    }
-                    ArrayList<CardModel> CardList = convertRow(s);
-                    if (CardList.size() != 0) {
-                        mMainCardsList.addAll(convertRow(s));
-                        final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-                        editor.putString("home_cards", s);
-                        editor.apply();
-                        Log.e("app", "editing done");
-                        mMainPageAdapter.notifyDataSetChanged();
-                        //Toast.makeText(getApplicationContext(), "More items ready", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Log.d("app", "no cards to show");
-                        mCardsLeft = false;
-                        mOffset = mMainCardsList.size();
-                    }
-                }
-            });
-        }
-    }
+
     @Override
     protected void onStart(){
         super.onStart();

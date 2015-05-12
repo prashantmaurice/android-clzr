@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".Home">
 
     <include layout="@layout/toolbar" />
 
@@ -13,43 +13,20 @@
         android:id="@+id/drawerLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#ffffff"
             android:orientation="vertical">
-
-
-            <Button
-                style="@style/rect_answer"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:layout_marginBottom="0dp"
-                android:layout_marginTop="0dp"
-                android:background="#FFFFFF"
-                android:elevation="5dp"
-                android:onClick="prompt"
-                android:text="SUGGEST A RESTAURANT"
-                android:textColor="#ff434444"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-            <!-- activity view -->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#fff">
-
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="55dp"
-                    tools:context=".Home" />
-
-                <include layout="@layout/mycards_sliding" />
-            </RelativeLayout>
+        <com.clozerr.app.SlidingTabLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#2196F3"
+            android:id="@+id/tabs" />
+        <android.support.v4.view.ViewPager
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/pager" />
         </LinearLayout>
 
         <include layout="@layout/navdrawer_content" />
