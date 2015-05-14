@@ -20,7 +20,7 @@ class MyPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         switch (position){
-            case 0:NearbyFragment myFragment=new NearbyFragment();
+            case 0:CategoriesFragment myFragment=new CategoriesFragment();
                  return myFragment;
             case 1:NearbyFragment nearbyFragment=new NearbyFragment();
                  return nearbyFragment;
@@ -39,6 +39,6 @@ class MyPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return tabheadings.length;
     }
 }

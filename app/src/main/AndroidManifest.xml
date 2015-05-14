@@ -189,10 +189,7 @@
             android:enabled="false"
             android:exported="true" />
 
-        <activity
-            android:name=".MyClubsFragment"
-            android:label="@string/title_activity_my_clubs" >
-        </activity>
+
     </application>
 
 </manifest>

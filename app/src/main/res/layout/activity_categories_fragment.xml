@@ -1,0 +1,28 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/categoriesLayout"
+    android:background="#ffffff"
+    android:gravity="center"
+    tools:context="com.clozerr.app.CategoriesFragment">
+
+
+
+    <ImageView
+        android:id="@+id/loyaltyempty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/loyaltyempty"
+        android:background="#ffffff"
+        />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/sliding_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".CategoriesFragment"
+        />
+
+
+
+</RelativeLayout>
