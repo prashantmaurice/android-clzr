@@ -65,7 +65,11 @@
                 android:layout_weight="1"
                 android:layout_height="0dp"
                 android:gravity="left"
-                android:text="User name"
+                android:text="Not logged in"
+                android:shadowColor="#000000"
+                android:shadowRadius="2"
+                android:shadowDx="1"
+                android:shadowDy="1"
                 android:textColor="#ffffffff" />
 
         </LinearLayout>

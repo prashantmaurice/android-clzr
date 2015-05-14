@@ -160,7 +160,7 @@ public class Home  extends ActionBarActivity {
         //stopService(new Intent(this, LocationService.class));
         Log.d("HOME","start");
         super.onResume();
-        PeriodicBFS.checkAndStartScan(getApplicationContext());
+        //PeriodicBFS.checkAndStartScan(getApplicationContext());
     }
 
     private void locationEnabledCheck() {
@@ -317,6 +317,7 @@ public class Home  extends ActionBarActivity {
                     SharedPreferences.Editor editor = example.edit();
                     editor.clear();
                     editor.apply();
+                    USER_PIC_URL = USERNAME = USERID = TOKEN = "";
                     if (Login.googleOrFb == 2 && Login.mGoogleApiClient != null)
                     {
                         if (Login.mGoogleApiClient.isConnected()) {
@@ -337,7 +338,7 @@ public class Home  extends ActionBarActivity {
                             session.closeAndClearTokenInformation();
                         }
                     }
-                    BeaconFinderService.disallowScanning(Home.this);
+                    //BeaconFinderService.disallowScanning(Home.this);
                     startActivity(new Intent(Home.this, Login.class));
                     finish();
                     break;
@@ -531,14 +532,15 @@ public class Home  extends ActionBarActivity {
     public void onBackPressed() {
         //boolean superBackPressed = false;
         SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer);
-        if(drawer.isOpened()) {
+        LinearLayout drawerContentLayout = (LinearLayout) findViewById(R.id.drawerContentLayout);
+        if(drawer != null && drawer.isOpened()) {
             drawer.animateClose();
         }
         /*else if(drawerLayout.isDrawerOpen(Gravity.LEFT | Gravity.START)) {
             drawerLayout.closeDrawer(Gravity.LEFT | Gravity.START);
         }*/
-        else if (drawerLayout.isDrawerOpen(findViewById(R.id.drawerContentLayout)))
-            drawerLayout.closeDrawer(findViewById(R.id.drawerContentLayout));
+        else if (drawerContentLayout != null && drawerLayout.isDrawerOpen(drawerContentLayout))
+            drawerLayout.closeDrawer(drawerContentLayout);
         else{
             super.onBackPressed();
             //Button cancel=(Button)findViewById(R.id.cancel);
