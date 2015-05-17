@@ -9,7 +9,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="125dp"
         android:id="@+id/card"
         android:layout_marginTop="0dp"
         android:layout_marginBottom="0dp"
@@ -36,11 +36,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginTop="20dp"
-            android:gravity="left"
+            android:gravity="start"
             android:paddingLeft="15dp"
             android:paddingTop="3dp"
             android:paddingBottom="3dp"
-            android:text="Caption!"
+            android:text="Category"
             android:textColor="#FFFFFF"
             android:textSize="12sp"
             style="@style/Circle"
@@ -48,55 +48,4 @@
             android:id="@+id/txtCaption"/>
     </RelativeLayout>
 
-    <!--<RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_marginTop="0dp"
-        android:layout_height="50dp"
-        android:layout_marginBottom="0dp"
-        android:padding="0dp"
-        android:background="@color/colorPrimary">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_marginTop="14dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/txtrating"
-            android:text=""
-            android:layout_centerVertical="true"
-            android:textSize="18sp"
-            android:textColor="#FFFFFF"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="0dp"
-            android:paddingTop="0dp"
-            android:textSize="16sp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Name"
-            android:textColor="#FFFFFF"
-            android:id="@+id/textTitle"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="0 km"
-            android:paddingLeft="0dp"
-            android:id="@+id/textDistance"
-            android:textColor="#FFFFFF"
-            android:layout_below="@+id/textTitle"
-            android:layout_alignLeft="@+id/textTitle"
-            android:layout_alignStart="@+id/textTitle" />
-    </RelativeLayout>
-
-
--->
 </LinearLayout>

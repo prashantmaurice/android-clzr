@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -103,6 +104,9 @@ public class Home  extends ActionBarActivity {
             //toolbar.setTitle(getString(R.string.app_name));
 
             toolbar.setTitle("");
+            ((TextView) toolbar.findViewById(R.id.appTitleView)).setTypeface(Typeface.createFromAsset(
+                    getAssets(), "fonts/comfortaa.ttf"
+            ));
             setSupportActionBar(toolbar);
 
         }
