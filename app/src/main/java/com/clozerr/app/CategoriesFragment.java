@@ -25,30 +25,30 @@ import java.util.ArrayList;
 
 
 public class CategoriesFragment extends Fragment {
+    private static final String TAG = "CategoriesFragment";
+
     Context c;
     View layout;
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         layout = inflater.inflate(R.layout.activity_my_clubs_fragment, container, false);
         final RecyclerView mRecyclerView = (RecyclerView) layout.findViewById(R.id.sliding_list);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(c,2));
+        mRecyclerView.setLayoutManager(new GridLayoutManager(c, 2));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
-        Log.e("app", "in slidingmycards; set recycler");
-
 
         SharedPreferences status = c.getSharedPreferences("USER", 0);
         String TOKEN = status.getString("token", "");
 
-        String urlVisited = "http://api.clozerr.com/vendor/get/visitedV2?access_token="+TOKEN;
-        Log.e("urlslide", urlVisited);
+        String urlCategories = "http://api.clozerr.com/vendor/get/visitedV2?access_token="+TOKEN;
+        Log.e(TAG, "url - " + urlCategories);
 
-        new AsyncGet(c, urlVisited , new AsyncGet.AsyncResult() {
+        new AsyncGet(c, urlCategories , new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
                 //  t1.setText(s);
 
-                Log.e("resultSlide", s);
+                Log.e(TAG, "result - " + s);
 
                 CategoryRecyclerViewAdapter categoryAdapter = new CategoryRecyclerViewAdapter(convertRowCategory(s), c);
                 mRecyclerView.setAdapter(categoryAdapter);
@@ -74,41 +74,35 @@ public class CategoriesFragment extends Fragment {
 
         return layout;
     }
-    private ArrayList<CardModel> convertRowCategory(String s) {
-        ArrayList<CardModel> rowItems = new ArrayList<>();
+    private ArrayList<CategoryModel> convertRowCategory(String s) {
+        ArrayList<CategoryModel> rowItems = new ArrayList<>();
         JSONObject temp;
         JSONArray array;
         try {
-            //Log.e("stringfunction", s);
-            Log.e("stringfunction", "processing..");
             temp = new JSONObject(s);
             array = temp.getJSONArray("data");
 
             ImageView loyaltyempty=(ImageView)layout.findViewById(R.id.loyaltyempty);
             if(array.length()==0){
-                Log.e("arrayLength", array.length()+"");
                 loyaltyempty.setVisibility(View.VISIBLE);
             }
             for(int i = 0 ; i < array.length() ; i++){
                 loyaltyempty.setVisibility(View.GONE);
-                Log.e("stringfunction", "processing..");
-                CardModel item = new CardModel(
+                CategoryModel item = new CategoryModel(
                         array.getJSONObject(i).getString("name"),
-                        array.getJSONObject(i).getString("phone"),
+                        /*array.getJSONObject(i).getString("phone"),
                         array.getJSONObject(i).getString("description"),
                         array.getJSONObject(i).getJSONArray("offers"),
                         array.getJSONObject(i).getJSONArray("location").getDouble(0),
-                        array.getJSONObject(i).getJSONArray("location").getDouble(1),
-                        array.getJSONObject(i).getString("image"),
+                        array.getJSONObject(i).getJSONArray("location").getDouble(1),*/
+                        array.getJSONObject(i).getString("image")/*,
                         array.getJSONObject(i).getString("fid"),
                         array.getJSONObject(i).getString("_id"),
-                        array.getJSONObject(i).getInt("stamps")
+                        array.getJSONObject(i).getInt("stamps")*/
                 );
-                Log.e("stringfunction", "processed");
                 rowItems.add(item);
             }
         } catch (Exception e) {
-            Log.e("uhoh",e.getMessage());
             e.printStackTrace();
         }
         return rowItems;

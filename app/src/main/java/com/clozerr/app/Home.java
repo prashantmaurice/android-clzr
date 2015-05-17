@@ -160,7 +160,7 @@ public class Home  extends ActionBarActivity {
         //stopService(new Intent(this, LocationService.class));
         Log.d("HOME","start");
         super.onResume();
-        //PeriodicBFS.checkAndStartScan(getApplicationContext());
+        PeriodicBFS.checkAndStartScan(getApplicationContext());
     }
 
     private void locationEnabledCheck() {

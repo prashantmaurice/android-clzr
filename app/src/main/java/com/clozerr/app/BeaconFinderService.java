@@ -67,11 +67,13 @@ public abstract class BeaconFinderService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent == null)
+        /*if (intent == null)
             PeriodicBFS.checkAndStartScan(getApplicationContext());
         else
             findBeacons();
-        return START_STICKY;
+        return START_STICKY;*/
+        stopSelf();
+        return START_NOT_STICKY;
     }
 
     protected void findBeacons() {

@@ -1,8 +1,6 @@
 package com.clozerr.app;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,10 +17,10 @@ import java.util.List;
  */
 public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRecyclerViewAdapter.ListItemViewHolder> {
 
-    private List<CardModel> items;
+    private List<CategoryModel> items;
     static Context c;
 
-    CategoryRecyclerViewAdapter(List<CardModel> modelData, Context c) {
+    CategoryRecyclerViewAdapter(List<CategoryModel> modelData, Context c) {
         if (modelData == null) {
             throw new IllegalArgumentException(
                     "modelData must not be null");
@@ -47,9 +45,9 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
     @Override
     public void onBindViewHolder(ListItemViewHolder viewHolder, int position) {
         viewHolder.currentItem = items.get(position);
-        CardModel model = items.get(position);
+        CategoryModel model = items.get(position);
         //viewHolder.txtTitle.setText(model.getTitle());
-        viewHolder.txtCaption.setText(model.getStampString());
+        viewHolder.txtTitle.setText(model.getTitle());
         //viewHolder.txtDist.setText(model.getDistance());
         Ion.with((viewHolder.imageView))
                 //   .placeholder(R.drawable.call)
@@ -69,14 +67,14 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
         ImageView imageView;
         //TextView txtTitle;
         //TextView txtDist;
-        TextView txtCaption;
-        public CardModel currentItem;
+        TextView txtTitle;
+        public CategoryModel currentItem;
 
         public ListItemViewHolder(View itemView) {
             super(itemView);
 
             //txtTitle = (TextView) itemView.findViewById(R.id.textTitle);
-            txtCaption = (TextView) itemView.findViewById(R.id.txtCaption);
+            txtTitle = (TextView) itemView.findViewById(R.id.txtCaption);
             imageView = (ImageView) itemView.findViewById(R.id.imageView);
             //txtDist=(TextView)itemView.findViewById(R.id.textDistance);
 

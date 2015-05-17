@@ -65,7 +65,7 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
         viewHolder.listRecyclerView.setAdapter(viewHolder.currentItem.getMyOfferAdapter());*/
 
         /*viewHolder.txtTitle.setText(model.getTitle());
-        viewHolder.txtCaption.setText(model.getCaption());
+        viewHolder.txtTitle.setText(model.getCaption());
         viewHolder.txtDist.setText(model.getDistance());*/
 
         //viewHolder.txtrating.setText(model.getRating());
@@ -134,7 +134,7 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
         /*ImageView imageView;
         TextView txtTitle;
         TextView txtDist;
-        TextView txtCaption;*/
+        TextView txtTitle;*/
         //TextView txtrating;
         /*public MyOffersCardModel currentItem;
         public TextView headingView;
@@ -151,7 +151,7 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
             headingView = (TextView) itemView.findViewById(R.id.cardHeadingView);
             *//*txtDist = (TextView) itemView.findViewById(R.id.textDistance);
             txtTitle = (TextView) itemView.findViewById(R.id.textTitle);
-            txtCaption = (TextView) itemView.findViewById(R.id.txtCaption);
+            txtTitle = (TextView) itemView.findViewById(R.id.txtTitle);
             imageView = (ImageView) itemView.findViewById(R.id.imageView);*//*
             //txtrating=(TextView) itemView.findViewById(R.id.txtrating);
 

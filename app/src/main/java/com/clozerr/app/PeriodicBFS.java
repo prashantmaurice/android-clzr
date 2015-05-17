@@ -340,6 +340,7 @@ public class PeriodicBFS extends BeaconFinderService {
         Log.e(TAG, "Ranged; size - " + beaconList.size());
         for (int i = 0; i < beaconList.size(); ++i) {
             Beacon beacon = beaconList.get(i);
+
             final String uuid = beacon.getProximityUUID();
             Log.e(TAG, "UUID scanned - " + uuid.toUpperCase());
             Log.e(TAG, "major - " + beacon.getMajor() + "; minor - " + beacon.getMinor());
@@ -347,8 +348,8 @@ public class PeriodicBFS extends BeaconFinderService {
                 VendorParams vendorParams = VendorParams.findVendorParamsInFile(getApplicationContext(),
                         new Predicate<VendorParams>() {
                             @Override
-                            public boolean apply(VendorParams vendorParams) {
-                                return areUuidsEqual(uuid, vendorParams.mUUID);
+                            public boolean apply(VendorParams params) {
+                                return areUuidsEqual(uuid, params.mUUID);
                             }
                         });
                 if (vendorParams.mIsNotifiable) {
