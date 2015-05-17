@@ -1,6 +1,12 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
 
-    tools:context=".MyActivity" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/search"
+        android:icon="@drawable/giftbox"
+        android:orderInCategory="1"
+        android:title="Freebies"
+        app:showAsAction="ifRoom|collapseActionView" />
 
 </menu>
