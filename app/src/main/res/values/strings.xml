@@ -31,4 +31,5 @@
         <item>NEARBY</item>
         <item>MY CLUBS</item>
     </string-array>
+    <string name="title_activity_catogory_detail">CatogoryDetail</string>
 </resources>
