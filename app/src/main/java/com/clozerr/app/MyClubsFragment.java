@@ -31,6 +31,9 @@ public class MyClubsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         layout = inflater.inflate(R.layout.activity_my_clubs_fragment, container, false);
         final RecyclerView mRecyclerView = (RecyclerView) layout.findViewById(R.id.sliding_list);
+
+
+
         mRecyclerView.setLayoutManager(new GridLayoutManager(c,2));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
