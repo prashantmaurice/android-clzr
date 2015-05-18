@@ -349,7 +349,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int height = displaymetrics.heightPixels;
-        return height;
+        return (toolbarIsShown()) ? height - mToolbar.getHeight() : height;
     }
 
 

@@ -19,7 +19,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginTop="6dp"
             android:background="@color/colorPrimary"
-            card_view:cardBackgroundColor="#00ffffff"
+            card_view:cardBackgroundColor="#FFFFFF"
             card_view:cardCornerRadius="2dp"
             card_view:cardUseCompatPadding="false">
 
@@ -33,7 +33,8 @@
                     android:id="@+id/searchView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:queryHint="" />
+                    android:queryHint=""
+                    android:background="#FFFFFF"/>
 
                 <TextView
                     android:id="@+id/searchHint"
@@ -41,7 +42,8 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
                     android:gravity="center_vertical"
-                    android:hint="Search for Places or Location" />
+                    android:hint="Search for Places or Location"
+                    android:background="#FFFFFF"/>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 

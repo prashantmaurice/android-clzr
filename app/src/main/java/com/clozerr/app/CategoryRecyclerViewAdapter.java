@@ -1,6 +1,7 @@
 package com.clozerr.app;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,10 +79,10 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
             imageView = (ImageView) itemView.findViewById(R.id.imageView);
             //txtDist=(TextView)itemView.findViewById(R.id.textDistance);
 
-            /*itemView.setOnClickListener(new View.OnClickListener() {
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    SharedPreferences status = c.getSharedPreferences("USER", 0);
+                    /*SharedPreferences status = c.getSharedPreferences("USER", 0);
                     String NotNow = status.getString("notNow", "false");
                     if (CouponPage.i == 0 && NotNow.equals("false"))
                     {
@@ -92,10 +93,10 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
                         detailIntent.putExtra("offer_text", currentItem.getOfferDescription());
                         RecyclerViewAdapter.vendor_name_temp = currentItem.getTitle();
                         c.startActivity(detailIntent);
-                    }
-
+                    }*/
+                    c.startActivity(new Intent(c, CategoryDetail.class));
                 }
-            });*/
+            });
         }
     }
 

@@ -190,7 +190,7 @@
             android:exported="true" />
 
         <activity
-            android:name=".CatogoryDetail"
+            android:name=".CategoryDetail"
             android:label="@string/title_activity_catogory_detail" >
         </activity>
     </application>

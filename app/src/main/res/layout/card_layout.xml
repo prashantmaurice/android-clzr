@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         card_view:cardCornerRadius="2dp"
         card_view:cardUseCompatPadding="false"
-        card_view:cardBackgroundColor="@color/colorPrimary"
+        card_view:cardBackgroundColor="#FFFFFF"
         style="@style/round_rect"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"

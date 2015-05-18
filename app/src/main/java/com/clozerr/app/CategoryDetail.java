@@ -1,9 +1,10 @@
 package com.clozerr.app;
 
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.location.Location;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,7 +31,7 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 
 
-public class CatogoryDetail extends ActionBarActivity implements ObservableScrollViewCallbacks{
+public class CategoryDetail extends ActionBarActivity implements ObservableScrollViewCallbacks{
 
     public static String TOKEN = "";
     Toolbar mToolbar;
@@ -46,12 +47,16 @@ public class CatogoryDetail extends ActionBarActivity implements ObservableScrol
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_catogory_detail);
+        setContentView(R.layout.activity_category_detail);
         final ObservableRecyclerView mRecyclerView = (ObservableRecyclerView) findViewById(R.id.list);
         mRecyclerView.setScrollViewCallbacks(this);
         final SearchView searchView = (SearchView)findViewById(R.id.searchView);
         mScrollable=findViewById(R.id.layout);
         mToolbar=(Toolbar)findViewById(R.id.toolbar);
+        mToolbar.setTitle("");
+        ((TextView) mToolbar.findViewById(R.id.appTitleView)).setTypeface(Typeface.createFromAsset(
+                getAssets(), "fonts/comfortaa.ttf"
+        ));
         final TextView searchHint = (TextView)findViewById(R.id.searchHint);
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
@@ -128,7 +133,7 @@ public class CatogoryDetail extends ActionBarActivity implements ObservableScrol
                     ArrayList<CardModel> CardList = convertRow(s);
                     if (CardList.size() != 0) {
                         mMainCardsList = CardList;
-                        mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, CatogoryDetail.this);
+                        mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, CategoryDetail.this);
                         mRecyclerView.setAdapter(mMainPageAdapter);
                         final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                         editor.putString("home_cards", s);
@@ -168,13 +173,13 @@ public class CatogoryDetail extends ActionBarActivity implements ObservableScrol
                             + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
                 Log.e("url", url);
 
-                new AsyncGet(CatogoryDetail.this, url, new AsyncGet.AsyncResult() {
+                new AsyncGet(CategoryDetail.this, url, new AsyncGet.AsyncResult() {
                     @Override
                     public void gotResult(String s) {
                         ArrayList<CardModel> CardList = convertRow(s);
                         if(CardList.size()!=0){
                             mMainCardsList = CardList;
-                            mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList,CatogoryDetail.this );
+                            mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList,CategoryDetail.this );
                             mRecyclerView.setAdapter(mMainPageAdapter);
 
                             final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
@@ -204,7 +209,7 @@ public class CatogoryDetail extends ActionBarActivity implements ObservableScrol
                 url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi
                         + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
             Log.e("url", url);
-            new AsyncGet(CatogoryDetail.this, url, new AsyncGet.AsyncResult() {
+            new AsyncGet(CategoryDetail.this, url, new AsyncGet.AsyncResult() {
                 @Override
                 public void gotResult(String s) {
                     Log.e("result", s);
