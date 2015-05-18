@@ -34,7 +34,7 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
             ViewGroup viewGroup, int viewType) {
         View itemView = LayoutInflater.
                 from(viewGroup.getContext()).
-                inflate(R.layout.card_layout,
+                inflate(R.layout.card_layout_myclubs,
                         viewGroup,
                         false);
         return new ListItemViewHolder(itemView);

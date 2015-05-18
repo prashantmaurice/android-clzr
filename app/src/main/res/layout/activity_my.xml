@@ -16,11 +16,12 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:id="@+id/layout"
             android:orientation="vertical">
         <com.clozerr.app.SlidingTabLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#2196F3"
+            android:background="@color/colorPrimary"
             android:id="@+id/tabs" />
         <android.support.v4.view.ViewPager
             android:layout_width="match_parent"

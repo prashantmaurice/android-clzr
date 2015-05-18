@@ -1,20 +1,17 @@
 package com.clozerr.app;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -32,18 +29,9 @@ import org.json.JSONArray;
 
 import java.util.ArrayList;
 
-/**
- * Created by srivatsan on 12/5/15.
- */
-public class NearbyFragment extends Fragment implements ObservableScrollViewCallbacks {
-    /*public static MyFragment getInstance(int Position){
-        MyFragment myFragment=new MyFragment();
-        Bundle args=new Bundle();
-        args.getInt("position",Position);
-        myFragment.setArguments(args);
-        return myFragment;
-    }*/
-    Context c;
+
+public class CatogoryDetail extends ActionBarActivity implements ObservableScrollViewCallbacks{
+
     public static String TOKEN = "";
     Toolbar mToolbar;
     private RecyclerViewAdapter mMainPageAdapter;
@@ -56,14 +44,15 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
     View mScrollable;
 
     @Override
-    public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
-        View layout=inflater.inflate(R.layout.activity_nearby_fragment,container,false);
-        final ObservableRecyclerView mRecyclerView = (ObservableRecyclerView) layout.findViewById(R.id.list);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_catogory_detail);
+        final ObservableRecyclerView mRecyclerView = (ObservableRecyclerView) findViewById(R.id.list);
         mRecyclerView.setScrollViewCallbacks(this);
-        final SearchView searchView = (SearchView)layout.findViewById(R.id.searchView);
-        mScrollable=getActivity().findViewById(R.id.drawerLayout);
-        mToolbar=(Toolbar)getActivity().findViewById(R.id.toolbar);
-        final TextView searchHint = (TextView)layout.findViewById(R.id.searchHint);
+        final SearchView searchView = (SearchView)findViewById(R.id.searchView);
+        mScrollable=findViewById(R.id.layout);
+        mToolbar=(Toolbar)findViewById(R.id.toolbar);
+        final TextView searchHint = (TextView)findViewById(R.id.searchHint);
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,7 +76,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
                 searchView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             }
         });
-        layout.findViewById(R.id.searchLayout).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.searchLayout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 searchView.setIconified(false);
@@ -95,10 +84,10 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
                 searchView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             }
         });
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(c));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(c);
+        mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mOnScrollListener = new EndlessRecyclerOnScrollListener(
                 (LinearLayoutManager)mLayoutManager) {
@@ -116,32 +105,32 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
         Home.longi = 80.2;
 
 
-        SharedPreferences status = c.getSharedPreferences("USER", 0);
+        SharedPreferences status = getSharedPreferences("USER", 0);
         final String cards = status.getString("home_cards", "");
         if(!cards.equals("")){
             Log.e("Cached Card", cards);
             mMainCardsList = convertRow(cards);
-            mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
+            mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, this);
             mRecyclerView.setAdapter(mMainPageAdapter);
         } else {
             mOffset = 0;
             String url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
                     + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
             Log.e("url", url);
-            new AsyncGet(c, url, new AsyncGet.AsyncResult() {
+            new AsyncGet(this, url, new AsyncGet.AsyncResult() {
                 @Override
                 public void gotResult(String s) {
                     Log.e("result",s);
                     if(s==null) {
-                        Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
                     }
 
                     ArrayList<CardModel> CardList = convertRow(s);
                     if (CardList.size() != 0) {
                         mMainCardsList = CardList;
-                        mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
+                        mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, CatogoryDetail.this);
                         mRecyclerView.setAdapter(mMainPageAdapter);
-                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+                        final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                         editor.putString("home_cards", s);
                         editor.apply();
                         Log.e("app", "editing done");
@@ -155,7 +144,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
         }
 
 
-        new MyLocation().getLocation(c, new MyLocation.LocationResult(){
+        new MyLocation().getLocation(this, new MyLocation.LocationResult(){
             @Override
             public void gotLocation (Location location) {
                 Log.e("location stuff","Location Callback called.");
@@ -167,7 +156,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
                 }catch (Exception e){
                     e.printStackTrace();
                 }
-                SharedPreferences status = c.getSharedPreferences("USER", 0);
+                SharedPreferences status = getSharedPreferences("USER", 0);
                 TOKEN = status.getString("token", "");
                 String url;
                 mOffset = 0;
@@ -179,16 +168,16 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
                             + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
                 Log.e("url", url);
 
-                new AsyncGet(c, url, new AsyncGet.AsyncResult() {
+                new AsyncGet(CatogoryDetail.this, url, new AsyncGet.AsyncResult() {
                     @Override
                     public void gotResult(String s) {
                         ArrayList<CardModel> CardList = convertRow(s);
                         if(CardList.size()!=0){
                             mMainCardsList = CardList;
-                            mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
+                            mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList,CatogoryDetail.this );
                             mRecyclerView.setAdapter(mMainPageAdapter);
 
-                            final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+                            final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                             editor.putString("home_cards", s);
                             editor.apply();
                         }
@@ -201,7 +190,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
 
         });
 
-        return layout;
+
     }
     public void loadMoreItems() {
         Log.e("load", "in loadMoreItems()");
@@ -215,17 +204,17 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
                 url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi
                         + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
             Log.e("url", url);
-            new AsyncGet(c, url, new AsyncGet.AsyncResult() {
+            new AsyncGet(CatogoryDetail.this, url, new AsyncGet.AsyncResult() {
                 @Override
                 public void gotResult(String s) {
                     Log.e("result", s);
                     if (s == null) {
-                        Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
                     }
                     ArrayList<CardModel> CardList = convertRow(s);
                     if (CardList.size() != 0) {
                         mMainCardsList.addAll(convertRow(s));
-                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+                        final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                         editor.putString("home_cards", s);
                         editor.apply();
                         Log.e("app", "editing done");
@@ -279,11 +268,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
         }
         return rowItems;
     }
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        c=activity;
-    }
+
 
     @Override
     public void onScrollChanged(int i, boolean b, boolean b2) {
@@ -297,7 +282,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
 
     @Override
     public void onUpOrCancelMotionEvent(ScrollState scrollState) {
-        ActionBar ab = ((ActionBarActivity)getActivity()).getSupportActionBar();
+
         if (scrollState == ScrollState.UP) {
             if (toolbarIsShown()) {
                 hideToolbar();
@@ -347,10 +332,31 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
 
     private int getScreenHeight() {
         DisplayMetrics displaymetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int height = displaymetrics.heightPixels;
         return height;
     }
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_catogory_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }

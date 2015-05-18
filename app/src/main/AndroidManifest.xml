@@ -189,7 +189,10 @@
             android:enabled="false"
             android:exported="true" />
 
-
+        <activity
+            android:name=".CatogoryDetail"
+            android:label="@string/title_activity_catogory_detail" >
+        </activity>
     </application>
 
 </manifest>
