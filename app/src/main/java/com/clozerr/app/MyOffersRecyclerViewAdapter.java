@@ -66,7 +66,7 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
 
         /*viewHolder.txtTitle.setText(model.getTitle());
         viewHolder.txtTitle.setText(model.getCaption());
-        viewHolder.txtDist.setText(model.getDistance());*/
+        viewHolder.txtDist.setText(model.getDistanceString());*/
 
         //viewHolder.txtrating.setText(model.getRating());
         // new DownloadImageTask(viewHolder.imageView).execute(model.getImageId());
@@ -179,7 +179,7 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
                         vendorBundle.putString("vendorImage", currentItem.getImageId());
                         vendorBundle.putDouble("latitude", currentItem.getLat());
                         vendorBundle.putDouble("longitude", currentItem.getLong());
-                        vendorBundle.putString("distance", currentItem.getDistance());
+                        vendorBundle.putString("distance", currentItem.getDistanceString());
                         vendorBundle.putString("phonenumber", currentItem.getPhonenumber());
                         vendor_name_temp = currentItem.getTitle();
                         detailIntent.putExtra("detailsBundle", vendorBundle);*//**//*

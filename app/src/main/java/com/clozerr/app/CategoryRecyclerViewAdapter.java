@@ -49,7 +49,7 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
         CategoryModel model = items.get(position);
         //viewHolder.txtTitle.setText(model.getTitle());
         viewHolder.txtTitle.setText(model.getTitle());
-        //viewHolder.txtDist.setText(model.getDistance());
+        //viewHolder.txtDist.setText(model.getDistanceString());
         Ion.with((viewHolder.imageView))
                 //   .placeholder(R.drawable.call)
                 //   .error(R.drawable.bat)

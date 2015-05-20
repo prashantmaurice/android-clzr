@@ -36,7 +36,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private List<CardModel> items;
     static Context c;
-    public static String vendor_name_temp = "";
+    //public static String vendor_name_temp = "";
 
     RecyclerViewAdapter(List<CardModel> modelData, Context c) {
         if (modelData == null) {
@@ -64,7 +64,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         CardModel model = items.get(position);
         viewHolder.txtTitle.setText(model.getTitle());
         viewHolder.txtCaption.setText(model.getCaption());
-        viewHolder.txtDist.setText(model.getDistance());
+        viewHolder.txtDist.setText(model.getDistanceString());
         //viewHolder.txtrating.setText(model.getRating());
        // new DownloadImageTask(viewHolder.imageView).execute(model.getImageId());
 
@@ -129,28 +129,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     String NotNow = status.getString("notNow", "false");
                     if (CouponPage.i == 0 && NotNow.equals("false"))
                     {
-                        Intent detailIntent = new Intent(c, CouponDetails.class);
-                        // pass selected vendor's image to details activity to avoid re-download
-                        /*imageView.buildDrawingCache();
-                        Bitmap image = imageView.getDrawingCache();
-                        Bundle vendorBundle = new Bundle();
-                      // vendorBundle.putParcelable("vendorImage", image);
-
-                    vendorBundle.putString("phoneNumber", phone number);
-                    vendorBundle.putString("location", location);
-                    vendorBundle.putString("description", description);*//*
-                        vendorBundle.putString("vendorTitle", currentItem.getTitle());
-                        vendorBundle.putString("offerText", currentItem.getOfferDescription() );
-                        vendorBundle.putString("vendorId", currentItem.getVendorId());
-                        vendorBundle.putString("offerId", currentItem.getOfferId());
-                        vendorBundle.putString("vendorImage", currentItem.getImageId());
-                        vendorBundle.putDouble("latitude", currentItem.getLat());
-                        vendorBundle.putDouble("longitude", currentItem.getLong());
-                        vendorBundle.putString("distance", currentItem.getDistance());
-                        vendorBundle.putString("phonenumber", currentItem.getPhonenumber());
-                        vendor_name_temp = currentItem.getTitle();
-                        detailIntent.putExtra("detailsBundle", vendorBundle);*/
-                        vendor_name_temp = currentItem.getTitle();
+                        Intent detailIntent = new Intent(c, VendorActivity.class);
                         detailIntent.putExtra("vendor_id", currentItem.getVendorId());
                         detailIntent.putExtra("offer_id", currentItem.getOfferId());
                         detailIntent.putExtra("offer_caption", currentItem.getCaption());

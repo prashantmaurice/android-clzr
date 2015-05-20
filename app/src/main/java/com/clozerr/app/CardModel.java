@@ -17,7 +17,8 @@ public class CardModel {
     private String title;
     private String caption;
     private String offerDescription;
-    private String distance;
+    private String distanceString;
+    private double distance;
     private Double lat;
     private Double longi;
     private String phonenumber;
@@ -52,10 +53,11 @@ public class CardModel {
 
         userLocation.setLatitude(Home.lat);
         userLocation.setLongitude(Home.longi);
+        distance = userLocation.distanceTo(location) / 1000;
         if (lat > 0.0 && longi > 0.0)
-            this.distance = String.format("%.2f", userLocation.distanceTo(location)/1000)+" km";
+            this.distanceString = String.format("%.2f", distance) + " km";
         else
-            this.distance = "";
+            this.distanceString = "";
 
         this.franchiseId = fId;
         this.vendorId = vId;
@@ -84,8 +86,9 @@ public class CardModel {
     public String getTitle() {
         return title;
     }
-    public String getDistance() {
-        return distance;
+    public double getDistance() { return distance; }
+    public String getDistanceString() {
+        return distanceString;
     }
     public Double getLat(){ return lat;}
     public Double getLong(){ return longi;}

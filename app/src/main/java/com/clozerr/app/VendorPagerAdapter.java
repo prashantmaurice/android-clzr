@@ -20,15 +20,14 @@ class VendorPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         switch (position){
-            case 0:VendorHomeFragment vendorhomefragment=new VendorHomeFragment();
-                return vendorhomefragment;
-            //TODO Interchange the code in MyStampsFragment and FreebiesFragment and interchange 2 and 1 here
-            case 2:MyStampsFragment mystampsfragment=new MyStampsFragment();
-                return mystampsfragment;
-            case 1:FreebiesFragment freebiesfragment = new FreebiesFragment();
-                return freebiesfragment;
-            case 3:FreebiesFragment freebiesfragment1 = new FreebiesFragment();
-                return freebiesfragment1;
+            case 0:VendorHomeFragment vendorHomeFragment=new VendorHomeFragment();
+                return vendorHomeFragment;
+            case 1:MyStampsFragment myStampsFragment=new MyStampsFragment();
+                return myStampsFragment;
+            case 2:FreebiesFragment freebiesFragment = new FreebiesFragment();
+                return freebiesFragment;
+            case 3:VendorSettingsFragment vendorSettingsFragment = new VendorSettingsFragment();
+                return vendorSettingsFragment;
             default:return null;
         }
 

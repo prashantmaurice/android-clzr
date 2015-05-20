@@ -48,7 +48,7 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
         CardModel model = items.get(position);
         viewHolder.txtTitle.setText(model.getTitle());
         viewHolder.txtStamps.setText(model.getStampString());
-        viewHolder.txtDist.setText(model.getDistance());
+        viewHolder.txtDist.setText(model.getDistanceString());
         Ion.with((viewHolder.imageView))
              //   .placeholder(R.drawable.call)
              //   .error(R.drawable.bat)
@@ -90,7 +90,7 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
                         detailIntent.putExtra("stamps", currentItem.getStamps());
                         detailIntent.putExtra("offer_id", currentItem.getOfferId());
                         detailIntent.putExtra("offer_text", currentItem.getOfferDescription());
-                        RecyclerViewAdapter.vendor_name_temp = currentItem.getTitle();
+                        //RecyclerViewAdapter.vendor_name_temp = currentItem.getTitle();
                         c.startActivity(detailIntent);
                     }
 

@@ -1,5 +1,4 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -18,11 +17,28 @@
         android:layout_height="wrap_content"
         android:background="#2196F3" />
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager_vendor"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1">
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pager_vendor"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/checkinButton"
+            android:src="@drawable/ic_action_accept"
+            android:scaleType="center"
+            android:background="@color/colorPrimary"/>
+
+    </RelativeLayout>
 
 
 </LinearLayout>

@@ -1,7 +1,7 @@
 package com.clozerr.app;
 
 /**
- * Created by Adarsh on 20-05-2015.
+ * Created by Aravind.S on 20-05-2015.
  */
 
 import android.app.Activity;
@@ -14,21 +14,21 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 
-public class MyStampsFragment extends Fragment {
+public class VendorSettingsFragment extends Fragment {
 
     Context c;
     FrameLayout layout;
 
     @Override
-    public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
-        layout = (FrameLayout) inflater.inflate(R.layout.activity_freebies_fragment, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        layout = (FrameLayout) inflater.inflate(R.layout.activity_vendor_settings_fragment, container, false);
         return layout;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        c=activity;
+        c = activity;
     }
 
     @Override

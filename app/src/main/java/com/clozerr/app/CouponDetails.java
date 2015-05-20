@@ -105,8 +105,6 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         String offer_text = callingIntent.getStringExtra("offer_text");
         final String offer_caption = callingIntent.getStringExtra("offer_caption");
 
-
-
         if (offer_text == null || offer_text.equals(""))
             offer_text = "No further offers available";
 
@@ -130,8 +128,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
             public void gotResult(String s) {
                 //Log.i("ghfv","Inside gotResu");
                 //Toast.makeText(CouponDetails.this, "Inside gotResult()", Toast.LENGTH_SHORT).show();
-                String phonenumber="";
-                String vendorDescription="";
+                String address = "", phonenumber="", vendorDescription="";
                 String uuid = null;
                 double latitude = 0.0, longitude = 0.0;
                 try {
@@ -158,7 +155,8 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                         uuid = object.getJSONArray("UUID").getString(0);
                         Log.e("UUID", uuid);
                     }
-                    Log.e("description", vendorDescription);
+                    address = object.getString("address");
+                    //Log.e("description", vendorDescription);
                     final CardModel currentItem = new CardModel(
                             object.getString("name"),
                             phonenumber,
@@ -192,11 +190,12 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     //detailsBundle.putString("offerText", currentItem.getOfferDescription() );
                     detailsBundle.putString("vendorId", currentItem.getVendorId());
                     detailsBundle.putString("description", vendorDescription);
+                    detailsBundle.putString("address", address);
                     //detailsBundle.putString("offerId", currentItem.getOfferId());
                     detailsBundle.putString("vendorImage", currentItem.getImageId());
                     detailsBundle.putDouble("latitude", latitude);
                     detailsBundle.putDouble("longitude", longitude);
-                    detailsBundle.putString("distance", currentItem.getDistance());
+                    detailsBundle.putString("distance", currentItem.getDistanceString());
                     detailsBundle.putString("phonenumber", phonenumber);
                     //currentItem.getQuestions();
 
@@ -254,7 +253,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     dirButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if (!currentItem.getDistance().isEmpty()) {
+                            if (!currentItem.getDistanceString().isEmpty()) {
                                 Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
                                         Uri.parse("http://maps.google.com/maps?daddr=" + detailsBundle.getDouble("latitude") + "," + detailsBundle.getDouble("longitude")));
                                 startActivity(intent);
