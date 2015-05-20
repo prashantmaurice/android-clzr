@@ -48,4 +48,8 @@
     <style name="rect_answer">
         <item name="android:background">@drawable/rect_answer</item>
     </style>
+    <style name="menu_labels_style">
+        <item name="android:background">@drawable/fab_label_background</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
 </resources>

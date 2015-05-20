@@ -193,6 +193,19 @@
             android:name=".CategoryDetail"
             android:label="@string/title_activity_catogory_detail" >
         </activity>
+        <activity
+            android:name=".VendorActivity"
+            android:label="@string/title_activity_vendor" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".FreebiesActivity"
+            android:label="@string/title_activity_freebies" >
+        </activity>
     </application>
 
 </manifest>

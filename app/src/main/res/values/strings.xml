@@ -31,5 +31,13 @@
         <item>NEARBY</item>
         <item>MY CLUBS</item>
     </string-array>
+    <string-array name="vendortabheadings">
+        <item>HOME</item>
+        <item>MY STAMPS</item>
+        <item>FREEBIES</item>
+        <item>SETTINGS</item>
+    </string-array>
     <string name="title_activity_catogory_detail">CatogoryDetail</string>
+    <string name="title_activity_vendor">VendorActivity</string>
+    <string name="title_activity_freebies">FreebiesActivity</string>
 </resources>
