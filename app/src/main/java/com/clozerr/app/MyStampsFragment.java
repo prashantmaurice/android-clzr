@@ -22,7 +22,7 @@ public class MyStampsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
-        layout = inflater.inflate(R.layout.activity_freebies_fragment, container, false);
+        layout = inflater.inflate(R.layout.activity_mystamps_fragment, container, false);
         final ListView listview=(ListView)layout.findViewById(R.id.freebietypes);
         final String[] values = new String[] { "Welcome Reward",
                 "Facebook Ckeck-In Reward",
@@ -30,7 +30,7 @@ public class MyStampsFragment extends Fragment {
                 "Lucky Reward"
         };
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.freebies_item_layout, R.id.freebiename, values);
-        //listview.setAdapter(adapter);
+        listview.setAdapter(adapter);
         return layout;
     }
     @Override
