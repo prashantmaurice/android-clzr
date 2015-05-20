@@ -52,6 +52,7 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -59,6 +60,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class CouponDetails extends ActionBarActivity implements ObservableScrollViewCallbacks {
 
     private static final String TAG = "CouponDetails";
+    private static final long CHECK_IN_SCAN_TIMEOUT = TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS);
+
     private FrameLayout detailsLayout;
     private View mToolbarView;
     private ObservableScrollView mScrollView;
@@ -223,9 +226,9 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     detailsView.setText(detailsBundle.getString("description"));
                     locView.setText(detailsBundle.getString("distance"));
 
-                    /*if (!callingIntent.getBooleanExtra("from_periodic_scan", false))
+                    if (!callingIntent.getBooleanExtra("from_periodic_scan", false))
                         OneTimeBFS.checkAndStartScan(getApplicationContext(), uuid);
-                    else PeriodicBFS.dismissNotifications(CouponDetails.this);*/
+                    else PeriodicBFS.dismissNotifications(CouponDetails.this);
 
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -824,13 +827,14 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         if( !gcm_id.equals("") )
             url += "&gcm_id=" + gcm_id;
 
-        Log.e("CouponDetails url", url);
+        Log.e(TAG, "url - " + url);
 
         // Login.showProgressDialog(getApplicationContext());
         new AsyncGet(CouponDetails.this, url, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
                 Log.e("pin", s);
+                BeaconFinderService.pauseScanningFor(CouponDetails.this, CHECK_IN_SCAN_TIMEOUT);
                 try {
                     pinNumber = new JSONObject(s).getJSONObject("checkin").getString("pin");
                 } catch (JSONException e) {
@@ -903,7 +907,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     // ALTERNATE
     @Override
     public void onPause() {
-        //OneTimeBFS.checkAndStopScan(getApplicationContext());
+        OneTimeBFS.checkAndStopScan(getApplicationContext());
         Log.d("HOME","destroy");
         //startService(new Intent(this, LocationService.class));
         super.onPause();

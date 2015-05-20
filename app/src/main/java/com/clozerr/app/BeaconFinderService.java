@@ -1,8 +1,11 @@
 package com.clozerr.app;
 
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -45,10 +48,22 @@ public abstract class BeaconFinderService extends Service {
     protected static boolean hasUserActivatedBluetooth = false;
     protected static boolean isUserLoggedIn = false;
 
+    protected enum RequestCodes {
+        CODE_ALARM_INTENT(1000),
+        CODE_DETAILS_INTENT(1234),
+        CODE_REFUSE_INTENT(1235),
+        CODE_VENDOR_LIST_INTENT(1236);
+
+        private int mCode;
+
+        RequestCodes(int code) { mCode = code; }
+        public int code() { return mCode; }
+    }
+
     protected static BluetoothAdapter bluetoothAdapter;
     protected static ArrayList<String> uuidDatabase = null;
     protected static Handler uiThreadHandler;
-
+    protected static AlarmManager alarmManager;
     protected static BeaconManager beaconManager;
     protected static Region scanningRegion;
 
@@ -58,6 +73,7 @@ public abstract class BeaconFinderService extends Service {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         uiThreadHandler = new Handler(Looper.getMainLooper());
         beaconManager = new BeaconManager(getApplicationContext());
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
     }
 
     @Override
@@ -201,11 +217,28 @@ public abstract class BeaconFinderService extends Service {
         isScanningAllowed = false;
         PeriodicBFS.checkAndStopScan(context);
         OneTimeBFS.checkAndStopScan(context);
+        Log.e(TAG, "scans blocked");
     }
 
     public static void allowScanning(Context context) {
         isScanningAllowed = true;
         PeriodicBFS.checkAndStartScan(context);
+        Log.e(TAG, "scans allowed");
+    }
+
+    public static void pauseScanningFor(Context context, long intervalMillis) {
+        disallowScanning(context);
+        Log.e(TAG, "scans paused for " + (intervalMillis / 1000.0) + " seconds");
+        long triggerTimeMillis = intervalMillis + System.currentTimeMillis();
+        Intent resumeIntent = new Intent(context, new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context1, Intent intent) {
+                allowScanning(context1);
+                Log.e(TAG, "scans resumed");
+            }
+        }.getClass());
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTimeMillis,
+                PendingIntent.getBroadcast(context, RequestCodes.CODE_ALARM_INTENT.code(), resumeIntent, 0));
     }
 
     protected static class VendorParams {
@@ -217,9 +250,9 @@ public abstract class BeaconFinderService extends Service {
         public String mNextOfferDescription;
         public boolean mIsNotifiable;
         public String mPaymentType;
+        public double mCounterDistanceMetres;
 
         public VendorParams(Context context, JSONObject object) throws JSONException {
-            Log.e(TAG, "object - " + object.toString());
             mName = object.getString("name");
             mUUID = (object.getJSONArray("UUID").length() > 0) ?
                         object.getJSONArray("UUID").getString(0).toLowerCase() : "";
@@ -229,9 +262,11 @@ public abstract class BeaconFinderService extends Service {
             mNextOfferID = (nextOffer == null) ? "" : nextOffer.getString("_id");
             mNextOfferCaption = (nextOffer == null) ? "" : nextOffer.getString("caption");
             mNextOfferDescription = (nextOffer == null) ? "" : nextOffer.getString("description");
-            mIsNotifiable = isVendorWithThisUUIDNotifiable(context, mUUID);
+            mIsNotifiable = !mNextOfferID.isEmpty() && isVendorWithThisUUIDNotifiable(context, mUUID);
             //mPaymentType = object.getString("paymentType");
             mPaymentType = "counter";
+            //mCounterDistanceMetres = object.getString("counterDistanceMetres");
+            mCounterDistanceMetres = 1.0;
         }
 
         public Intent getDetailsIntent(Context context) {
