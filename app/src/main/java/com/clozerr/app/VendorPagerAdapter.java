@@ -22,10 +22,9 @@ class VendorPagerAdapter extends FragmentPagerAdapter {
         switch (position){
             case 0:VendorHomeFragment vendorhomefragment=new VendorHomeFragment();
                 return vendorhomefragment;
-            //TODO Interchange the code in MyStampsFragment and FreebiesFragment and interchange 2 and 1 here
-            case 2:MyStampsFragment mystampsfragment=new MyStampsFragment();
+            case 1:MyStampsFragment mystampsfragment=new MyStampsFragment();
                 return mystampsfragment;
-            case 1:FreebiesFragment freebiesfragment = new FreebiesFragment();
+            case 2:FreebiesFragment freebiesfragment = new FreebiesFragment();
                 return freebiesfragment;
             case 3:FreebiesFragment freebiesfragment1 = new FreebiesFragment();
                 return freebiesfragment1;
