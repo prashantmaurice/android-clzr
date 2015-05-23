@@ -46,6 +46,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
     Context c;
     public static String TOKEN = "";
     Toolbar mToolbar;
+    View swipetab;
     private RecyclerViewAdapter mMainPageAdapter;
     private ArrayList<CardModel> mMainCardsList;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -54,15 +55,17 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
     private boolean mCardsLeft = true;
     private final int ITEMS_PER_PAGE = 7, INITIAL_LOAD_LIMIT = 8;
     View mScrollable;
+    SearchView searchView;
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         View layout=inflater.inflate(R.layout.activity_nearby_fragment,container,false);
         final ObservableRecyclerView mRecyclerView = (ObservableRecyclerView) layout.findViewById(R.id.list);
         mRecyclerView.setScrollViewCallbacks(this);
-        final SearchView searchView = (SearchView)layout.findViewById(R.id.searchView);
+        searchView = (SearchView)layout.findViewById(R.id.searchView);
         mScrollable=getActivity().findViewById(R.id.drawerLayout);
         mToolbar=(Toolbar)getActivity().findViewById(R.id.toolbar);
+        swipetab=getActivity().findViewById(R.id.tabs);
         final TextView searchHint = (TextView)layout.findViewById(R.id.searchHint);
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
@@ -349,7 +352,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int height = displaymetrics.heightPixels;
-        return (toolbarIsShown()) ? height - mToolbar.getHeight() : height;
+        return height - swipetab.getHeight()-searchView.getHeight();
     }
 
 

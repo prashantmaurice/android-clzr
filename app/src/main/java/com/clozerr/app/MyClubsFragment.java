@@ -40,15 +40,17 @@ public class MyClubsFragment extends Fragment implements ObservableScrollViewCal
     View layout;
     View mScrollable;
     Toolbar mToolbar;
-
+    View swipetab;
+    SearchView searchView;
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         layout = inflater.inflate(R.layout.activity_my_clubs_fragment, container, false);
         final ObservableRecyclerView mRecyclerView = (ObservableRecyclerView) layout.findViewById(R.id.sliding_list);
         mRecyclerView.setScrollViewCallbacks(this);
-        final SearchView searchView = (SearchView)layout.findViewById(R.id.searchView);
+        searchView = (SearchView)layout.findViewById(R.id.searchView);
         mScrollable=getActivity().findViewById(R.id.drawerLayout);
         mToolbar=(Toolbar)getActivity().findViewById(R.id.toolbar);
+        swipetab=getActivity().findViewById(R.id.tabs);
         final TextView searchHint = (TextView)layout.findViewById(R.id.searchHint);
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
@@ -235,6 +237,6 @@ public class MyClubsFragment extends Fragment implements ObservableScrollViewCal
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int height = displaymetrics.heightPixels;
-        return height;
+        return height - swipetab.getHeight()-searchView.getHeight();
     }
 }
