@@ -75,7 +75,6 @@ public class AsyncGet extends AsyncTask<String, String, String> {
                 }
             });
         }
-
         return content;
     }
     @Override

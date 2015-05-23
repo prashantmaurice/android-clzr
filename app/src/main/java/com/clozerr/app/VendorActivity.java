@@ -119,25 +119,6 @@ public class VendorActivity extends ActionBarActivity {
                     }*/
                     //Log.e("title", currentItem.getTitle());
                     //Toast.makeText(CouponDetails.this, "title - " + currentItem.getTitle(), Toast.LENGTH_SHORT).show();
-                    toolbar=(Toolbar)findViewById(R.id.toolbar_vendor);
-                    if (toolbar != null) {
-                        setSupportActionBar(toolbar);
-                        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                        toolbar.setTitle(currentItem.getTitle());
-                    }
-                    pager=(ViewPager)findViewById(R.id.pager_vendor);
-                    pager.setAdapter(new VendorPagerAdapter(getSupportFragmentManager(),VendorActivity.this));
-                    mtabs=(SlidingTabLayout)findViewById(R.id.tabs_vendor);
-                    mtabs.setDistributeEvenly(true);
-                    mtabs.setCustomTabView(R.layout.custom_tab_view, R.id.tabtitle);
-                    mtabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-                        @Override
-                        public int getIndicatorColor(int position) {
-                            return getResources().getColor(R.color.colorAccent);
-                        }
-                    });
-                    mtabs.setViewPager(pager);
-
                     detailsBundle.putString("vendorTitle", currentItem.getTitle());
                     //detailsBundle.putString("offerText", currentItem.getOfferDescription() );
                     detailsBundle.putString("vendorId", currentItem.getVendorId());
@@ -152,6 +133,24 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putString("phonenumber", phonenumber);
                     //currentItem.getQuestions();
 
+                    toolbar=(Toolbar)findViewById(R.id.toolbar_vendor);
+                    if (toolbar != null) {
+                        setSupportActionBar(toolbar);
+                        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                        toolbar.setTitle(currentItem.getTitle());
+                    }
+                    pager=(ViewPager)findViewById(R.id.pager_vendor);
+                    pager.setAdapter(new VendorPagerAdapter(getSupportFragmentManager(), VendorActivity.this));
+                    mtabs=(SlidingTabLayout)findViewById(R.id.tabs_vendor);
+                    mtabs.setDistributeEvenly(true);
+                    mtabs.setCustomTabView(R.layout.custom_tab_view, R.id.tabtitle);
+                    mtabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+                        @Override
+                        public int getIndicatorColor(int position) {
+                            return getResources().getColor(R.color.colorAccent);
+                        }
+                    });
+                    mtabs.setViewPager(pager);
                     mCheckInButton = (FloatingActionButton) findViewById(R.id.checkinButton);
                     mCheckInButton.setOnClickListener(new View.OnClickListener() {
                         @Override
