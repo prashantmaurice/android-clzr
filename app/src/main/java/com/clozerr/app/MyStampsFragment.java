@@ -2,11 +2,16 @@ package com.clozerr.app;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 
 public class MyStampsFragment extends Fragment {
@@ -17,6 +22,14 @@ public class MyStampsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         layout = (FrameLayout) inflater.inflate(R.layout.activity_mystamps_fragment, container, false);
+        final RecyclerView recyclerview=(RecyclerView)layout.findViewById(R.id.stampslist);
+        recyclerview.setLayoutManager(new GridLayoutManager(c,3));
+        recyclerview.setItemAnimator(new DefaultItemAnimator());
+        recyclerview.setHasFixedSize(true);
+        final String[] values = new String[] { "1","2","3","4","5","6","7","8","9","10" };
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.stamp_layout, R.id.stampnumber, values);
+        recyclerview.setAdapter(new MyStampsRecyclerViewAdapter(values,getActivity()));
+        Resources reso=getResources();
         /*final Resources reso = getResources();
         final TextView num1 = (TextView)layout.findViewById(R.id.num1);
         final TextView num2 = (TextView)layout.findViewById(R.id.num2);
