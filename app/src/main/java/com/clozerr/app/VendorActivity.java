@@ -121,6 +121,20 @@ public class VendorActivity extends ActionBarActivity {
                     }*/
                     //Log.e("title", currentItem.getTitle());
                     //Toast.makeText(CouponDetails.this, "title - " + currentItem.getTitle(), Toast.LENGTH_SHORT).show();
+                    detailsBundle.putString("vendorTitle", currentItem.getTitle());
+                    //detailsBundle.putString("offerText", currentItem.getOfferDescription() );
+                    detailsBundle.putString("vendorId", currentItem.getVendorId());
+                    detailsBundle.putString("description", vendorDescription);
+                    detailsBundle.putString("address", address);
+                    //detailsBundle.putString("offerId", currentItem.getOfferId());
+                    detailsBundle.putString("vendorImage", currentItem.getImageId());
+                    detailsBundle.putDouble("latitude", latitude);
+                    detailsBundle.putDouble("longitude", longitude);
+                    detailsBundle.putDouble("distance", currentItem.getDistance());
+                    detailsBundle.putString("distanceString", currentItem.getDistanceString());
+                    detailsBundle.putString("phonenumber", phonenumber);
+                    //currentItem.getQuestions();
+
                     toolbar=(Toolbar)findViewById(R.id.toolbar_vendor);
                     if (toolbar != null) {
                         setSupportActionBar(toolbar);
@@ -128,7 +142,7 @@ public class VendorActivity extends ActionBarActivity {
                         toolbar.setTitle(currentItem.getTitle());
                     }
                     pager=(ViewPager)findViewById(R.id.pager_vendor);
-                    pager.setAdapter(new VendorPagerAdapter(getSupportFragmentManager(),VendorActivity.this));
+                    pager.setAdapter(new VendorPagerAdapter(getSupportFragmentManager(), VendorActivity.this));
                     mtabs=(SlidingTabLayout)findViewById(R.id.tabs_vendor);
                     mtabs.setDistributeEvenly(true);
                     mtabs.setCustomTabView(R.layout.custom_tab_view, R.id.tabtitle);
@@ -139,6 +153,7 @@ public class VendorActivity extends ActionBarActivity {
                         }
                     });
                     mtabs.setViewPager(pager);
+
 
                     detailsBundle.putString("vendorTitle", currentItem.getTitle());
                     //detailsBundle.putString("offerText", currentItem.getOfferDescription() );
@@ -154,6 +169,7 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putString("distanceString", currentItem.getDistanceString());
                     detailsBundle.putString("phonenumber", phonenumber);
                     //currentItem.getQuestions();
+
 
                     mCheckInButton = (FloatingActionButton) findViewById(R.id.checkinButton);
                     mCheckInButton.setOnClickListener(new View.OnClickListener() {
