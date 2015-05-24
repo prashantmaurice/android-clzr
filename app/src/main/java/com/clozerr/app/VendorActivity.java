@@ -49,7 +49,8 @@ public class VendorActivity extends ActionBarActivity {
 
     private String pinNumber;
     public static Bundle detailsBundle;
-
+    static String vendorId;
+    static String vendorTitle;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +59,7 @@ public class VendorActivity extends ActionBarActivity {
         detailsBundle = new Bundle();
         callingIntent = getIntent();
         final String vendor_id = callingIntent.getStringExtra("vendor_id");
+        vendorId=vendor_id;
         final String urlVendor = "http://api.clozerr.com/vendor/get?vendor_id=" + vendor_id;
         new AsyncGet(this, urlVendor, new AsyncGet.AsyncResult() {
             @Override
@@ -140,6 +142,7 @@ public class VendorActivity extends ActionBarActivity {
 
                     detailsBundle.putString("vendorTitle", currentItem.getTitle());
                     //detailsBundle.putString("offerText", currentItem.getOfferDescription() );
+                    vendorTitle=currentItem.getTitle();
                     detailsBundle.putString("vendorId", currentItem.getVendorId());
                     detailsBundle.putString("description", vendorDescription);
                     detailsBundle.putString("address", address);

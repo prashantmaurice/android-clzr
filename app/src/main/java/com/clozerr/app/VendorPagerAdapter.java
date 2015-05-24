@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 class VendorPagerAdapter extends FragmentPagerAdapter {
     Context c;
     String[] tabheadings;
+
     public VendorPagerAdapter(FragmentManager fm,Context c) {
         super(fm);
         this.c=c;
