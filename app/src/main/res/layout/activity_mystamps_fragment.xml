@@ -10,15 +10,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Stamp Description"
+            android:text="Get a Stamp for every Rs.300 you spend here"
             android:id="@+id/stampdesc"
-            android:layout_margin="10dp"
+            android:layout_margin="20dp"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal" />
         <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:id="@+id/stampslist" />
     </LinearLayout>
 

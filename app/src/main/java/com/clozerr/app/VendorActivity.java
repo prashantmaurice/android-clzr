@@ -27,6 +27,8 @@ import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gcm.GCMRegistrar;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,16 +58,17 @@ public class VendorActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vendor);
 
+
         detailsBundle = new Bundle();
         callingIntent = getIntent();
         final String vendor_id = callingIntent.getStringExtra("vendor_id");
-        vendorId=vendor_id;
+        vendorId = vendor_id;
         final String urlVendor = "http://api.clozerr.com/vendor/get?vendor_id=" + vendor_id;
         new AsyncGet(this, urlVendor, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
                 try {
-                    String address = "", phonenumber="", vendorDescription="", uuid = null;
+                    String address = "", phonenumber = "", vendorDescription = "", uuid = null;
                     double latitude = 0.0, longitude = 0.0;
                     JSONObject object = new JSONObject(s);
 
@@ -100,21 +103,19 @@ public class VendorActivity extends ActionBarActivity {
                             latitude,
                             longitude,
                             object.getString("image"),
-                            object.getString("fid"),object.getString("_id"),
+                            object.getString("fid"), object.getString("_id"),
                             0
                     );
                     ArrayList<String> stringArray = new ArrayList<String>();
                     JSONArray jsonArray = object.getJSONArray("question");
-                    for(int i = 0, count = jsonArray.length(); i< count; i++)
-                    {
+                    for (int i = 0, count = jsonArray.length(); i < count; i++) {
                         try {
                             stringArray.add(jsonArray.getString(i));
-                        }
-                        catch (JSONException e) {
+                        } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
-                    detailsBundle.putStringArrayList("questions",stringArray);
+                    detailsBundle.putStringArrayList("questions", stringArray);
                      /*JSONArray question= object.getJSONArray("question");
                     for(int i=0;i<question.length();i++){
                       ques_arr.add(question.getString(i));
@@ -135,15 +136,15 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putString("phonenumber", phonenumber);
                     //currentItem.getQuestions();
 
-                    toolbar=(Toolbar)findViewById(R.id.toolbar_vendor);
+                    toolbar = (Toolbar) findViewById(R.id.toolbar_vendor);
                     if (toolbar != null) {
                         setSupportActionBar(toolbar);
                         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                         toolbar.setTitle(currentItem.getTitle());
                     }
-                    pager=(ViewPager)findViewById(R.id.pager_vendor);
+                    pager = (ViewPager) findViewById(R.id.pager_vendor);
                     pager.setAdapter(new VendorPagerAdapter(getSupportFragmentManager(), VendorActivity.this));
-                    mtabs=(SlidingTabLayout)findViewById(R.id.tabs_vendor);
+                    mtabs = (SlidingTabLayout) findViewById(R.id.tabs_vendor);
                     mtabs.setDistributeEvenly(true);
                     mtabs.setCustomTabView(R.layout.custom_tab_view, R.id.tabtitle);
                     mtabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
@@ -157,7 +158,7 @@ public class VendorActivity extends ActionBarActivity {
 
                     detailsBundle.putString("vendorTitle", currentItem.getTitle());
                     //detailsBundle.putString("offerText", currentItem.getOfferDescription() );
-                    vendorTitle=currentItem.getTitle();
+                    vendorTitle = currentItem.getTitle();
                     detailsBundle.putString("vendorId", currentItem.getVendorId());
                     detailsBundle.putString("description", vendorDescription);
                     detailsBundle.putString("address", address);
@@ -197,6 +198,47 @@ public class VendorActivity extends ActionBarActivity {
                 }
             }
         });
+
+        SharedPreferences status = getSharedPreferences("USER", 0);
+        String TOKEN = status.getString("token", "");
+
+        String urlVisited = "http://api.clozerr.com/vendor/offers/myofferspage?vendor_id=" + vendorId + "&access_token=" + TOKEN;
+        String urlUser = "http://api.clozerr.com/auth?fid=" + detailsBundle.getString("fid") + "&access_token=" + TOKEN;
+
+        Log.e("urlslide", urlVisited);
+        //Toast.makeText(getApplicationContext(),urlVisited,Toast.LENGTH_SHORT).show();
+
+        new AsyncGet(this, urlVisited, new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                //  t1.setText(s);
+
+
+                Log.e("resultSlide", s);
+                detailsBundle.putString("offerstring", s);
+
+                try {
+                    Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
+
+                    t.setScreenName(detailsBundle.getString("vendorId") + "_offer");
+
+                    t.send(new HitBuilders.AppViewBuilder().build());
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "Error" + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+                //l1.setAdapter(adapter);
+                if (s == null) {
+                    Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+                }
+
+                // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
+
+
+                          /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
+                          mRecyclerView.setAdapter(Cardadapter);*/
+            }
+        });
+
     }
 
     @Override
@@ -245,6 +287,49 @@ public class VendorActivity extends ActionBarActivity {
         });
 
         return popupWindow;
+    }
+
+    private void slidingtaboffers() {
+        SharedPreferences status = getSharedPreferences("USER", 0);
+        String TOKEN = status.getString("token", "");
+
+        String urlVisited = "http://api.clozerr.com/vendor/offers/myofferspage?vendor_id=" + vendorId + "&access_token=" + TOKEN;
+        String urlUser = "http://api.clozerr.com/auth?fid=" + detailsBundle.getString("fid") + "&access_token=" + TOKEN;
+
+        Log.e("urlslide", urlVisited);
+        //Toast.makeText(getApplicationContext(),urlVisited,Toast.LENGTH_SHORT).show();
+
+        new AsyncGet(this, urlVisited, new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                //  t1.setText(s);
+
+
+                    Log.e("resultSlide", s);
+                    Toast.makeText(VendorActivity.this,s, Toast.LENGTH_SHORT).show();
+                    detailsBundle.putString("offerstring", s);
+
+                    try {
+                        Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
+
+                        t.setScreenName(detailsBundle.getString("vendorId") + "_offer");
+
+                        t.send(new HitBuilders.AppViewBuilder().build());
+                    } catch (Exception e) {
+                        Toast.makeText(getApplicationContext(), "Error" + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                    //l1.setAdapter(adapter);
+                    if (s == null) {
+                        Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+                    }
+
+                // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
+
+
+                          /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
+                          mRecyclerView.setAdapter(Cardadapter);*/
+            }
+        });
     }
 
     private void checkIn() {

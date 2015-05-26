@@ -9,8 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.koushikdutta.ion.Ion;
-
 import java.util.ArrayList;
 
 public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRecyclerViewAdapter.ListItemViewHolder> {
@@ -49,7 +47,7 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
         View itemView = LayoutInflater.
                 from(viewGroup.getContext()).
                 /*inflate(R.layout.offers_card,*/
-                inflate(R.layout.offer_list,
+                inflate(R.layout.stamp_layout,
                         viewGroup,
                         false);
         return new ListItemViewHolder(itemView);
@@ -103,15 +101,22 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
         }).intoImageView(viewHolder.imageView);*/
         MyOffer currentItem = mItems.get(position);
         viewHolder.mCaptionView.setText(currentItem.getCaption());
-        viewHolder.mDescriptionView.setText(currentItem.getDescription());
-        if (currentItem.getImageUrl() != null && !currentItem.getImageUrl().isEmpty() &&
-                !currentItem.getImageUrl().equalsIgnoreCase("null"))
-            Ion.with(c).load(currentItem.getImageUrl()).withBitmap()
-                    .intoImageView(viewHolder.mMainImageView);
-        if (currentItem.getOptionalImageUrl() != null && !currentItem.getOptionalImageUrl().isEmpty() &&
-                !currentItem.getOptionalImageUrl().equalsIgnoreCase("null"))
-            Ion.with(c).load(currentItem.getOptionalImageUrl()).withBitmap()
-                    .intoImageView(viewHolder.mOptionalImageView);
+        viewHolder.stampnumber.setText(String.valueOf(currentItem.getStamps()));
+        viewHolder.stampnumber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewHolder.mCaptionView.setVisibility(View.VISIBLE);
+            }
+        });
+        //viewHolder.mDescriptionView.setText(currentItem.getDescription());
+//        if (currentItem.getImageUrl() != null && !currentItem.getImageUrl().isEmpty() &&
+//                !currentItem.getImageUrl().equalsIgnoreCase("null"))
+//            Ion.with(c).load(currentItem.getImageUrl()).withBitmap()
+//                    .intoImageView(viewHolder.mMainImageView);
+//        if (currentItem.getOptionalImageUrl() != null && !currentItem.getOptionalImageUrl().isEmpty() &&
+//                !currentItem.getOptionalImageUrl().equalsIgnoreCase("null"))
+//            Ion.with(c).load(currentItem.getOptionalImageUrl()).withBitmap()
+//                    .intoImageView(viewHolder.mOptionalImageView);
     }
 
     @Override
@@ -121,15 +126,15 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
 
     public final static class ListItemViewHolder extends RecyclerView.ViewHolder {
         public ImageView mMainImageView, mOptionalImageView;
-        public TextView mCaptionView, mDescriptionView;
+        public TextView mCaptionView, stampnumber;
 
         public ListItemViewHolder(final View itemView) {
             super(itemView);
 
-            mMainImageView = (ImageView) itemView.findViewById(R.id.offer_label);
+            //mMainImageView = (ImageView) itemView.findViewById(R.id.offer_label);
             // find optional view
-            mCaptionView = (TextView) itemView.findViewById(R.id.txtOffer);
-            mDescriptionView = (TextView) itemView.findViewById(R.id.txtDesc);
+            mCaptionView = (TextView) itemView.findViewById(R.id.freebiecontent);
+            stampnumber = (TextView) itemView.findViewById(R.id.stampnumber);
         }
         /*ImageView imageView;
         TextView txtTitle;

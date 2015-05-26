@@ -581,7 +581,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                   offers_menu.setText(detailsBundle.getString("vendorTitle"));
                   offers_menu.setTextColor(Color.parseColor("#FFFFFF"));
                   offers_menu.setBackgroundColor(Color.parseColor("#EF6C00"));
-                  SharedPreferences status = getSharedPreferences("USER", 0);
+                  SharedPreferences status = getSharedPreferences("USER",0);
                   String TOKEN = status.getString("token", "");
                   CouponDetails.this.getSupportActionBar().hide();
 /*
