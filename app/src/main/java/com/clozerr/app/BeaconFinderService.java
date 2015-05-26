@@ -262,7 +262,7 @@ public abstract class BeaconFinderService extends Service {
             mNextOfferID = (nextOffer == null) ? "" : nextOffer.getString("_id");
             mNextOfferCaption = (nextOffer == null) ? "" : nextOffer.getString("caption");
             mNextOfferDescription = (nextOffer == null) ? "" : nextOffer.getString("description");
-            mIsNotifiable = !mNextOfferID.isEmpty() && isVendorWithThisUUIDNotifiable(context, mUUID);
+            mIsNotifiable = /*!mNextOfferID.isEmpty() && isVendorWithThisUUIDNotifiable(context, mUUID)*/true;
             //mPaymentType = object.getString("paymentType");
             mPaymentType = "counter";
             //mCounterDistanceMetres = object.getString("counterDistanceMetres");

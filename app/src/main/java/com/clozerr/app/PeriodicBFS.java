@@ -326,46 +326,46 @@ public class PeriodicBFS extends BeaconFinderService {
             final String uuid = beacon.getProximityUUID();
             Log.e(TAG, "UUID scanned - " + uuid.toUpperCase());
             Log.e(TAG, "major - " + beacon.getMajor() + "; minor - " + beacon.getMinor());
-            if (uuidDatabase.contains(uuid.toUpperCase())) {
-                VendorParams vendorParams = VendorParams.findVendorParamsInFile(getApplicationContext(),
-                        new Predicate<VendorParams>() {
-                            @Override
-                            public boolean apply(VendorParams vendorParams) {
-                                return areUuidsEqual(uuid, vendorParams.mUUID);
-                            }
-                        });
-                if (vendorParams.mIsNotifiable) {
-                    DeviceParams deviceParams;
-                    if (periodicScanDeviceMap.containsKey(uuid)) {
-                        deviceParams = periodicScanDeviceMap.get(uuid);
-                        if (!deviceParams.mFoundInThisScan) {
-                            ++(deviceParams.mCount);
-                            deviceParams.mFoundInThisScan = true;
-                        } else continue;
-                    } else {
-                        periodicScanDeviceMap.put(uuid, new DeviceParams(1, true));
-                        deviceParams = periodicScanDeviceMap.get(uuid);
-                    }
-                    if (vendorParams.mPaymentType.equalsIgnoreCase("counter")) {
-                        double distance = getDistanceFromBeacon(beacon);
-                        Log.e(TAG, "counter-type; distance (m): " + distance);
-                        if (distance >= 0.0 && distance <= vendorParams.mCounterDistanceMetres) {
-                            deviceParams.mCount = 0;
-                            showNotificationForVendor(getApplicationContext(), uuid);
-                            //deviceParams.mToBeNotified = true;
+            /*if (uuidDatabase.contains(uuid.toUpperCase())) {*/
+            VendorParams vendorParams = VendorParams.findVendorParamsInFile(getApplicationContext(),
+                    new Predicate<VendorParams>() {
+                        @Override
+                        public boolean apply(VendorParams vendorParams) {
+                            return areUuidsEqual(uuid, vendorParams.mUUID);
                         }
-                    }
-                    else if (vendorParams.mPaymentType.equalsIgnoreCase("gourmet")) {
-                        Log.e(TAG, "count-" + deviceParams.mCount + ";lim-" + PERIODIC_SCAN_BEACON_LIMIT);
-                        if (deviceParams.mCount == PERIODIC_SCAN_BEACON_LIMIT) {
-                            deviceParams.mCount = 0;
-                            showNotificationForVendor(getApplicationContext(), uuid);
-                            //deviceParams.mToBeNotified = true;
-                        }
-                    }
-                    writeHashMapToFile();
+                    });
+            if (vendorParams != null && vendorParams.mIsNotifiable) {
+                DeviceParams deviceParams;
+                if (periodicScanDeviceMap.containsKey(uuid)) {
+                    deviceParams = periodicScanDeviceMap.get(uuid);
+                    if (!deviceParams.mFoundInThisScan) {
+                        ++(deviceParams.mCount);
+                        deviceParams.mFoundInThisScan = true;
+                    } else continue;
+                } else {
+                    periodicScanDeviceMap.put(uuid, new DeviceParams(1, true));
+                    deviceParams = periodicScanDeviceMap.get(uuid);
                 }
+                if (vendorParams.mPaymentType.equalsIgnoreCase("counter")) {
+                    double distance = getDistanceFromBeacon(beacon);
+                    Log.e(TAG, "counter-type; distance (m): " + distance);
+                    if (distance >= 0.0 && distance <= vendorParams.mCounterDistanceMetres) {
+                        deviceParams.mCount = 0;
+                        showNotificationForVendor(getApplicationContext(), uuid);
+                        //deviceParams.mToBeNotified = true;
+                    }
+                }
+                else if (vendorParams.mPaymentType.equalsIgnoreCase("gourmet")) {
+                    Log.e(TAG, "count-" + deviceParams.mCount + ";lim-" + PERIODIC_SCAN_BEACON_LIMIT);
+                    if (deviceParams.mCount == PERIODIC_SCAN_BEACON_LIMIT) {
+                        deviceParams.mCount = 0;
+                        showNotificationForVendor(getApplicationContext(), uuid);
+                        //deviceParams.mToBeNotified = true;
+                    }
+                }
+                writeHashMapToFile();
             }
+            /*}*/
         }
     }
 
