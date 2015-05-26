@@ -43,6 +43,7 @@ public abstract class BeaconFinderService extends Service {
     protected static final String REGION_ID = "com.clozerr.app";
     protected static final String CLOZERR_UUID = "20CAE8A0-A9CF-11E3-A5E2-0800200C9A66";
     protected static final long SCAN_START_DELAY = TimeUnit.MILLISECONDS.convert(2L, TimeUnit.SECONDS);
+    protected static final int THRESHOLD_RSSI = -85;
 
     protected static boolean isBLESupported = true;
     protected static boolean isScanningAllowed = true;
@@ -246,12 +247,12 @@ public abstract class BeaconFinderService extends Service {
         public String mName;
         public String mUUID;
         public String mVendorID;
-        public String mNextOfferID;
+        /*public String mNextOfferID;
         public String mNextOfferCaption;
-        public String mNextOfferDescription;
+        public String mNextOfferDescription;*/
         public boolean mIsNotifiable;
-        public String mPaymentType;
-        public double mCounterDistanceMetres;
+        //public String mPaymentType;
+        public int mThresholdRssi;
 
         public VendorParams(Context context, JSONObject object) throws JSONException {
             mName = object.getString("name");
@@ -260,22 +261,21 @@ public abstract class BeaconFinderService extends Service {
             mVendorID = object.getString("_id");
             JSONObject nextOffer = (object.getJSONArray("offers_qualified").length()) > 0 ?
                                     object.getJSONArray("offers_qualified").getJSONObject(0) : null;
-            mNextOfferID = (nextOffer == null) ? "" : nextOffer.getString("_id");
+            /*mNextOfferID = (nextOffer == null) ? "" : nextOffer.getString("_id");
             mNextOfferCaption = (nextOffer == null) ? "" : nextOffer.getString("caption");
-            mNextOfferDescription = (nextOffer == null) ? "" : nextOffer.getString("description");
+            mNextOfferDescription = (nextOffer == null) ? "" : nextOffer.getString("description");*/
             mIsNotifiable = /*!mNextOfferID.isEmpty() && isVendorWithThisUUIDNotifiable(context, mUUID)*/true;
             //mPaymentType = object.getString("paymentType");
-            mPaymentType = "counter";
-            //mCounterDistanceMetres = object.getString("counterDistanceMetres");
-            mCounterDistanceMetres = 1.0;
+            //mPaymentType = "counter";
+            mThresholdRssi = THRESHOLD_RSSI;
         }
 
         public Intent getDetailsIntent(Context context) {
             Intent detailIntent = new Intent(context, CouponDetails.class);
             detailIntent.putExtra("vendor_id", mVendorID);
-            detailIntent.putExtra("offer_id", mNextOfferID);
+            /*detailIntent.putExtra("offer_id", mNextOfferID);
             detailIntent.putExtra("offer_caption", mNextOfferCaption);
-            detailIntent.putExtra("offer_text", mNextOfferDescription);
+            detailIntent.putExtra("offer_text", mNextOfferDescription);*/
             return detailIntent;
         }
 
@@ -313,9 +313,9 @@ public abstract class BeaconFinderService extends Service {
             return null;
         }
 
-        public static boolean isVendorWithThisUUIDNotifiable(Context context, String uuid) {
+        /*public static boolean isVendorWithThisUUIDNotifiable(Context context, String uuid) {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
             return !preferences.contains(uuid);
-        }
+        }*/
     }
 }
