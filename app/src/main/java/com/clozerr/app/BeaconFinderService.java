@@ -41,10 +41,10 @@ import java.util.concurrent.TimeUnit;
 public abstract class BeaconFinderService extends Service {
     private static final String TAG = "BFS";
     protected static final String REGION_ID = "com.clozerr.app";
-    protected static final String CLOZERR_UUID = "20CAE8A0-A9CF-11E3-A5E2-0800200C9A66";
     protected static final long SCAN_START_DELAY = TimeUnit.MILLISECONDS.convert(2L, TimeUnit.SECONDS);
     protected static final int THRESHOLD_RSSI = -85;
 
+    protected static String CLOZERR_UUID = "";
     protected static boolean isBLESupported = true;
     protected static boolean isScanningAllowed = true;
     protected static boolean hasUserActivatedBluetooth = false;
@@ -63,7 +63,7 @@ public abstract class BeaconFinderService extends Service {
     }
 
     protected static BluetoothAdapter bluetoothAdapter;
-    protected static ArrayList<String> uuidDatabase = null;
+    protected static ArrayList<BeaconDBParams> beaconDatabase = null;
     protected static Handler uiThreadHandler;
     protected static AlarmManager alarmManager;
     protected static BeaconManager beaconManager;
@@ -166,8 +166,8 @@ public abstract class BeaconFinderService extends Service {
             }
             else {
                 isBLESupported = true;
-                UUIDDownloadBaseReceiver.scheduleDownload(getApplicationContext());
-                if (uuidDatabase == null)
+                BeaconDBDownloadBaseReceiver.scheduleDownload(getApplicationContext());
+                if (beaconDatabase == null)
                         readUUIDsFromFile(getApplicationContext());
                 return true;
             }
@@ -177,22 +177,26 @@ public abstract class BeaconFinderService extends Service {
 
     protected static void readUUIDsFromFile(Context context) {
         try {
-            FileOutputStream dummyOutputStream = context.openFileOutput(UUIDDownloader.UUID_FILE_NAME, MODE_APPEND);
+            FileOutputStream dummyOutputStream = context.openFileOutput(BeaconDBDownloader.BEACONS_FILE_NAME, MODE_APPEND);
                                                 // for creating the file if not present
             dummyOutputStream.close();
-            FileInputStream fileInputStream = context.openFileInput(UUIDDownloader.UUID_FILE_NAME);
+            FileInputStream fileInputStream = context.openFileInput(BeaconDBDownloader.BEACONS_FILE_NAME);
             byte[] dataBytes = new byte[fileInputStream.available()];
             fileInputStream.read(dataBytes);
             fileInputStream.close();
-            // TODO change format if JSON changes
             String data = new String(dataBytes);
             if (!data.isEmpty()) {
-                JSONArray rootArray = new JSONArray(data);
-                uuidDatabase = new ArrayList<String>();
+                JSONObject rootObject = new JSONObject(data);
+                CLOZERR_UUID = rootObject.getString("UUID");
+                JSONArray rootArray = rootObject.getJSONArray("vendors");
+                beaconDatabase = new ArrayList<>();
                 for (int i = 0; i < rootArray.length(); ++i)
                     try {
-                        if (rootArray.getJSONObject(i).getJSONArray("UUID").length() > 0)
-                            uuidDatabase.add(rootArray.getJSONObject(i).getJSONArray("UUID").getString(0));
+                        /*if (rootArray.getJSONObject(i).getJSONArray("UUID").length() > 0)
+                            beaconDatabase.add(rootArray.getJSONObject(i).getJSONArray("UUID").getString(0));*/
+                        JSONObject beaconObject = rootArray.getJSONObject(i).getJSONObject("beacons");
+                        if (beaconObject.has("major"))
+                            beaconDatabase.add(new BeaconDBParams(beaconObject.getInt("major"), beaconObject.getInt("minor")));
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -282,7 +286,7 @@ public abstract class BeaconFinderService extends Service {
         public static ArrayList<VendorParams> readVendorParamsFromFile(Context context) {
             ArrayList<VendorParams> result = null;
             try {
-                FileInputStream fileInputStream = context.openFileInput(UUIDDownloader.UUID_FILE_NAME);
+                FileInputStream fileInputStream = context.openFileInput(BeaconDBDownloader.BEACONS_FILE_NAME);
                 byte[] dataBytes = new byte[fileInputStream.available()];
                 fileInputStream.read(dataBytes);
                 JSONArray rootArray = new JSONArray(new String(dataBytes));
@@ -317,5 +321,23 @@ public abstract class BeaconFinderService extends Service {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
             return !preferences.contains(uuid);
         }*/
+    }
+
+    public static class BeaconDBParams {
+        public int mMajor;
+        public int mMinor;
+
+        public BeaconDBParams(int major, int minor) {
+            mMajor = major;
+            mMinor = minor;
+        }
+
+        public boolean equals(BeaconDBParams other) {
+            return mMajor == other.mMajor && mMinor == other.mMinor;
+        }
+
+        public String toString() {
+            return "major: " + mMajor + "; minor: " + mMinor;
+        }
     }
 }

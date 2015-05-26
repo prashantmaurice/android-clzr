@@ -166,12 +166,12 @@
             android:exported="false" />
 
         <receiver
-            android:name=".UUIDDownloadBaseReceiver"
+            android:name=".BeaconDBDownloadBaseReceiver"
             android:enabled="true"
             android:exported="true" >
         </receiver>
         <receiver
-            android:name=".UUIDDownloader"
+            android:name=".BeaconDBDownloader"
             android:enabled="false"
             android:exported="true" >
             <intent-filter>
@@ -188,12 +188,12 @@
             android:name=".PeriodicBFS$ScanStarter"
             android:enabled="false"
             android:exported="true" />
-        <receiver
+        <!--<receiver
             android:name=".PeriodicBFS$NotificationRemovalReceiver"
             android:enabled="false"
             android:exported="false" >
 
-        </receiver>
+        </receiver>-->
     </application>
 
 </manifest>

@@ -135,7 +135,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                 //Toast.makeText(CouponDetails.this, "Inside gotResult()", Toast.LENGTH_SHORT).show();
                 String phonenumber="";
                 String vendorDescription="";
-                String uuid = null;
+                BeaconFinderService.BeaconDBParams params = null;
                 double latitude = 0.0, longitude = 0.0;
                 try {
                     Log.e("resultAsync", s);
@@ -157,9 +157,10 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                         e.printStackTrace();
                         //Toast.makeText(CouponDetails.this, "Error - " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                     }
-                    if (object.getJSONArray("UUID").length() > 0) {
-                        uuid = object.getJSONArray("UUID").getString(0);
-                        Log.e("UUID", uuid);
+                    if (object.getJSONObject("beacons").has("major")) {
+                        params = new BeaconFinderService.BeaconDBParams(object.getJSONObject("beacons").getInt("major"),
+                                                                        object.getJSONObject("beacons").getInt("minor"));
+                        Log.e(TAG, "BDB params - " + params.toString());
                     }
                     Log.e("description", vendorDescription);
                     final CardModel currentItem = new CardModel(
@@ -227,7 +228,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     locView.setText(detailsBundle.getString("distance"));
 
                     if (!callingIntent.getBooleanExtra("from_periodic_scan", false))
-                        OneTimeBFS.checkAndStartScan(getApplicationContext(), uuid);
+                        OneTimeBFS.checkAndStartScan(getApplicationContext(), params);
                     else PeriodicBFS.dismissNotifications(CouponDetails.this);
 
                     checkinButton.setOnClickListener(new View.OnClickListener() {

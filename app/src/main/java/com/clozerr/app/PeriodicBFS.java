@@ -27,7 +27,7 @@ public class PeriodicBFS extends BeaconFinderService {
 
     private static final String TAG = "PBFS";
     //private static final String ACTION_REMOVE_VENDOR = "RemoveVendor";
-    private static final String ACTION_FIRE_ALARM_SCAN = "FireAlarmScan";
+    private static final String ACTION_FIRE_ALARM_SCAN = "com.clozerr.app.ACTION_FIRE_ALARM_SCAN";
 
     private static final long INTERVAL = TimeUnit.MILLISECONDS.convert(20L, TimeUnit.SECONDS);
                                     // TODO make this 10 min
@@ -277,8 +277,8 @@ public class PeriodicBFS extends BeaconFinderService {
     }
 
     private static boolean areAnyVendorsNotifiable(Context context) {
-        if (uuidDatabase != null) {
-            for (String uuid : uuidDatabase)
+        if (beaconDatabase != null) {
+            for (String uuid : beaconDatabase)
                 if (VendorParams.isVendorWithThisUUIDNotifiable(context, uuid))
                     return true;
             return false;
@@ -288,7 +288,7 @@ public class PeriodicBFS extends BeaconFinderService {
 
     @Override
     protected Region createRegion() {
-        return new Region(REGION_ID, null, null, null);
+        return new Region(REGION_ID, CLOZERR_UUID, null, null); // search for all beacons, so no rules on major, minor
     }
 
     @Override
@@ -299,7 +299,7 @@ public class PeriodicBFS extends BeaconFinderService {
             final String uuid = beacon.getProximityUUID();
             /*Log.e(TAG, "UUID scanned - " + uuid.toUpperCase());
             Log.e(TAG, "major - " + beacon.getMajor() + "; minor - " + beacon.getMinor());*/
-            /*if (uuidDatabase.contains(uuid.toUpperCase())) {*/
+            /*if (beaconDatabase.contains(uuid.toUpperCase())) {*/
             VendorParams vendorParams = VendorParams.findVendorParamsInFile(getApplicationContext(),
                     new Predicate<VendorParams>() {
                         @Override
@@ -369,7 +369,7 @@ public class PeriodicBFS extends BeaconFinderService {
     public static void checkAndStopScan(Context context) {
         if (running) {
             context.stopService(new Intent(context, PeriodicBFS.class));
-            UUIDDownloadBaseReceiver.stopDownloads(context);
+            BeaconDBDownloadBaseReceiver.stopDownloads(context);
         }
     }
 
@@ -425,7 +425,7 @@ public class PeriodicBFS extends BeaconFinderService {
                         }, SCAN_PERIOD);
                     }
                 };
-                if (uuidDatabase != null/* && areAnyVendorsNotifiable(context)*/)
+                if (beaconDatabase != null/* && areAnyVendorsNotifiable(context)*/)
                     uiThreadHandler.post(mScanningRunnable);
             }
         }

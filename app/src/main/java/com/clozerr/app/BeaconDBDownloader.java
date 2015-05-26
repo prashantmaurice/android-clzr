@@ -13,18 +13,18 @@ import java.io.FileOutputStream;
 
 import static com.clozerr.app.AsyncGet.isNetworkAvailable;
 
-public class UUIDDownloader extends BroadcastReceiver {
-    private static final String TAG = "UUIDDownloader";
-    private static final String DOWNLOAD_URL = "http://api.clozerr.com/vendor/get/all/uuid?access_token=";
-    public static final String UUID_FILE_NAME = "UUIDs.txt";
-    public static final String ACTION_INITIATE_DOWNLOADER = "InitiateDownloader";
+public class BeaconDBDownloader extends BroadcastReceiver {
+    private static final String TAG = "BDBDownloader";
+    private static final String DOWNLOAD_URL = "http://api.clozerr.com/vendor/get/all/beacons?access_token=";
+    public static final String BEACONS_FILE_NAME = "beacons.txt";
+    public static final String ACTION_INITIATE_DOWNLOADER = "com.clozerr.app.ACTION_INITIATE_DOWNLOADER";
     private static boolean isDownloadDone = false;
 
-    public UUIDDownloader() {
+    public BeaconDBDownloader() {
         isDownloadDone = false;
     }
 
-    private static void downloadUUIDs(final Context context) {
+    private static void downloadBeaconDB(final Context context) {
         String token = context.getSharedPreferences("USER", 0).getString("token", "");
         final String url = DOWNLOAD_URL + token;
         Log.e(TAG, "downloading; url - " + url);
@@ -33,18 +33,18 @@ public class UUIDDownloader extends BroadcastReceiver {
             public void gotResult(String s) {
                 Log.e(TAG, "results - " + s);
                 try {
-                    FileOutputStream fileOutputStream = context.openFileOutput(UUID_FILE_NAME, Context.MODE_PRIVATE);
+                    FileOutputStream fileOutputStream = context.openFileOutput(BEACONS_FILE_NAME, Context.MODE_PRIVATE);
                     fileOutputStream.write(s.getBytes());
                     fileOutputStream.close();
                     isDownloadDone = true;
-                    UUIDDownloadBaseReceiver.releaseWakeLock();
-                    ComponentName receiver = new ComponentName(context, UUIDDownloader.class);
+                    BeaconDBDownloadBaseReceiver.releaseWakeLock();
+                    ComponentName receiver = new ComponentName(context, BeaconDBDownloader.class);
                     context.getPackageManager().setComponentEnabledSetting(receiver,
                             PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-                    Log.e(TAG, "disabled UUIDDownloader");
+                    Log.e(TAG, "disabled BDBDownloader");
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Intent nextTrialIntent = new Intent(context, UUIDDownloader.class);
+                    Intent nextTrialIntent = new Intent(context, BeaconDBDownloader.class);
                     nextTrialIntent.setAction(ACTION_INITIATE_DOWNLOADER);
                     LocalBroadcastManager.getInstance(context).sendBroadcast(nextTrialIntent);
                 }
@@ -63,7 +63,7 @@ public class UUIDDownloader extends BroadcastReceiver {
             Log.e(TAG, "received");
             if (isNetworkAvailable(context))
                 if (!isDownloadDone)
-                    downloadUUIDs(context);
+                    downloadBeaconDB(context);
                 else
                     Log.e(TAG, "already downloaded");
             else

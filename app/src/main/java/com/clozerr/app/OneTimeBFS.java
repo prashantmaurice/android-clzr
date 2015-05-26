@@ -15,7 +15,8 @@ import java.util.List;
 public class OneTimeBFS extends BeaconFinderService {
 
     private static final String TAG = "OTBFS";
-    private static String uuid = "";
+    //private static String uuid = "";
+    private static BeaconDBParams beaconDBParams;
     private static boolean running = false;
 
     @Override
@@ -28,16 +29,16 @@ public class OneTimeBFS extends BeaconFinderService {
 
     @Override
     protected Region createRegion() {
-        return new Region(REGION_ID, getUuidWithoutHyphens(uuid), null, null);
+        return new Region(REGION_ID, getUuidWithoutHyphens(CLOZERR_UUID), beaconDBParams.mMajor, beaconDBParams.mMinor);
     }
 
     @Override
     protected void onRangedBeacons(final List<Beacon> beaconList) {
         Log.e(TAG, "Ranged; size - " + beaconList.size());
         for (Beacon beacon : beaconList) {
-            Log.e(TAG, "uuid found: " + beacon.getProximityUUID());
-            if (beacon.getProximityUUID().equalsIgnoreCase(uuid)) {
-                // TODO Auto check-in
+            BeaconDBParams params = new BeaconDBParams(beacon.getMajor(), beacon.getMinor());
+            Log.e(TAG, "found " + params.toString());
+            if (params.equals(beaconDBParams)) {
                 putToast(getApplicationContext(), "Near this restaurant. Check in?", Toast.LENGTH_LONG);
                 beaconManager.stopRanging(scanningRegion);
                 turnOffBluetooth();
@@ -61,10 +62,10 @@ public class OneTimeBFS extends BeaconFinderService {
         }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
     }
 
-    public static void checkAndStartScan(Context context, String vendorUuid) {
-        if (vendorUuid != null && !vendorUuid.isEmpty() && isBLESupported) {
+    public static void checkAndStartScan(Context context, BeaconDBParams params) {
+        if (params != null && isBLESupported) {
             context.stopService(new Intent(context, PeriodicBFS.class));
-            uuid = vendorUuid;
+            beaconDBParams = params;
             context.startService(new Intent(context, OneTimeBFS.class));
         }
     }
