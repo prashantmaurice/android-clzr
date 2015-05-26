@@ -40,7 +40,8 @@ import java.util.concurrent.TimeUnit;
 @TargetApi(18)
 public abstract class BeaconFinderService extends Service {
     private static final String TAG = "BFS";
-    protected static final String REGION_UNIQUE_ID = "BeaconFinderServiceRegionUniqueID";
+    protected static final String REGION_ID = "com.clozerr.app";
+    protected static final String CLOZERR_UUID = "20CAE8A0-A9CF-11E3-A5E2-0800200C9A66";
     protected static final long SCAN_START_DELAY = TimeUnit.MILLISECONDS.convert(2L, TimeUnit.SECONDS);
 
     protected static boolean isBLESupported = true;

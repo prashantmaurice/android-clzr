@@ -28,7 +28,7 @@ public class OneTimeBFS extends BeaconFinderService {
 
     @Override
     protected Region createRegion() {
-        return new Region(REGION_UNIQUE_ID, getUuidWithoutHyphens(uuid), null, null);
+        return new Region(REGION_ID, getUuidWithoutHyphens(uuid), null, null);
     }
 
     @Override

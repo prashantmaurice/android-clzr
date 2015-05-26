@@ -315,7 +315,7 @@ public class PeriodicBFS extends BeaconFinderService {
 
     @Override
     protected Region createRegion() {
-        return new Region(REGION_UNIQUE_ID, null, null, null);  // search for multiple beacons, so no rules
+        return new Region(REGION_ID, null, null, null);
     }
 
     @Override
