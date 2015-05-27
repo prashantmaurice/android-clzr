@@ -30,6 +30,7 @@ import org.json.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +43,7 @@ public abstract class BeaconFinderService extends Service {
     private static final String TAG = "BFS";
     protected static final String REGION_ID = "com.clozerr.app";
     protected static final long SCAN_START_DELAY = TimeUnit.MILLISECONDS.convert(2L, TimeUnit.SECONDS);
-    protected static final int THRESHOLD_RSSI = -85;
+    protected static final int THRESHOLD_RSSI = -100;
 
     protected static String CLOZERR_UUID = "";
     protected static boolean isBLESupported = true;
@@ -137,9 +138,9 @@ public abstract class BeaconFinderService extends Service {
         return resultUuid;
     }
 
-    protected static boolean areUuidsEqual(String uuid1, String uuid2) {
+    /*protected static boolean areUuidsEqual(String uuid1, String uuid2) {
         return (getUuidWithoutHyphens(uuid1).equalsIgnoreCase(getUuidWithoutHyphens(uuid2)));
-    }
+    }*/
 
     protected boolean canScanStart() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -168,42 +169,41 @@ public abstract class BeaconFinderService extends Service {
                 isBLESupported = true;
                 BeaconDBDownloadBaseReceiver.scheduleDownload(getApplicationContext());
                 if (beaconDatabase == null)
-                        readUUIDsFromFile(getApplicationContext());
+                    try {
+                        readBeaconDBFromFile(getApplicationContext());
+                    } catch (Exception e){
+                        Log.e(TAG, e.getLocalizedMessage());
+                        return false;
+                    }
                 return true;
             }
         }
         else return false;
     }
 
-    protected static void readUUIDsFromFile(Context context) {
-        try {
-            FileOutputStream dummyOutputStream = context.openFileOutput(BeaconDBDownloader.BEACONS_FILE_NAME, MODE_APPEND);
-                                                // for creating the file if not present
-            dummyOutputStream.close();
-            FileInputStream fileInputStream = context.openFileInput(BeaconDBDownloader.BEACONS_FILE_NAME);
-            byte[] dataBytes = new byte[fileInputStream.available()];
-            fileInputStream.read(dataBytes);
-            fileInputStream.close();
-            String data = new String(dataBytes);
-            if (!data.isEmpty()) {
-                JSONObject rootObject = new JSONObject(data);
-                CLOZERR_UUID = rootObject.getString("UUID");
-                JSONArray rootArray = rootObject.getJSONArray("vendors");
-                beaconDatabase = new ArrayList<>();
-                for (int i = 0; i < rootArray.length(); ++i)
-                    try {
-                        /*if (rootArray.getJSONObject(i).getJSONArray("UUID").length() > 0)
-                            beaconDatabase.add(rootArray.getJSONObject(i).getJSONArray("UUID").getString(0));*/
-                        JSONObject beaconObject = rootArray.getJSONObject(i).getJSONObject("beacons");
-                        if (beaconObject.has("major"))
-                            beaconDatabase.add(new BeaconDBParams(beaconObject.getInt("major"), beaconObject.getInt("minor")));
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
+    protected static void readBeaconDBFromFile(Context context) throws IOException, JSONException {
+        FileOutputStream dummyOutputStream = context.openFileOutput(BeaconDBDownloader.BEACONS_FILE_NAME, MODE_APPEND);
+                                            // for creating the file if not present
+        dummyOutputStream.close();
+        FileInputStream fileInputStream = context.openFileInput(BeaconDBDownloader.BEACONS_FILE_NAME);
+        byte[] dataBytes = new byte[fileInputStream.available()];
+        fileInputStream.read(dataBytes);
+        fileInputStream.close();
+        String data = new String(dataBytes);
+        JSONObject rootObject = new JSONObject(data);
+        CLOZERR_UUID = rootObject.getString("UUID");
+        JSONArray rootArray = rootObject.getJSONArray("vendors");
+        beaconDatabase = new ArrayList<>();
+        for (int i = 0; i < rootArray.length(); ++i)
+            try {
+                /*if (rootArray.getJSONObject(i).getJSONArray("UUID").length() > 0)
+                    beaconDatabase.add(rootArray.getJSONObject(i).getJSONArray("UUID").getString(0));*/
+                JSONObject beaconObject = rootArray.getJSONObject(i).getJSONObject("beacons");
+                if (beaconObject.has("major"))
+                    beaconDatabase.add(new BeaconDBParams(beaconObject));
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     protected static void turnOnBluetooth() {
@@ -249,26 +249,32 @@ public abstract class BeaconFinderService extends Service {
 
     protected static class VendorParams {
         public String mName;
-        public String mUUID;
+        //public String mUUID;
+        public BeaconDBParams mBeaconParams;
         public String mVendorID;
         /*public String mNextOfferID;
         public String mNextOfferCaption;
         public String mNextOfferDescription;*/
-        public boolean mIsNotifiable;
+        //public boolean mIsNotifiable;
+        public boolean mHasOffers;
         //public String mPaymentType;
+        public String mLoyaltyType;
         public int mThresholdRssi;
 
-        public VendorParams(Context context, JSONObject object) throws JSONException {
+        public VendorParams(/*Context context, */JSONObject object) throws JSONException {
             mName = object.getString("name");
-            mUUID = (object.getJSONArray("UUID").length() > 0) ?
-                        object.getJSONArray("UUID").getString(0).toLowerCase() : "";
+            /*mUUID = (object.getJSONArray("UUID").length() > 0) ?
+                        object.getJSONArray("UUID").getString(0).toLowerCase() : "";*/
+            mBeaconParams = new BeaconDBParams(object.getJSONObject("beacons"));
             mVendorID = object.getString("_id");
-            JSONObject nextOffer = (object.getJSONArray("offers_qualified").length()) > 0 ?
+            /*JSONObject nextOffer = (object.getJSONArray("offers_qualified").length()) > 0 ?
                                     object.getJSONArray("offers_qualified").getJSONObject(0) : null;
-            /*mNextOfferID = (nextOffer == null) ? "" : nextOffer.getString("_id");
+            mNextOfferID = (nextOffer == null) ? "" : nextOffer.getString("_id");
             mNextOfferCaption = (nextOffer == null) ? "" : nextOffer.getString("caption");
             mNextOfferDescription = (nextOffer == null) ? "" : nextOffer.getString("description");*/
-            mIsNotifiable = /*!mNextOfferID.isEmpty() && isVendorWithThisUUIDNotifiable(context, mUUID)*/true;
+            //mIsNotifiable = /*!mNextOfferID.isEmpty() && isVendorWithThisUUIDNotifiable(context, mUUID)*/true;
+            mHasOffers = object.getBoolean("hasOffers");
+            mLoyaltyType = (object.getJSONObject("settings").getBoolean("sxEnabled")) ? "SX" : "S1";
             //mPaymentType = object.getString("paymentType");
             //mPaymentType = "counter";
             mThresholdRssi = THRESHOLD_RSSI;
@@ -289,14 +295,15 @@ public abstract class BeaconFinderService extends Service {
                 FileInputStream fileInputStream = context.openFileInput(BeaconDBDownloader.BEACONS_FILE_NAME);
                 byte[] dataBytes = new byte[fileInputStream.available()];
                 fileInputStream.read(dataBytes);
-                JSONArray rootArray = new JSONArray(new String(dataBytes));
+                JSONObject rootObject = new JSONObject(new String(dataBytes));
+                JSONArray rootArray = rootObject.getJSONArray("vendors");
                 Log.e(TAG, "root - " + rootArray.toString());
                 VendorParams vendorParams;
-                result = new ArrayList<VendorParams>();
+                result = new ArrayList<>();
                 for (int i = 0; i < rootArray.length(); ++i) {
                     vendorParams = null;
                     try {
-                        vendorParams = new VendorParams(context, rootArray.getJSONObject(i));
+                        vendorParams = new VendorParams(/*context, */rootArray.getJSONObject(i));
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     } finally {
@@ -326,6 +333,16 @@ public abstract class BeaconFinderService extends Service {
     public static class BeaconDBParams {
         public int mMajor;
         public int mMinor;
+
+        public BeaconDBParams(JSONObject object) throws JSONException {
+            mMajor = object.getInt("major");
+            mMinor = object.getInt("minor");
+        }
+
+        public BeaconDBParams(Beacon beacon) {
+            mMajor = beacon.getMajor();
+            mMinor = beacon.getMinor();
+        }
 
         public BeaconDBParams(int major, int minor) {
             mMajor = major;

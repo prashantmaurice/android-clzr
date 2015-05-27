@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.internal.util.Predicate;
 import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.Region;
 
@@ -35,16 +36,31 @@ public class OneTimeBFS extends BeaconFinderService {
     @Override
     protected void onRangedBeacons(final List<Beacon> beaconList) {
         Log.e(TAG, "Ranged; size - " + beaconList.size());
-        for (Beacon beacon : beaconList) {
-            BeaconDBParams params = new BeaconDBParams(beacon.getMajor(), beacon.getMinor());
+        for (final Beacon beacon : beaconList) {
+            BeaconDBParams params = new BeaconDBParams(beacon);
             Log.e(TAG, "found " + params.toString());
             if (params.equals(beaconDBParams)) {
-                putToast(getApplicationContext(), "Near this restaurant. Check in?", Toast.LENGTH_LONG);
-                beaconManager.stopRanging(scanningRegion);
-                turnOffBluetooth();
-                Log.e(TAG, "Stopped Scan");
-                running = false;
-                return;
+                VendorParams vendorParams = VendorParams.findVendorParamsInFile(getApplicationContext(), new Predicate<VendorParams>() {
+                    @Override
+                    public boolean apply(VendorParams vendorParams) {
+                        return vendorParams.mBeaconParams.equals(beaconDBParams);
+                    }
+                });
+                if (vendorParams != null) {
+                    String toastText = "You are close to this place. ";
+                    if (vendorParams.mHasOffers)
+                        toastText += "And you have rewards you can use here! Check in and use them!";
+                    else if (vendorParams.mLoyaltyType.equalsIgnoreCase("sx"))
+                        toastText += "Go in and get your stamps during billing!";
+                    else
+                        toastText += "Go in and mark your visit!";
+                    putToast(getApplicationContext(), toastText, Toast.LENGTH_LONG);
+                    beaconManager.stopRanging(scanningRegion);
+                    turnOffBluetooth();
+                    Log.e(TAG, "Stopped Scan");
+                    running = false;
+                    return;
+                }
             }
         }
     }
