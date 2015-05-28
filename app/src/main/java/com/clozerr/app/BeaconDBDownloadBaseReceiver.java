@@ -13,15 +13,15 @@ import android.util.Log;
 
 import java.util.concurrent.TimeUnit;
 
-public class UUIDDownloadBaseReceiver extends BroadcastReceiver {
-    private static final String TAG = "UUIDBaseReceiver";
+public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
+    private static final String TAG = "BDBBaseReceiver";
     private static final long MAXIMUM_ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(1L, TimeUnit.MINUTES);
                                         // TODO change to 1 day
     private static final long MINIMUM_ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.SECONDS);
                                         // TODO change to 1 hr or so
     private static final long CONNECTIVITY_SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(15L, TimeUnit.SECONDS);
                                         // TODO change to 15 min or so
-    private static final String ACTION_FIRE_ALARM_DOWNLOAD = "FireAlarmDownload";
+    private static final String ACTION_FIRE_ALARM_DOWNLOAD = "com.clozerr.app.ACTION_FIRE_ALARM_DOWNLOAD";
     private static final int REDUCTION_FACTOR = 2;
     private static final int REQUEST_CODE = 1234;
 
@@ -32,22 +32,22 @@ public class UUIDDownloadBaseReceiver extends BroadcastReceiver {
     private Context mContext = null;
     private Handler mHandler = null;
 
-    public UUIDDownloadBaseReceiver() {}
+    public BeaconDBDownloadBaseReceiver() {}
 
-    public UUIDDownloadBaseReceiver(Context context) {
+    public BeaconDBDownloadBaseReceiver(Context context) {
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         mContext = context;
     }
 
-    private static PendingIntent getUUIDDownloaderPendingIntent(Context context) {
-        Intent intentToSend = new Intent(context, UUIDDownloadBaseReceiver.class);
+    private static PendingIntent getBDBDownloaderPendingIntent(Context context) {
+        Intent intentToSend = new Intent(context, BeaconDBDownloadBaseReceiver.class);
         intentToSend.setAction(ACTION_FIRE_ALARM_DOWNLOAD);
         return PendingIntent.getBroadcast(context, REQUEST_CODE, intentToSend, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 
     private void setNewAlarm() {
         Log.e(TAG, "setting alarm; interval - " + alarmInterval);
-        PendingIntent operationIntent = getUUIDDownloaderPendingIntent(mContext);
+        PendingIntent operationIntent = getBDBDownloaderPendingIntent(mContext);
         if (alarmManager != null)
             alarmManager.cancel(operationIntent);
         else
@@ -59,26 +59,26 @@ public class UUIDDownloadBaseReceiver extends BroadcastReceiver {
     public static boolean hasStarted() { return alarmManager != null; }
 
     public static void scheduleDownload(Context context) {
-        if (!UUIDDownloadBaseReceiver.hasStarted())
-            new UUIDDownloadBaseReceiver(context).setNewAlarm();
+        if (!BeaconDBDownloadBaseReceiver.hasStarted())
+            new BeaconDBDownloadBaseReceiver(context).setNewAlarm();
     }
 
     public static void stopDownloads(Context context) {
-        if (UUIDDownloadBaseReceiver.hasStarted())
-            alarmManager.cancel(getUUIDDownloaderPendingIntent(context));
+        if (BeaconDBDownloadBaseReceiver.hasStarted())
+            alarmManager.cancel(getBDBDownloaderPendingIntent(context));
     }
 
-    private void enableUUIDDownloader(Context context) {
-        ComponentName receiver = new ComponentName(context, UUIDDownloader.class);
+    private void enableBDBDownloader(Context context) {
+        ComponentName receiver = new ComponentName(context, BeaconDBDownloader.class);
         context.getPackageManager().setComponentEnabledSetting(receiver,
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-        Intent initiateIntent = new Intent(context, UUIDDownloader.class);
-        initiateIntent.setAction(UUIDDownloader.ACTION_INITIATE_DOWNLOADER);
+        Intent initiateIntent = new Intent(context, BeaconDBDownloader.class);
+        initiateIntent.setAction(BeaconDBDownloader.ACTION_INITIATE_DOWNLOADER);
         context.sendBroadcast(initiateIntent);
     }
 
-    private void disableUUIDDownloader(Context context) {
-        ComponentName receiver = new ComponentName(context, UUIDDownloader.class);
+    private void disableBDBDownloader(Context context) {
+        ComponentName receiver = new ComponentName(context, BeaconDBDownloader.class);
         context.getPackageManager().setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
     }
@@ -98,14 +98,14 @@ public class UUIDDownloadBaseReceiver extends BroadcastReceiver {
                 @Override
                 public void run() {
                     Log.e(TAG, "received");
-                    Log.e(TAG, "enabling UUIDDownloader");
-                    enableUUIDDownloader(context);
+                    Log.e(TAG, "enabling BDBDownloader");
+                    enableBDBDownloader(context);
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (!UUIDDownloader.isDoneDownloading()) {
-                                Log.e(TAG, "Timeout; disabling UUIDDownloader");
-                                disableUUIDDownloader(context);
+                            if (!BeaconDBDownloader.isDoneDownloading()) {
+                                Log.e(TAG, "Timeout; disabling BDBDownloader");
+                                disableBDBDownloader(context);
                                 if (alarmInterval > MINIMUM_ALARM_INTERVAL) {
                                     alarmInterval /= REDUCTION_FACTOR;
                                     if (alarmInterval < MINIMUM_ALARM_INTERVAL)

@@ -77,32 +77,34 @@ public class GCMIntentService extends GCMBaseIntentService {
 	@ Override
     protected void onMessage(Context context, Intent intent) {
         Log.d(TAG, "onMessage - context: " + context);
-        String type = intent.getStringExtra("type");
+        String type = intent.hasExtra("type") ? intent.getStringExtra("type") : "";
         String message = "", title = "";
         // make notifications here
-        if( type.equals("STANDARD") ) {
-            message = intent.getStringExtra("message");
-            title = intent.getStringExtra("title");
-            notify(title, message);
-        }
-
-        else if(type.equals("REVIEW")) {
-            String checkin_id = intent.getStringExtra("checkin_id");
-            String vendor_id = intent.getStringExtra("vendor_id");
-            message = intent.getStringExtra("message");
-            title = intent.getStringExtra("title");
-            notifyreview( title, message, checkin_id, vendor_id );
-        }
-        else if (type.equals("BIRTHDAY")) {
-            try {
-                Log.e("GCMBirthday", intent.getExtras().get("vendor").toString());
-                JSONObject vendor = new JSONObject(intent.getExtras().get("vendor").toString());
-                message = vendor.getJSONObject("settings").getJSONObject("birthday").getString("birthdayWish");
-                title = getResources().getString(R.string.app_name) + " - " + vendor.getString("name");
+        switch (type) {
+            case "STANDARD":
+                message = intent.getStringExtra("message");
+                title = intent.getStringExtra("title");
                 notify(title, message);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                break;
+            case "REVIEW":
+                String checkin_id = intent.getStringExtra("checkin_id");
+                String vendor_id = intent.getStringExtra("vendor_id");
+                message = intent.getStringExtra("message");
+                title = intent.getStringExtra("title");
+                notifyreview(title, message, checkin_id, vendor_id);
+                break;
+            case "BIRTHDAY":
+                try {
+                    Log.e("GCMBirthday", intent.getExtras().get("vendor").toString());
+                    JSONObject vendor = new JSONObject(intent.getExtras().get("vendor").toString());
+                    message = vendor.getJSONObject("settings").getJSONObject("birthday").getString("birthdayWish");
+                    title = getResources().getString(R.string.app_name) + " - " + vendor.getString("name");
+                    notify(title, message);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            default: break;
         }
     }
 

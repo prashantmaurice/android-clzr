@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.internal.util.Predicate;
 import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.Region;
 
@@ -15,7 +16,8 @@ import java.util.List;
 public class OneTimeBFS extends BeaconFinderService {
 
     private static final String TAG = "OTBFS";
-    private static String uuid = "";
+    //private static String uuid = "";
+    private static BeaconDBParams beaconDBParams;
     private static boolean running = false;
 
     @Override
@@ -28,22 +30,37 @@ public class OneTimeBFS extends BeaconFinderService {
 
     @Override
     protected Region createRegion() {
-        return new Region(REGION_UNIQUE_ID, getUuidWithoutHyphens(uuid), null, null);
+        return new Region(REGION_ID, getUuidWithoutHyphens(CLOZERR_UUID), beaconDBParams.mMajor, beaconDBParams.mMinor);
     }
 
     @Override
     protected void onRangedBeacons(final List<Beacon> beaconList) {
         Log.e(TAG, "Ranged; size - " + beaconList.size());
-        for (Beacon beacon : beaconList) {
-            Log.e(TAG, "uuid found: " + beacon.getProximityUUID());
-            if (beacon.getProximityUUID().equalsIgnoreCase(uuid)) {
-                // TODO Auto check-in
-                putToast(getApplicationContext(), "Near this restaurant. Check in?", Toast.LENGTH_LONG);
-                beaconManager.stopRanging(scanningRegion);
-                turnOffBluetooth();
-                Log.e(TAG, "Stopped Scan");
-                running = false;
-                return;
+        for (final Beacon beacon : beaconList) {
+            BeaconDBParams params = new BeaconDBParams(beacon);
+            Log.e(TAG, "found " + params.toString());
+            if (params.equals(beaconDBParams)) {
+                VendorParams vendorParams = VendorParams.findVendorParamsInFile(getApplicationContext(), new Predicate<VendorParams>() {
+                    @Override
+                    public boolean apply(VendorParams vendorParams) {
+                        return vendorParams.mBeaconParams.equals(beaconDBParams);
+                    }
+                });
+                if (vendorParams != null) {
+                    String toastText = "You are close to this place. ";
+                    if (vendorParams.mHasOffers)
+                        toastText += "And you have rewards you can use here! Check in and use them!";
+                    else if (vendorParams.mLoyaltyType.equalsIgnoreCase("sx"))
+                        toastText += "Go in and get your stamps during billing!";
+                    else
+                        toastText += "Go in and mark your visit!";
+                    putToast(getApplicationContext(), toastText, Toast.LENGTH_LONG);
+                    beaconManager.stopRanging(scanningRegion);
+                    turnOffBluetooth();
+                    Log.e(TAG, "Stopped Scan");
+                    running = false;
+                    return;
+                }
             }
         }
     }
@@ -61,10 +78,10 @@ public class OneTimeBFS extends BeaconFinderService {
         }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
     }
 
-    public static void checkAndStartScan(Context context, String vendorUuid) {
-        if (vendorUuid != null && !vendorUuid.isEmpty() && isBLESupported) {
+    public static void checkAndStartScan(Context context, BeaconDBParams params) {
+        if (params != null && isBLESupported) {
             context.stopService(new Intent(context, PeriodicBFS.class));
-            uuid = vendorUuid;
+            beaconDBParams = params;
             context.startService(new Intent(context, OneTimeBFS.class));
         }
     }
