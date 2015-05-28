@@ -83,13 +83,13 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
                 public void onClick(View view) {
                     SharedPreferences status = c.getSharedPreferences("USER", 0);
                     String NotNow = status.getString("notNow", "false");
-                    if (CouponPage.i == 0 && NotNow.equals("false"))
+                    if (VendorActivity.i == 0 && NotNow.equals("false"))
                     {
-                        Intent detailIntent = new Intent(c, CouponDetails.class);
+                        Intent detailIntent = new Intent(c, VendorActivity.class);
                         detailIntent.putExtra("vendor_id", currentItem.getVendorId());
-                        detailIntent.putExtra("stamps", currentItem.getStamps());
+                        /*detailIntent.putExtra("stamps", currentItem.getStamps());
                         detailIntent.putExtra("offer_id", currentItem.getOfferId());
-                        detailIntent.putExtra("offer_text", currentItem.getOfferDescription());
+                        detailIntent.putExtra("offer_text", currentItem.getOfferDescription());*/
                         //RecyclerViewAdapter.vendor_name_temp = currentItem.getTitle();
                         c.startActivity(detailIntent);
                     }

@@ -26,7 +26,6 @@
             android:layout_gravity="center"
             android:layout_margin="5dp"
             android:gravity="center"
-            android:visibility="invisible"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Freebie 1"
             android:maxLines="2"

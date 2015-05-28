@@ -222,9 +222,9 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     detailsView.setText(detailsBundle.getString("description"));
                     locView.setText(detailsBundle.getString("distance"));
 
-                    if (!callingIntent.getBooleanExtra("from_periodic_scan", false))
+                    /*if (!callingIntent.getBooleanExtra("from_periodic_scan", false))
                         OneTimeBFS.checkAndStartScan(getApplicationContext(), uuid);
-                    else PeriodicBFS.dismissNotifications(CouponDetails.this);
+                    else PeriodicBFS.dismissNotifications(CouponDetails.this);*/
 
                     checkinButton.setOnClickListener(new View.OnClickListener() {
                         @Override

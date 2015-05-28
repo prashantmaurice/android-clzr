@@ -306,7 +306,7 @@ public class Home  extends ActionBarActivity {
                 }
 
         });
-        CouponPage.i=0;
+        VendorActivity.i=0;
         button=(Button)findViewById(R.id.button);
        // Toast.makeText(this, "end nitview", Toast.LENGTH_SHORT).show();
     }

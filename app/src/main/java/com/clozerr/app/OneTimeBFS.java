@@ -50,8 +50,8 @@ public class OneTimeBFS extends BeaconFinderService {
                     String toastText = "You are close to this place. ";
                     if (vendorParams.mHasOffers)
                         toastText += "And you have rewards you can use here! Check in and use them!";
-                    else if (vendorParams.mLoyaltyType.equalsIgnoreCase("sx"))
-                        toastText += "Go in and get your stamps during billing!";
+                    /*else if (vendorParams.mLoyaltyType.equalsIgnoreCase("sx"))
+                        toastText += "Go in and get your stamps during billing!";*/
                     else
                         toastText += "Go in and mark your visit!";
                     putToast(getApplicationContext(), toastText, Toast.LENGTH_LONG);

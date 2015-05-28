@@ -120,7 +120,7 @@ public class GCMIntentService extends GCMBaseIntentService {
                         .setAutoCancel( true );
 
 // Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(this, CouponDetails.class);
+        Intent resultIntent = new Intent(this, VendorActivity.class);
         resultIntent.putExtra("from_notify_review",true);
         resultIntent.putExtra("checkin_id",checkin_id);
         resultIntent.putExtra("vendor_id", vendor_id);

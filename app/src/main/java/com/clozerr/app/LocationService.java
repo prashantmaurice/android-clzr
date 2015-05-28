@@ -168,9 +168,9 @@ public class LocationService extends Service {
                             editor.putString("latitude", location.getLatitude()+"");
                             editor.putString("longitude", location.getLongitude()+"");
                             editor.apply();
-                            Intent intent = new Intent(LocationService.this, CouponDetails.class);
+                            Intent intent = new Intent(LocationService.this, VendorActivity.class);
                             intent.putExtra("vendor_id", jsonObject.getString("_id"));
-                            JSONArray jsonArray=jsonObject.getJSONArray("offers");
+                            /*JSONArray jsonArray=jsonObject.getJSONArray("offers");
                             if(jsonArray.length()==0){
                                 intent.putExtra("offer_caption","No offers available");
                             }
@@ -178,7 +178,7 @@ public class LocationService extends Service {
                                 intent.putExtra("offer_id", jsonArray.getJSONObject(0).getString("_id"));
                                 intent.putExtra("offer_caption", jsonArray.getJSONObject(0).getString("caption"));
                                 intent.putExtra("offer_text", jsonArray.getJSONObject(0).getString("description"));
-                            }
+                            }*/
                             intent.putExtra("Notification",true);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                                     Intent.FLAG_ACTIVITY_SINGLE_TOP |

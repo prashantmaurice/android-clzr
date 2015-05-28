@@ -86,13 +86,13 @@ public abstract class BeaconFinderService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        /*if (intent == null)
+        if (intent == null)
             PeriodicBFS.checkAndStartScan(getApplicationContext());
         else
             findBeacons();
-        return START_STICKY;*/
-        stopSelf();
-        return START_NOT_STICKY;
+        return START_STICKY;
+        /*stopSelf();
+        return START_NOT_STICKY;*/
     }
 
     protected void findBeacons() {
@@ -267,7 +267,9 @@ public abstract class BeaconFinderService extends Service {
             mName = object.getString("name");
             /*mUUID = (object.getJSONArray("UUID").length() > 0) ?
                         object.getJSONArray("UUID").getString(0).toLowerCase() : "";*/
-            mBeaconParams = new BeaconDBParams(object.getJSONObject("beacons"));
+            if (object.getJSONObject("beacons").has("major"))
+                mBeaconParams = new BeaconDBParams(object.getJSONObject("beacons"));
+            else mBeaconParams = null;
             mVendorID = object.getString("_id");
             /*JSONObject nextOffer = (object.getJSONArray("offers_qualified").length()) > 0 ?
                                     object.getJSONArray("offers_qualified").getJSONObject(0) : null;
@@ -276,14 +278,14 @@ public abstract class BeaconFinderService extends Service {
             mNextOfferDescription = (nextOffer == null) ? "" : nextOffer.getString("description");*/
             //mIsNotifiable = /*!mNextOfferID.isEmpty() && isVendorWithThisUUIDNotifiable(context, mUUID)*/true;
             mHasOffers = object.getBoolean("hasOffers");
-            mLoyaltyType = (object.getJSONObject("settings").getBoolean("sxEnabled")) ? "SX" : "S1";
+            mLoyaltyType = /*(object.getJSONObject("settings").getBoolean("sxEnabled")) ? "SX" : */"S1";
             //mPaymentType = object.getString("paymentType");
             //mPaymentType = "counter";
             mThresholdRssi = THRESHOLD_RSSI;
         }
 
         public Intent getDetailsIntent(Context context) {
-            Intent detailIntent = new Intent(context, CouponDetails.class);
+            Intent detailIntent = new Intent(context, VendorActivity.class);
             detailIntent.putExtra("vendor_id", mVendorID);
             /*detailIntent.putExtra("offer_id", mNextOfferID);
             detailIntent.putExtra("offer_caption", mNextOfferCaption);
@@ -307,13 +309,13 @@ public abstract class BeaconFinderService extends Service {
                     try {
                         vendorParams = new VendorParams(/*context, */rootArray.getJSONObject(i));
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        //ex.printStackTrace();
                     } finally {
                         if (vendorParams != null) result.add(vendorParams);
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
             return result;
         }
@@ -352,6 +354,7 @@ public abstract class BeaconFinderService extends Service {
         }
 
         public boolean equals(BeaconDBParams other) {
+            if (other == null) return false;
             return mMajor == other.mMajor && mMinor == other.mMinor;
         }
 
