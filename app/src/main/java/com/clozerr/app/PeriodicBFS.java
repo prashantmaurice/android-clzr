@@ -5,14 +5,13 @@ import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.internal.util.Predicate;
 import com.jaalee.sdk.Beacon;
@@ -32,6 +31,7 @@ public class PeriodicBFS extends BeaconFinderService {
                                     // TODO make this 10 min
     private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(6L, TimeUnit.SECONDS);
                                     // TODO modify as required
+    private static final long SCAN_PAUSE_INTERVAL = TimeUnit.MILLISECONDS.convert(40L, TimeUnit.SECONDS);
     //private static final int PERIODIC_SCAN_BEACON_LIMIT = 3;
     private static final int NOTIFICATION_ID = 0;
     //private static final ConcurrentHashMap<String, DeviceParams> periodicScanDeviceMap = new ConcurrentHashMap<>();
@@ -67,7 +67,7 @@ public class PeriodicBFS extends BeaconFinderService {
         //mCheckTask.stopScanning();
         //mTimer.cancel();
         alarmManager.cancel(getScanStarterPendingIntent(applicationContext));
-        disableScanStarter(applicationContext);
+        disableComponent(applicationContext, ScanStarter.class);
         /*if (!isScanningAllowed) {               // if this was because scanning was disallowed by settings
             periodicScanDeviceMap.clear();
             writeHashMapToFile();               // next time scan starts, start with an empty hash map
@@ -76,7 +76,7 @@ public class PeriodicBFS extends BeaconFinderService {
         super.onDestroy();
     }
 
-    private static void enableScanStarter(Context context) {
+    /*private static void enableScanStarter(Context context) {
         ComponentName receiver = new ComponentName(context, ScanStarter.class);
         context.getPackageManager().setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
@@ -86,10 +86,10 @@ public class PeriodicBFS extends BeaconFinderService {
         ComponentName receiver = new ComponentName(context, ScanStarter.class);
         context.getPackageManager().setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-    }
+    }*/
 
     private static PendingIntent getScanStarterPendingIntent(Context context) {
-        enableScanStarter(context);
+        enableComponent(context, ScanStarter.class);
         Intent intentToSend = new Intent(context, ScanStarter.class);
         intentToSend.setAction(ACTION_FIRE_ALARM_SCAN);
         return PendingIntent.getBroadcast(context, RequestCodes.CODE_ALARM_INTENT.code(), intentToSend,
@@ -148,6 +148,7 @@ public class PeriodicBFS extends BeaconFinderService {
     private static void showNotificationForVendor(Context context, final BeaconDBParams beaconParams)
     {
         Log.e(TAG, "Params for notification - " + beaconParams.toString());
+        putToast(context, "Params for notification - " + beaconParams.toString(), Toast.LENGTH_SHORT);
         dismissNotifications(context);
         try {
             //ArrayList<VendorParams> rootArray = VendorParams.readVendorParamsFromFile(context);
@@ -195,10 +196,11 @@ public class PeriodicBFS extends BeaconFinderService {
                         .setContentText(contentText)
                         //.setContentIntent(detailPendingIntent)
                         .setWhen(System.currentTimeMillis())
-                        .addAction(R.drawable.ic_action_accept, actionText, detailPendingIntent);/*
-                        .addAction(R.drawable.ic_refuse, "Not for this vendor", refusePendingIntent);*/
+                        .addAction(R.drawable.ic_action_accept, actionText, detailPendingIntent);
+                        //.addAction(R.drawable.ic_refuse, "Not for this vendor", refusePendingIntent);
                 notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
             }
+            pauseScanningFor(context, SCAN_PAUSE_INTERVAL);
                     /*break;
                 }
             }*/
@@ -319,12 +321,13 @@ public class PeriodicBFS extends BeaconFinderService {
             final BeaconDBParams params = new BeaconDBParams(beacon);
             Log.e(TAG, "UUID scanned - " + beacon.getProximityUUID().toUpperCase());
             Log.e(TAG, "major - " + beacon.getMajor() + "; minor - " + beacon.getMinor());
+
             /*if (beaconDatabase.contains(uuid.toUpperCase())) {*/
             VendorParams vendorParams = VendorParams.findVendorParamsInFile(getApplicationContext(),
                     new Predicate<VendorParams>() {
                         @Override
                         public boolean apply(VendorParams vendorParams) {
-                            /*return areUuidsEqual(uuid, vendorParams.mUUID);*/
+                            //return areUuidsEqual(uuid, vendorParams.mUUID);
                             return vendorParams.mBeaconParams.equals(params);
                         }
                     });
@@ -338,8 +341,8 @@ public class PeriodicBFS extends BeaconFinderService {
                 } else {
                     periodicScanDeviceMap.put(uuid, new DeviceParams(0, true));
                     deviceParams = periodicScanDeviceMap.get(uuid);
-                }*/
-                /*if (vendorParams.mPaymentType.equalsIgnoreCase("counter")) {
+                }
+                if (vendorParams.mPaymentType.equalsIgnoreCase("counter")) {
                     //double distance = getDistanceFromBeacon(beacon);
                     putToast(getApplicationContext(), "RSSI = " + beacon.getRssi(), Toast.LENGTH_LONG);
                     if (beacon.getRssi() >= vendorParams.mThresholdRssi) {
@@ -358,7 +361,7 @@ public class PeriodicBFS extends BeaconFinderService {
                     }
                 }
                 writeHashMapToFile();*/
-                if (beacon.getRssi() >= vendorParams.mThresholdRssi) {
+                if (beacon.getRssi() >= THRESHOLD_RSSI) {
                     //deviceParams.mCount = 0;
                     ScanStarter.pushedNotification = true;
                     showNotificationForVendor(getApplicationContext(), params);

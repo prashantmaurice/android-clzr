@@ -187,7 +187,11 @@
         <receiver
             android:name=".PeriodicBFS$ScanStarter"
             android:enabled="false"
-            android:exported="true" />
+            android:exported="false" />
+
+        <receiver android:name=".BeaconFinderService$ScanResumeReceiver"
+            android:enabled="false"
+            android:exported="false" />
 
         <activity
             android:name=".CategoryDetail"

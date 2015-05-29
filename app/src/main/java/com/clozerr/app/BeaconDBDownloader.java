@@ -1,10 +1,8 @@
 package com.clozerr.app;
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -38,10 +36,7 @@ public class BeaconDBDownloader extends BroadcastReceiver {
                     fileOutputStream.close();
                     isDownloadDone = true;
                     BeaconDBDownloadBaseReceiver.releaseWakeLock();
-                    ComponentName receiver = new ComponentName(context, BeaconDBDownloader.class);
-                    context.getPackageManager().setComponentEnabledSetting(receiver,
-                            PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-                    Log.e(TAG, "disabled BDBDownloader");
+                    BeaconFinderService.disableComponent(context, BeaconDBDownloader.class);
                 } catch (Exception e) {
                     e.printStackTrace();
                     Intent nextTrialIntent = new Intent(context, BeaconDBDownloader.class);

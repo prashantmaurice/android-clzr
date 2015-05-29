@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -42,6 +44,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class BeaconFinderService extends Service {
     private static final String TAG = "BFS";
     protected static final String REGION_ID = "com.clozerr.app";
+    protected static final String ACTION_RESUME_SCAN = "com.clozerr.app.ACTION_RESUME_SCAN";
     protected static final long SCAN_START_DELAY = TimeUnit.MILLISECONDS.convert(2L, TimeUnit.SECONDS);
     protected static final int THRESHOLD_RSSI = -100;
 
@@ -55,7 +58,8 @@ public abstract class BeaconFinderService extends Service {
         CODE_ALARM_INTENT(1000),
         CODE_DETAILS_INTENT(1234),
         CODE_REFUSE_INTENT(1235),
-        CODE_VENDOR_LIST_INTENT(1236);
+        CODE_VENDOR_LIST_INTENT(1236),
+        CODE_RESUME_SCAN_INTENT(1237);
 
         private int mCode;
 
@@ -74,7 +78,7 @@ public abstract class BeaconFinderService extends Service {
     public void onCreate() {
         super.onCreate();
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        uiThreadHandler = new Handler(Looper.getMainLooper());
+
         beaconManager = new BeaconManager(getApplicationContext());
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
     }
@@ -96,6 +100,7 @@ public abstract class BeaconFinderService extends Service {
     }
 
     protected void findBeacons() {
+        uiThreadHandler = new Handler(Looper.getMainLooper());
         if (canScanStart()) {
             scanningRegion = createRegion();
             beaconManager.setRangingListener(new RangingListener() {
@@ -125,6 +130,7 @@ public abstract class BeaconFinderService extends Service {
     // This function is just for putting toasts, but required as work is done on a background thread
     // so if a toast is directly put, the app will crash (Toasts must be put in the UI thread)
     protected static void putToast(final Context context, final CharSequence text, final int duration) {
+        uiThreadHandler = new Handler(Looper.getMainLooper());
         uiThreadHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -208,6 +214,18 @@ public abstract class BeaconFinderService extends Service {
             }
     }
 
+    public static void enableComponent(Context context, Class componentClass) {
+        ComponentName component = new ComponentName(context, componentClass);
+        context.getPackageManager().setComponentEnabledSetting(component,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+    }
+
+    public static void disableComponent(Context context, Class componentClass) {
+        ComponentName component = new ComponentName(context, componentClass);
+        context.getPackageManager().setComponentEnabledSetting(component,
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+    }
+
     protected static void turnOnBluetooth() {
         hasUserActivatedBluetooth = bluetoothAdapter.isEnabled();  // check if user has already enabled BT
         if (!hasUserActivatedBluetooth)                            // disabled, so enable BT
@@ -234,19 +252,16 @@ public abstract class BeaconFinderService extends Service {
         Log.e(TAG, "scans allowed");
     }
 
-    public static void pauseScanningFor(Context context, long intervalMillis) {
+    public static void pauseScanningFor(final Context context, long intervalMillis) {
         disallowScanning(context);
-        Log.e(TAG, "scans paused for " + (intervalMillis / 1000.0) + " seconds");
-        long triggerTimeMillis = intervalMillis + System.currentTimeMillis();
-        Intent resumeIntent = new Intent(context, new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context1, Intent intent) {
-                allowScanning(context1);
-                Log.e(TAG, "scans resumed");
-            }
-        }.getClass());
+        Log.e(TAG, "scans paused for " + intervalMillis + " ms");
+        putToast(context, "scans paused for " + intervalMillis + " ms", Toast.LENGTH_SHORT);
+        long triggerTimeMillis = intervalMillis + SystemClock.elapsedRealtime();
+        enableComponent(context, ScanResumeReceiver.class);
+        Intent resumeIntent = new Intent(context, ScanResumeReceiver.class);
+        resumeIntent.setAction(ACTION_RESUME_SCAN);
         alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTimeMillis,
-                PendingIntent.getBroadcast(context, RequestCodes.CODE_ALARM_INTENT.code(), resumeIntent, 0));
+                PendingIntent.getBroadcast(context, RequestCodes.CODE_RESUME_SCAN_INTENT.code(), resumeIntent, 0));
     }
 
     protected static class VendorParams {
@@ -361,5 +376,17 @@ public abstract class BeaconFinderService extends Service {
         public String toString() {
             return "major: " + mMajor + "; minor: " + mMinor;
         }
+    }
+
+    public static class ScanResumeReceiver extends BroadcastReceiver {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent != null && intent.getAction().equals(ACTION_RESUME_SCAN)) {
+                    allowScanning(context);
+                    Log.e(TAG, "scans resumed");
+                    putToast(context, "scans resumed", Toast.LENGTH_SHORT);
+                    disableComponent(context, ScanResumeReceiver.class);
+                }
+            }
     }
 }

@@ -3,10 +3,8 @@ package com.clozerr.app;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -68,20 +66,18 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
             alarmManager.cancel(getBDBDownloaderPendingIntent(context));
     }
 
-    private void enableBDBDownloader(Context context) {
-        ComponentName receiver = new ComponentName(context, BeaconDBDownloader.class);
-        context.getPackageManager().setComponentEnabledSetting(receiver,
-            PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+    private void initiateBDBDownloader(Context context) {
+        BeaconFinderService.enableComponent(context, BeaconDBDownloader.class);
         Intent initiateIntent = new Intent(context, BeaconDBDownloader.class);
         initiateIntent.setAction(BeaconDBDownloader.ACTION_INITIATE_DOWNLOADER);
         context.sendBroadcast(initiateIntent);
     }
 
-    private void disableBDBDownloader(Context context) {
+    /*private void disableBDBDownloader(Context context) {
         ComponentName receiver = new ComponentName(context, BeaconDBDownloader.class);
         context.getPackageManager().setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-    }
+    }*/
 
     public static void acquireWakeLock(Context context) { wakeLockManager.acquireWakeLock(context, TAG); }
 
@@ -99,13 +95,13 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
                 public void run() {
                     Log.e(TAG, "received");
                     Log.e(TAG, "enabling BDBDownloader");
-                    enableBDBDownloader(context);
+                    initiateBDBDownloader(context);
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             if (!BeaconDBDownloader.isDoneDownloading()) {
                                 Log.e(TAG, "Timeout; disabling BDBDownloader");
-                                disableBDBDownloader(context);
+                                BeaconFinderService.disableComponent(context, BeaconDBDownloader.class);
                                 if (alarmInterval > MINIMUM_ALARM_INTERVAL) {
                                     alarmInterval /= REDUCTION_FACTOR;
                                     if (alarmInterval < MINIMUM_ALARM_INTERVAL)
