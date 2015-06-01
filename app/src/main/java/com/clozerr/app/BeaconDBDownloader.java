@@ -29,22 +29,24 @@ public class BeaconDBDownloader extends BroadcastReceiver {
         new AsyncGet(context, DOWNLOAD_URL + token, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
-                Log.e(TAG, "results - " + s);
-                try {
-                    FileOutputStream fileOutputStream = context.openFileOutput(BEACONS_FILE_NAME, Context.MODE_PRIVATE);
-                    fileOutputStream.write(s.getBytes());
-                    fileOutputStream.close();
-                    isDownloadDone = true;
-                    BeaconDBDownloadBaseReceiver.releaseWakeLock();
-                    BeaconFinderService.disableComponent(context, BeaconDBDownloader.class);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Intent nextTrialIntent = new Intent(context, BeaconDBDownloader.class);
-                    nextTrialIntent.setAction(ACTION_INITIATE_DOWNLOADER);
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(nextTrialIntent);
+                //Log.e(TAG, "results - " + s);
+                if (s != null && !s.isEmpty()) {
+                    try {
+                        FileOutputStream fileOutputStream = context.openFileOutput(BEACONS_FILE_NAME, Context.MODE_PRIVATE);
+                        fileOutputStream.write(s.getBytes());
+                        fileOutputStream.close();
+                        isDownloadDone = true;
+                        //BeaconDBDownloadBaseReceiver.releaseWakeLock();
+                        BeaconFinderService.disableComponent(context, BeaconDBDownloader.class);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Intent nextTrialIntent = new Intent(context, BeaconDBDownloader.class);
+                        nextTrialIntent.setAction(ACTION_INITIATE_DOWNLOADER);
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(nextTrialIntent);
+                    }
                 }
             }
-        });
+        }, false);
     }
 
     public static boolean isDoneDownloading() { return isDownloadDone; }

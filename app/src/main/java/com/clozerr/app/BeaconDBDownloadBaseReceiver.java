@@ -14,11 +14,8 @@ import java.util.concurrent.TimeUnit;
 public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
     private static final String TAG = "BDBBaseReceiver";
     private static final long MAXIMUM_ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(1L, TimeUnit.MINUTES);
-                                        // TODO change to 1 day
     private static final long MINIMUM_ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.SECONDS);
-                                        // TODO change to 1 hr or so
     private static final long CONNECTIVITY_SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(15L, TimeUnit.SECONDS);
-                                        // TODO change to 15 min or so
     private static final String ACTION_FIRE_ALARM_DOWNLOAD = "com.clozerr.app.ACTION_FIRE_ALARM_DOWNLOAD";
     private static final int REDUCTION_FACTOR = 2;
     private static final int REQUEST_CODE = 1234;
@@ -79,16 +76,22 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
     }*/
 
-    public static void acquireWakeLock(Context context) { wakeLockManager.acquireWakeLock(context, TAG); }
+    /*public static void acquireWakeLock(Context context) {
+        if (wakeLockManager == null)
+            wakeLockManager = new WakeLockManager();
+        wakeLockManager.acquireWakeLock(context, TAG);
+    }
 
-    public static void releaseWakeLock() { wakeLockManager.releaseWakeLock(); }
+    public static void releaseWakeLock() { wakeLockManager.releaseWakeLock(); }*/
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
         if (intent.getAction() != null && intent.getAction().equals(ACTION_FIRE_ALARM_DOWNLOAD)) {
             mContext = context;
             mHandler = new Handler(Looper.myLooper());
-            wakeLockManager = new WakeLockManager();
+            //acquireWakeLock(context);
+            if (wakeLockManager == null)
+                wakeLockManager = new WakeLockManager();
             wakeLockManager.acquireWakeLock(context, TAG);
             mHandler.post(new Runnable() {
                 @Override
@@ -116,6 +119,7 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
                                     setNewAlarm();
                                 }
                             }
+                            //releaseWakeLock();
                             wakeLockManager.releaseWakeLock();
                         }
                     }, CONNECTIVITY_SCAN_PERIOD);

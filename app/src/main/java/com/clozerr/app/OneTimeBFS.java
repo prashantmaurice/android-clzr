@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.android.internal.util.Predicate;
 import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.Region;
+import com.jaalee.sdk.ServiceReadyCallback;
 
 import java.util.List;
 
@@ -28,10 +29,10 @@ public class OneTimeBFS extends BeaconFinderService {
 
     public static boolean isRunning() { return running; }
 
-    @Override
+    /*@Override
     protected Region createRegion() {
         return new Region(REGION_ID, getUuidWithoutHyphens(CLOZERR_UUID), beaconDBParams.mMajor, beaconDBParams.mMinor);
-    }
+    }*/
 
     @Override
     protected void onRangedBeacons(final List<Beacon> beaconList) {
@@ -50,8 +51,8 @@ public class OneTimeBFS extends BeaconFinderService {
                     String toastText = "You are close to this place. ";
                     if (vendorParams.mHasOffers)
                         toastText += "And you have rewards you can use here! Check in and use them!";
-                    /*else if (vendorParams.mLoyaltyType.equalsIgnoreCase("sx"))
-                        toastText += "Go in and get your stamps during billing!";*/
+                    else if (vendorParams.mLoyaltyType.equalsIgnoreCase("sx"))
+                        toastText += "Go in and get your stamps during billing!";
                     else
                         toastText += "Go in and mark your visit!";
                     putToast(getApplicationContext(), toastText, Toast.LENGTH_LONG);
@@ -65,7 +66,7 @@ public class OneTimeBFS extends BeaconFinderService {
         }
     }
 
-    @Override
+    /*@Override
     protected void scan() {
         turnOnBluetooth();
         Log.e(TAG, "Started Scan");
@@ -76,6 +77,25 @@ public class OneTimeBFS extends BeaconFinderService {
                 beaconManager.startRangingAndDiscoverDevice(scanningRegion);
             }
         }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
+    }*/
+
+    @Override
+    protected void runService() {
+        scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(CLOZERR_UUID), beaconDBParams.mMajor, beaconDBParams.mMinor);
+        beaconManager.connect(new ServiceReadyCallback() {
+            @Override
+            public void onServiceReady() {
+                turnOnBluetooth();
+                Log.e(TAG, "Started Scan");
+                running = true;
+                uiThreadHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        beaconManager.startRangingAndDiscoverDevice(scanningRegion);
+                    }
+                }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
+            }
+        });
     }
 
     public static void checkAndStartScan(Context context, BeaconDBParams params) {

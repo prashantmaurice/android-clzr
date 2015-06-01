@@ -404,4 +404,10 @@ public class VendorActivity extends ActionBarActivity {
             }
         });
     }
+
+    @Override
+    public void onStop() {
+        AsyncGet.dismissDialog();
+        super.onStop();
+    }
 }

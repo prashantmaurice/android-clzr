@@ -21,8 +21,8 @@ public class AsyncTokenGet extends AsyncTask<Void, Void, String> {
     Context mContext;
     Activity mInvokingActivity;
     AsyncTokenResult mResult;
-    ProgressDialog pDialog;
-    public AsyncTokenGet(Context context, AsyncTokenResult result, Activity invokingActivity ) {
+    static ProgressDialog pDialog;
+    public AsyncTokenGet(Context context, AsyncTokenResult result, Activity invokingActivity) {
         mContext = context;
         mResult = result;
         mInvokingActivity = invokingActivity;
@@ -70,8 +70,13 @@ public class AsyncTokenGet extends AsyncTask<Void, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        pDialog.hide();
+        dismissDialog();
         mResult.gotResult(result);
+    }
+
+    public static void dismissDialog() {
+        if (pDialog != null)
+            pDialog.dismiss();
     }
 
     public static abstract class AsyncTokenResult{

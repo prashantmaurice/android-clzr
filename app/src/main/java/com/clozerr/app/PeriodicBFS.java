@@ -4,18 +4,22 @@ import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.android.internal.util.Predicate;
 import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.Region;
+import com.jaalee.sdk.ServiceReadyCallback;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -28,10 +32,8 @@ public class PeriodicBFS extends BeaconFinderService {
     private static final String ACTION_FIRE_ALARM_SCAN = "com.clozerr.app.ACTION_FIRE_ALARM_SCAN";
 
     private static final long INTERVAL = TimeUnit.MILLISECONDS.convert(20L, TimeUnit.SECONDS);
-                                    // TODO make this 10 min
     private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(6L, TimeUnit.SECONDS);
-                                    // TODO modify as required
-    private static final long SCAN_PAUSE_INTERVAL = TimeUnit.MILLISECONDS.convert(40L, TimeUnit.SECONDS);
+    private static final long SCAN_PAUSE_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.SECONDS);
     //private static final int PERIODIC_SCAN_BEACON_LIMIT = 3;
     private static final int NOTIFICATION_ID = 0;
     //private static final ConcurrentHashMap<String, DeviceParams> periodicScanDeviceMap = new ConcurrentHashMap<>();
@@ -139,7 +141,7 @@ public class PeriodicBFS extends BeaconFinderService {
     private static NotificationCompat.Builder getDefaultNotificationBuilder(Context context) {
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         return new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_notif_logo)
+                .setSmallIcon(R.drawable.ic_launcher)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setSound(soundUri)
                 .setAutoCancel(true);
@@ -199,11 +201,9 @@ public class PeriodicBFS extends BeaconFinderService {
                         .addAction(R.drawable.ic_action_accept, actionText, detailPendingIntent);
                         //.addAction(R.drawable.ic_refuse, "Not for this vendor", refusePendingIntent);
                 notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+
+                pauseScanningFor(context, SCAN_PAUSE_INTERVAL);
             }
-            pauseScanningFor(context, SCAN_PAUSE_INTERVAL);
-                    /*break;
-                }
-            }*/
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -307,10 +307,10 @@ public class PeriodicBFS extends BeaconFinderService {
         else return true;
     }*/
 
-    @Override
+    /*@Override
     protected Region createRegion() {
         return new Region(REGION_ID, getUuidWithoutHyphens(CLOZERR_UUID), null, null); // search for all beacons, so no rules on major, minor
-    }
+    }*/
 
     @Override
     protected void onRangedBeacons(final List<Beacon> beaconList) {
@@ -321,17 +321,18 @@ public class PeriodicBFS extends BeaconFinderService {
             final BeaconDBParams params = new BeaconDBParams(beacon);
             Log.e(TAG, "UUID scanned - " + beacon.getProximityUUID().toUpperCase());
             Log.e(TAG, "major - " + beacon.getMajor() + "; minor - " + beacon.getMinor());
-
+            putToast(getApplicationContext(), "scanned", Toast.LENGTH_SHORT);
             /*if (beaconDatabase.contains(uuid.toUpperCase())) {*/
-            VendorParams vendorParams = VendorParams.findVendorParamsInFile(getApplicationContext(),
-                    new Predicate<VendorParams>() {
-                        @Override
-                        public boolean apply(VendorParams vendorParams) {
-                            //return areUuidsEqual(uuid, vendorParams.mUUID);
-                            return vendorParams.mBeaconParams.equals(params);
-                        }
-                    });
-            if (vendorParams != null) {
+
+            if (beacon.getRssi() >= THRESHOLD_RSSI) {
+                VendorParams vendorParams = VendorParams.findVendorParamsInFile(getApplicationContext(),
+                        new Predicate<VendorParams>() {
+                            @Override
+                            public boolean apply(VendorParams vendorParams) {
+                                //return areUuidsEqual(uuid, vendorParams.mUUID);
+                                return vendorParams.mBeaconParams.equals(params);
+                            }
+                        });
                 /*DeviceParams deviceParams;
                 if (periodicScanDeviceMap.containsKey(uuid)) {
                     deviceParams = periodicScanDeviceMap.get(uuid);
@@ -361,8 +362,10 @@ public class PeriodicBFS extends BeaconFinderService {
                     }
                 }
                 writeHashMapToFile();*/
-                if (beacon.getRssi() >= THRESHOLD_RSSI) {
+                putToast(getApplicationContext(), "Within threshold", Toast.LENGTH_SHORT);
+                if (vendorParams != null) {
                     //deviceParams.mCount = 0;
+                    putToast(getApplicationContext(), "found params", Toast.LENGTH_SHORT);
                     ScanStarter.pushedNotification = true;
                     showNotificationForVendor(getApplicationContext(), params);
                     //deviceParams.mToBeNotified = true;
@@ -372,13 +375,23 @@ public class PeriodicBFS extends BeaconFinderService {
         }
     }
 
-    @Override
+    /*@Override
     protected void scan() {
         if (!running) {
             running = true;
             //mTimer.schedule(mCheckTask, 0, INTERVAL);
-            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, INTERVAL,
-                                            getScanStarterPendingIntent(getApplicationContext()));
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(),
+                                            INTERVAL, getScanStarterPendingIntent(getApplicationContext()));
+        }
+    }*/
+
+    @Override
+    protected void runService() {
+        if (!running) {
+            running = true;
+            //mTimer.schedule(mCheckTask, 0, INTERVAL);
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(),
+                    INTERVAL, getScanStarterPendingIntent(getApplicationContext()));
         }
     }
 
@@ -397,67 +410,82 @@ public class PeriodicBFS extends BeaconFinderService {
         }
     }
 
-    public static class ScanStarter extends BroadcastReceiver {
+    public static class ScanStarter extends WakefulBroadcastReceiver {
         private static final String TAG = "ScanStarter";
         public static boolean pushedNotification;
 
         private Runnable mScanningRunnable;
+        private boolean mHasScanStarted = false;
 
         public ScanStarter() {}
 
-        public void startScanning(Context context) {
-            turnOnBluetooth();
-            pushedNotification = false;
-            /*for (DeviceParams params : periodicScanDeviceMap.values())
-                params.mFoundInThisScan *//*= params.mToBeNotified *//*= false;*/
-            Log.e(TAG, "Started Scan");
-            uiThreadHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    beaconManager.startRangingAndDiscoverDevice(scanningRegion);
-                }
-            }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
+        public void startScanning(final Context context) {
+            if (!CLOZERR_UUID.isEmpty()) {
+                scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(CLOZERR_UUID), null, null);
+                                            // scan for all possible major & minor values, so no rules
+                beaconManager.connect(new ServiceReadyCallback() {
+                    @Override
+                    public void onServiceReady() {
+                        mHasScanStarted = true;
+                        turnOnBluetooth();
+                        pushedNotification = false;
+                        /*for (DeviceParams params : periodicScanDeviceMap.values())
+                            params.mFoundInThisScan *//*= params.mToBeNotified *//*= false;*/
+                        Log.e(TAG, "Started Scan");
+                        uiThreadHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                beaconManager.startRangingAndDiscoverDevice(scanningRegion);
+                            }
+                        }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
+                    }
+                });
+            }
         }
 
         public void stopScanning(Context context) {
-            beaconManager.stopRanging(scanningRegion);
-            turnOffBluetooth();
-            Log.e(TAG, "Stopped Scan");
-
-            /*for (String uuid : periodicScanDeviceMap.keySet())
-                if (!periodicScanDeviceMap.get(uuid).mFoundInThisScan)
-                    periodicScanDeviceMap.remove(uuid);*/
-            //showNotifications(context);
-            wakeLockManager.releaseWakeLock();
+            if (mHasScanStarted) {
+                beaconManager.stopRanging(scanningRegion);
+                turnOffBluetooth();
+                Log.e(TAG, "Stopped Scan");
+                mHasScanStarted = false;
+                /*for (String uuid : periodicScanDeviceMap.keySet())
+                    if (!periodicScanDeviceMap.get(uuid).mFoundInThisScan)
+                        periodicScanDeviceMap.remove(uuid);*/
+                //showNotifications(context);
+                wakeLockManager.releaseWakeLock();
+            }
         }
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
             Log.e(TAG, "Received");
-            if (intent.getAction() != null && intent.getAction().equals(ACTION_FIRE_ALARM_SCAN)) {
+            if (intent.getAction() != null && intent.getAction().equals(ACTION_FIRE_ALARM_SCAN) && isScanningAllowed) {
+                uiThreadHandler = new Handler(Looper.getMainLooper());
                 if (wakeLockManager == null)
                     wakeLockManager = new WakeLockManager();
                 wakeLockManager.acquireWakeLock(context, TAG);
-                try {
+                /*try {
                     readBeaconDBFromFile(context);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
-                    mScanningRunnable = new Runnable() {
+                    */
+                mScanningRunnable = new Runnable() {
                         @Override
                         public void run() {
-                            startScanning(context);
-                            uiThreadHandler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    stopScanning(context);
-                                }
-                            }, SCAN_PERIOD);
-                        }
-                    };
-                    if (beaconDatabase != null/* && areAnyVendorsNotifiable(context)*/)
-                        uiThreadHandler.post(mScanningRunnable);
-                }
+                        startScanning(context);
+                        uiThreadHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                stopScanning(context);
+                            }
+                        }, SCAN_PERIOD);
+                    }
+                };
+                    /*if (beaconDatabase != null*//* && areAnyVendorsNotifiable(context)*//*)*/
+                uiThreadHandler.post(mScanningRunnable);
+                /*}*/
             }
         }
     }

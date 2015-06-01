@@ -191,12 +191,16 @@ public class Login extends FragmentActivity implements
     }
     @Override
     public void onStop() {
+        if (pDialog != null)
+            pDialog.dismiss();
+        AsyncGet.dismissDialog();
+        AsyncTokenGet.dismissDialog();
         super.onStop();
 //EasyTracker.getInstance().activityStop(this);
 // The rest of your onStop() code.
-        if (mGoogleApiClient.isConnected()) {
+        /*if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
-        }
+        }*/
     }
     @Override
     protected void onActivityResult(final int requestCode,

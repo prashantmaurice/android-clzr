@@ -24,15 +24,12 @@ import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.BeaconManager;
 import com.jaalee.sdk.RangingListener;
 import com.jaalee.sdk.Region;
-import com.jaalee.sdk.ServiceReadyCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -99,10 +96,17 @@ public abstract class BeaconFinderService extends Service {
         return START_NOT_STICKY;*/
     }
 
+    @Override
+    public void onDestroy() {
+        turnOffBluetooth();
+        alarmManager = null;
+        super.onDestroy();
+    }
+
     protected void findBeacons() {
         uiThreadHandler = new Handler(Looper.getMainLooper());
-        if (canScanStart()) {
-            scanningRegion = createRegion();
+        if (canServiceRun()) {
+            /*scanningRegion = createRegion();
             beaconManager.setRangingListener(new RangingListener() {
                 @Override
                 public void onBeaconsDiscovered(Region region, final List list) {
@@ -119,13 +123,28 @@ public abstract class BeaconFinderService extends Service {
                 public void onServiceReady() {
                     scan();
                 }
+            });*/
+            beaconManager.setRangingListener(new RangingListener() {
+                @Override
+                public void onBeaconsDiscovered(Region region, final List list) {
+                    uiThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            onRangedBeacons((List<Beacon>) list);
+                        }
+                    });
+                }
             });
+            runService();
         }
     }
 
-    protected abstract Region createRegion();
+    /*protected abstract Region createRegion();
     protected abstract void onRangedBeacons(final List<Beacon> beaconList);
-    protected abstract void scan();
+    protected abstract void scan();*/
+
+    protected abstract void onRangedBeacons(final List<Beacon> beaconList);
+    protected abstract void runService();
 
     // This function is just for putting toasts, but required as work is done on a background thread
     // so if a toast is directly put, the app will crash (Toasts must be put in the UI thread)
@@ -150,7 +169,7 @@ public abstract class BeaconFinderService extends Service {
         return (getUuidWithoutHyphens(uuid1).equalsIgnoreCase(getUuidWithoutHyphens(uuid2)));
     }*/
 
-    protected boolean canScanStart() {
+    protected boolean canServiceRun() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         isScanningAllowed = sharedPreferences.getBoolean(getResources().getString(R.string.beacon_detection), true);
         sharedPreferences = getSharedPreferences("USER", 0);
@@ -176,20 +195,13 @@ public abstract class BeaconFinderService extends Service {
             else {
                 isBLESupported = true;
                 BeaconDBDownloadBaseReceiver.scheduleDownload(getApplicationContext());
-                if (beaconDatabase == null)
-                    try {
-                        readBeaconDBFromFile(getApplicationContext());
-                    } catch (Exception e){
-                        Log.e(TAG, e.getLocalizedMessage());
-                        return false;
-                    }
                 return true;
             }
         }
         else return false;
     }
 
-    protected static void readBeaconDBFromFile(Context context) throws IOException, JSONException {
+    /*protected static void readBeaconDBFromFile(Context context) throws IOException, JSONException {
         FileOutputStream dummyOutputStream = context.openFileOutput(BeaconDBDownloader.BEACONS_FILE_NAME, MODE_APPEND);
                                             // for creating the file if not present
         dummyOutputStream.close();
@@ -198,21 +210,24 @@ public abstract class BeaconFinderService extends Service {
         fileInputStream.read(dataBytes);
         fileInputStream.close();
         String data = new String(dataBytes);
-        JSONObject rootObject = new JSONObject(data);
-        CLOZERR_UUID = rootObject.getString("UUID");
-        JSONArray rootArray = rootObject.getJSONArray("vendors");
-        beaconDatabase = new ArrayList<>();
-        for (int i = 0; i < rootArray.length(); ++i)
-            try {
-                /*if (rootArray.getJSONObject(i).getJSONArray("UUID").length() > 0)
-                    beaconDatabase.add(rootArray.getJSONObject(i).getJSONArray("UUID").getString(0));*/
-                JSONObject beaconObject = rootArray.getJSONObject(i).getJSONObject("beacons");
-                if (beaconObject.has("major"))
-                    beaconDatabase.add(new BeaconDBParams(beaconObject));
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-    }
+        if (!data.isEmpty()) {
+            JSONObject rootObject = new JSONObject(data);
+            CLOZERR_UUID = rootObject.getString("UUID");
+            JSONArray rootArray = rootObject.getJSONArray("vendors");
+            beaconDatabase = new ArrayList<>();
+            for (int i = 0; i < rootArray.length(); ++i)
+                try {
+                *//*if (rootArray.getJSONObject(i).getJSONArray("UUID").length() > 0)
+                    beaconDatabase.add(rootArray.getJSONObject(i).getJSONArray("UUID").getString(0));*//*
+                    JSONObject beaconObject = rootArray.getJSONObject(i).has("beacons") ?
+                            rootArray.getJSONObject(i).getJSONObject("beacons") : null;
+                    if (beaconObject != null && beaconObject.has("major"))
+                        beaconDatabase.add(new BeaconDBParams(beaconObject));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+        }
+    }*/
 
     public static void enableComponent(Context context, Class componentClass) {
         ComponentName component = new ComponentName(context, componentClass);
@@ -253,7 +268,6 @@ public abstract class BeaconFinderService extends Service {
     }
 
     public static void pauseScanningFor(final Context context, long intervalMillis) {
-        disallowScanning(context);
         Log.e(TAG, "scans paused for " + intervalMillis + " ms");
         putToast(context, "scans paused for " + intervalMillis + " ms", Toast.LENGTH_SHORT);
         long triggerTimeMillis = intervalMillis + SystemClock.elapsedRealtime();
@@ -262,6 +276,8 @@ public abstract class BeaconFinderService extends Service {
         resumeIntent.setAction(ACTION_RESUME_SCAN);
         alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTimeMillis,
                 PendingIntent.getBroadcast(context, RequestCodes.CODE_RESUME_SCAN_INTENT.code(), resumeIntent, 0));
+        //disallowScanning(context);
+        isScanningAllowed = false;
     }
 
     protected static class VendorParams {
@@ -282,7 +298,7 @@ public abstract class BeaconFinderService extends Service {
             mName = object.getString("name");
             /*mUUID = (object.getJSONArray("UUID").length() > 0) ?
                         object.getJSONArray("UUID").getString(0).toLowerCase() : "";*/
-            if (object.getJSONObject("beacons").has("major"))
+            if (object.has("beacons") && object.getJSONObject("beacons").has("major"))
                 mBeaconParams = new BeaconDBParams(object.getJSONObject("beacons"));
             else mBeaconParams = null;
             mVendorID = object.getString("_id");
@@ -293,7 +309,8 @@ public abstract class BeaconFinderService extends Service {
             mNextOfferDescription = (nextOffer == null) ? "" : nextOffer.getString("description");*/
             //mIsNotifiable = /*!mNextOfferID.isEmpty() && isVendorWithThisUUIDNotifiable(context, mUUID)*/true;
             mHasOffers = object.getBoolean("hasOffers");
-            mLoyaltyType = /*(object.getJSONObject("settings").getBoolean("sxEnabled")) ? "SX" : */"S1";
+            mLoyaltyType = (object.has("settings") && object.getJSONObject("settings").getBoolean("sxEnabled")) ?
+                    "SX" : "S1";
             //mPaymentType = object.getString("paymentType");
             //mPaymentType = "counter";
             mThresholdRssi = THRESHOLD_RSSI;
@@ -382,7 +399,8 @@ public abstract class BeaconFinderService extends Service {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent != null && intent.getAction().equals(ACTION_RESUME_SCAN)) {
-                    allowScanning(context);
+                    //allowScanning(context);
+                    isScanningAllowed = true;
                     Log.e(TAG, "scans resumed");
                     putToast(context, "scans resumed", Toast.LENGTH_SHORT);
                     disableComponent(context, ScanResumeReceiver.class);

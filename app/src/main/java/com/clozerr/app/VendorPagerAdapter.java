@@ -20,6 +20,7 @@ class VendorPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
+        AsyncGet.dismissDialog();
         switch (position){
             case 0:VendorHomeFragment vendorHomeFragment=new VendorHomeFragment();
                 return vendorHomeFragment;

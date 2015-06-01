@@ -560,9 +560,8 @@ public class Home  extends ActionBarActivity {
     }
     @Override
     protected void onStop(){
+        AsyncGet.dismissDialog();
         super.onStop();
         GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
-
-
 }
