@@ -195,6 +195,7 @@ public abstract class BeaconFinderService extends Service {
             else {
                 isBLESupported = true;
                 BeaconDBDownloadBaseReceiver.scheduleDownload(getApplicationContext());
+                CLOZERR_UUID = sharedPreferences.getString("UUID", "");
                 return true;
             }
         }
@@ -269,7 +270,7 @@ public abstract class BeaconFinderService extends Service {
 
     public static void pauseScanningFor(final Context context, long intervalMillis) {
         Log.e(TAG, "scans paused for " + intervalMillis + " ms");
-        putToast(context, "scans paused for " + intervalMillis + " ms", Toast.LENGTH_SHORT);
+        //putToast(context, "scans paused for " + intervalMillis + " ms", Toast.LENGTH_SHORT);
         long triggerTimeMillis = intervalMillis + SystemClock.elapsedRealtime();
         enableComponent(context, ScanResumeReceiver.class);
         Intent resumeIntent = new Intent(context, ScanResumeReceiver.class);
@@ -332,8 +333,9 @@ public abstract class BeaconFinderService extends Service {
                 byte[] dataBytes = new byte[fileInputStream.available()];
                 fileInputStream.read(dataBytes);
                 JSONObject rootObject = new JSONObject(new String(dataBytes));
+                CLOZERR_UUID = rootObject.getString("UUID");
                 JSONArray rootArray = rootObject.getJSONArray("vendors");
-                Log.e(TAG, "root - " + rootArray.toString());
+                //Log.e(TAG, "root - " + rootArray.toString());
                 VendorParams vendorParams;
                 result = new ArrayList<>();
                 for (int i = 0; i < rootArray.length(); ++i) {
@@ -402,7 +404,7 @@ public abstract class BeaconFinderService extends Service {
                     //allowScanning(context);
                     isScanningAllowed = true;
                     Log.e(TAG, "scans resumed");
-                    putToast(context, "scans resumed", Toast.LENGTH_SHORT);
+                    //putToast(context, "scans resumed", Toast.LENGTH_SHORT);
                     disableComponent(context, ScanResumeReceiver.class);
                 }
             }

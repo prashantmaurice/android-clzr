@@ -4,8 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import org.json.JSONObject;
 
 import java.io.FileOutputStream;
 
@@ -36,6 +39,9 @@ public class BeaconDBDownloader extends BroadcastReceiver {
                         fileOutputStream.write(s.getBytes());
                         fileOutputStream.close();
                         isDownloadDone = true;
+                        BeaconFinderService.CLOZERR_UUID = new JSONObject(s).getString("UUID");
+                        PreferenceManager.getDefaultSharedPreferences(context).edit().
+                                putString("UUID", BeaconFinderService.CLOZERR_UUID).commit();
                         //BeaconDBDownloadBaseReceiver.releaseWakeLock();
                         BeaconFinderService.disableComponent(context, BeaconDBDownloader.class);
                     } catch (Exception e) {
