@@ -75,7 +75,7 @@ public class AsyncTokenGet extends AsyncTask<Void, Void, String> {
     }
 
     public static void dismissDialog() {
-        if (pDialog != null)
+        if (pDialog != null && pDialog.isShowing())
             pDialog.dismiss();
     }
 

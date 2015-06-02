@@ -34,7 +34,7 @@ public class AsyncGet extends AsyncTask<String, String, String> {
             asyncResult=as;
             this.Url = url;
             toDisplayProgress = displayProgress;
-            if (context instanceof Activity && toDisplayProgress) {
+            if ((pDialog == null || !pDialog.isShowing()) && context instanceof Activity && toDisplayProgress) {
                 try {
                     pDialog = new ProgressDialog(context);
                     pDialog.setMessage("Loading...");
@@ -91,7 +91,7 @@ public class AsyncGet extends AsyncTask<String, String, String> {
     }
 
     public static void dismissDialog() {
-        if (pDialog != null)
+        if (pDialog != null && pDialog.isShowing())
             pDialog.dismiss();
     }
 

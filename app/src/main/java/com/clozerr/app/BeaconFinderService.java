@@ -398,15 +398,15 @@ public abstract class BeaconFinderService extends Service {
     }
 
     public static class ScanResumeReceiver extends BroadcastReceiver {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent != null && intent.getAction().equals(ACTION_RESUME_SCAN)) {
-                    //allowScanning(context);
-                    isScanningAllowed = true;
-                    Log.e(TAG, "scans resumed");
-                    //putToast(context, "scans resumed", Toast.LENGTH_SHORT);
-                    disableComponent(context, ScanResumeReceiver.class);
-                }
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null && intent.getAction().equals(ACTION_RESUME_SCAN)) {
+                //allowScanning(context);
+                isScanningAllowed = true;
+                Log.e(TAG, "scans resumed");
+                //putToast(context, "scans resumed", Toast.LENGTH_SHORT);
+                disableComponent(context, ScanResumeReceiver.class);
             }
+        }
     }
 }
