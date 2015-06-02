@@ -143,7 +143,7 @@ public class PeriodicBFS extends BeaconFinderService {
     private static NotificationCompat.Builder getDefaultNotificationBuilder(Context context) {
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         return new NotificationCompat.Builder(context)
-                .setLargeIcon(NOTIFICATION_LARGE_ICON)
+                //.setLargeIcon(NOTIFICATION_LARGE_ICON)
                 .setSmallIcon(R.drawable.ic_notif_logo)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setSound(soundUri)
