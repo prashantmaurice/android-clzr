@@ -42,12 +42,15 @@ public class MyClubsFragment extends Fragment implements ObservableScrollViewCal
     Toolbar mToolbar;
     View swipetab;
     SearchView searchView;
+    ObservableRecyclerView mRecyclerView;
+    View SearchCard;
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         layout = inflater.inflate(R.layout.activity_my_clubs_fragment, container, false);
-        final ObservableRecyclerView mRecyclerView = (ObservableRecyclerView) layout.findViewById(R.id.sliding_list);
+        mRecyclerView = (ObservableRecyclerView) layout.findViewById(R.id.sliding_list);
         mRecyclerView.setScrollViewCallbacks(this);
         searchView = (SearchView)layout.findViewById(R.id.searchView);
+        SearchCard=layout.findViewById(R.id.card_view);
         mScrollable=getActivity().findViewById(R.id.drawerLayout);
         mToolbar=(Toolbar)getActivity().findViewById(R.id.toolbar);
         swipetab=getActivity().findViewById(R.id.tabs);
@@ -189,10 +192,12 @@ public class MyClubsFragment extends Fragment implements ObservableScrollViewCal
         if (scrollState == ScrollState.UP) {
             if (toolbarIsShown()) {
                 hideToolbar();
+                hideSearchbar();
             }
         } else if (scrollState == ScrollState.DOWN) {
             if (toolbarIsHidden()) {
                 showToolbar();
+                showSearchbar();
             }
         }
     }
@@ -233,10 +238,42 @@ public class MyClubsFragment extends Fragment implements ObservableScrollViewCal
         animator.start();
     }
 
+    private void showSearchbar() {
+        moveSearchbar(0);
+    }
+
+    private void hideSearchbar() {
+        moveSearchbar(-SearchCard.getHeight()-dpToPx(12));
+    }
+    private void moveSearchbar(float toTranslationY) {
+        if (ViewHelper.getTranslationY(SearchCard) == toTranslationY) {
+            return;
+        }
+        ValueAnimator animator = ValueAnimator.ofFloat(ViewHelper.getTranslationY(SearchCard), toTranslationY).setDuration(200);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float translationY = (float) animation.getAnimatedValue();
+
+                ViewHelper.setTranslationY(SearchCard, translationY);
+                ViewHelper.setTranslationY( mRecyclerView, translationY);
+                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) ( mRecyclerView).getLayoutParams();
+                lp.height = (int) -translationY + getScreenHeight()-SearchCard.getHeight() -lp.topMargin;
+                ((View) mScrollable).requestLayout();
+            }
+        });
+        animator.start();
+    }
+
     private int getScreenHeight() {
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int height = displaymetrics.heightPixels;
-        return height - swipetab.getHeight()-searchView.getHeight();
+        return height - swipetab.getHeight()-searchView.getHeight()+dpToPx(10);
+    }
+    public int dpToPx(int dp) {
+        DisplayMetrics displayMetrics = c.getResources().getDisplayMetrics();
+        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+        return px;
     }
 }

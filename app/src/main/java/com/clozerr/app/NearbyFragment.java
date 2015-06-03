@@ -46,6 +46,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
     Context c;
     public static String TOKEN = "";
     Toolbar mToolbar;
+    ObservableRecyclerView mRecyclerView;
     View swipetab;
     private RecyclerViewAdapter mMainPageAdapter;
     private ArrayList<CardModel> mMainCardsList;
@@ -56,13 +57,15 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
     private final int ITEMS_PER_PAGE = 7, INITIAL_LOAD_LIMIT = 8;
     View mScrollable;
     SearchView searchView;
+    View SearchCard;
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         View layout=inflater.inflate(R.layout.activity_nearby_fragment,container,false);
-        final ObservableRecyclerView mRecyclerView = (ObservableRecyclerView) layout.findViewById(R.id.list);
+        mRecyclerView = (ObservableRecyclerView) layout.findViewById(R.id.list);
         mRecyclerView.setScrollViewCallbacks(this);
         searchView = (SearchView)layout.findViewById(R.id.searchView);
+        SearchCard = layout.findViewById(R.id.card_view);
         mScrollable=getActivity().findViewById(R.id.drawerLayout);
         mToolbar=(Toolbar)getActivity().findViewById(R.id.toolbar);
         swipetab=getActivity().findViewById(R.id.tabs);
@@ -304,10 +307,18 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
         if (scrollState == ScrollState.UP) {
             if (toolbarIsShown()) {
                 hideToolbar();
+                hideSearchbar();
+            }
+            if (searchbarIsShown()) {
+
             }
         } else if (scrollState == ScrollState.DOWN) {
             if (toolbarIsHidden()) {
                 showToolbar();
+                showSearchbar();
+            }
+            if (searchbarIsHidden()) {
+
             }
         }
     }
@@ -339,9 +350,48 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
                 float translationY = (float) animation.getAnimatedValue();
 
                 ViewHelper.setTranslationY(mToolbar, translationY);
-                ViewHelper.setTranslationY( mScrollable, translationY);
+                float x=translationY;
+
+                ViewHelper.setTranslationY( mScrollable, x);
                 LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) ( mScrollable).getLayoutParams();
-                lp.height = (int) -translationY + getScreenHeight() - lp.topMargin;
+                lp.height = (int) -x + getScreenHeight() - lp.topMargin;
+                ((View) mScrollable).requestLayout();
+            }
+        });
+        animator.start();
+    }
+
+    private boolean searchbarIsShown() {
+        // Toolbar is 0 in Y-axis, so we can say it's shown.
+        return ViewHelper.getTranslationY(SearchCard) == 0;
+    }
+
+    private boolean searchbarIsHidden() {
+        // Toolbar is outside of the screen and absolute Y matches the height of it.
+        // So we can say it's hidden.
+        return ViewHelper.getTranslationY(SearchCard) == -SearchCard.getHeight();
+    }
+    private void showSearchbar() {
+        moveSearchbar(0);
+    }
+
+    private void hideSearchbar() {
+        moveSearchbar(-SearchCard.getHeight()-dpToPx(12));
+    }
+    private void moveSearchbar(float toTranslationY) {
+        if (ViewHelper.getTranslationY(SearchCard) == toTranslationY) {
+            return;
+        }
+        ValueAnimator animator = ValueAnimator.ofFloat(ViewHelper.getTranslationY(SearchCard), toTranslationY).setDuration(200);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float translationY = (float) animation.getAnimatedValue();
+
+                ViewHelper.setTranslationY(SearchCard, translationY);
+                ViewHelper.setTranslationY( mRecyclerView, translationY);
+                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) ( mRecyclerView).getLayoutParams();
+                lp.height = (int) -translationY + getScreenHeight()-SearchCard.getHeight() -lp.topMargin;
                 ((View) mScrollable).requestLayout();
             }
         });
@@ -352,8 +402,12 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int height = displaymetrics.heightPixels;
-        return height - swipetab.getHeight()-searchView.getHeight();
+        return height - swipetab.getHeight()-searchView.getHeight()+dpToPx(10);
     }
-
+    public int dpToPx(int dp) {
+        DisplayMetrics displayMetrics = c.getResources().getDisplayMetrics();
+        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+        return px;
+    }
 
 }
