@@ -10,6 +10,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +22,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.koushikdutta.ion.Ion;
+
+import java.util.ArrayList;
+import java.util.Observable;
 
 
 public class VendorHomeFragment extends Fragment {
@@ -31,6 +38,7 @@ public class VendorHomeFragment extends Fragment {
     private TextView mVendorTitleView;
     private TextView mVendorAddressView;
     private ImageButton mCallButton, mDirButton;
+    private RecyclerView gallerylist;
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
@@ -47,8 +55,7 @@ public class VendorHomeFragment extends Fragment {
                     Intent dialIntent = new Intent(Intent.ACTION_DIAL);
                     dialIntent.setData(Uri.parse("tel:" + VendorActivity.detailsBundle.getString("phonenumber")));
                     startActivity(dialIntent);
-                }
-                else
+                } else
                     Toast.makeText(getActivity(), "Sorry, the phone number has not been provided by the vendor.",
                             Toast.LENGTH_SHORT).show();
             }
@@ -67,6 +74,13 @@ public class VendorHomeFragment extends Fragment {
                             Toast.LENGTH_SHORT).show();
             }
         });
+        gallerylist.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        gallerylist.setItemAnimator(new DefaultItemAnimator());
+        gallerylist.setHasFixedSize(true);
+        final String[] values = new String[] { "1","2","3","4","5","6","7","8","9","10" };
+        GalleryAdapter adapter = new GalleryAdapter(values, getActivity());
+        gallerylist.setAdapter(adapter);
+
         return layout;
     }
 
@@ -84,6 +98,7 @@ public class VendorHomeFragment extends Fragment {
     private void initViews() {
         layout.getForeground().mutate().setAlpha(0);
         mVendorImageView = (ImageView) layout.findViewById(R.id.vendorImageView);
+        gallerylist = (RecyclerView) layout.findViewById(R.id.GalleryRecyclerView);
         mVendorTitleView = (TextView) layout.findViewById(R.id.vendorTitleView);
         mVendorAddressView = (TextView) layout.findViewById(R.id.addressView);
         mCallButton = (ImageButton) layout.findViewById(R.id.callButton);
