@@ -127,7 +127,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 public void onClick(View view) {
                     SharedPreferences status = c.getSharedPreferences("USER", 0);
                     String NotNow = status.getString("notNow", "false");
-                    if (CouponPage.i == 0 && NotNow.equals("false"))
+                    if (VendorActivity.i == 0 && NotNow.equals("false"))
                     {
                         Intent detailIntent = new Intent(c, VendorActivity.class);
                         detailIntent.putExtra("vendor_id", currentItem.getVendorId());

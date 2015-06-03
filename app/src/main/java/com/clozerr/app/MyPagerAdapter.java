@@ -19,6 +19,7 @@ class MyPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
+        AsyncGet.dismissDialog();
         switch (position){
             case 0:CategoriesFragment myFragment=new CategoriesFragment();
                  return myFragment;

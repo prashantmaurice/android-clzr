@@ -166,12 +166,12 @@
             android:exported="false" />
 
         <receiver
-            android:name=".UUIDDownloadBaseReceiver"
+            android:name=".BeaconDBDownloadBaseReceiver"
             android:enabled="true"
             android:exported="true" >
         </receiver>
         <receiver
-            android:name=".UUIDDownloader"
+            android:name=".BeaconDBDownloader"
             android:enabled="false"
             android:exported="true" >
             <intent-filter>
@@ -179,15 +179,19 @@
             </intent-filter>
         </receiver>
 
-        <activity
+        <!--<activity
             android:name=".PeriodicBFS$VendorListActivity"
             android:label="@string/app_name" >
-        </activity>
+        </activity>-->
 
         <receiver
             android:name=".PeriodicBFS$ScanStarter"
             android:enabled="false"
-            android:exported="true" />
+            android:exported="false" />
+
+        <receiver android:name=".BeaconFinderService$ScanResumeReceiver"
+            android:enabled="false"
+            android:exported="false" />
 
         <activity
             android:name=".CategoryDetail"

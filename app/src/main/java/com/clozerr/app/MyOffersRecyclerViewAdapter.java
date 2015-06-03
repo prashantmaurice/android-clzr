@@ -102,12 +102,12 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
         MyOffer currentItem = mItems.get(position);
         viewHolder.mCaptionView.setText(currentItem.getCaption());
         viewHolder.stampnumber.setText(String.valueOf(currentItem.getStamps()));
-        viewHolder.stampnumber.setOnClickListener(new View.OnClickListener() {
+        /*viewHolder.stampnumber.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 viewHolder.mCaptionView.setVisibility(View.VISIBLE);
             }
-        });
+        });*/
         //viewHolder.mDescriptionView.setText(currentItem.getDescription());
 //        if (currentItem.getImageUrl() != null && !currentItem.getImageUrl().isEmpty() &&
 //                !currentItem.getImageUrl().equalsIgnoreCase("null"))

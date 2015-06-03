@@ -306,7 +306,7 @@ public class Home  extends ActionBarActivity {
                 }
 
         });
-        CouponPage.i=0;
+        VendorActivity.i=0;
         button=(Button)findViewById(R.id.button);
        // Toast.makeText(this, "end nitview", Toast.LENGTH_SHORT).show();
     }
@@ -560,9 +560,8 @@ public class Home  extends ActionBarActivity {
     }
     @Override
     protected void onStop(){
+        AsyncGet.dismissDialog();
         super.onStop();
         GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
-
-
 }

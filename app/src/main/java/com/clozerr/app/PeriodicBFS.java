@@ -4,81 +4,47 @@ import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.internal.util.Predicate;
 import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.Region;
+import com.jaalee.sdk.ServiceReadyCallback;
 
-import org.json.JSONObject;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @TargetApi(18)
 public class PeriodicBFS extends BeaconFinderService {
 
     private static final String TAG = "PBFS";
-    private static final String ACTION_REMOVE_VENDOR = "RemoveVendor";
-    private static final String ACTION_FIRE_ALARM_SCAN = "FireAlarmScan";
+    //private static final String ACTION_REMOVE_VENDOR = "RemoveVendor";
+    private static final String ACTION_FIRE_ALARM_SCAN = "com.clozerr.app.ACTION_FIRE_ALARM_SCAN";
 
     private static final long INTERVAL = TimeUnit.MILLISECONDS.convert(20L, TimeUnit.SECONDS);
-                                    // TODO make this 10 min
     private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(6L, TimeUnit.SECONDS);
-                                    // TODO modify as required
-    private static enum RequestCodes {
-        CODE_ALARM_INTENT(1000),
-        CODE_DETAILS_INTENT(1234),
-        CODE_REFUSE_INTENT(1235),
-        CODE_VENDOR_LIST_INTENT(1236);
-
-        private int mCode;
-
-        private RequestCodes(int code) { mCode = code; }
-        public int code() { return mCode; }
-    }
-
-    private static final int PERIODIC_SCAN_BEACON_LIMIT = 1;
+    private static final long SCAN_PAUSE_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.SECONDS);
+    //private static final int PERIODIC_SCAN_BEACON_LIMIT = 3;
     private static final int NOTIFICATION_ID = 0;
-    private static final ConcurrentHashMap<String, DeviceParams> periodicScanDeviceMap = new ConcurrentHashMap<>();
+    //private static final ConcurrentHashMap<String, DeviceParams> periodicScanDeviceMap = new ConcurrentHashMap<>();
     private static NotificationCompat.Builder notificationBuilder;
     private static NotificationManager notificationManager;
     private static WakeLockManager wakeLockManager;
-    private static AlarmManager alarmManager;
-    private static ScanStarter scanStarter;
+    private static Bitmap NOTIFICATION_LARGE_ICON;
     private static boolean running = false;
 
-    public static final String MAP_CONTENTS_FILE_NAME = "mapContents.txt";
+    //public static final String MAP_CONTENTS_FILE_NAME = "mapContents.txt";
 
     //private Timer mTimer;
     //private BeaconCheckTask mCheckTask;
@@ -86,14 +52,13 @@ public class PeriodicBFS extends BeaconFinderService {
     @Override
     public void onCreate() {
         super.onCreate();
-        readHashMapFromFile();
+        //readHashMapFromFile();
 
         //mTimer = new Timer();
         //mCheckTask = new BeaconCheckTask();
-
+        NOTIFICATION_LARGE_ICON = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
         wakeLockManager = new WakeLockManager();
-        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        scanStarter = new ScanStarter();
+
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationBuilder = getDefaultNotificationBuilder(getApplicationContext());
     }
@@ -106,16 +71,16 @@ public class PeriodicBFS extends BeaconFinderService {
         //mCheckTask.stopScanning();
         //mTimer.cancel();
         alarmManager.cancel(getScanStarterPendingIntent(applicationContext));
-        disableScanStarter(applicationContext);
-        if (!isScanningAllowed) {               // if this was because scanning was disallowed by settings
+        disableComponent(applicationContext, ScanStarter.class);
+        /*if (!isScanningAllowed) {               // if this was because scanning was disallowed by settings
             periodicScanDeviceMap.clear();
             writeHashMapToFile();               // next time scan starts, start with an empty hash map
-        }
+        }*/
         wakeLockManager.releaseWakeLock();
         super.onDestroy();
     }
 
-    private static void enableScanStarter(Context context) {
+    /*private static void enableScanStarter(Context context) {
         ComponentName receiver = new ComponentName(context, ScanStarter.class);
         context.getPackageManager().setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
@@ -125,17 +90,17 @@ public class PeriodicBFS extends BeaconFinderService {
         ComponentName receiver = new ComponentName(context, ScanStarter.class);
         context.getPackageManager().setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-    }
+    }*/
 
     private static PendingIntent getScanStarterPendingIntent(Context context) {
-        enableScanStarter(context);
+        enableComponent(context, ScanStarter.class);
         Intent intentToSend = new Intent(context, ScanStarter.class);
         intentToSend.setAction(ACTION_FIRE_ALARM_SCAN);
         return PendingIntent.getBroadcast(context, RequestCodes.CODE_ALARM_INTENT.code(), intentToSend,
                 PendingIntent.FLAG_CANCEL_CURRENT);
     }
 
-    private void readHashMapFromFile() {
+    /*private void readHashMapFromFile() {
         try {
             FileOutputStream dummyOutputStream = openFileOutput(MAP_CONTENTS_FILE_NAME, MODE_APPEND);
                                                 // create file if not created yet
@@ -173,68 +138,82 @@ public class PeriodicBFS extends BeaconFinderService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     private static NotificationCompat.Builder getDefaultNotificationBuilder(Context context) {
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         return new NotificationCompat.Builder(context)
+                //.setLargeIcon(NOTIFICATION_LARGE_ICON)
                 .setSmallIcon(R.drawable.ic_notif_logo)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setSound(soundUri)
                 .setAutoCancel(true);
     }
 
-    private static void showNotificationForVendor(Context context, String uuid)
+    private static void showNotificationForVendor(Context context, final VendorParams vendorParams)
     {
-        Log.e(TAG, "UUID for notification - " + uuid);
+        Log.e(TAG, "Params for notification - " + vendorParams.mBeaconParams.toString());
+        //putToast(context, "Params for notification - " + beaconParams.toString(), Toast.LENGTH_SHORT);
         dismissNotifications(context);
         try {
-            ArrayList<VendorParams> rootArray = VendorParams.readVendorParamsFromFile(context);
-            for (final VendorParams vendorParams : rootArray) {
-                if (areUuidsEqual(vendorParams.mUUID, uuid)) {
-                    String title = "Clozerr - " + vendorParams.mName;
-                    Log.e(TAG, "vendor - " + vendorParams.mName);
-                    final String contentText = vendorParams.mNextOfferCaption;
-
-                    Intent detailIntent = vendorParams.getDetailsIntent(context);
-                    detailIntent.putExtra("from_periodic_scan", true);
-                    PendingIntent detailPendingIntent = PendingIntent.getActivity(context,
-                            RequestCodes.CODE_DETAILS_INTENT.code(),
-                            detailIntent, PendingIntent.FLAG_ONE_SHOT);
-
-                    Intent refuseIntent = new Intent(ACTION_REMOVE_VENDOR);
-                    PendingIntent refusePendingIntent = PendingIntent.getBroadcast(context,
-                            RequestCodes.CODE_REFUSE_INTENT.code(),
-                            refuseIntent, PendingIntent.FLAG_ONE_SHOT);
-                    context.registerReceiver(new BroadcastReceiver() {
-                        @Override
-                        public void onReceive(Context context, Intent intent) {
-                            if (intent.getAction().equals(ACTION_REMOVE_VENDOR)) {
-                                turnOffNotificationsForVendor(context, vendorParams);
-                                notificationManager.cancel(NOTIFICATION_ID);
-                                context.unregisterReceiver(this);
-                            }
-                        }
-                    }, new IntentFilter(ACTION_REMOVE_VENDOR));
-
-                    notificationBuilder = getDefaultNotificationBuilder(context);
-                    notificationBuilder.setContentTitle(title)
-                            .setTicker(title)
-                            .setContentText(contentText)
-                            //.setContentIntent(detailPendingIntent)
-                            .setWhen(System.currentTimeMillis())
-                            .addAction(R.drawable.ic_action_accept, "Check in", detailPendingIntent)
-                            .addAction(R.drawable.ic_refuse, "Turn off for this vendor", refusePendingIntent);
-                    notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
-                    break;
+            //ArrayList<VendorParams> rootArray = VendorParams.readVendorParamsFromFile(context);
+            /*for (final VendorParams vendorParams : rootArray) {
+                *//*if (areUuidsEqual(vendorParams.mUUID, uuid)) {*//*
+                if (vendorParams.mBeaconParams.equals(beaconParams)) {*/
+            /*VendorParams vendorParams = VendorParams.findVendorParamsInFile(context, new Predicate<VendorParams>() {
+                @Override
+                public boolean apply(VendorParams vendorParams) {
+                    return vendorParams.mBeaconParams.equals(beaconParams);
                 }
+            });
+            if (vendorParams != null) {*/
+            String title = "Clozerr - " + vendorParams.mName;
+            Log.e(TAG, "vendor - " + vendorParams.mName);
+            String contentText = "", actionText = "";
+            if (vendorParams.mHasOffers) {
+                contentText = "You have rewards you can use now!";
+                actionText = "See rewards";
             }
+            else if (vendorParams.mLoyaltyType.equalsIgnoreCase("s1")) {
+                contentText = "Mark your visit here!";
+                actionText = "Mark visit";
+            }
+            else if (vendorParams.mLoyaltyType.equalsIgnoreCase("sx")) {
+                contentText = "Get your stamps here during billing!";
+                actionText = "Get stamps";
+            }
+            Intent detailIntent = vendorParams.getDetailsIntent(context);
+            detailIntent.putExtra("from_periodic_scan", true);
+            PendingIntent detailPendingIntent = PendingIntent.getActivity(context,
+                    RequestCodes.CODE_DETAILS_INTENT.code(),
+                    detailIntent, PendingIntent.FLAG_ONE_SHOT);
+
+            /*Intent refuseIntent = new Intent(context, NotificationRemovalReceiver.class);
+            refuseIntent.setAction(ACTION_REMOVE_VENDOR);
+            refuseIntent.putExtra("uuid", vendorParams.mUUID);
+            PendingIntent refusePendingIntent = PendingIntent.getBroadcast(context,
+                    RequestCodes.CODE_REFUSE_INTENT.code(),
+                    refuseIntent, PendingIntent.FLAG_ONE_SHOT);*/
+
+            notificationBuilder = getDefaultNotificationBuilder(context);
+            notificationBuilder.setContentTitle(title)
+                    .setTicker(title + " - " + contentText)
+                    .setContentText(contentText)
+                    //.setContentIntent(detailPendingIntent)
+                    //.setContentInfo("Clozerr")
+                    .setWhen(System.currentTimeMillis())
+                    .addAction(R.drawable.ic_action_accept, actionText, detailPendingIntent);
+                    //.addAction(R.drawable.ic_refuse, "Not for this vendor", refusePendingIntent);
+            notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+
+            pauseScanningFor(context, SCAN_PAUSE_INTERVAL);
+            /*}*/
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static void showNotifications(Context context) {
+    /*private static void showNotifications(Context context) {
         dismissNotifications(context);
         ArrayList<String> uuidList = new ArrayList<>();
         for (String uuid : periodicScanDeviceMap.keySet())
@@ -246,10 +225,12 @@ public class PeriodicBFS extends BeaconFinderService {
                 showNotificationForVendor(context, uuidList.get(0));
             else
                 showNotificationForVendorList(context, uuidList);
+            Log.e(TAG, "Setting notifications");
+            showNotificationForVendor(context, uuidList.get(0));
         }
-    }
+    }*/
 
-    private static void showNotificationForVendorList(Context context, ArrayList<String> uuids) {
+    /*private static void showNotificationForVendorList(Context context, ArrayList<String> uuids) {
         Log.e(TAG, "Multiple vendors, size " + uuids.size());
         dismissNotifications(context);
         try {
@@ -270,14 +251,14 @@ public class PeriodicBFS extends BeaconFinderService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     public static void dismissNotifications(Context context) {
         notificationManager.cancelAll();
         notificationBuilder = getDefaultNotificationBuilder(context);
     }
 
-    public static void turnOffNotificationsForVendor(Context context, VendorParams vendorParams) {
+    /*public static void turnOffNotificationsForVendor(Context context, VendorParams vendorParams) {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putString(vendorParams.mUUID, "don't notify");   // dummy string value
         editor.apply();
@@ -302,12 +283,12 @@ public class PeriodicBFS extends BeaconFinderService {
 
     public static void turnOnNotificationsForVendor(Context context, final String uuid) {
         turnOnNotificationsForVendor(context, VendorParams.findVendorParamsInFile(context,
-                            new Predicate<VendorParams>() {
-                                @Override
-                                public boolean apply(VendorParams vendorParams) {
-                                    return areUuidsEqual(uuid, vendorParams.mUUID);
-                                }
-                            }));
+                new Predicate<VendorParams>() {
+                    @Override
+                    public boolean apply(VendorParams vendorParams) {
+                        return areUuidsEqual(uuid, vendorParams.mUUID);
+                    }
+                }));
     }
 
     public static void turnOffNotificationsForVendor(Context context, final String uuid) {
@@ -321,77 +302,108 @@ public class PeriodicBFS extends BeaconFinderService {
     }
 
     private static boolean areAnyVendorsNotifiable(Context context) {
-        if (uuidDatabase != null) {
-            for (String uuid : uuidDatabase)
+        if (beaconDatabase != null) {
+            for (String uuid : beaconDatabase)
                 if (VendorParams.isVendorWithThisUUIDNotifiable(context, uuid))
                     return true;
             return false;
         }
         else return true;
-    }
+    }*/
 
-    @Override
+    /*@Override
     protected Region createRegion() {
-        return new Region(REGION_UNIQUE_ID, null, null, null);  // search for multiple beacons, so no rules
-    }
+        return new Region(REGION_ID, getUuidWithoutHyphens(CLOZERR_UUID), null, null); // search for all beacons, so no rules on major, minor
+    }*/
 
     @Override
     protected void onRangedBeacons(final List<Beacon> beaconList) {
-        Log.e(TAG, "Ranged; size - " + beaconList.size());
-        for (int i = 0; i < beaconList.size(); ++i) {
+        //Log.e(TAG, "Ranged; size - " + beaconList.size());
+        for (int i = 0; i < beaconList.size() && !ScanStarter.pushedNotification; ++i) {
             Beacon beacon = beaconList.get(i);
-
-            final String uuid = beacon.getProximityUUID();
-            Log.e(TAG, "UUID scanned - " + uuid.toUpperCase());
+            //final String uuid = beacon.getProximityUUID();
+            final BeaconDBParams params = new BeaconDBParams(beacon);
+            Log.e(TAG, "UUID scanned - " + beacon.getProximityUUID().toUpperCase());
             Log.e(TAG, "major - " + beacon.getMajor() + "; minor - " + beacon.getMinor());
-            if (uuidDatabase.contains(uuid.toUpperCase())) {
+            //putToast(getApplicationContext(), "scanned", Toast.LENGTH_SHORT);
+            /*if (beaconDatabase.contains(uuid.toUpperCase())) {*/
+
+            if (beacon.getRssi() >= THRESHOLD_RSSI) {
                 VendorParams vendorParams = VendorParams.findVendorParamsInFile(getApplicationContext(),
                         new Predicate<VendorParams>() {
                             @Override
-                            public boolean apply(VendorParams params) {
-                                return areUuidsEqual(uuid, params.mUUID);
+                            public boolean apply(VendorParams vendorParams) {
+                                //return areUuidsEqual(uuid, vendorParams.mUUID);
+                                return vendorParams.mBeaconParams != null &&
+                                        vendorParams.mBeaconParams.equals(params);
                             }
                         });
-                if (vendorParams.mIsNotifiable) {
-                    DeviceParams deviceParams;
-                    int beaconLimit = (vendorParams.mPaymentType.equalsIgnoreCase("counter")) ? 1 :
-                                        PERIODIC_SCAN_BEACON_LIMIT;
-                    if (periodicScanDeviceMap.containsKey(uuid)) {
-                        deviceParams = periodicScanDeviceMap.get(uuid);
-                        if (!deviceParams.mFoundInThisScan) {
-                            ++(deviceParams.mCount);
-                            deviceParams.mFoundInThisScan = true;
-                        } else continue;
-                    } else {
-                        periodicScanDeviceMap.put(uuid, new DeviceParams(1, true));
-                        deviceParams = periodicScanDeviceMap.get(uuid);
+                /*DeviceParams deviceParams;
+                if (periodicScanDeviceMap.containsKey(uuid)) {
+                    deviceParams = periodicScanDeviceMap.get(uuid);
+                    if (!deviceParams.mFoundInThisScan) {
+                        deviceParams.mFoundInThisScan = true;
+                    } else continue;
+                } else {
+                    periodicScanDeviceMap.put(uuid, new DeviceParams(0, true));
+                    deviceParams = periodicScanDeviceMap.get(uuid);
+                }
+                if (vendorParams.mPaymentType.equalsIgnoreCase("counter")) {
+                    //double distance = getDistanceFromBeacon(beacon);
+                    putToast(getApplicationContext(), "RSSI = " + beacon.getRssi(), Toast.LENGTH_LONG);
+                    if (beacon.getRssi() >= vendorParams.mThresholdRssi) {
+                        //deviceParams.mCount = 0;
+                        showNotificationForVendor(getApplicationContext(), uuid);
+                        //deviceParams.mToBeNotified = true;
                     }
-                    Log.e(TAG, "count-" + deviceParams.mCount +
-                            ";lim-" + beaconLimit);
-                    if (deviceParams.mCount == beaconLimit) {
+                }
+                else if (vendorParams.mPaymentType.equalsIgnoreCase("gourmet")) {
+                    ++(deviceParams.mCount);
+                    Log.e(TAG, "count-" + deviceParams.mCount + ";lim-" + PERIODIC_SCAN_BEACON_LIMIT);
+                    if (deviceParams.mCount == PERIODIC_SCAN_BEACON_LIMIT) {
                         deviceParams.mCount = 0;
-                        deviceParams.mToBeNotified = true;
+                        showNotificationForVendor(getApplicationContext(), uuid);
+                        //deviceParams.mToBeNotified = true;
                     }
-                    writeHashMapToFile();
+                }
+                writeHashMapToFile();*/
+                //putToast(getApplicationContext(), "Within threshold", Toast.LENGTH_SHORT);
+                if (vendorParams != null) {
+                    //deviceParams.mCount = 0;
+                    //putToast(getApplicationContext(), "found params", Toast.LENGTH_SHORT);
+                    ScanStarter.pushedNotification = true;
+                    showNotificationForVendor(getApplicationContext(), vendorParams);
+                    //deviceParams.mToBeNotified = true;
                 }
             }
+            /*}*/
         }
     }
 
-    @Override
+    /*@Override
     protected void scan() {
         if (!running) {
             running = true;
             //mTimer.schedule(mCheckTask, 0, INTERVAL);
-            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, INTERVAL,
-                                            getScanStarterPendingIntent(getApplicationContext()));
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(),
+                                            INTERVAL, getScanStarterPendingIntent(getApplicationContext()));
+        }
+    }*/
+
+    @Override
+    protected void runService() {
+        if (!running) {
+            running = true;
+            //mTimer.schedule(mCheckTask, 0, INTERVAL);
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(),
+                    INTERVAL, getScanStarterPendingIntent(getApplicationContext()));
         }
     }
 
     public static boolean isRunning() { return running; }
 
     public static void checkAndStartScan(Context context) {
-        if (!running && isBLESupported && areAnyVendorsNotifiable(context)) {
+        if (!running && isBLESupported/* && areAnyVendorsNotifiable(context)*/) {
             context.startService(new Intent(context, PeriodicBFS.class));
         }
     }
@@ -399,52 +411,68 @@ public class PeriodicBFS extends BeaconFinderService {
     public static void checkAndStopScan(Context context) {
         if (running) {
             context.stopService(new Intent(context, PeriodicBFS.class));
-            UUIDDownloadBaseReceiver.stopDownloads(context);
+            BeaconDBDownloadBaseReceiver.stopDownloads(context);
         }
     }
 
-    public static class ScanStarter extends BroadcastReceiver {
+    public static class ScanStarter extends WakefulBroadcastReceiver {
         private static final String TAG = "ScanStarter";
+        public static boolean pushedNotification;
 
         private Runnable mScanningRunnable;
+        private boolean mHasScanStarted = false;
 
         public ScanStarter() {}
 
-        public void startScanning(Context context) {
-            turnOnBluetooth();
-            for (DeviceParams params : periodicScanDeviceMap.values())
-                params.mFoundInThisScan = params.mToBeNotified = false;
-            Log.e(TAG, "Started Scan");
-            uiThreadHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    beaconManager.startRangingAndDiscoverDevice(scanningRegion);
-                }
-            }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
+        public void startScanning(final Context context) {
+            if (!CLOZERR_UUID.isEmpty()) {
+                scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(CLOZERR_UUID), null, null);
+                                            // scan for all possible major & minor values, so no rules
+                beaconManager.connect(new ServiceReadyCallback() {
+                    @Override
+                    public void onServiceReady() {
+                        mHasScanStarted = true;
+                        turnOnBluetooth();
+                        pushedNotification = false;
+                        /*for (DeviceParams params : periodicScanDeviceMap.values())
+                            params.mFoundInThisScan *//*= params.mToBeNotified *//*= false;*/
+                        Log.e(TAG, "Started Scan");
+                        uiThreadHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                beaconManager.startRangingAndDiscoverDevice(scanningRegion);
+                            }
+                        }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
+                    }
+                });
+            }
         }
 
         public void stopScanning(Context context) {
-            beaconManager.stopRanging(scanningRegion);
-            turnOffBluetooth();
-            Log.e(TAG, "Stopped Scan");
-
-            for (String uuid : periodicScanDeviceMap.keySet())
-                if (!periodicScanDeviceMap.get(uuid).mFoundInThisScan)
-                    periodicScanDeviceMap.remove(uuid);
-            showNotifications(context
-            );
-            wakeLockManager.releaseWakeLock();
+            if (mHasScanStarted) {
+                beaconManager.stopRanging(scanningRegion);
+                turnOffBluetooth();
+                Log.e(TAG, "Stopped Scan");
+                mHasScanStarted = false;
+                /*for (String uuid : periodicScanDeviceMap.keySet())
+                    if (!periodicScanDeviceMap.get(uuid).mFoundInThisScan)
+                        periodicScanDeviceMap.remove(uuid);*/
+                //showNotifications(context);
+                wakeLockManager.releaseWakeLock();
+            }
         }
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
             Log.e(TAG, "Received");
-            if (intent.getAction() != null && intent.getAction().equals(ACTION_FIRE_ALARM_SCAN)) {
+            if (intent.getAction() != null && intent.getAction().equals(ACTION_FIRE_ALARM_SCAN) && isScanningAllowed) {
+                if (wakeLockManager == null)
+                    wakeLockManager = new WakeLockManager();
                 wakeLockManager.acquireWakeLock(context, TAG);
-                readUUIDsFromFile(context);
+                uiThreadHandler = new Handler(Looper.getMainLooper());
                 mScanningRunnable = new Runnable() {
-                    @Override
-                    public void run() {
+                            @Override
+                            public void run() {
                         startScanning(context);
                         uiThreadHandler.postDelayed(new Runnable() {
                             @Override
@@ -454,25 +482,24 @@ public class PeriodicBFS extends BeaconFinderService {
                         }, SCAN_PERIOD);
                     }
                 };
-                if (uuidDatabase != null && areAnyVendorsNotifiable(context))
-                    uiThreadHandler.post(mScanningRunnable);
+                uiThreadHandler.post(mScanningRunnable);
             }
         }
     }
 
-    private class DeviceParams {
+    /*private class DeviceParams {
         public int mCount;
         public boolean mFoundInThisScan;
-        public boolean mToBeNotified;
+        //public boolean mToBeNotified;
 
         public DeviceParams(int count, boolean foundInThisScan) {
             mCount = count;
             mFoundInThisScan = foundInThisScan;
-            mToBeNotified = false;
+            //mToBeNotified = false;
         }
-    }
+    }*/
 
-    public static class VendorListActivity extends ActionBarActivity {
+    /*public static class VendorListActivity extends ActionBarActivity {
 
         private static final String TAG = "VendorListActivity";
 
@@ -638,5 +665,19 @@ public class PeriodicBFS extends BeaconFinderService {
                 }
             }
         }
-    }
+    }*/
+
+    /*public static class NotificationRemovalReceiver extends BroadcastReceiver {
+        private static final String TAG = "NRReceiver";
+
+        public NotificationRemovalReceiver() {
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.e(TAG, "received");
+            String uuid = intent.getStringExtra("uuid");
+            turnOffNotificationsForVendor(context, uuid);
+        }
+    }*/
 }

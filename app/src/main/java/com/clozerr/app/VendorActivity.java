@@ -53,6 +53,7 @@ public class VendorActivity extends ActionBarActivity {
     public static Bundle detailsBundle;
     static String vendorId;
     static String vendorTitle;
+    static int i=1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,18 +65,20 @@ public class VendorActivity extends ActionBarActivity {
         final String vendor_id = callingIntent.getStringExtra("vendor_id");
         vendorId = vendor_id;
         final String urlVendor = "http://api.clozerr.com/vendor/get?vendor_id=" + vendor_id;
+        Log.e(TAG, "vendor url - " + urlVendor);
         new AsyncGet(this, urlVendor, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
                 try {
-                    String address = "", phonenumber = "", vendorDescription = "", uuid = null;
+                    String address = "", phoneNumber = "", vendorDescription = "";
+                    BeaconFinderService.BeaconDBParams params = null;
                     double latitude = 0.0, longitude = 0.0;
                     JSONObject object = new JSONObject(s);
 
                     try {
-                        phonenumber = object.getString("phone");
-                        if (phonenumber.equalsIgnoreCase("undefined"))
-                            phonenumber = "";
+                        phoneNumber = object.getString("phone");
+                        if (phoneNumber.equalsIgnoreCase("undefined"))
+                            phoneNumber = "";
                         vendorDescription = object.getString("description");
                         if (vendorDescription.equalsIgnoreCase("undefined"))
                             vendorDescription = "";
@@ -89,15 +92,15 @@ public class VendorActivity extends ActionBarActivity {
                         e.printStackTrace();
                         //Toast.makeText(CouponDetails.this, "Error - " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                     }
-                    if (object.getJSONArray("UUID").length() > 0) {
-                        uuid = object.getJSONArray("UUID").getString(0);
-                        Log.e("UUID", uuid);
+                    if (object.has("beacons") && object.getJSONObject("beacons").has("major")) {
+                        params = new BeaconFinderService.BeaconDBParams(object.getJSONObject("beacons"));
+                        Log.e(TAG, "BDB params - " + params.toString());
                     }
                     //Log.e("description", vendorDescription);
                     address = object.getString("address");
                     final CardModel currentItem = new CardModel(
                             object.getString("name"),
-                            phonenumber,
+                            phoneNumber,
                             vendorDescription,
                             object.getJSONArray("offers"),
                             latitude,
@@ -133,8 +136,12 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putDouble("longitude", longitude);
                     detailsBundle.putDouble("distance", currentItem.getDistance());
                     detailsBundle.putString("distanceString", currentItem.getDistanceString());
-                    detailsBundle.putString("phonenumber", phonenumber);
+                    detailsBundle.putString("phoneNumber", phoneNumber);
                     //currentItem.getQuestions();
+
+                    if (!callingIntent.getBooleanExtra("from_periodic_scan", false) && params != null)
+                        OneTimeBFS.checkAndStartScan(getApplicationContext(), params);
+                    else PeriodicBFS.dismissNotifications(VendorActivity.this);
 
                     toolbar = (Toolbar) findViewById(R.id.toolbar_vendor);
                     if (toolbar != null) {
@@ -168,7 +175,7 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putDouble("longitude", longitude);
                     detailsBundle.putDouble("distance", currentItem.getDistance());
                     detailsBundle.putString("distanceString", currentItem.getDistanceString());
-                    detailsBundle.putString("phonenumber", phonenumber);
+                    detailsBundle.putString("phoneNumber", phoneNumber);
                     //currentItem.getQuestions();
 
 
@@ -183,6 +190,7 @@ public class VendorActivity extends ActionBarActivity {
                         }
                     });
                 } catch (Exception e) {
+                    Log.e(TAG, "Error loading");
                     e.printStackTrace();
                     AlertDialog.Builder builder = new AlertDialog.Builder(VendorActivity.this);
                     builder.setTitle("Error")
@@ -256,7 +264,11 @@ public class VendorActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        /*if (id == R.id.action_settings) {
+            return true;
+        }*/
+        if (id == android.R.id.home) {
+            onBackPressed();
             return true;
         }
 
@@ -395,5 +407,11 @@ public class VendorActivity extends ActionBarActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onStop() {
+        AsyncGet.dismissDialog();
+        super.onStop();
     }
 }

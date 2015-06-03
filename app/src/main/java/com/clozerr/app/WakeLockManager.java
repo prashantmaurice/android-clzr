@@ -13,19 +13,18 @@ public class WakeLockManager {
 
     private void initialize(Context context, String tag) {
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
-                                                tag);
+        mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, tag);
     }
 
     public void acquireWakeLock(Context context, String tag) {
-        if (mWakeLock != null && !mWakeLock.isHeld()) {
+        if (mWakeLock == null || !mWakeLock.isHeld()) {
             initialize(context, tag);
             mWakeLock.acquire();
         }
     }
 
     public void acquireWakeLock(Context context, String tag, long timeout) {
-        if (mWakeLock != null && !mWakeLock.isHeld()) {
+        if (mWakeLock == null || !mWakeLock.isHeld()) {
             initialize(context, tag);
             mWakeLock.acquire(timeout);
         }

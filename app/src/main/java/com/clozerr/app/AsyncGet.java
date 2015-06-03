@@ -24,15 +24,17 @@ public class AsyncGet extends AsyncTask<String, String, String> {
     AsyncResult asyncResult;
     String Url;
     Context c;
-    ProgressDialog pDialog;
-    Handler handler;
-    public AsyncGet(Context context, String url, AsyncResult as) {
+    static ProgressDialog pDialog;
+    static Handler handler;
+    boolean toDisplayProgress;
+    public AsyncGet(Context context, String url, AsyncResult as, boolean displayProgress) {
         handler = new Handler(Looper.getMainLooper());
         if(isNetworkAvailable(context)) {
             c=context;
             asyncResult=as;
             this.Url = url;
-            if (context instanceof Activity) {
+            toDisplayProgress = displayProgress;
+            if ((pDialog == null || !pDialog.isShowing()) && context instanceof Activity && toDisplayProgress) {
                 try {
                     pDialog = new ProgressDialog(context);
                     pDialog.setMessage("Loading...");
@@ -43,11 +45,15 @@ public class AsyncGet extends AsyncTask<String, String, String> {
                     e.printStackTrace();
                 }
             }
-                this.execute(url);
+            this.execute(url);
 
         }
-        else if (context instanceof Activity)
+        else if (context instanceof Activity && toDisplayProgress)
             Toast.makeText(context,"Network error. Check your network connections and try again.",Toast.LENGTH_LONG).show();
+    }
+
+    public AsyncGet(Context context, String url, AsyncResult as) {
+        this(context, url, as, true);
     }
 
     static boolean isNetworkAvailable(Context context) {
@@ -67,21 +73,26 @@ public class AsyncGet extends AsyncTask<String, String, String> {
             content = hc.execute(hGet,rHand);
         } catch (Exception e) {
             e.printStackTrace();
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(c, "Network error. Check your network connections and try again.",
-                            Toast.LENGTH_LONG).show();
-                }
-            });
+            if (toDisplayProgress)
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(c, "Network error. Check your network connections and try again.",
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
         }
         return content;
     }
     @Override
     protected void onPostExecute(String result) {
+        dismissDialog();
         asyncResult.gotResult(result);
-        if (c instanceof Activity)
-            pDialog.hide();
+    }
+
+    public static void dismissDialog() {
+        if (pDialog != null && pDialog.isShowing())
+            pDialog.dismiss();
     }
 
     public static abstract class AsyncResult{
