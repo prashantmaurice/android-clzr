@@ -6,8 +6,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Handler;
@@ -41,7 +39,7 @@ public class PeriodicBFS extends BeaconFinderService {
     private static NotificationCompat.Builder notificationBuilder;
     private static NotificationManager notificationManager;
     private static WakeLockManager wakeLockManager;
-    private static Bitmap NOTIFICATION_LARGE_ICON;
+    //private static Bitmap NOTIFICATION_LARGE_ICON;
     private static boolean running = false;
 
     //public static final String MAP_CONTENTS_FILE_NAME = "mapContents.txt";
@@ -56,7 +54,7 @@ public class PeriodicBFS extends BeaconFinderService {
 
         //mTimer = new Timer();
         //mCheckTask = new BeaconCheckTask();
-        NOTIFICATION_LARGE_ICON = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+        //NOTIFICATION_LARGE_ICON = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
         wakeLockManager = new WakeLockManager();
 
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -437,7 +435,7 @@ public class PeriodicBFS extends BeaconFinderService {
                         /*for (DeviceParams params : periodicScanDeviceMap.values())
                             params.mFoundInThisScan *//*= params.mToBeNotified *//*= false;*/
                         Log.e(TAG, "Started Scan");
-                        uiThreadHandler.postDelayed(new Runnable() {
+                        bgThreadHandler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 beaconManager.startRangingAndDiscoverDevice(scanningRegion);
@@ -469,12 +467,12 @@ public class PeriodicBFS extends BeaconFinderService {
                 if (wakeLockManager == null)
                     wakeLockManager = new WakeLockManager();
                 wakeLockManager.acquireWakeLock(context, TAG);
-                uiThreadHandler = new Handler(Looper.getMainLooper());
+                bgThreadHandler = new Handler(Looper.myLooper());
                 mScanningRunnable = new Runnable() {
                             @Override
                             public void run() {
                         startScanning(context);
-                        uiThreadHandler.postDelayed(new Runnable() {
+                        bgThreadHandler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 stopScanning(context);
@@ -482,7 +480,7 @@ public class PeriodicBFS extends BeaconFinderService {
                         }, SCAN_PERIOD);
                     }
                 };
-                uiThreadHandler.post(mScanningRunnable);
+                bgThreadHandler.post(mScanningRunnable);
             }
         }
     }

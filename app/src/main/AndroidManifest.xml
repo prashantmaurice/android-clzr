@@ -137,14 +137,14 @@
             android:label="@string/title_activity_splashscreen" >
         </activity>
 
-        <receiver
+        <!--<receiver
             android:name=".PhoneStartupReceiver"
             android:enabled="true"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
-        </receiver>
+        </receiver>-->
 
         <activity
             android:name=".SettingsActivity"
@@ -206,6 +206,15 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <receiver android:name="com.commonsware.cwac.wakeful.AlarmReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="com.commonsware.cwac.wakeful"
+                android:resource="@xml/wakeful"/>
+        </receiver>
     </application>
 
 </manifest>

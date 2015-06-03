@@ -65,8 +65,8 @@ public abstract class BeaconFinderService extends Service {
     }
 
     protected static BluetoothAdapter bluetoothAdapter;
-    protected static ArrayList<BeaconDBParams> beaconDatabase = null;
-    protected static Handler uiThreadHandler;
+    //protected static ArrayList<BeaconDBParams> beaconDatabase = null;
+    protected static Handler bgThreadHandler;
     protected static AlarmManager alarmManager;
     protected static BeaconManager beaconManager;
     protected static Region scanningRegion;
@@ -104,13 +104,13 @@ public abstract class BeaconFinderService extends Service {
     }
 
     protected void findBeacons() {
-        uiThreadHandler = new Handler(Looper.getMainLooper());
+        bgThreadHandler = new Handler(Looper.myLooper());
         if (canServiceRun()) {
             /*scanningRegion = createRegion();
             beaconManager.setRangingListener(new RangingListener() {
                 @Override
                 public void onBeaconsDiscovered(Region region, final List list) {
-                    uiThreadHandler.post(new Runnable() {
+                    bgThreadHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             onRangedBeacons((List<Beacon>) list);
@@ -127,7 +127,7 @@ public abstract class BeaconFinderService extends Service {
             beaconManager.setRangingListener(new RangingListener() {
                 @Override
                 public void onBeaconsDiscovered(Region region, final List list) {
-                    uiThreadHandler.post(new Runnable() {
+                    bgThreadHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             onRangedBeacons((List<Beacon>) list);
@@ -149,8 +149,7 @@ public abstract class BeaconFinderService extends Service {
     // This function is just for putting toasts, but required as work is done on a background thread
     // so if a toast is directly put, the app will crash (Toasts must be put in the UI thread)
     protected static void putToast(final Context context, final CharSequence text, final int duration) {
-        uiThreadHandler = new Handler(Looper.getMainLooper());
-        uiThreadHandler.post(new Runnable() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
                 Toast.makeText(context, text, duration).show();

@@ -24,6 +24,7 @@ public class OneTimeBFS extends BeaconFinderService {
     @Override
     public void onDestroy() {
         running = false;
+        turnOffBluetooth();
         super.onDestroy();
     }
 
@@ -71,7 +72,7 @@ public class OneTimeBFS extends BeaconFinderService {
         turnOnBluetooth();
         Log.e(TAG, "Started Scan");
         running = true;
-        uiThreadHandler.postDelayed(new Runnable() {
+        bgThreadHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 beaconManager.startRangingAndDiscoverDevice(scanningRegion);
@@ -88,7 +89,7 @@ public class OneTimeBFS extends BeaconFinderService {
                 turnOnBluetooth();
                 Log.e(TAG, "Started Scan");
                 running = true;
-                uiThreadHandler.postDelayed(new Runnable() {
+                bgThreadHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         beaconManager.startRangingAndDiscoverDevice(scanningRegion);
