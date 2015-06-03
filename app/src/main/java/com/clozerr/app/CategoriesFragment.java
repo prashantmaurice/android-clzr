@@ -93,7 +93,7 @@ public class CategoriesFragment extends Fragment implements ObservableScrollView
         SharedPreferences status = c.getSharedPreferences("USER", 0);
         String TOKEN = status.getString("token", "");
 
-        String urlCategories = "http://api.clozerr.com/vendor/get/visitedV2?access_token="+TOKEN;
+        String urlCategories = "http://api.clozerr.com/v2/vendor/list/category";
         Log.e(TAG, "url - " + urlCategories);
 
         new AsyncGet(c, urlCategories , new AsyncGet.AsyncResult() {
@@ -132,8 +132,8 @@ public class CategoriesFragment extends Fragment implements ObservableScrollView
         JSONObject temp;
         JSONArray array;
         try {
-            temp = new JSONObject(s);
-            array = temp.getJSONArray("data");
+            //temp = new JSONObject(s);
+            array = new JSONArray(s);
 
             ImageView loyaltyempty=(ImageView)layout.findViewById(R.id.loyaltyempty);
             if(array.length()==0){
