@@ -77,9 +77,9 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="0dp"
             android:paddingTop="0dp"
-            android:textSize="15sp"
+            android:textSize="16sp"
             android:text="Name"
-            android:textColor="#525858"
+            android:textColor="#393F3F"
             android:id="@+id/textTitle" />
 
         <TextView
