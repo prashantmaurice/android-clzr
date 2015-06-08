@@ -54,9 +54,9 @@ public class Home  extends ActionBarActivity {
 
     static final String SENDER_ID = "496568600186";  // project id from Google Console
     public static String TOKEN = "";
-    private static String USERNAME = "";
-    private static String USERID = "";
-    private static String USER_PIC_URL = "";
+    public static String USERNAME = "";
+    public static String USERID = "";
+    public static String USER_PIC_URL = "";
     public static Context c;
     Button button;
     static double lat;

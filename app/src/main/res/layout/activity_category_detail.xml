@@ -6,6 +6,10 @@
     tools:context="com.clozerr.app.CategoryDetail">
 
     <include layout="@layout/toolbar" />
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -16,11 +20,13 @@
         android:layout_height="55dp"
         android:background="@color/colorPrimary"
         android:orientation="horizontal">
-    <TextView
+    <ImageButton
+        android:id="@+id/close"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="x"
+        android:src="@drawable/ic_close"
         android:textColor="#ffffff"
+        android:background="#00000000"
         android:paddingLeft="10dp"
         android:layout_gravity="center_vertical"/>
         <TextView
@@ -83,5 +89,6 @@
 
         </LinearLayout>
         </LinearLayout>
-
+    <include layout="@layout/navdrawer_content" />
+    </android.support.v4.widget.DrawerLayout>
 </LinearLayout>
