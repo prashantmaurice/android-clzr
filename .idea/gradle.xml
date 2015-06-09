@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/app/libraries" />
             <option value="$PROJECT_DIR$/app/libraries/facebook" />
+            <option value="$PROJECT_DIR$/app/libraries/wakeful" />
           </set>
         </option>
       </GradleProjectSettings>

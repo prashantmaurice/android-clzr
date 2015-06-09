@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="main"><source path="D:\Programming\GitHub\octo-ninja\app\libraries\wakeful\res"/><source path="D:\Programming\GitHub\octo-ninja\app\libraries\wakeful\build\generated\res\rs\release"/><source path="D:\Programming\GitHub\octo-ninja\app\libraries\wakeful\build\generated\res\generated\release"/></dataSet><dataSet config="release"><source path="D:\Programming\GitHub\octo-ninja\app\libraries\wakeful\build-types\release\res"/></dataSet><mergedItems/></merger>
