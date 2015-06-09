@@ -93,7 +93,7 @@ public class CategoriesFragment extends Fragment implements ObservableScrollView
         SharedPreferences status = c.getSharedPreferences("USER", 0);
         String TOKEN = status.getString("token", "");
 
-        String urlCategories = "http://api.clozerr.com/v2/vendor/list/category";
+        String urlCategories = "http://api.clozerr.com/v2/vendor/categories/get";
         Log.e(TAG, "url - " + urlCategories);
 
         new AsyncGet(c, urlCategories , new AsyncGet.AsyncResult() {

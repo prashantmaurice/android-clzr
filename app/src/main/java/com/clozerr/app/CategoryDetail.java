@@ -54,6 +54,7 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
     SearchView searchView;
     private boolean mCardsLeft = true;
     private final int ITEMS_PER_PAGE = 7, INITIAL_LOAD_LIMIT = 8;
+    private Bundle categorybundle;
     View mScrollable;
     private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Tell Friends about Clozerr", "Settings", "Log out"};
 
@@ -61,6 +62,7 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category_detail);
+        categorybundle=getIntent().getExtras();
         nitView();
         TextView username = (TextView)findViewById(R.id.nav_text);
         if(Home.USERNAME.length()!=0)
@@ -116,13 +118,13 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mOnScrollListener = new EndlessRecyclerOnScrollListener(
-                (LinearLayoutManager)mLayoutManager) {
-            @Override
-            public void onLoadMore() {
-                loadMoreItems();
-            }
-        };
+//        mOnScrollListener = new EndlessRecyclerOnScrollListener(
+//                (LinearLayoutManager)mLayoutManager) {
+//            @Override
+//            public void onLoadMore() {
+//                loadMoreItems();
+//            }
+//        };
         mRecyclerView.setOnScrollListener(mOnScrollListener);
 
 
@@ -146,8 +148,7 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
             mRecyclerView.setAdapter(mMainPageAdapter);
         } else {
             mOffset = 0;
-            String url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
-                    + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
+            String url = "http://api.clozerr.com/v2/vendor/list/category?category=" + categorybundle.getString("categoryname");
             Log.e("url", url);
             new AsyncGet(this, url, new AsyncGet.AsyncResult() {
                 @Override
@@ -193,11 +194,9 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
                 String url;
                 mOffset = 0;
                 if(!TOKEN.equals(""))
-                    url = "http://api.clozerr.com/vendor/get/near?latitude="+Home.lat+"&longitude="+Home.longi+"&access_token="+TOKEN
-                            + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
+                    url = "http://api.clozerr.com/v2/vendor/list/category?category="+categorybundle.getString("categoryname");
                 else
-                    url = "http://api.clozerr.com/vendor/get/near?latitude="+Home.lat+"&longitude="+Home.longi
-                            + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
+                    url = "http://api.clozerr.com/v2/vendor/list/category?category="+categorybundle.getString("categoryname");
                 Log.e("url", url);
 
                 new AsyncGet(CategoryDetail.this, url, new AsyncGet.AsyncResult() {
@@ -224,43 +223,43 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
 
 
     }
-    public void loadMoreItems() {
-        Log.e("load", "in loadMoreItems()");
-        if (mCardsLeft) {
-            mOffset += (mOffset == 0) ? INITIAL_LOAD_LIMIT : ITEMS_PER_PAGE;
-            String url = "";
-            if (!TOKEN.equals(""))
-                url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
-                        + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
-            else
-                url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi
-                        + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
-            Log.e("url", url);
-            new AsyncGet(CategoryDetail.this, url, new AsyncGet.AsyncResult() {
-                @Override
-                public void gotResult(String s) {
-                    Log.e("result", s);
-                    if (s == null) {
-                        Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
-                    }
-                    ArrayList<CardModel> CardList = convertRow(s);
-                    if (CardList.size() != 0) {
-                        mMainCardsList.addAll(convertRow(s));
-                        final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-                        editor.putString("home_cards", s);
-                        editor.apply();
-                        Log.e("app", "editing done");
-                        mMainPageAdapter.notifyDataSetChanged();
-                        //Toast.makeText(getApplicationContext(), "More items ready", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Log.d("app", "no cards to show");
-                        mCardsLeft = false;
-                        mOffset = mMainCardsList.size();
-                    }
-                }
-            });
-        }
-    }
+//    public void loadMoreItems() {
+//        Log.e("load", "in loadMoreItems()");
+//        if (mCardsLeft) {
+//            mOffset += (mOffset == 0) ? INITIAL_LOAD_LIMIT : ITEMS_PER_PAGE;
+//            String url = "";
+//            if (!TOKEN.equals(""))
+//                url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
+//                        + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
+//            else
+//                url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi
+//                        + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
+//            Log.e("url", url);
+//            new AsyncGet(CategoryDetail.this, url, new AsyncGet.AsyncResult() {
+//                @Override
+//                public void gotResult(String s) {
+//                    Log.e("result", s);
+//                    if (s == null) {
+//                        Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+//                    }
+//                    ArrayList<CardModel> CardList = convertRow(s);
+//                    if (CardList.size() != 0) {
+//                        mMainCardsList.addAll(convertRow(s));
+//                        final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
+//                        editor.putString("home_cards", s);
+//                        editor.apply();
+//                        Log.e("app", "editing done");
+//                        mMainPageAdapter.notifyDataSetChanged();
+//                        //Toast.makeText(getApplicationContext(), "More items ready", Toast.LENGTH_SHORT).show();
+//                    } else {
+//                        Log.d("app", "no cards to show");
+//                        mCardsLeft = false;
+//                        mOffset = mMainCardsList.size();
+//                    }
+//                }
+//            });
+//        }
+//    }
     private ArrayList<CardModel> convertRow(String s) {
         ArrayList<CardModel> rowItems = new ArrayList<>();
         JSONArray array;
@@ -397,6 +396,8 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
     }
     private void nitView() {
         // Toast.makeText(this, "in nitview", Toast.LENGTH_SHORT).show();
+        TextView categoryheader=(TextView)findViewById(R.id.categoryheader);
+        categoryheader.setText(categorybundle.getString("categoryname"));
         ListView leftDrawerList = (ListView) findViewById(R.id.nav_listView);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
