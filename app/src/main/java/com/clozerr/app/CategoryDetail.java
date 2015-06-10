@@ -1,9 +1,14 @@
 package com.clozerr.app;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,20 +20,26 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.Session;
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
+import com.google.android.gms.plus.Plus;
 import com.nineoldandroids.animation.ValueAnimator;
 import com.nineoldandroids.view.ViewHelper;
 
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class CategoryDetail extends ActionBarActivity implements ObservableScrollViewCallbacks{
@@ -40,18 +51,31 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
     private RecyclerView.LayoutManager mLayoutManager;
     private EndlessRecyclerOnScrollListener mOnScrollListener;
     private int mOffset;
+    SearchView searchView;
     private boolean mCardsLeft = true;
     private final int ITEMS_PER_PAGE = 7, INITIAL_LOAD_LIMIT = 8;
+    private Bundle categorybundle;
     View mScrollable;
+    private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Tell Friends about Clozerr", "Settings", "Log out"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category_detail);
+        categorybundle=getIntent().getExtras();
+        nitView();
+        TextView username = (TextView)findViewById(R.id.nav_text);
+        if(Home.USERNAME.length()!=0)
+            username.setText(Home.USERNAME);
+
+        Log.e("pic", Home.USER_PIC_URL);
+
+        new DownloadImageTask((de.hdodenhof.circleimageview.CircleImageView)findViewById(R.id.nav_image))
+                .execute(Home.USER_PIC_URL);
         final ObservableRecyclerView mRecyclerView = (ObservableRecyclerView) findViewById(R.id.list);
         mRecyclerView.setScrollViewCallbacks(this);
-        final SearchView searchView = (SearchView)findViewById(R.id.searchView);
-        mScrollable=findViewById(R.id.layout);
+        searchView = (SearchView)findViewById(R.id.searchView);
+        mScrollable=findViewById(R.id.drawerLayout);
         mToolbar=(Toolbar)findViewById(R.id.toolbar);
         mToolbar.setTitle("");
         ((TextView) mToolbar.findViewById(R.id.appTitleView)).setTypeface(Typeface.createFromAsset(
@@ -94,13 +118,13 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mOnScrollListener = new EndlessRecyclerOnScrollListener(
-                (LinearLayoutManager)mLayoutManager) {
-            @Override
-            public void onLoadMore() {
-                loadMoreItems();
-            }
-        };
+//        mOnScrollListener = new EndlessRecyclerOnScrollListener(
+//                (LinearLayoutManager)mLayoutManager) {
+//            @Override
+//            public void onLoadMore() {
+//                loadMoreItems();
+//            }
+//        };
         mRecyclerView.setOnScrollListener(mOnScrollListener);
 
 
@@ -108,7 +132,12 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
         //startService(new Intent(this, LocationService.class));
         Home.lat = 13;
         Home.longi = 80.2;
-
+        findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         SharedPreferences status = getSharedPreferences("USER", 0);
         final String cards = status.getString("home_cards", "");
@@ -116,11 +145,10 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
             Log.e("Cached Card", cards);
             mMainCardsList = convertRow(cards);
             mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, this);
-            mRecyclerView.setAdapter(mMainPageAdapter);
+            //mRecyclerView.setAdapter(mMainPageAdapter);
         } else {
             mOffset = 0;
-            String url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
-                    + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
+            String url = "http://api.clozerr.com/v2/vendor/list/category?category=" + categorybundle.getString("categoryname");
             Log.e("url", url);
             new AsyncGet(this, url, new AsyncGet.AsyncResult() {
                 @Override
@@ -166,28 +194,27 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
                 String url;
                 mOffset = 0;
                 if(!TOKEN.equals(""))
-                    url = "http://api.clozerr.com/vendor/get/near?latitude="+Home.lat+"&longitude="+Home.longi+"&access_token="+TOKEN
-                            + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
+                    url = "http://api.clozerr.com/v2/vendor/list/category?category="+categorybundle.getString("categoryname");
                 else
-                    url = "http://api.clozerr.com/vendor/get/near?latitude="+Home.lat+"&longitude="+Home.longi
-                            + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
+                    url = "http://api.clozerr.com/v2/vendor/list/category?category="+categorybundle.getString("categoryname");
                 Log.e("url", url);
 
                 new AsyncGet(CategoryDetail.this, url, new AsyncGet.AsyncResult() {
                     @Override
                     public void gotResult(String s) {
-                        ArrayList<CardModel> CardList = convertRow(s);
-                        if(CardList.size()!=0){
-                            mMainCardsList = CardList;
-                            mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList,CategoryDetail.this );
-                            mRecyclerView.setAdapter(mMainPageAdapter);
+                        if (s != "") {
+                            ArrayList<CardModel> CardList = convertRow(s);
+                            if (CardList.size() != 0) {
+                                mMainCardsList = CardList;
+                                mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, CategoryDetail.this);
+                                mRecyclerView.setAdapter(mMainPageAdapter);
 
-                            final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-                            editor.putString("home_cards", s);
-                            editor.apply();
-                        }
-                        else {
-                            mCardsLeft = false;
+                                final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
+                                editor.putString("home_cards", s);
+                                editor.apply();
+                            } else {
+                                mCardsLeft = false;
+                            }
                         }
                     }
                 });
@@ -197,43 +224,43 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
 
 
     }
-    public void loadMoreItems() {
-        Log.e("load", "in loadMoreItems()");
-        if (mCardsLeft) {
-            mOffset += (mOffset == 0) ? INITIAL_LOAD_LIMIT : ITEMS_PER_PAGE;
-            String url = "";
-            if (!TOKEN.equals(""))
-                url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
-                        + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
-            else
-                url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi
-                        + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
-            Log.e("url", url);
-            new AsyncGet(CategoryDetail.this, url, new AsyncGet.AsyncResult() {
-                @Override
-                public void gotResult(String s) {
-                    Log.e("result", s);
-                    if (s == null) {
-                        Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
-                    }
-                    ArrayList<CardModel> CardList = convertRow(s);
-                    if (CardList.size() != 0) {
-                        mMainCardsList.addAll(convertRow(s));
-                        final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-                        editor.putString("home_cards", s);
-                        editor.apply();
-                        Log.e("app", "editing done");
-                        mMainPageAdapter.notifyDataSetChanged();
-                        //Toast.makeText(getApplicationContext(), "More items ready", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Log.d("app", "no cards to show");
-                        mCardsLeft = false;
-                        mOffset = mMainCardsList.size();
-                    }
-                }
-            });
-        }
-    }
+//    public void loadMoreItems() {
+//        Log.e("load", "in loadMoreItems()");
+//        if (mCardsLeft) {
+//            mOffset += (mOffset == 0) ? INITIAL_LOAD_LIMIT : ITEMS_PER_PAGE;
+//            String url = "";
+//            if (!TOKEN.equals(""))
+//                url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
+//                        + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
+//            else
+//                url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi
+//                        + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
+//            Log.e("url", url);
+//            new AsyncGet(CategoryDetail.this, url, new AsyncGet.AsyncResult() {
+//                @Override
+//                public void gotResult(String s) {
+//                    Log.e("result", s);
+//                    if (s == null) {
+//                        Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+//                    }
+//                    ArrayList<CardModel> CardList = convertRow(s);
+//                    if (CardList.size() != 0) {
+//                        mMainCardsList.addAll(convertRow(s));
+//                        final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
+//                        editor.putString("home_cards", s);
+//                        editor.apply();
+//                        Log.e("app", "editing done");
+//                        mMainPageAdapter.notifyDataSetChanged();
+//                        //Toast.makeText(getApplicationContext(), "More items ready", Toast.LENGTH_SHORT).show();
+//                    } else {
+//                        Log.d("app", "no cards to show");
+//                        mCardsLeft = false;
+//                        mOffset = mMainCardsList.size();
+//                    }
+//                }
+//            });
+//        }
+//    }
     private ArrayList<CardModel> convertRow(String s) {
         ArrayList<CardModel> rowItems = new ArrayList<>();
         JSONArray array;
@@ -338,10 +365,14 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
     private int getScreenHeight() {
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int height = displaymetrics.heightPixels;
+        int height = displaymetrics.heightPixels-2*searchView.getHeight()+dpToPx(10);
         return height;
     }
-
+    public int dpToPx(int dp) {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+        return px;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -364,4 +395,126 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
 
         return super.onOptionsItemSelected(item);
     }
+    private void nitView() {
+        // Toast.makeText(this, "in nitview", Toast.LENGTH_SHORT).show();
+        TextView categoryheader=(TextView)findViewById(R.id.categoryheader);
+        categoryheader.setText(categorybundle.getString("categoryname"));
+        ListView leftDrawerList = (ListView) findViewById(R.id.nav_listView);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        //navigationDrawerAdapter=new ArrayAdapter<String>( Home.this, android.R.layout.simple_list_item_1, leftSliderData);
+        // navigationDrawerAdapter=new ArrayAdapter<String>( Home.this, R.layout.navdrawlist,R.id.textView, leftSliderData);
+        // Log.i("omy",leftSliderData[0]);
+        List<String> l = Arrays.asList(leftSliderData);
+
+// if List<String> isnt specific enough:
+        ArrayList<String> al = new ArrayList<>(l);
+        // ArrayList<String> arr ;
+        // arr= (ArrayList<String>) Arrays.asList(leftSliderData);
+        NavDrawAdapter nav = new NavDrawAdapter(this, al);
+        leftDrawerList.setAdapter(nav);
+        leftDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                // Toast.makeText(Home.this, i+"", Toast.LENGTH_SHORT).show();
+                if(i==leftSliderData.length-1){ // this is basically the logout button
+                    AlertDialog.Builder builder = new AlertDialog.Builder(CategoryDetail.this);
+                    builder.setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
+                            .setNegativeButton("No", dialogClickListener).show();
+
+                }
+
+                //"ABOUT US","FAQ'S","LIKE/FOLLOW CLOZERR","RATE CLOZERR", "LOGOUT"
+                if(i==1){
+                    startActivity(new Intent(CategoryDetail.this,FAQ.class));
+                }
+                else if(i==0){
+                    startActivity(new Intent(CategoryDetail.this,AboutUs.class));
+                }
+
+                else if(i==5){
+                    startActivity(new Intent(CategoryDetail.this,SettingsActivity.class));
+                }
+
+                else if(i==4) {
+                    Intent textShareIntent = new Intent(Intent.ACTION_SEND);
+                    textShareIntent.putExtra(Intent.EXTRA_TEXT, "Try out Clozerr, an app which lets you try out new restaurants near you and rewards you for your loyalty. https://play.google.com/store/apps/details?id=com.clozerr.app ");
+                    textShareIntent.setType("text/plain");
+                    startActivity(Intent.createChooser(textShareIntent, "Share with..."));
+                }
+
+
+                else if(i==2) {
+                    Uri uri = null;
+                    if (Login.googleOrFb == 1)
+                    {
+                        uri = Uri.parse("https://www.facebook.com/clozerrdeals");
+                    }
+                    else if (Login.googleOrFb == 2)
+                    {
+                        uri = Uri.parse("https://plus.google.com/112342093373744098489/about");
+                    }
+                    if (uri == null) Log.e("navdraw", "null" + Login.googleOrFb);
+                    Intent intent = new Intent(Intent.ACTION_VIEW,uri);
+                    /*// Create and start the chooser
+                    Intent chooser = Intent.createChooser(intent, "Open with");*/
+                    startActivity(intent/*chooser*/);
+                }
+                else if(i==3) {
+                    final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                    } catch (android.content.ActivityNotFoundException anfe) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                    }
+                }
+            }
+
+        });
+        VendorActivity.i=0;
+        // Toast.makeText(this, "end nitview", Toast.LENGTH_SHORT).show();
+    }
+    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which){
+                case DialogInterface.BUTTON_POSITIVE:
+                    //Yes button clicked
+                    Toast.makeText(CategoryDetail.this, "Logging out", Toast.LENGTH_SHORT).show();
+                    SharedPreferences example = getSharedPreferences("USER", 0);
+                    SharedPreferences.Editor editor = example.edit();
+                    editor.clear();
+                    editor.apply();
+                    Home.USER_PIC_URL = Home.USERNAME = Home.USERID = TOKEN = "";
+                    if (Login.googleOrFb == 2 && Login.mGoogleApiClient != null)
+                    {
+                        if (Login.mGoogleApiClient.isConnected()) {
+                            Plus.AccountApi.clearDefaultAccount(Login.mGoogleApiClient);
+                            Login.mGoogleApiClient.disconnect();
+                        }
+                    }
+                    else if (Login.googleOrFb == 1)
+                    {
+                        Session session = Session.getActiveSession();
+                        if (session != null) {
+                            if (!session.isClosed()) {
+                                session.closeAndClearTokenInformation();
+                            }
+                        } else {
+                            session = new Session(CategoryDetail.this);
+                            Session.setActiveSession(session);
+                            session.closeAndClearTokenInformation();
+                        }
+                    }
+                    //BeaconFinderService.disallowScanning(Home.this);
+                    startActivity(new Intent(CategoryDetail.this, Login.class));
+                    finish();
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    //Toast.makeText(Home.this, "Thanks for staying. You are awesome.", Toast.LENGTH_SHORT).show();
+                    //No button clicked
+                    break;
+            }
+        }
+    };
 }

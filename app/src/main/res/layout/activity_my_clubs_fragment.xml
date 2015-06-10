@@ -14,7 +14,7 @@
         <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/card_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_gravity="center"
             android:layout_marginBottom="8dp"
             android:layout_marginLeft="8dp"
@@ -34,7 +34,7 @@
                 <SearchView
                     android:id="@+id/searchView"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:queryHint=""
                     android:background="#FFFFFF"/>
 
@@ -44,6 +44,8 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
                     android:gravity="center_vertical"
+                    android:textSize="16sp"
+                    android:textColorHint="#50000000"
                     android:hint="Search for Places or Location"
                     android:background="#FFFFFF"/>
             </LinearLayout>
@@ -58,13 +60,13 @@
     </LinearLayout>
 
 
-        <ImageView
-            android:id="@+id/loyaltyempty"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/loyaltyempty"
-            android:background="#ffffff"
-            />
+    <ImageView
+        android:id="@+id/loyaltyempty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/loyaltyempty"
+        android:background="#ffffff"
+        />
 
 
 

@@ -47,7 +47,7 @@ public class CategoriesFragment extends Fragment implements ObservableScrollView
     View layout;
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
-        layout = inflater.inflate(R.layout.activity_my_clubs_fragment, container, false);
+        layout = inflater.inflate(R.layout.activity_categories_fragment, container, false);
         mRecyclerView = (ObservableRecyclerView) layout.findViewById(R.id.sliding_list);
         searchView = (SearchView)layout.findViewById(R.id.searchView);
         SearchCard=layout.findViewById(R.id.card_view);
@@ -93,7 +93,7 @@ public class CategoriesFragment extends Fragment implements ObservableScrollView
         SharedPreferences status = c.getSharedPreferences("USER", 0);
         String TOKEN = status.getString("token", "");
 
-        String urlCategories = "http://api.clozerr.com/v2/vendor/list/category";
+        String urlCategories = "http://api.clozerr.com/v2/vendor/categories/get";
         Log.e(TAG, "url - " + urlCategories);
 
         new AsyncGet(c, urlCategories , new AsyncGet.AsyncResult() {
@@ -259,7 +259,7 @@ public class CategoriesFragment extends Fragment implements ObservableScrollView
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int height = displaymetrics.heightPixels;
-        return height - swipetab.getHeight()-searchView.getHeight()+dpToPx(10);
+        return height - swipetab.getHeight()-searchView.getHeight()+dpToPx(0);
     }
     public int dpToPx(int dp) {
         DisplayMetrics displayMetrics = c.getResources().getDisplayMetrics();

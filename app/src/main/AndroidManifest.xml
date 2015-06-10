@@ -149,6 +149,9 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Home" />
         </activity>
 
         <service
@@ -205,6 +208,10 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".FreebieDescription"
+            android:label="@string/title_activity_freebie_description" >
         </activity>
 
         <receiver android:name="com.commonsware.cwac.wakeful.AlarmReceiver">

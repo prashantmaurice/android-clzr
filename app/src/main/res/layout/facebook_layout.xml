@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:padding="25dp"
+    android:background="#ffffff"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+
+        android:gravity="center_vertical"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minLines="2"
+            android:layout_marginRight="25dp"
+            android:textColor="#000000"
+            android:textSize="30dp"
+            android:layout_weight="1"
+            android:text="Facebook checkin\nReward"/>
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_launcher"/>
+        </LinearLayout>
+        <TextView
+            android:paddingTop="25dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:paddingBottom="25dp"
+            android:text="Hit OK to check-in to facebook\nand unlock the reward"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#ffffff">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <Button
+                android:background="#ffffff"
+                android:id="@+id/cancel"
+                android:layout_width="wrap_content"
+                android:text="CANCEL"
+                android:textColor="@color/colorPrimary"
+                android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/ok"
+                android:background="#ffffff"
+                android:text="OK"
+                android:clickable="true"
+                android:textColor="@color/colorPrimary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            </LinearLayout>
+</LinearLayout>
