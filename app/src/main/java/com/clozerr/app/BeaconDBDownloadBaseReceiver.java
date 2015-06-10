@@ -13,8 +13,8 @@ import java.util.concurrent.TimeUnit;
 
 public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
     private static final String TAG = "BDBBaseReceiver";
-    private static final long MAXIMUM_ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(1L, TimeUnit.MINUTES);
-    private static final long MINIMUM_ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.SECONDS);
+    private static final long MAXIMUM_ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(1L, TimeUnit.DAYS);
+    private static final long MINIMUM_ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.MINUTES);
     private static final long CONNECTIVITY_SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(15L, TimeUnit.SECONDS);
     private static final String ACTION_FIRE_ALARM_DOWNLOAD = "com.clozerr.app.ACTION_FIRE_ALARM_DOWNLOAD";
     private static final int REDUCTION_FACTOR = 2;
