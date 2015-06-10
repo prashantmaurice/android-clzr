@@ -145,7 +145,7 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
             Log.e("Cached Card", cards);
             mMainCardsList = convertRow(cards);
             mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, this);
-            mRecyclerView.setAdapter(mMainPageAdapter);
+            //mRecyclerView.setAdapter(mMainPageAdapter);
         } else {
             mOffset = 0;
             String url = "http://api.clozerr.com/v2/vendor/list/category?category=" + categorybundle.getString("categoryname");
@@ -202,18 +202,19 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
                 new AsyncGet(CategoryDetail.this, url, new AsyncGet.AsyncResult() {
                     @Override
                     public void gotResult(String s) {
-                        ArrayList<CardModel> CardList = convertRow(s);
-                        if(CardList.size()!=0){
-                            mMainCardsList = CardList;
-                            mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList,CategoryDetail.this );
-                            mRecyclerView.setAdapter(mMainPageAdapter);
+                        if (s != "") {
+                            ArrayList<CardModel> CardList = convertRow(s);
+                            if (CardList.size() != 0) {
+                                mMainCardsList = CardList;
+                                mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, CategoryDetail.this);
+                                mRecyclerView.setAdapter(mMainPageAdapter);
 
-                            final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-                            editor.putString("home_cards", s);
-                            editor.apply();
-                        }
-                        else {
-                            mCardsLeft = false;
+                                final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
+                                editor.putString("home_cards", s);
+                                editor.apply();
+                            } else {
+                                mCardsLeft = false;
+                            }
                         }
                     }
                 });

@@ -94,39 +94,39 @@ public class MyClubsFragment extends Fragment implements ObservableScrollViewCal
         Log.e("app", "in slidingmycards; set recycler");
 
 
-                SharedPreferences status = c.getSharedPreferences("USER", 0);
-                String TOKEN = status.getString("token", "");
+        SharedPreferences status = c.getSharedPreferences("USER", 0);
+        String TOKEN = status.getString("token", "");
 
-                String urlVisited = "http://api.clozerr.com/vendor/get/visitedV2?access_token=" +TOKEN;
-                Log.e("urlslide", urlVisited);
+        String urlVisited = "http://api.clozerr.com/vendor/get/visitedV2?access_token=" +TOKEN;
+        Log.e("urlslide", urlVisited);
 
-                new AsyncGet(c, urlVisited , new AsyncGet.AsyncResult() {
-                    @Override
-                    public void gotResult(String s) {
-                        //  t1.setText(s);
+        new AsyncGet(c, urlVisited , new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                //  t1.setText(s);
 
-                        Log.e("resultSlide", s);
+                Log.e("resultSlide", s);
 
-                        MyCardRecyclerViewAdapter Cardadapter = new MyCardRecyclerViewAdapter(convertRowMyCard(s), c);
-                        mRecyclerView.setAdapter(Cardadapter);
-                        try
-                        {
-                            Tracker t = ((Analytics) c.getApplicationContext()).getTracker(Analytics.TrackerName.APP_TRACKER);
+                MyCardRecyclerViewAdapter Cardadapter = new MyCardRecyclerViewAdapter(convertRowMyCard(s), c);
+                mRecyclerView.setAdapter(Cardadapter);
+                try
+                {
+                    Tracker t = ((Analytics) c.getApplicationContext()).getTracker(Analytics.TrackerName.APP_TRACKER);
 
-                            t.setScreenName("MyCards");
+                    t.setScreenName("MyCards");
 
-                            t.send(new HitBuilders.AppViewBuilder().build());
-                        }
-                        catch(Exception  e)
-                        {
-                            Toast.makeText(c, "Error" + e.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                        if(s==null) {
-                            Toast.makeText(c,"No internet connection",Toast.LENGTH_SHORT).show();
-                        }
-                        //l1.setAdapter(adapter);
-                    }
-                });
+                    t.send(new HitBuilders.AppViewBuilder().build());
+                }
+                catch(Exception  e)
+                {
+                    Toast.makeText(c, "Error" + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+                if(s==null) {
+                    Toast.makeText(c,"No internet connection",Toast.LENGTH_SHORT).show();
+                }
+                //l1.setAdapter(adapter);
+            }
+        });
 
 
         return layout;
