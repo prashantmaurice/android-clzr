@@ -259,7 +259,7 @@ public class CategoriesFragment extends Fragment implements ObservableScrollView
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int height = displaymetrics.heightPixels;
-        return height - swipetab.getHeight()-searchView.getHeight()+dpToPx(10);
+        return height - swipetab.getHeight()-searchView.getHeight()+dpToPx(0);
     }
     public int dpToPx(int dp) {
         DisplayMetrics displayMetrics = c.getResources().getDisplayMetrics();

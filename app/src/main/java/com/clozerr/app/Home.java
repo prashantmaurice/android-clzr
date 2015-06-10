@@ -119,16 +119,7 @@ public class Home  extends ActionBarActivity {
 
         new DownloadImageTask((de.hdodenhof.circleimageview.CircleImageView)findViewById(R.id.nav_image))
                 .execute(USER_PIC_URL);
-
-
-
-
-
-
-
         //slidingMyCards();
-
-
         GCMRegistrar.checkDevice(this);
         GCMRegistrar.checkManifest(this);
         final String regId = GCMRegistrar.getRegistrationId(this);
