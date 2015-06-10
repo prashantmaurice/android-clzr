@@ -161,7 +161,8 @@ public class VendorActivity extends ActionBarActivity {
                         }
                     });
                     mtabs.setViewPager(pager);
-
+                    if (callingIntent.getBooleanExtra("from_periodic_scan", false))
+                        pager.setCurrentItem(1);
 
                     detailsBundle.putString("vendorTitle", currentItem.getTitle());
                     //detailsBundle.putString("offerText", currentItem.getOfferDescription() );
