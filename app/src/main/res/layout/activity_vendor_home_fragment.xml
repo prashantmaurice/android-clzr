@@ -33,7 +33,9 @@
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentStart="true"
-                    android:layout_marginBottom="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:background="@drawable/buttons_gradient"
                     android:gravity="center">
 
                     <ImageButton
@@ -260,25 +262,33 @@
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
                                 android:layout_marginRight="3dp"
-                                android:src="@drawable/galleryimage" />
+                                android:src="@drawable/facebook"
+                                android:scaleType="fitXY"
+                                android:padding="0dp"/>
 
                             <ImageButton
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
                                 android:layout_marginRight="3dp"
-                                android:src="@drawable/galleryimage" />
+                                android:src="@drawable/gplus_logo"
+                                android:scaleType="fitXY"
+                                android:padding="0dp"/>
 
                             <ImageButton
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
                                 android:layout_marginRight="3dp"
-                                android:src="@drawable/galleryimage" />
+                                android:padding="0dp"
+                                android:src="@drawable/twitter_logo"
+                                android:scaleType="fitXY"/>
 
                             <ImageButton
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
                                 android:layout_marginRight="3dp"
-                                android:src="@drawable/galleryimage" />
+                                android:src="@drawable/instagram"
+                                android:scaleType="fitXY"
+                                android:padding="0dp"/>
                         </LinearLayout>
                     </LinearLayout>
 

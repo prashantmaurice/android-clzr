@@ -47,7 +47,7 @@ public class CategoriesFragment extends Fragment implements ObservableScrollView
     View layout;
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
-        layout = inflater.inflate(R.layout.activity_my_clubs_fragment, container, false);
+        layout = inflater.inflate(R.layout.activity_categories_fragment, container, false);
         mRecyclerView = (ObservableRecyclerView) layout.findViewById(R.id.sliding_list);
         searchView = (SearchView)layout.findViewById(R.id.searchView);
         SearchCard=layout.findViewById(R.id.card_view);
