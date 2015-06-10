@@ -94,7 +94,9 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
                         RecyclerViewAdapter.vendor_name_temp = currentItem.getTitle();
                         c.startActivity(detailIntent);
                     }*/
-                    c.startActivity(new Intent(c, CategoryDetail.class));
+                    Intent detailIntent = new Intent(c,CategoryDetail.class);
+                    detailIntent.putExtra("categoryname",currentItem.getTitle());
+                    c.startActivity(detailIntent);
                 }
             });
         }
