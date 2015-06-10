@@ -137,14 +137,16 @@
             android:label="@string/title_activity_splashscreen" >
         </activity>
 
-        <!--<receiver
+        <!--
+        <receiver
             android:name=".PhoneStartupReceiver"
             android:enabled="true"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
-        </receiver>-->
+        </receiver>
+        -->
 
         <activity
             android:name=".SettingsActivity"
@@ -182,17 +184,19 @@
             </intent-filter>
         </receiver>
 
-        <!--<activity
+        <!--
+        <activity
             android:name=".PeriodicBFS$VendorListActivity"
             android:label="@string/app_name" >
-        </activity>-->
+        </activity>
+        -->
 
         <receiver
             android:name=".PeriodicBFS$ScanStarter"
             android:enabled="false"
             android:exported="false" />
-
-        <receiver android:name=".BeaconFinderService$ScanResumeReceiver"
+        <receiver
+            android:name=".BeaconFinderService$ScanResumeReceiver"
             android:enabled="false"
             android:exported="false" />
 
@@ -208,6 +212,10 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".FreebieDescription"
+            android:label="@string/title_activity_freebie_description" >
         </activity>
     </application>
 

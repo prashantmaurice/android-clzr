@@ -5,15 +5,18 @@ package com.clozerr.app;
  */
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
@@ -37,11 +40,23 @@ public class FreebiesFragment extends Fragment {
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.freebiesFragmentLayout, new FreebieDescriptionFragment(), "replace");
-                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                transaction.addToBackStack("replace");
-                transaction.commit();
+                if(position==1) {
+                    final Dialog dialog = new Dialog(getActivity());
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(R.layout.facebook_layout);
+                    dialog.show();
+
+                    Button cancelButton = (Button) dialog.findViewById(R.id.cancel);
+                    cancelButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // Close dialog
+                            dialog.dismiss();
+                        }
+                    });
+                }
+                else
+                    startActivity(new Intent(getActivity(),FreebieDescription.class));
             }
         });
         return layout;
