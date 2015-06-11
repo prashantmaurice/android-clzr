@@ -137,14 +137,16 @@
             android:label="@string/title_activity_splashscreen" >
         </activity>
 
-        <!--<receiver
+        <!--
+        <receiver
             android:name=".PhoneStartupReceiver"
             android:enabled="true"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
-        </receiver>-->
+        </receiver>
+        -->
 
         <activity
             android:name=".SettingsActivity"
@@ -182,17 +184,23 @@
             </intent-filter>
         </receiver>
 
-        <!--<activity
+        <!--
+        <activity
             android:name=".PeriodicBFS$VendorListActivity"
             android:label="@string/app_name" >
-        </activity>-->
+        </activity>
+        -->
 
-        <!--<receiver
+
+        <!--
+            <receiver
             android:name=".PeriodicBFS$ScanStarter"
             android:enabled="false"
-            android:exported="false" />-->
+            android:exported="false" />
+        -->
 
-        <receiver android:name=".BeaconFinderService$ScanResumeReceiver"
+        <receiver
+            android:name=".BeaconFinderService$ScanResumeReceiver"
             android:enabled="false"
             android:exported="false" />
 
@@ -214,15 +222,20 @@
             android:label="@string/title_activity_freebie_description" >
         </activity>
 
-        <receiver android:name="com.commonsware.cwac.wakeful.AlarmReceiver">
+        <receiver android:name="com.commonsware.cwac.wakeful.AlarmReceiver" >
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
 
             <meta-data
                 android:name="com.commonsware.cwac.wakeful"
-                android:resource="@xml/wakeful"/>
+                android:resource="@xml/wakeful" />
         </receiver>
+
+        <activity
+            android:name=".UnusedOffersActivity"
+            android:label="@string/title_activity_unused_offers" >
+        </activity>
     </application>
 
 </manifest>
