@@ -44,6 +44,8 @@ public class MyClubsFragment extends Fragment implements ObservableScrollViewCal
     SearchView searchView;
     ObservableRecyclerView mRecyclerView;
     View SearchCard;
+    GridLayoutManager gridLayoutManager;
+    int length_of_array=0;
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         layout = inflater.inflate(R.layout.activity_my_clubs_fragment, container, false);
@@ -87,8 +89,8 @@ public class MyClubsFragment extends Fragment implements ObservableScrollViewCal
             }
         });
 
-
-        mRecyclerView.setLayoutManager(new GridLayoutManager(c,2));
+        gridLayoutManager = new GridLayoutManager(c,2);
+        mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
         Log.e("app", "in slidingmycards; set recycler");
@@ -146,6 +148,7 @@ public class MyClubsFragment extends Fragment implements ObservableScrollViewCal
                 Log.e("arrayLength", array.length()+"");
                 loyaltyempty.setVisibility(View.VISIBLE);
             }
+            length_of_array = array.length();
             for(int i = 0 ; i < array.length() ; i++){
                 loyaltyempty.setVisibility(View.GONE);
                 Log.e("stringfunction", "processing..");
@@ -190,13 +193,25 @@ public class MyClubsFragment extends Fragment implements ObservableScrollViewCal
     public void onUpOrCancelMotionEvent(ScrollState scrollState) {
         ActionBar ab = ((ActionBarActivity)getActivity()).getSupportActionBar();
         if (scrollState == ScrollState.UP) {
-            if (toolbarIsShown()) {
+            if (toolbarIsShown() && length_of_array>(int)((gridLayoutManager.findLastVisibleItemPosition()- gridLayoutManager.findFirstVisibleItemPosition())*1.5))
+            {
                 hideToolbar();
+            }
+            if(searchbarIsShown() && length_of_array>(int)((gridLayoutManager.findLastVisibleItemPosition()- gridLayoutManager.findFirstVisibleItemPosition())*1.5) ){
                 hideSearchbar();
             }
         } else if (scrollState == ScrollState.DOWN) {
             if (toolbarIsHidden()) {
                 showToolbar();
+            }
+            if (searchbarIsHidden()) {
+                showSearchbar();
+            }
+        }else{
+            if (toolbarIsHidden()) {
+                showToolbar();
+            }
+            if (searchbarIsHidden()) {
                 showSearchbar();
             }
         }
@@ -237,7 +252,16 @@ public class MyClubsFragment extends Fragment implements ObservableScrollViewCal
         });
         animator.start();
     }
+    private boolean searchbarIsShown() {
+        // Toolbar is 0 in Y-axis, so we can say it's shown.
+        return ViewHelper.getTranslationY(SearchCard) == 0;
+    }
 
+    private boolean searchbarIsHidden() {
+        // Toolbar is outside of the screen and absolute Y matches the height of it.
+        // So we can say it's hidden.
+        return ViewHelper.getTranslationY(SearchCard) == -SearchCard.getHeight()-dpToPx(12);
+    }
     private void showSearchbar() {
         moveSearchbar(0);
     }

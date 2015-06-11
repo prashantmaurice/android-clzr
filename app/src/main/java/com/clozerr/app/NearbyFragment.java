@@ -366,18 +366,16 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
         if (scrollState == ScrollState.UP) {
             if (toolbarIsShown()) {
                 hideToolbar();
-                hideSearchbar();
             }
             if (searchbarIsShown()) {
-
+                hideSearchbar();
             }
         } else if (scrollState == ScrollState.DOWN) {
             if (toolbarIsHidden()) {
                 showToolbar();
-                showSearchbar();
             }
             if (searchbarIsHidden()) {
-
+                showSearchbar();
             }
         }
     }
@@ -428,7 +426,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
     private boolean searchbarIsHidden() {
         // Toolbar is outside of the screen and absolute Y matches the height of it.
         // So we can say it's hidden.
-        return ViewHelper.getTranslationY(SearchCard) == -SearchCard.getHeight();
+        return ViewHelper.getTranslationY(SearchCard) == -SearchCard.getHeight()-dpToPx(12);
     }
     private void showSearchbar() {
         moveSearchbar(0);

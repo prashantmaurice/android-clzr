@@ -194,9 +194,9 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
                 String url;
                 mOffset = 0;
                 if(!TOKEN.equals(""))
-                    url = "http://api.clozerr.com/v2/vendor/list/category?category="+categorybundle.getString("categoryname");
+                    url = "http://api.clozerr.com/v2/vendor/list/category?category="+categorybundle.getString("categoryname").replace(" ","%20");
                 else
-                    url = "http://api.clozerr.com/v2/vendor/list/category?category="+categorybundle.getString("categoryname");
+                    url = "http://api.clozerr.com/v2/vendor/list/category?category="+categorybundle.getString("categoryname").replace(" ","%20");
                 Log.e("url", url);
 
                 new AsyncGet(CategoryDetail.this, url, new AsyncGet.AsyncResult() {
