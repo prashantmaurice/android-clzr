@@ -138,11 +138,11 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putString("distanceString", currentItem.getDistanceString());
                     detailsBundle.putString("phoneNumber", phoneNumber);
                     //currentItem.getQuestions();
-
-                    if (!callingIntent.getBooleanExtra("from_periodic_scan", false) && params != null)
-                        OneTimeBFS.checkAndStartScan(getApplicationContext(), params);
-                    else PeriodicBFS.dismissNotifications(VendorActivity.this);
-
+                    try {
+                        if (!callingIntent.getBooleanExtra("from_periodic_scan", false) && params != null)
+                            OneTimeBFS.checkAndStartScan(getApplicationContext(), params);
+                        else PeriodicBFS.dismissNotifications(VendorActivity.this);
+                    }catch (Exception e){}
                     toolbar = (Toolbar) findViewById(R.id.toolbar_vendor);
                     if (toolbar != null) {
                         setSupportActionBar(toolbar);
@@ -183,8 +183,10 @@ public class VendorActivity extends ActionBarActivity {
                     mCheckInButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if (detailsBundle.getString("offerId") == null)
+                            if (detailsBundle.getString("offerId") == null) {
                                 Toast.makeText(getApplicationContext(), "No further offers available.", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(VendorActivity.this, UnusedOffersActivity.class));
+                            }
                             else
                                 checkIn();
                         }
@@ -244,6 +246,33 @@ public class VendorActivity extends ActionBarActivity {
 
                           /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
                           mRecyclerView.setAdapter(Cardadapter);*/
+            }
+        });
+
+        new AsyncGet(this, "http://api.clozerr.com/v2/vendor/offers/offerspage?access_token="+TOKEN+"&vendor_id="+vendorId , new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                //  t1.setText(s);
+
+
+                Log.e("Offers", s);
+                detailsBundle.putString("Alloffers", s);
+                //Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+
+                try {
+                    Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
+
+                    t.setScreenName(detailsBundle.getString("vendorId") + "_offer");
+
+                    t.send(new HitBuilders.AppViewBuilder().build());
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "Error" + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+                //l1.setAdapter(adapter);
+                if (s == null) {
+                    Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 
@@ -317,23 +346,23 @@ public class VendorActivity extends ActionBarActivity {
                 //  t1.setText(s);
 
 
-                    Log.e("resultSlide", s);
-                    Toast.makeText(VendorActivity.this,s, Toast.LENGTH_SHORT).show();
-                    detailsBundle.putString("offerstring", s);
+                Log.e("resultSlide", s);
+                Toast.makeText(VendorActivity.this,s, Toast.LENGTH_SHORT).show();
+                detailsBundle.putString("offerstring", s);
 
-                    try {
-                        Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
+                try {
+                    Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
 
-                        t.setScreenName(detailsBundle.getString("vendorId") + "_offer");
+                    t.setScreenName(detailsBundle.getString("vendorId") + "_offer");
 
-                        t.send(new HitBuilders.AppViewBuilder().build());
-                    } catch (Exception e) {
-                        Toast.makeText(getApplicationContext(), "Error" + e.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                    //l1.setAdapter(adapter);
-                    if (s == null) {
-                        Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
-                    }
+                    t.send(new HitBuilders.AppViewBuilder().build());
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "Error" + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+                //l1.setAdapter(adapter);
+                if (s == null) {
+                    Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+                }
 
                 // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
 

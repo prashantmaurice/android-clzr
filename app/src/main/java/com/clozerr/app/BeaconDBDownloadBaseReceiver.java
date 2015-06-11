@@ -13,8 +13,8 @@ import java.util.concurrent.TimeUnit;
 
 public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
     private static final String TAG = "BDBBaseReceiver";
-    private static final long MAXIMUM_ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(1L, TimeUnit.MINUTES);
-    private static final long MINIMUM_ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.SECONDS);
+    private static final long MAXIMUM_ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(1L, TimeUnit.DAYS);
+    private static final long MINIMUM_ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.MINUTES);
     private static final long CONNECTIVITY_SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(15L, TimeUnit.SECONDS);
     private static final String ACTION_FIRE_ALARM_DOWNLOAD = "com.clozerr.app.ACTION_FIRE_ALARM_DOWNLOAD";
     private static final int REDUCTION_FACTOR = 2;
@@ -22,7 +22,7 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
 
     private static long alarmInterval = MAXIMUM_ALARM_INTERVAL;
     private static AlarmManager alarmManager = null;
-    private static WakeLockManager wakeLockManager = null;
+    //private static WakeLockManager wakeLockManager = null;
 
     private Context mContext = null;
     private Handler mHandler = null;
@@ -90,9 +90,9 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
             mContext = context;
             mHandler = new Handler(Looper.myLooper());
             //acquireWakeLock(context);
-            if (wakeLockManager == null)
+            /*if (wakeLockManager == null)
                 wakeLockManager = new WakeLockManager();
-            wakeLockManager.acquireWakeLock(context, TAG);
+            wakeLockManager.acquireWakeLock(context, TAG);*/
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -120,7 +120,7 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
                                 }
                             }
                             //releaseWakeLock();
-                            wakeLockManager.releaseWakeLock();
+                            //wakeLockManager.releaseWakeLock();
                         }
                     }, CONNECTIVITY_SCAN_PERIOD);
                 }

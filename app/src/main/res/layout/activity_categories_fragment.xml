@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/mycardslayout"
-    android:background="#E2E2E2"
+    android:background="#15000000"
     android:gravity="center"
     tools:context="com.clozerr.app.CategoriesFragment">
     <LinearLayout
@@ -34,7 +34,7 @@
                 <SearchView
                     android:id="@+id/searchView"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:queryHint=""
                     android:background="#FFFFFF"/>
 
@@ -44,6 +44,8 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
                     android:gravity="center_vertical"
+                    android:textColorHint="#50000000"
+                    android:textSize="16sp"
                     android:hint="Search for Places or Location"
                     android:background="#FFFFFF"/>
             </LinearLayout>

@@ -101,6 +101,52 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
                 searchView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             }
         });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                String url;
+                if(!query.equals("")) {
+                    url = "http://api.clozerr.com/v2/vendor/search/name?access_token=" + TOKEN + "&text=" + query + "&latitude=" + Home.lat + "&longitude=" + Home.longi;
+                }
+                else{
+                    mOffset=0;
+                    url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
+                            + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
+                }
+
+                    new AsyncGet(c, url, new AsyncGet.AsyncResult() {
+                        @Override
+                        public void gotResult(String s) {
+                            Log.e("result", s);
+                            if (s == null) {
+                                Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
+                            }
+                            ArrayList<CardModel> CardList = convertRow(s);
+                            if (CardList.size() != 0) {
+                                mMainCardsList = CardList;
+                                mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
+                                mRecyclerView.setAdapter(mMainPageAdapter);
+                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+                                editor.putString("home_cards", s);
+                                editor.apply();
+                                Log.e("app", "editing done");
+                            } else {
+                                Log.d("app", "no cards to show");
+                                mCardsLeft = false;
+                            }
+                        }
+                    });
+
+
+                return false;
+            }
+        });
         mRecyclerView.setLayoutManager(new LinearLayoutManager(c));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
@@ -147,6 +193,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
                         mMainCardsList = CardList;
                         mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
                         mRecyclerView.setAdapter(mMainPageAdapter);
+
                         final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
                         editor.putString("home_cards", s);
                         editor.apply();
@@ -268,15 +315,27 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
                 {
                     vendorDescription="No Restaurant Description Available Now";
                 }
+                String fid;
+                try {
+                    fid=array.getJSONObject(i).getString("fid");
+                }catch (Exception e){
+                    fid="";
+                }
+                JSONArray offers;
+                try{
+                    offers = array.getJSONObject(i).getJSONArray("offers");
+                }catch (Exception e){
+                    offers = new JSONArray("[{}]");
+                }
                 Log.e("description", vendorDescription);
                 CardModel item = new CardModel(
                         array.getJSONObject(i).getString("name"),
                         phonenumber, vendorDescription,
-                        array.getJSONObject(i).getJSONArray("offers"),
+                        offers,
                         array.getJSONObject(i).getJSONArray("location").getDouble(0),
                         array.getJSONObject(i).getJSONArray("location").getDouble(1),
                         array.getJSONObject(i).getString("image"),
-                        array.getJSONObject(i).getString("fid"),array.getJSONObject(i).getString("_id"),0
+                        fid,array.getJSONObject(i).getString("_id"),0
                 );
                 rowItems.add(item);
             }

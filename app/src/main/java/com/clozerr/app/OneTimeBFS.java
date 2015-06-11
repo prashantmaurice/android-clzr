@@ -3,10 +3,13 @@ package com.clozerr.app;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.android.internal.util.Predicate;
+import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.Region;
 import com.jaalee.sdk.ServiceReadyCallback;
@@ -21,12 +24,19 @@ public class OneTimeBFS extends BeaconFinderService {
     private static BeaconDBParams beaconDBParams;
     private static boolean running = false;
 
-    @Override
+    /*public OneTimeBFS() {
+        super();
+    }*/
+
+    /*@Override
     public void onDestroy() {
-        running = false;
-        turnOffBluetooth();
+        if (running) {
+            running = false;
+            beaconManager.stopRanging(scanningRegion);
+            turnOffBluetooth();
+        }
         super.onDestroy();
-    }
+    }*/
 
     public static boolean isRunning() { return running; }
 
@@ -49,18 +59,19 @@ public class OneTimeBFS extends BeaconFinderService {
                     }
                 });
                 if (vendorParams != null) {
-                    String toastText = "You are close to this place. ";
+                    String toastText;
                     if (vendorParams.mHasOffers)
-                        toastText += "And you have rewards you can use here! Check in and use them!";
+                        toastText = "Redeem your rewards here!";
                     else if (vendorParams.mLoyaltyType.equalsIgnoreCase("sx"))
-                        toastText += "Go in and get your stamps during billing!";
+                        toastText = "Get your stamps during billing!";
                     else
-                        toastText += "Go in and mark your visit!";
+                        toastText = "Mark your visit!";
                     putToast(getApplicationContext(), toastText, Toast.LENGTH_LONG);
                     beaconManager.stopRanging(scanningRegion);
                     turnOffBluetooth();
                     Log.e(TAG, "Stopped Scan");
                     running = false;
+                    releaseLock();
                     return;
                 }
             }
@@ -80,7 +91,7 @@ public class OneTimeBFS extends BeaconFinderService {
         }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
     }*/
 
-    @Override
+    /*@Override
     protected void runService() {
         scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(CLOZERR_UUID), beaconDBParams.mMajor, beaconDBParams.mMinor);
         beaconManager.connect(new ServiceReadyCallback() {
@@ -89,7 +100,7 @@ public class OneTimeBFS extends BeaconFinderService {
                 turnOnBluetooth();
                 Log.e(TAG, "Started Scan");
                 running = true;
-                bgThreadHandler.postDelayed(new Runnable() {
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         beaconManager.startRangingAndDiscoverDevice(scanningRegion);
@@ -97,19 +108,62 @@ public class OneTimeBFS extends BeaconFinderService {
                 }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
             }
         });
+    }*/
+
+    @Override
+    protected void doWakefulWork(Intent intent) {
+        /*beaconManager.connect(new ServiceReadyCallback() {
+            @Override
+            public void onServiceReady() {
+                turnOnBluetooth();
+                Log.e(TAG, "Started Scan");
+                running = true;
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        beaconManager.startRangingAndDiscoverDevice(scanningRegion);
+                    }
+                }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
+            }
+        });*/
+        setListener();
+        turnOnBluetooth();
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                beaconManager.connect(new ServiceReadyCallback() {
+                    @Override
+                    public void onServiceReady() {
+                        Log.e(TAG, "Started Scan");
+                        running = true;
+                        scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(CLOZERR_UUID), beaconDBParams.mMajor, beaconDBParams.mMinor);
+                        beaconManager.startRangingAndDiscoverDevice(scanningRegion);
+                    }
+                });
+            }
+        }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
+    }
+
+    @Override
+    protected boolean isListeningAfterWork() {
+        return false;
     }
 
     public static void checkAndStartScan(Context context, BeaconDBParams params) {
-        if (params != null && isBLESupported) {
-            context.stopService(new Intent(context, PeriodicBFS.class));
+        if (!running && params != null && checkCompatibility(context) && checkPreferences(context)) {
+            //context.stopService(new Intent(context, PeriodicBFS.class));
+            WakefulIntentService.cancelAlarms(context);
             beaconDBParams = params;
-            context.startService(new Intent(context, OneTimeBFS.class));
+            //context.startService(new Intent(context, OneTimeBFS.class));
+            WakefulIntentService.sendWakefulWork(context, OneTimeBFS.class);
         }
     }
 
     public static void checkAndStopScan(Context context) {
         if (running) {
-            context.stopService(new Intent(context, OneTimeBFS.class));
+            running = false;
+            beaconManager.stopRanging(scanningRegion);
+            turnOffBluetooth();
             PeriodicBFS.checkAndStartScan(context);
         }
     }

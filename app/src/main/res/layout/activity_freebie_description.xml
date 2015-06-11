@@ -33,6 +33,7 @@
                 android:src="@drawable/ic_close"
                 android:background="#00000000"/>
             <TextView
+                android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Welcome Reward"
@@ -49,6 +50,7 @@
         <TextView
             android:paddingTop="15dp"
             android:paddingBottom="15dp"
+            android:id="@+id/caption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Welcome Reward"
@@ -60,6 +62,7 @@
             android:layout_marginRight="15dp"
             android:background="#eeeeee"></LinearLayout>
         <TextView
+            android:id="@+id/description"
             android:paddingTop="15dp"
             android:paddingBottom="15dp"
             android:layout_width="match_parent"

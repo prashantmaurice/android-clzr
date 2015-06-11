@@ -1,0 +1,2 @@
+<WakefulIntentService
+    listener="com.clozerr.app.PeriodicBFS$AlarmListener"/>

@@ -102,6 +102,7 @@
     <orderEntry type="library" exported="" name="android-support-v13" level="project" />
     <orderEntry type="library" exported="" name="bolts-android-1.1.2" level="project" />
     <orderEntry type="module" module-name="facebook" exported="" />
+    <orderEntry type="module" module-name="wakeful" exported="" />
   </component>
 </module>
 
