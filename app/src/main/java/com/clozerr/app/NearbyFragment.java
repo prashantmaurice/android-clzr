@@ -112,7 +112,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
             public boolean onQueryTextChange(String query) {
                 String url;
                 if(!query.equals("")) {
-                    url = "http://api.clozerr.com/v2/vendor/search/name?access_token=" + TOKEN + "&text=" + query + "&latitude=" + Home.lat + "&longitude=" + Home.longi;
+                    url = "http://api.clozerr.com/v2/vendor/search/name?access_token=" + TOKEN + "&text=" + query.replace(" ","%20") + "&latitude=" + Home.lat + "&longitude=" + Home.longi;
                 }
                 else{
                     mOffset=0;
