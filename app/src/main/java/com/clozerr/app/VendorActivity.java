@@ -183,12 +183,7 @@ public class VendorActivity extends ActionBarActivity {
                     mCheckInButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if (detailsBundle.getString("offerId") == null) {
-                                Toast.makeText(getApplicationContext(), "No further offers available.", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(VendorActivity.this, UnusedOffersActivity.class));
-                            }
-                            else
-                                checkIn();
+                            startActivity(new Intent(VendorActivity.this, UnusedOffersActivity.class));
                         }
                     });
                 } catch (Exception e) {

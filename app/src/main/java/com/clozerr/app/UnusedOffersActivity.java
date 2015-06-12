@@ -77,7 +77,7 @@ public class UnusedOffersActivity extends ActionBarActivity {
 //                        offerObject.getString("description"),
 //                        offerObject.getInt("stamps"),
 //                        extras);
-                if(offerObject.getJSONObject("params").getBoolean("unlocked")==true) {
+                if((offerObject.getJSONObject("params").getBoolean("unlocked")==true) && (offerObject.getJSONObject("params").getBoolean("used")==false)) {
                     rowItems.add(offerObject.getString("caption"));
                     offerid.add(offerObject.getString("_id"));
                     caption.add(offerObject.getString("caption"));
