@@ -42,4 +42,5 @@
     <string name="title_activity_freebies">FreebiesActivity</string>
     <string name="title_activity_freebie_description">FreebieDescription</string>
     <string name="title_activity_unused_offers">UnusedOffersActivity</string>
+    <string name="title_activity_qr">QRActivity</string>
 </resources>
