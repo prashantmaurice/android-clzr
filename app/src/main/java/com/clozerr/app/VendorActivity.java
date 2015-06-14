@@ -249,7 +249,6 @@ public class VendorActivity extends ActionBarActivity {
             public void gotResult(String s) {
                 //  t1.setText(s);
 
-
                 Log.e("Offers", s);
                 detailsBundle.putString("Alloffers", s);
                 //Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();

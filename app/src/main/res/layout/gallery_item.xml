@@ -7,7 +7,7 @@
         android:layout_height="50dp"
         android:src="@drawable/galleryimage"
         android:layout_gravity="center"
-        android:layout_margin="1dp"
+        android:layout_margin="4dp"
         android:id="@+id/galleryimage"/>
 
 </LinearLayout>

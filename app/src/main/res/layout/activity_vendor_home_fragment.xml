@@ -129,7 +129,8 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
+                        android:layout_gravity="start"
+                        android:layout_marginLeft="15dp"
                         android:gravity="center"
                         android:orientation="horizontal"
                         android:padding="10dp">
@@ -228,8 +229,8 @@
                         android:layout_height="55dp"
                         android:layout_width="match_parent"
                         android:id="@+id/GalleryRecyclerView"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginRight="15dp"
+                        android:layout_marginLeft="11dp"
+                        android:layout_marginRight="11dp"
                         android:layout_marginTop="5dp"/>
 
                     <View
@@ -261,7 +262,7 @@
                             <ImageButton
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
-                                android:layout_marginRight="3dp"
+                                android:layout_marginRight="8dp"
                                 android:src="@drawable/facebook"
                                 android:scaleType="fitXY"
                                 android:padding="0dp"/>
@@ -269,7 +270,7 @@
                             <ImageButton
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
-                                android:layout_marginRight="3dp"
+                                android:layout_marginRight="8dp"
                                 android:src="@drawable/gplus_logo"
                                 android:scaleType="fitXY"
                                 android:padding="0dp"/>
@@ -277,7 +278,7 @@
                             <ImageButton
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
-                                android:layout_marginRight="3dp"
+                                android:layout_marginRight="8dp"
                                 android:padding="0dp"
                                 android:src="@drawable/twitter_logo"
                                 android:scaleType="fitXY"/>
@@ -285,7 +286,7 @@
                             <ImageButton
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
-                                android:layout_marginRight="3dp"
+                                android:layout_marginRight="8dp"
                                 android:src="@drawable/instagram"
                                 android:scaleType="fitXY"
                                 android:padding="0dp"/>
