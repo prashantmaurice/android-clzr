@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -57,6 +58,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
     private final int ITEMS_PER_PAGE = 7, INITIAL_LOAD_LIMIT = 8;
     View mScrollable;
     SearchView searchView;
+    CountDownTimer countDownTimer;
     View SearchCard;
 
     @Override
@@ -109,41 +111,60 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
             }
 
             @Override
-            public boolean onQueryTextChange(String query) {
-                String url;
-                if(!query.equals("")) {
-                    url = "http://api.clozerr.com/v2/vendor/search/name?access_token=" + TOKEN + "&text=" + query.replace(" ","%20") + "&latitude=" + Home.lat + "&longitude=" + Home.longi;
+            public boolean onQueryTextChange(final String query) {
+                if(countDownTimer!=null) {
+                    countDownTimer.cancel();
                 }
-                else{
-                    mOffset=0;
-                    url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
-                            + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
-                }
+                countDownTimer = new CountDownTimer(1000, 1000) {//CountDownTimer(edittext1.getText()+edittext2.getText()) also parse it to long
 
-                    new AsyncGet(c, url, new AsyncGet.AsyncResult() {
-                        @Override
-                        public void gotResult(String s) {
-                            Log.e("result", s);
-                            if (s == null) {
-                                Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
-                            }
-                            ArrayList<CardModel> CardList = convertRow(s);
-                            if (CardList.size() != 0) {
-                                mMainCardsList = CardList;
-                                mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
-                                mRecyclerView.setAdapter(mMainPageAdapter);
-                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                                editor.putString("home_cards", s);
-                                editor.apply();
-                                Log.e("app", "editing done");
-                            } else {
-                                Log.d("app", "no cards to show");
-                                mCardsLeft = false;
-                            }
+                    public void onTick(long millisUntilFinished) {
+
+                    }
+
+                    public void onFinish() {
+                        countDownTimer.cancel();
+                        String url;
+
+                        if(!query.equals("")) {
+                            url = "http://api.clozerr.com/v2/vendor/search/name?access_token=" + TOKEN + "&text=" + query.replace(" ","%20") + "&latitude=" + Home.lat + "&longitude=" + Home.longi;
                         }
-                    });
+                        else{
+                            mCardsLeft = true;
+                            mOffset = 0;
+                            url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
+                                    + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
+                            Log.d("urlsearch",url);
+                        }
 
+                        new AsyncGet(c, url, new AsyncGet.AsyncResult() {
+                            @Override
+                            public void gotResult(String s) {
+                                Log.e("result", s);
+                                if (s == null) {
+                                    Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
+                                }
+                                ArrayList<CardModel> CardList = convertRow(s);
+                                if (CardList.size() != 0) {
 
+                                    mMainCardsList = CardList;
+                                    mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
+                                    mRecyclerView.setAdapter(mMainPageAdapter);
+                                    if(query.equals("")) {
+
+                                        mRecyclerView.setOnScrollListener(mOnScrollListener);
+                                    }
+                                    final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+                                    editor.putString("home_cards", s);
+                                    editor.apply();
+                                    Log.e("app", "editing done");
+                                } else {
+                                    Log.d("app", "no cards to show");
+                                    mCardsLeft = false;
+                                }
+                            }
+                        });
+                    }
+                }.start();
                 return false;
             }
         });
