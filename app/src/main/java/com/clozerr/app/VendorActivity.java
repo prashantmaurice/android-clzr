@@ -54,7 +54,7 @@ public class VendorActivity extends ActionBarActivity {
 
     private String pinNumber;
     public static Bundle detailsBundle;
-    static String vendorId;
+    public static String vendorId;
     static String vendorTitle;
     static int i=1;
     @Override

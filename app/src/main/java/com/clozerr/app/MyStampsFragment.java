@@ -77,10 +77,13 @@ public class MyStampsFragment extends Fragment {
                         null,
                         offerObject.getString("caption"),
                         offerObject.getString("description"),
-                        offerObject.getInt("stamps"),
+                        offerObject.getJSONObject("params").getInt("stamps"),
+                        offerObject.getJSONObject("params").getBoolean("used"),
+                        offerObject.getJSONObject("params").getBoolean("unlocked"),
                         extras);
                 rowItems.add(item);
             }
+            Toast.makeText(getActivity(),"ABCD", Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             e.printStackTrace();
         }
