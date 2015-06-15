@@ -17,7 +17,9 @@
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal" />
         <android.support.v7.widget.RecyclerView
-            android:layout_width="300dp"
+            android:layout_width="match_parent"
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:id="@+id/stampslist" />

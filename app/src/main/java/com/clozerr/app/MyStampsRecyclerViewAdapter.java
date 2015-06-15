@@ -8,8 +8,10 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 public class MyStampsRecyclerViewAdapter extends RecyclerView.Adapter<MyStampsRecyclerViewAdapter.ListItemViewHolder> {
 
@@ -36,26 +38,26 @@ public class MyStampsRecyclerViewAdapter extends RecyclerView.Adapter<MyStampsRe
         String current=values[position];
         //viewHolder.txtvisitno.setText(model.getStamps()+"");
         viewHolder.stampnumber.setText(current);
-//        viewHolder.stampnumber.setOnTouchListener(new View.OnTouchListener() {
-//
-//            @Override
-//            public boolean onTouch(View arg0, MotionEvent arg1) {
-//                switch (arg1.getActionMasked()) {
-//                    case MotionEvent.ACTION_DOWN: {
-//                        viewHolder.stampnumber.setBackground(reso.getDrawable(R.drawable.cirkbackhover));
-//                        return true;
-//
-//                    }
-//                    case MotionEvent.ACTION_UP:
-//                        // TODO Auto-generated method stub
-//                    {
-//                        viewHolder.stampnumber.setBackground(reso.getDrawable(R.drawable.circularback));
-//                        return true;
-//                    }
-//                }
-//                return false;
-//            }
-//        });
+        viewHolder.stampnumber.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View arg0, MotionEvent arg1) {
+                switch (arg1.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        viewHolder.stampnumber.setBackground(reso.getDrawable(R.drawable.cirkbackhover));
+                        return true;
+
+                    }
+                    case MotionEvent.ACTION_UP:
+                        // TODO Auto-generated method stub
+                    {
+                        viewHolder.stampnumber.setBackground(reso.getDrawable(R.drawable.circularback));
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
         // viewHolder.txtDist.setText(model.getDesc());
 
     }
@@ -71,12 +73,15 @@ public class MyStampsRecyclerViewAdapter extends RecyclerView.Adapter<MyStampsRe
         TextView txtvisitno;
 
         TextView stampnumber;
+        ImageView stampcheck;
         /*public MyOffer currentItem;*/
 
         public ListItemViewHolder(View itemView) {
             super(itemView);
             //txtvisitno = (TextView) itemView.findViewById(R.id.txtNum);
             stampnumber = (TextView) itemView.findViewById(R.id.stampnumber);
+            stampcheck = (ImageView) itemView.findViewById(R.id.stampcheck);
+
 
         }
     }
