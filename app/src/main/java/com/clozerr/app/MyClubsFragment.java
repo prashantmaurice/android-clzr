@@ -92,6 +92,7 @@ public class MyClubsFragment extends Fragment implements ObservableScrollViewCal
         gridLayoutManager = new GridLayoutManager(c,2);
         mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.addItemDecoration(new SpaceItemDecoration(dpToPx(52),1));
         mRecyclerView.setHasFixedSize(true);
         Log.e("app", "in slidingmycards; set recycler");
 

@@ -112,7 +112,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
 
             @Override
             public boolean onQueryTextChange(final String query) {
-                if(countDownTimer!=null) {
+                if (countDownTimer != null) {
                     countDownTimer.cancel();
                 }
                 countDownTimer = new CountDownTimer(1000, 1000) {//CountDownTimer(edittext1.getText()+edittext2.getText()) also parse it to long
@@ -125,15 +125,14 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
                         countDownTimer.cancel();
                         String url;
 
-                        if(!query.equals("")) {
-                            url = "http://api.clozerr.com/v2/vendor/search/name?access_token=" + TOKEN + "&text=" + query.replace(" ","%20") + "&latitude=" + Home.lat + "&longitude=" + Home.longi;
-                        }
-                        else{
+                        if (!query.equals("")) {
+                            url = "http://api.clozerr.com/v2/vendor/search/name?access_token=" + TOKEN + "&text=" + query.replace(" ", "%20") + "&latitude=" + Home.lat + "&longitude=" + Home.longi;
+                        } else {
                             mCardsLeft = true;
                             mOffset = 0;
                             url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
                                     + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
-                            Log.d("urlsearch",url);
+                            Log.d("urlsearch", url);
                         }
 
                         new AsyncGet(c, url, new AsyncGet.AsyncResult() {
@@ -149,7 +148,8 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
                                     mMainCardsList = CardList;
                                     mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
                                     mRecyclerView.setAdapter(mMainPageAdapter);
-                                    if(query.equals("")) {
+                                    addMargin();
+                                    if (query.equals("")) {
 
                                         mRecyclerView.setOnScrollListener(mOnScrollListener);
                                     }
@@ -170,9 +170,12 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
         });
         mRecyclerView.setLayoutManager(new LinearLayoutManager(c));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.addItemDecoration(new SpaceItemDecoration(dpToPx(52),0));
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(c);
         mRecyclerView.setLayoutManager(mLayoutManager);
+
+        //mLayoutManager.offsetChildrenVertical(dpToPx(52));
         mOnScrollListener = new EndlessRecyclerOnScrollListener(
                 (LinearLayoutManager)mLayoutManager) {
             @Override
@@ -196,6 +199,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
             mMainCardsList = convertRow(cards);
             mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
             mRecyclerView.setAdapter(mMainPageAdapter);
+//            addMargin();
         } else {
             mOffset = 0;
             String url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
@@ -214,7 +218,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
                         mMainCardsList = CardList;
                         mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
                         mRecyclerView.setAdapter(mMainPageAdapter);
-
+                        addMargin();
                         final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
                         editor.putString("home_cards", s);
                         editor.apply();
@@ -259,9 +263,10 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
                         ArrayList<CardModel> CardList = convertRow(s);
                         if(CardList.size()!=0){
                             mMainCardsList = CardList;
+
                             mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
                             mRecyclerView.setAdapter(mMainPageAdapter);
-
+                            addMargin();
                             final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
                             editor.putString("home_cards", s);
                             editor.apply();
@@ -276,6 +281,14 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
         });
 
         return layout;
+    }
+    public void addMargin(){
+        /*LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0, dpToPx(52), 0, 0);
+        ((mLayoutManager.findViewByPosition(0)).findViewById(R.id.cardlayout)).setLayoutParams(params);*/
     }
     public void loadMoreItems() {
         Log.e("load", "in loadMoreItems()");
@@ -480,7 +493,7 @@ public class NearbyFragment extends Fragment implements ObservableScrollViewCall
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int height = displaymetrics.heightPixels;
-        return height - swipetab.getHeight()-searchView.getHeight()+dpToPx(0);
+        return height - swipetab.getHeight()-searchView.getHeight()+dpToPx(8);
     }
     public int dpToPx(int dp) {
         DisplayMetrics displayMetrics = c.getResources().getDisplayMetrics();

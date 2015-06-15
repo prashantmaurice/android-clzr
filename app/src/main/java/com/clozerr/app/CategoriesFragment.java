@@ -93,6 +93,7 @@ public class CategoriesFragment extends Fragment implements ObservableScrollView
         gridLayoutManager = new GridLayoutManager(c, 2);
         mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.addItemDecoration(new SpaceItemDecoration(dpToPx(52),1));
         mRecyclerView.setHasFixedSize(true);
 
         SharedPreferences status = c.getSharedPreferences("USER", 0);
