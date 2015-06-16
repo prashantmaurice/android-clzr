@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -125,6 +126,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         TextView txtDist;
         TextView txtCaption;
         LinearLayout linearLayout;
+        ImageButton like;
         //TextView txtrating;
         public CardModel currentItem;
 
@@ -135,7 +137,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             txtCaption = (TextView) itemView.findViewById(R.id.txtCaption);
             imageView = (ImageView) itemView.findViewById(R.id.imageView);
             linearLayout = (LinearLayout)itemView.findViewById(R.id.cardlayout);
-
+            like = (ImageButton)itemView.findViewById(R.id.like);
            /* LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     linearLayout.getWidth()/2
@@ -144,7 +146,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             linearLayout.setLayoutParams(params);*/
 
             //txtrating=(TextView) itemView.findViewById(R.id.txtrating);
+            like.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
+                }
+            });
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
