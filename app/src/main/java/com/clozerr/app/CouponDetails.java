@@ -68,7 +68,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     private CircleImageView callButton, dirButton, rateButton;
     private TextView checkinButton;
     private Bundle detailsBundle;
-    private String pinNumber, gcmId,someNickname;
+    private String pinNumber, gcmId, someNickname;
     private Intent i;
 
 
@@ -79,8 +79,8 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         System.out.println("set content view");
 
         final Intent callingIntent = getIntent();
-        i=callingIntent;
-        if(callingIntent.getBooleanExtra("Notification",false)){
+        i = callingIntent;
+        if (callingIntent.getBooleanExtra("Notification", false)) {
             NotificationManager mNotificationManager;
             mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.cancel(0);
@@ -89,17 +89,14 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         initViews();
         detailsBundle = new Bundle();
         final String vendor_id = callingIntent.getStringExtra("vendor_id");
-        try
-        {
+        try {
             Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
 
-            t.setScreenName(vendor_id+"_screen");
+            t.setScreenName(vendor_id + "_screen");
 
             t.send(new HitBuilders.AppViewBuilder().build());
-        }
-        catch(Exception  e)
-        {
-            Toast.makeText(getApplicationContext(), "Error"+e.getMessage(), Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "Error" + e.getMessage(), Toast.LENGTH_LONG).show();
         }
         final String offer_id = callingIntent.getStringExtra("offer_id");
         String offer_text = callingIntent.getStringExtra("offer_text");
@@ -113,9 +110,9 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         detailsBundle.putString("offerCaption", offer_caption);
         final ArrayList<String> ques_arr = new ArrayList<>();
         SharedPreferences status = getSharedPreferences("USER", 0);
-        if(status.contains("latitude") && status.contains("longitude")){
-            Home.lat=Double.parseDouble(status.getString("latitude",""));
-            Home.longi=Double.parseDouble(status.getString("longitude",""));
+        if (status.contains("latitude") && status.contains("longitude")) {
+            Home.lat = Double.parseDouble(status.getString("latitude", ""));
+            Home.longi = Double.parseDouble(status.getString("longitude", ""));
         }
 
         //Toast.makeText(this, "id - " + vendor_id, Toast.LENGTH_SHORT).show();
@@ -128,7 +125,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
             public void gotResult(String s) {
                 //Log.i("ghfv","Inside gotResu");
                 //Toast.makeText(CouponDetails.this, "Inside gotResult()", Toast.LENGTH_SHORT).show();
-                String address = "", phonenumber="", vendorDescription="";
+                String address = "", phonenumber = "", vendorDescription = "";
                 String uuid = null;
                 double latitude = 0.0, longitude = 0.0;
                 try {
@@ -165,21 +162,19 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                             latitude,
                             longitude,
                             object.getString("image"),
-                            object.getString("fid"),object.getString("_id"),
+                            object.getString("fid"), object.getString("_id"),
                             0
                     );
                     ArrayList<String> stringArray = new ArrayList<String>();
                     JSONArray jsonArray = object.getJSONArray("question");
-                    for(int i = 0, count = jsonArray.length(); i< count; i++)
-                    {
+                    for (int i = 0, count = jsonArray.length(); i < count; i++) {
                         try {
                             stringArray.add(jsonArray.getString(i));
-                        }
-                        catch (JSONException e) {
+                        } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
-                    detailsBundle.putStringArrayList("questions",stringArray);
+                    detailsBundle.putStringArrayList("questions", stringArray);
                      /*JSONArray question= object.getJSONArray("question");
                     for(int i=0;i<question.length();i++){
                       ques_arr.add(question.getString(i));
@@ -199,7 +194,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     detailsBundle.putString("phonenumber", phonenumber);
                     //currentItem.getQuestions();
 
-                    Log.i("fvgh",detailsBundle.toString());
+                    Log.i("fvgh", detailsBundle.toString());
 
                     try {
                         Ion.with(itemImageView)
@@ -208,13 +203,12 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                                 //    .animateLoad(spinAnimation)
                                 //    .animateIn(fadeInAnimation)
                                 .load(detailsBundle.getString("vendorImage"));
-                        Log.e("abc",currentItem.getImageId());
-                    }
-                    catch(Exception e) {
+                        Log.e("abc", currentItem.getImageId());
+                    } catch (Exception e) {
                         e.printStackTrace();
-                        Log.e("sh",e.toString());
+                        Log.e("sh", e.toString());
                         // Log.e("img",detailsBundle.getString("vendorImage"));
-                        Log.e("abc",currentItem.getImageId());
+                        Log.e("abc", currentItem.getImageId());
                     }
 
                     titleView.setText(detailsBundle.getString("vendorTitle"));
@@ -230,7 +224,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                         @Override
                         public void onClick(View v) {
                             if (detailsBundle.getString("offerId") == null)
-                                Toast.makeText(getApplicationContext(),"No further offers available.",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "No further offers available.", Toast.LENGTH_SHORT).show();
                             else
                                 showConfirmPopup();
                         }
@@ -243,8 +237,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                                 Intent dialIntent = new Intent(Intent.ACTION_DIAL);
                                 dialIntent.setData(Uri.parse("tel:" + detailsBundle.getString("phonenumber")));
                                 startActivity(dialIntent);
-                            }
-                            else
+                            } else
                                 Toast.makeText(CouponDetails.this, "Sorry, the phone number is unavailable now...",
                                         Toast.LENGTH_SHORT).show();
                         }
@@ -257,8 +250,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                                 Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
                                         Uri.parse("http://maps.google.com/maps?daddr=" + detailsBundle.getDouble("latitude") + "," + detailsBundle.getDouble("longitude")));
                                 startActivity(intent);
-                            }
-                            else
+                            } else
                                 Toast.makeText(CouponDetails.this, "Sorry, the location details haven't been provided by the vendor.",
                                         Toast.LENGTH_SHORT).show();
                         }
@@ -315,7 +307,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                         }
                     });*/
 
-                    if(callingIntent.getBooleanExtra("from_notify_review",false)) {
+                    if (callingIntent.getBooleanExtra("from_notify_review", false)) {
                         final String checkin_id_review = callingIntent.getStringExtra("checkin_id");
                         // load dialogs only when context is valid
                         findViewById(R.id.detailsLayout).post(new Runnable() {
@@ -413,7 +405,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if(id==R.id.imageView2){
+        if (id == R.id.imageView2) {
             Intent shortcutIntent = new Intent(getApplicationContext(), CouponDetails.class);
             shortcutIntent.putExtra("vendor_id", i.getStringExtra("vendor_id"));
             shortcutIntent.putExtra("offer_id", i.getStringExtra("offer_id"));
@@ -421,8 +413,8 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
             shortcutIntent.putExtra("offer_text", i.getStringExtra("offer_text"));
             SharedPreferences example = getSharedPreferences("USER", 0);
             SharedPreferences.Editor editor = example.edit();
-            editor.putString("latitude", Home.lat+"");
-            editor.putString("longitude", Home.longi+"");
+            editor.putString("latitude", Home.lat + "");
+            editor.putString("longitude", Home.longi + "");
             editor.apply();
             shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -432,7 +424,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
             addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, Intent.ShortcutIconResource.fromContext(getApplicationContext(), R.drawable.ic_launcher));
             addIntent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
             getApplicationContext().sendBroadcast(addIntent);
-            Toast.makeText(getApplicationContext(),"Pinned To Home Screen",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Pinned To Home Screen", Toast.LENGTH_SHORT).show();
         }
         //noinspection SimplifiableIfStatement
         /*if (id == R.id.action_settings) {
@@ -518,14 +510,17 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                     extras = new MyOffer.SXOfferExtras(offerObject.getJSONObject("stampStatus").getInt("total"),
                             offerObject.getDouble("billAmt"));
                 item = new MyOffer(type,
-                                   offerObject.getString("image"),
-                                   offerObject.getString("optionalImage"),
-                                   offerObject.getString("caption"),
-                                   offerObject.getString("description"),
-                                   offerObject.getInt("stamps"),
-                                   extras);
+                        offerObject.getString("image"),
+                        offerObject.getString("optionalImage"),
+                        offerObject.getString("caption"),
+                        offerObject.getString("description"),
+                        offerObject.getInt("stamps"),
+                        offerObject.getJSONObject("params").getBoolean("used"),
+                        offerObject.getJSONObject("params").getBoolean("unlocked"),
+                        extras);
                 rowItems.add(item);
             }
+            Toast.makeText(getApplicationContext(),rowItems.size(),Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -577,13 +572,13 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
             public void onDrawerOpened() {
 
 
-                  Button offers_menu = (Button) findViewById(R.id.myoffers);
-                  offers_menu.setText(detailsBundle.getString("vendorTitle"));
-                  offers_menu.setTextColor(Color.parseColor("#FFFFFF"));
-                  offers_menu.setBackgroundColor(Color.parseColor("#EF6C00"));
-                  SharedPreferences status = getSharedPreferences("USER",0);
-                  String TOKEN = status.getString("token", "");
-                  CouponDetails.this.getSupportActionBar().hide();
+                Button offers_menu = (Button) findViewById(R.id.myoffers);
+                offers_menu.setText(detailsBundle.getString("vendorTitle"));
+                offers_menu.setTextColor(Color.parseColor("#FFFFFF"));
+                offers_menu.setBackgroundColor(Color.parseColor("#EF6C00"));
+                SharedPreferences status = getSharedPreferences("USER", 0);
+                String TOKEN = status.getString("token", "");
+                CouponDetails.this.getSupportActionBar().hide();
 /*
 
                 Button offers_menu = (Button) findViewById(R.id.myoffers);
@@ -595,13 +590,13 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
 
 */
 
-                String urlVisited ="http://api.clozerr.com/vendor/offers/myofferspage?vendor_id=" + detailsBundle.getString("vendorId")+"&access_token="+TOKEN;
-                String urlUser = "http://api.clozerr.com/auth?fid="+detailsBundle.getString("fid")+"&access_token=" + TOKEN;
+                String urlVisited = "http://api.clozerr.com/vendor/offers/myofferspage?vendor_id=" + detailsBundle.getString("vendorId") + "&access_token=" + TOKEN;
+                String urlUser = "http://api.clozerr.com/auth?fid=" + detailsBundle.getString("fid") + "&access_token=" + TOKEN;
 
                 Log.e("urlslide", urlVisited);
                 //Toast.makeText(getApplicationContext(),urlVisited,Toast.LENGTH_SHORT).show();
 
-                new AsyncGet(CouponDetails.this, urlVisited , new AsyncGet.AsyncResult() {
+                new AsyncGet(CouponDetails.this, urlVisited, new AsyncGet.AsyncResult() {
                     @Override
                     public void gotResult(String s) {
                         //  t1.setText(s);
@@ -620,21 +615,18 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                         mRecyclerView.setAdapter(myOffersAdapter);*/
                         MyOffersRecyclerViewAdapter adapter = new MyOffersRecyclerViewAdapter(myOffers, CouponDetails.this);
                         mRecyclerView.setAdapter(adapter);
-                        try
-                        {
+                        try {
                             Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
 
-                            t.setScreenName(detailsBundle.getString("vendorId")+"_offer");
+                            t.setScreenName(detailsBundle.getString("vendorId") + "_offer");
 
                             t.send(new HitBuilders.AppViewBuilder().build());
-                        }
-                        catch(Exception  e)
-                        {
-                            Toast.makeText(getApplicationContext(), "Error"+e.getMessage(), Toast.LENGTH_LONG).show();
+                        } catch (Exception e) {
+                            Toast.makeText(getApplicationContext(), "Error" + e.getMessage(), Toast.LENGTH_LONG).show();
                         }
                         //l1.setAdapter(adapter);
-                        if(s==null) {
-                            Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
+                        if (s == null) {
+                            Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -657,12 +649,11 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     }
 
 
-    public PopupWindow getNewPopupWindow(final FrameLayout parent, int layoutId)
-    {
+    public PopupWindow getNewPopupWindow(final FrameLayout parent, int layoutId) {
         parent.getForeground().mutate().setAlpha(255);
         final PopupWindow popupWindow = new PopupWindow(this);
 
-        LayoutInflater inflater = (LayoutInflater)getApplicationContext().
+        LayoutInflater inflater = (LayoutInflater) getApplicationContext().
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View displayView = inflater.inflate(layoutId, null);
 
@@ -748,19 +739,18 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         checkinPopup.showAtLocation(detailsLayout, Gravity.CENTER, 0, 0);
     }*/
 
-    public void feedback(final String checkin_id)
-    {
+    public void feedback(final String checkin_id) {
         Context c = CouponDetails.this;
         LayoutInflater lf = LayoutInflater.from(c);
-        View feedbackView = lf.inflate(R.layout.dialog_reviews,null);
+        View feedbackView = lf.inflate(R.layout.dialog_reviews, null);
         RecyclerView rv = (RecyclerView) feedbackView.findViewById(R.id.list_questions);
         final EditText tv = (EditText) feedbackView.findViewById(R.id.text_remarks);
 
         final ArrayList<String> ques_arr = detailsBundle.getStringArrayList("questions");
 
-        final ReviewQuestionsAdapter rqa = new ReviewQuestionsAdapter(ques_arr,c);
+        final ReviewQuestionsAdapter rqa = new ReviewQuestionsAdapter(ques_arr, c);
         rv.setAdapter(rqa);
-        rv.setLayoutManager(new MyLinearLayoutManager(CouponDetails.this, LinearLayoutManager.VERTICAL, false ));
+        rv.setLayoutManager(new MyLinearLayoutManager(CouponDetails.this, LinearLayoutManager.VERTICAL, false));
 
         final AlertDialog.Builder adbuilder = new AlertDialog.Builder(CouponDetails.this);
         adbuilder.setView(feedbackView);
@@ -788,21 +778,21 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                 SharedPreferences status = getSharedPreferences("USER", 0);
                 String TOKEN = status.getString("token", "");
                 String remarks = tv.getText().toString();
-                String url_review = "http://api.clozerr.com/review/create?access_token=" + TOKEN + "&checkin_id=" + checkin_id ;           //fill the url - use function getStarCount(position) to get the stars
-                try{
-                    url_review += "&remarks=" + URLEncoder.encode( remarks, "UTF-8");
-                }catch( Exception e ){
+                String url_review = "http://api.clozerr.com/review/create?access_token=" + TOKEN + "&checkin_id=" + checkin_id;           //fill the url - use function getStarCount(position) to get the stars
+                try {
+                    url_review += "&remarks=" + URLEncoder.encode(remarks, "UTF-8");
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                for( int i = 0; i < ques_arr.size(); i ++ ) {
+                for (int i = 0; i < ques_arr.size(); i++) {
                     url_review += "&stars=" + rqa.getStarCount(i);
                 }
                 new AsyncGet(CouponDetails.this, url_review, new AsyncGet.AsyncResult() {
 
                     @Override
                     public void gotResult(String s) {
-                        Log.e("review_response",s);
+                        Log.e("review_response", s);
                         //Toast.makeText(getApplicationContext(),"Thank you for your reviews",Toast.LENGTH_SHORT).show();
                         finish();
                         System.exit(0);
@@ -818,9 +808,9 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         SharedPreferences status = getSharedPreferences("USER", 0);
         String TOKEN = status.getString("token", "");
 
-        String url="http://api.clozerr.com/checkin/create?access_token=" + TOKEN + "&vendor_id=" + detailsBundle.getString("vendorId") +"&offer_id=" + detailsBundle.getString("offerId");
+        String url = "http://api.clozerr.com/checkin/create?access_token=" + TOKEN + "&vendor_id=" + detailsBundle.getString("vendorId") + "&offer_id=" + detailsBundle.getString("offerId");
         String gcm_id = GCMRegistrar.getRegistrationId(getApplicationContext());
-        if( !gcm_id.equals("") )
+        if (!gcm_id.equals(""))
             url += "&gcm_id=" + gcm_id;
 
         Log.e("CouponDetails url", url);
@@ -835,16 +825,16 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                if(s==null) {
-                    Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
+                if (s == null) {
+                    Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
                 } else {
                     final PopupWindow confirmPopup = getNewPopupWindow(detailsLayout, R.layout.checkin_pin_confirm);
-                    final LinearLayout displayView = ((LinearLayout)((CardView)((LinearLayout)(confirmPopup.getContentView())).
+                    final LinearLayout displayView = ((LinearLayout) ((CardView) ((LinearLayout) (confirmPopup.getContentView())).
                             getChildAt(0)).getChildAt(0));
                     detailsLayout.getForeground().mutate().setAlpha(255);
                     for (int i = 0; i < displayView.getChildCount(); ++i) {
                         View child = displayView.getChildAt(i);
-                        switch(child.getId()) {
+                        switch (child.getId()) {
                             /*case R.id.confirmFrameLayout:
                                 child.findViewById(R.id.confirmButton).setOnClickListener(
                                         new View.OnClickListener() {
@@ -860,14 +850,17 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
                             case R.id.dateTimeLayout:
                                 String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis())),
                                         time = new SimpleDateFormat("HH:mm").format(new Date(System.currentTimeMillis())) + " hrs";
-                                ((TextView)(child.findViewById(R.id.timeView))).setText(time);
-                                ((TextView)(child.findViewById(R.id.dateView))).setText(date);
+                                ((TextView) (child.findViewById(R.id.timeView))).setText(time);
+                                ((TextView) (child.findViewById(R.id.dateView))).setText(date);
                                 break;
-                            case R.id.pinView:  ((TextView) child).setText(pinNumber);
+                            case R.id.pinView:
+                                ((TextView) child).setText(pinNumber);
                                 break;
-                            case R.id.confirmTitleView: ((TextView) child).setText(detailsBundle.getString("vendorTitle"));
+                            case R.id.confirmTitleView:
+                                ((TextView) child).setText(detailsBundle.getString("vendorTitle"));
                                 break;
-                            case R.id.confirmOfferView: ((TextView) child).setText(detailsBundle.getString("offerCaption"));
+                            case R.id.confirmOfferView:
+                                ((TextView) child).setText(detailsBundle.getString("offerCaption"));
                                 break;
                         }
                     }
@@ -891,10 +884,9 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     @Override
     public void onBackPressed() {
         SlidingDrawer drawer = (SlidingDrawer) findViewById(R.id.sliding_drawer1);
-        if(drawer.isOpened()) {
+        if (drawer.isOpened()) {
             drawer.animateClose();
-        }
-        else {
+        } else {
             super.onBackPressed();
         }
     }
@@ -903,7 +895,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     @Override
     public void onPause() {
         OneTimeBFS.checkAndStopScan(getApplicationContext());
-        Log.d("HOME","destroy");
+        Log.d("HOME", "destroy");
         //startService(new Intent(this, LocationService.class));
         super.onPause();
     }
@@ -922,18 +914,20 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
 
 
     @Override
-    public void onResume(){
-        Log.d("destroyonstart","onstart");
+    public void onResume() {
+        Log.d("destroyonstart", "onstart");
         //stopService(new Intent(this, LocationService.class));
         super.onResume();
     }
+
     @Override
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
         GoogleAnalytics.getInstance(this).reportActivityStart(this);
     }
+
     @Override
-    protected void onStop(){
+    protected void onStop() {
         super.onStop();
         GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }

@@ -63,7 +63,7 @@ public class MyStampsFragment extends Fragment {
             //Log.e(TAG, "json passed - " + s);
             JSONObject offerObject = null;
             JSONArray array = new JSONArray(s);
-            Toast.makeText(getActivity(),s, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getActivity(),s, Toast.LENGTH_LONG).show();
             MyOffer.SXOfferExtras extras = null;
             for (int i = 0; i < array.length(); ++i) {
                 offerObject = array.getJSONObject(i);
@@ -77,7 +77,9 @@ public class MyStampsFragment extends Fragment {
                         null,
                         offerObject.getString("caption"),
                         offerObject.getString("description"),
-                        offerObject.getInt("stamps"),
+                        offerObject.getJSONObject("params").getInt("stamps"),
+                        offerObject.getJSONObject("params").getBoolean("used"),
+                        offerObject.getJSONObject("params").getBoolean("unlocked"),
                         extras);
                 rowItems.add(item);
             }

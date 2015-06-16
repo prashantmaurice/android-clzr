@@ -7,6 +7,7 @@ package com.clozerr.app;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -37,7 +38,7 @@ public class VendorHomeFragment extends Fragment {
     private ImageView mVendorImageView;
     private TextView mVendorTitleView;
     private TextView mVendorAddressView;
-    private ImageButton mCallButton, mDirButton;
+    private ImageButton mCallButton, mDirButton, favorites;
     private RecyclerView gallerylist;
 
     @Override
@@ -74,6 +75,30 @@ public class VendorHomeFragment extends Fragment {
                             Toast.LENGTH_SHORT).show();
             }
         });
+        favorites.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedPreferences status = getActivity().getSharedPreferences("USER", 0);
+                String TOKEN = status.getString("token", "");
+                new AsyncGet(getActivity(), "http://api.clozerr.com/v2/user/add/favourites?vendor_id="+VendorActivity.vendorId+"&access_token="+TOKEN, new AsyncGet.AsyncResult() {
+                    @Override
+                    public void gotResult(String s) {
+                        Toast.makeText(getActivity(),"Successfully added to Favorites", Toast.LENGTH_LONG).show();
+                        //l1.setAdapter(adapter);
+                        if (s == null) {
+                            Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
+                        }
+
+                        // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
+
+
+                          /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
+                          mRecyclerView.setAdapter(Cardadapter);*/
+                    }
+                });
+
+            }
+        });
         gallerylist.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         gallerylist.setItemAnimator(new DefaultItemAnimator());
         gallerylist.setHasFixedSize(true);
@@ -103,6 +128,7 @@ public class VendorHomeFragment extends Fragment {
         mVendorAddressView = (TextView) layout.findViewById(R.id.addressView);
         mCallButton = (ImageButton) layout.findViewById(R.id.callButton);
         mDirButton = (ImageButton) layout.findViewById(R.id.dirButton);
+        favorites = (ImageButton) layout.findViewById(R.id.favorites);
     }
 }
 

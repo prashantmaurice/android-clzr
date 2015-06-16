@@ -20,6 +20,8 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gcm.GCMRegistrar;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -73,7 +75,7 @@ public class FreebieDescription extends ActionBarActivity {
         findViewById(R.id.useit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+Home.TOKEN+"&offer_id="+offerid+"&vendor_id="+vendorid;
+                String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+Home.TOKEN+"&offer_id="+offerid+"&vendor_id="+vendorid+"&gcm_id"+ GCMRegistrar.getRegistrationId(getApplicationContext());
                 Log.d(url, "");
                 //Toast.makeText(getApplicationContext(),url,Toast.LENGTH_LONG).show();
                 new AsyncGet(getApplicationContext(), url, new AsyncGet.AsyncResult() {
