@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,6 +31,7 @@ public class MyStampsFragment extends Fragment {
         recyclerview.setItemAnimator(new DefaultItemAnimator());
         recyclerview.setHasFixedSize(true);
         ArrayList<MyOffer> myOffers = convertRowMyOffers(VendorActivity.detailsBundle.getString("Alloffers"));
+        //Toast.makeText(getActivity(), VendorActivity.detailsBundle.getString("Alloffers"), Toast.LENGTH_LONG).show();
                         /*MyOffer currentOffer = getCurrentOffer(s);
 
                         MyOffersRecyclerViewAdapter myOffersAdapter = new MyOffersRecyclerViewAdapter(myOffers, currentOffer, CouponDetails.this);
@@ -60,8 +62,8 @@ public class MyStampsFragment extends Fragment {
         MyOffer item = null;
         try {
             //Log.e(TAG, "json passed - " + s);
-            JSONObject offerObject = null;
-            JSONArray array = new JSONArray(s);
+            JSONObject offerObject = new JSONObject(s);
+            JSONArray array = offerObject.getJSONArray("offers");
             //Toast.makeText(getActivity(),s, Toast.LENGTH_LONG).show();
             MyOffer.SXOfferExtras extras = null;
             for (int i = 0; i < array.length(); ++i) {

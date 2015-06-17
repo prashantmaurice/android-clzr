@@ -132,6 +132,7 @@ public class MyClubsFragment extends Fragment implements ObservableScrollViewCal
         });
 
 
+
         return layout;
     }
     private ArrayList<CardModel> convertRowMyCard(String s) {
