@@ -23,6 +23,7 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
     private static long alarmInterval = MAXIMUM_ALARM_INTERVAL;
     private static AlarmManager alarmManager = null;
     //private static WakeLockManager wakeLockManager = null;
+    private static boolean firstDownloadPending = true;
 
     private Context mContext = null;
     private Handler mHandler = null;
@@ -37,7 +38,7 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
     private static PendingIntent getBDBDownloaderPendingIntent(Context context) {
         Intent intentToSend = new Intent(context, BeaconDBDownloadBaseReceiver.class);
         intentToSend.setAction(ACTION_FIRE_ALARM_DOWNLOAD);
-        return PendingIntent.getBroadcast(context, REQUEST_CODE, intentToSend, PendingIntent.FLAG_CANCEL_CURRENT);
+        return PendingIntent.getBroadcast(context, REQUEST_CODE, intentToSend, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     private void setNewAlarm() {
@@ -47,7 +48,11 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
             alarmManager.cancel(operationIntent);
         else
             alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+        long triggerTimeMillis = System.currentTimeMillis() + ((firstDownloadPending) ? 0 : alarmInterval);
+                                // first download triggers scanning, so it has to complete ASAP
+                                // hence on every failure make the alarm fire as soon as it is set
+                                // else, let it fire the next scheduled time (alarmInterval)
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, triggerTimeMillis,
                                          alarmInterval, operationIntent);
     }
 
@@ -114,6 +119,8 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
                             }
                             else {
                                 Log.e(TAG, "Download for this session completed successfully.");
+                                if (firstDownloadPending)
+                                    firstDownloadPending = false;
                                 if (alarmInterval < MAXIMUM_ALARM_INTERVAL) {
                                     alarmInterval = MAXIMUM_ALARM_INTERVAL;
                                     setNewAlarm();
