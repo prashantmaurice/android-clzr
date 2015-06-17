@@ -101,7 +101,8 @@ public class VendorActivity extends ActionBarActivity {
                         e.printStackTrace();
                         //Toast.makeText(CouponDetails.this, "Error - " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                     }
-                    if (object.has("beacons") && object.getJSONObject("beacons").has("major")) {
+                    if (object.has("beacons") && object.getJSONObject("beacons").has("major") &&
+                            object.getJSONObject("beacons").has("minor")) {
                         params = new BeaconFinderService.BeaconDBParams(object.getJSONObject("beacons"));
                         Log.e(TAG, "BDB params - " + params.toString());
                     }
@@ -170,7 +171,8 @@ public class VendorActivity extends ActionBarActivity {
                         }
                     });
                     mtabs.setViewPager(pager);
-
+                    if (callingIntent.getBooleanExtra("from_periodic_scan", false))
+                        pager.setCurrentItem(1);
 
                     detailsBundle.putString("vendorTitle", currentItem.getTitle());
                     //detailsBundle.putString("offerText", currentItem.getOfferDescription() );
@@ -431,6 +433,15 @@ public class VendorActivity extends ActionBarActivity {
                                 break;
                             case R.id.confirmOfferView: ((TextView) child).setText(detailsBundle.getString("offerCaption"));
                                 break;
+                            /*case R.id.qrButton: child.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent qrIntent = new Intent(VendorActivity.this, QRActivity.class);
+                                    qrIntent.putExtra("vendorId", detailsBundle.getString("vendorId"));
+                                    qrIntent.putExtra("offerId", offerid);
+                                    startActivity(qrIntent);
+                                }
+                            });*/
                         }
                     }
                     confirmPopup.showAtLocation(currentLayout, Gravity.CENTER, 0, 0);
