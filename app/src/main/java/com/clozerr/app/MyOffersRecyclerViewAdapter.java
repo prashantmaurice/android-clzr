@@ -1,6 +1,7 @@
 package com.clozerr.app;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -102,6 +103,10 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
         MyOffer currentItem = mItems.get(position);
         viewHolder.mCaptionView.setText(currentItem.getCaption());
         viewHolder.stampnumber.setText(String.valueOf(currentItem.getStamps()));
+        if(currentItem.getUsedState()==true) {
+            viewHolder.stampnumber.setTextColor(Color.GRAY);
+        viewHolder.stampcheck.setVisibility(View.VISIBLE);
+        }
         /*viewHolder.stampnumber.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -125,7 +130,7 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
     }
 
     public final static class ListItemViewHolder extends RecyclerView.ViewHolder {
-        public ImageView mMainImageView, mOptionalImageView;
+        public ImageView mMainImageView, mOptionalImageView, stampcheck;
         public TextView mCaptionView, stampnumber;
 
         public ListItemViewHolder(final View itemView) {
@@ -135,6 +140,7 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
             // find optional view
             mCaptionView = (TextView) itemView.findViewById(R.id.freebiecontent);
             stampnumber = (TextView) itemView.findViewById(R.id.stampnumber);
+            stampcheck = (ImageView) itemView.findViewById(R.id.stampcheck);
         }
         /*ImageView imageView;
         TextView txtTitle;

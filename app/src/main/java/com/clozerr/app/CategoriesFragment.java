@@ -93,6 +93,7 @@ public class CategoriesFragment extends Fragment implements ObservableScrollView
         gridLayoutManager = new GridLayoutManager(c, 2);
         mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.addItemDecoration(new SpaceItemDecoration(dpToPx(52),1));
         mRecyclerView.setHasFixedSize(true);
 
         SharedPreferences status = c.getSharedPreferences("USER", 0);
@@ -289,7 +290,7 @@ public class CategoriesFragment extends Fragment implements ObservableScrollView
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int height = displaymetrics.heightPixels;
-        return height - swipetab.getHeight()-searchView.getHeight()+dpToPx(0);
+        return height - swipetab.getHeight()-searchView.getHeight()+dpToPx(6);
     }
     public int dpToPx(int dp) {
         DisplayMetrics displayMetrics = c.getResources().getDisplayMetrics();

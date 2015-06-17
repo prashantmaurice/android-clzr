@@ -151,7 +151,8 @@
 
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings" >
+            android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Home" />
@@ -207,11 +208,13 @@
 
         <activity
             android:name=".CategoryDetail"
-            android:label="@string/title_activity_catogory_detail" >
+            android:label="@string/title_activity_catogory_detail"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".VendorActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
 
@@ -220,7 +223,8 @@
         </activity>
         <activity
             android:name=".FreebieDescription"
-            android:label="@string/title_activity_freebie_description" >
+            android:label="@string/title_activity_freebie_description"
+            android:screenOrientation="portrait">
         </activity>
 
         <receiver android:name="com.commonsware.cwac.wakeful.AlarmReceiver" >
@@ -235,7 +239,8 @@
 
         <activity
             android:name=".UnusedOffersActivity"
-            android:label="@string/title_activity_unused_offers" >
+            android:label="@string/title_activity_unused_offers"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".QRActivity"

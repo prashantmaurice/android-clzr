@@ -18,6 +18,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="55dp"
+        android:elevation="5dp"
         android:background="@color/colorPrimary"
         android:orientation="horizontal">
     <ImageButton

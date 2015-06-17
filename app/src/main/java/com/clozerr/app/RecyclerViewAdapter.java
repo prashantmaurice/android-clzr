@@ -14,11 +14,14 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +39,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private List<CardModel> items;
     static Context c;
+
     //public static String vendor_name_temp = "";
 
     RecyclerViewAdapter(List<CardModel> modelData, Context c) {
@@ -57,6 +61,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         false);
         return new ListItemViewHolder(itemView);
     }
+    public int dpToPx(int dp) {
+        DisplayMetrics displayMetrics = c.getResources().getDisplayMetrics();
+        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+        return px;
+    }
 
     @Override
     public void onBindViewHolder(final ListItemViewHolder viewHolder, int position) {
@@ -65,20 +74,25 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         viewHolder.txtTitle.setText(model.getTitle());
         viewHolder.txtCaption.setText(model.getCaption());
         viewHolder.txtDist.setText(model.getDistanceString());
+        /*LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                dpToPx(viewHolder.linearLayout.getWidth())/2
+        );
+
+        viewHolder.linearLayout.setLayoutParams(params);*/
         //viewHolder.txtrating.setText(model.getRating());
        // new DownloadImageTask(viewHolder.imageView).execute(model.getImageId());
-
         // viewHolder.txtDist.setText(model.getDesc());
 
         Ion.with(c).load(model.getImageId()).withBitmap().placeholder(R.drawable.defoffer).transform(new com.koushikdutta.ion.bitmap.Transform() {
             public Bitmap transform(Bitmap bitmap) {
                 Log.d("Bitmap transform", "wd:" + viewHolder.imageView.getWidth() + " ht:" + viewHolder.imageView.getHeight() );
-                Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getWidth()/2, Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(output);
 
                 final int color = 0xff424242;
                 final Paint paint = new Paint();
-                final Rect rect = new Rect( 0, 0, bitmap.getWidth(), bitmap.getHeight());
+                final Rect rect = new Rect( 0, 0, bitmap.getWidth(), bitmap.getWidth()/2);
                 final RectF rectF = new RectF(rect);
                 final float roundPx = 10.0f;
 
@@ -111,6 +125,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         TextView txtTitle;
         TextView txtDist;
         TextView txtCaption;
+        LinearLayout linearLayout;
+        ImageButton like;
         //TextView txtrating;
         public CardModel currentItem;
 
@@ -120,8 +136,22 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             txtTitle = (TextView) itemView.findViewById(R.id.textTitle);
             txtCaption = (TextView) itemView.findViewById(R.id.txtCaption);
             imageView = (ImageView) itemView.findViewById(R.id.imageView);
-            //txtrating=(TextView) itemView.findViewById(R.id.txtrating);
+            linearLayout = (LinearLayout)itemView.findViewById(R.id.cardlayout);
+            like = (ImageButton)itemView.findViewById(R.id.like);
+           /* LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    linearLayout.getWidth()/2
+            );
 
+            linearLayout.setLayoutParams(params);*/
+
+            //txtrating=(TextView) itemView.findViewById(R.id.txtrating);
+            like.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

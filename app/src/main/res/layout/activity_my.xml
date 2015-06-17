@@ -1,16 +1,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     style="rect_answer"
+    android:background="#eaeaea"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".Home">
 
-    <include layout="@layout/toolbar" />
+    <include layout="@layout/toolbar"/>
 
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawerLayout"
+        android:background="#eaeaea"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
@@ -21,11 +23,13 @@
         <com.clozerr.app.SlidingTabLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:elevation="5dp"
             android:background="@color/colorPrimary"
             android:id="@+id/tabs" />
         <android.support.v4.view.ViewPager
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:background="#eaeaea"
             android:layout_weight="1"
             android:id="@+id/pager" />
         </LinearLayout>

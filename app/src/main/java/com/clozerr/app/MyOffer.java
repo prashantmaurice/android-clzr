@@ -33,6 +33,8 @@ public class MyOffer {
     private String mCaption;
     private String mDescription;
     private int mStamps;
+    private Boolean mused;
+    private Boolean munlocked;
     private SXOfferExtras mSXOfferExtras;
 
     public String getType() {
@@ -59,8 +61,12 @@ public class MyOffer {
         return mStamps;
     }
 
+    public Boolean getUsedState() {return mused;}
+
+    public Boolean getUnlocked() {return munlocked;}
+
     public MyOffer(String type, String imageUrl, String optionalImageUrl, String caption,
-            String description, int stamps, SXOfferExtras sxOfferExtras) {
+            String description, int stamps, Boolean used, Boolean unlocked, SXOfferExtras sxOfferExtras) {
         this.mType = type;
         this.mImageUrl = imageUrl;
         this.mOptionalImageUrl = optionalImageUrl;
@@ -68,6 +74,8 @@ public class MyOffer {
         this.mDescription = description;
         this.mStamps = stamps;
         this.mSXOfferExtras = sxOfferExtras;
+        this.mused=used;
+        this.munlocked=unlocked;
     }
 
     public static class SXOfferExtras {

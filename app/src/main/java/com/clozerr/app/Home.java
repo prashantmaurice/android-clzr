@@ -8,9 +8,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -141,7 +143,7 @@ public class Home  extends ActionBarActivity {
         pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager(),Home.this));
         mtabs=(SlidingTabLayout)findViewById(R.id.tabs);
         mtabs.setDistributeEvenly(true);
-        mtabs.setCustomTabView(R.layout.custom_tab_view, R.id.tabtitle);
+        mtabs.setCustomTabView(R.layout.custom_tab_view_home, R.id.tabtitle);
         mtabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
             public int getIndicatorColor(int position) {
@@ -412,6 +414,10 @@ public class Home  extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.my, menu);
+        Drawable myIcon = getResources().getDrawable( R.drawable.giftbox );
+        ColorFilter filter = new LightingColorFilter( Color.WHITE, Color.WHITE );
+        myIcon.setColorFilter(filter);
+        menu.findItem(R.id.search).setIcon(myIcon);
         return true;
     }
 

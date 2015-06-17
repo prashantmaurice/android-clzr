@@ -169,7 +169,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
         TextView textView = new TextView(context);
         textView.setGravity(Gravity.CENTER);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, TAB_VIEW_TEXT_SIZE_SP);
-        textView.setTypeface(Typeface.DEFAULT_BOLD);
+        textView.setTypeface(null,Typeface.NORMAL);
         textView.setLayoutParams(new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
@@ -177,11 +177,11 @@ public class SlidingTabLayout extends HorizontalScrollView {
         getContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground,
                 outValue, true);
         textView.setBackgroundResource(outValue.resourceId);
-        textView.setAllCaps(true);
+        textView.setAllCaps(false);
 
         int padding = (int) (TAB_VIEW_PADDING_DIPS * getResources().getDisplayMetrics().density);
         textView.setPadding(padding, padding, padding, padding);
-
+        textView.setTypeface(null,Typeface.NORMAL);
         return textView;
     }
 
@@ -213,8 +213,9 @@ public class SlidingTabLayout extends HorizontalScrollView {
                 lp.width = 0;
                 lp.weight = 1;
             }
-
+            tabTitleView.setTypeface(null,Typeface.NORMAL);
             tabTitleView.setText(adapter.getPageTitle(i));
+            tabTitleView.setTypeface(null, Typeface.NORMAL);
             tabView.setOnClickListener(tabClickListener);
             String desc = mContentDescriptions.get(i, null);
             if (desc != null) {
@@ -222,8 +223,10 @@ public class SlidingTabLayout extends HorizontalScrollView {
             }
 
             mTabStrip.addView(tabView);
+            tabView.setAlpha(0.6f);
             if (i == mViewPager.getCurrentItem()) {
                 tabView.setSelected(true);
+                tabView.setAlpha(1);
             }
         }
     }
@@ -301,6 +304,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
             }
             for (int i = 0; i < mTabStrip.getChildCount(); i++) {
                 mTabStrip.getChildAt(i).setSelected(position == i);
+                mTabStrip.getChildAt(i).setAlpha(position==i?1:0.6f);
             }
             if (mViewPagerPageChangeListener != null) {
                 mViewPagerPageChangeListener.onPageSelected(position);

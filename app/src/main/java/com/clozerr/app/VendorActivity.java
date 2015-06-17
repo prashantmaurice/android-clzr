@@ -6,7 +6,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.LightingColorFilter;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
@@ -51,14 +54,20 @@ public class VendorActivity extends ActionBarActivity {
 
     private String pinNumber;
     public static Bundle detailsBundle;
-    static String vendorId;
+    public static String vendorId;
     static String vendorTitle;
     static int i=1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vendor);
+        Drawable myIcon = getResources().getDrawable( R.drawable.checkinbutton );
+        ColorFilter filter = new LightingColorFilter( Color.WHITE, Color.WHITE );
+        myIcon.setColorFilter(filter);
 
+
+        mCheckInButton = (FloatingActionButton) findViewById(R.id.checkinButton);
+        mCheckInButton.setImageDrawable(myIcon);
 
         detailsBundle = new Bundle();
         callingIntent = getIntent();
@@ -153,7 +162,7 @@ public class VendorActivity extends ActionBarActivity {
                     pager.setAdapter(new VendorPagerAdapter(getSupportFragmentManager(), VendorActivity.this));
                     mtabs = (SlidingTabLayout) findViewById(R.id.tabs_vendor);
                     mtabs.setDistributeEvenly(true);
-                    mtabs.setCustomTabView(R.layout.custom_tab_view, R.id.tabtitle);
+                    mtabs.setCustomTabView(R.layout.custom_tab_view_vendor, R.id.tabtitle);
                     mtabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
                         @Override
                         public int getIndicatorColor(int position) {
@@ -178,8 +187,6 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putString("phoneNumber", phoneNumber);
                     //currentItem.getQuestions();
 
-
-                    mCheckInButton = (FloatingActionButton) findViewById(R.id.checkinButton);
                     mCheckInButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
