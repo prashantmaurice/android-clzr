@@ -61,6 +61,46 @@
             android:text="Welcome Reward"
             android:gravity="center"/>
         <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/whatsappshare"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:background="#00000000"
+                android:scaleType="centerCrop"
+                android:src="@drawable/whatsappblack" />
+
+            <ImageButton
+                android:id="@+id/favorites"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:background="#00000000"
+                android:scaleType="centerCrop"
+                android:src="@drawable/pin100" />
+
+            <ImageButton
+                android:id="@+id/share"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:background="#00000000"
+                android:tint="#90000000"
+                android:scaleType="centerCrop"
+                android:src="@drawable/share_vendor" />
+
+        </LinearLayout>
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginLeft="15dp"
