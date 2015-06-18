@@ -45,4 +45,5 @@ dependencies {
     compile 'com.google.android.gms:play-services:6.1.71'
     compile 'com.getbase:floatingactionbutton:1.9.0'
     compile project(':app:libraries:wakeful')
+    compile 'me.dm7.barcodescanner:zxing:1.7.2'
 }

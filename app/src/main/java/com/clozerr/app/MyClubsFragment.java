@@ -158,6 +158,7 @@ public class MyClubsFragment extends Fragment{
         });
 
 
+
         return layout;
     }
     private ArrayList<CardModel> convertRowMyCard(String s) {

@@ -20,6 +20,10 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 
 public class FreebiesFragment extends Fragment {
 
@@ -35,7 +39,11 @@ public class FreebiesFragment extends Fragment {
                 "Happy Hour Reward",
                 "Lucky Reward"
         };
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.freebies_item_layout, R.id.freebiename, values);
+        List<String> l = Arrays.asList(values);
+
+// if List<String> isnt specific enough:
+        ArrayList<String> al = new ArrayList<>(l);
+        RewardsAdapter adapter = new RewardsAdapter(getActivity(),al);
         listview.setAdapter(adapter);
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

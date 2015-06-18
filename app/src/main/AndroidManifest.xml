@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
@@ -240,6 +241,10 @@
             android:name=".UnusedOffersActivity"
             android:label="@string/title_activity_unused_offers"
             android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".QRActivity"
+            android:label="@string/title_activity_qr" >
         </activity>
     </application>
 

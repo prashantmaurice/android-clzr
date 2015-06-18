@@ -31,7 +31,7 @@ public class PeriodicBFS extends BeaconFinderService {
     //private static final String ACTION_FIRE_ALARM_SCAN = "com.clozerr.app.ACTION_FIRE_ALARM_SCAN";
 
     private static final long ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(3L, TimeUnit.MINUTES);
-    private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(6L, TimeUnit.SECONDS);
+    private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(8L, TimeUnit.SECONDS);
     private static final long SCAN_PAUSE_INTERVAL = TimeUnit.MILLISECONDS.convert(3L, TimeUnit.MINUTES);
     private static final long MAX_SCAN_RESTART_INTERVAL = ALARM_INTERVAL * 2 + SCAN_PAUSE_INTERVAL;
                                 // interval after which alarms have to be rescheduled no matter what

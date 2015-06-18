@@ -60,8 +60,8 @@ public class UnusedOffersActivity extends ActionBarActivity {
         MyOffer item = null;
         try {
             //Log.e(TAG, "json passed - " + s);
-            JSONObject offerObject = null;
-            JSONArray array = new JSONArray(s);
+            JSONObject offerObject = new JSONObject(s);
+            JSONArray array = offerObject.getJSONArray("offers");
             MyOffer.SXOfferExtras extras = null;
             for (int i = 0; i < array.length(); ++i) {
                 offerObject = array.getJSONObject(i);
@@ -77,12 +77,12 @@ public class UnusedOffersActivity extends ActionBarActivity {
 //                        offerObject.getString("description"),
 //                        offerObject.getInt("stamps"),
 //                        extras);
-                if((offerObject.getJSONObject("params").getBoolean("unlocked")==true) && (offerObject.getJSONObject("params").getBoolean("used")==false)) {
+                //if((offerObject.getJSONObject("params").getBoolean("unlocked")==true) && (offerObject.getJSONObject("params").getBoolean("used")==false)) {
                     rowItems.add(offerObject.getString("caption"));
                     offerid.add(offerObject.getString("_id"));
                     caption.add(offerObject.getString("caption"));
                     description.add(offerObject.getString("description"));
-                }
+                //}
             }
         } catch (Exception e) {
             e.printStackTrace();

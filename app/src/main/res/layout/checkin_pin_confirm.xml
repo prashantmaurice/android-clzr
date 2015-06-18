@@ -148,7 +148,17 @@
                     android:textStyle="bold"
                     android:id="@+id/confirmButton"/>-->
 
+
             </FrameLayout>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_margin="0dp"
+                android:gravity="center"
+                android:text="USE QR CODE INSTEAD"
+                android:id="@+id/qrButton"/>
 
         </LinearLayout>
 

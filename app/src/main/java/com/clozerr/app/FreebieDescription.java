@@ -117,6 +117,15 @@ public class FreebieDescription extends ActionBarActivity {
                                             break;
                                         case R.id.confirmOfferView: ((TextView) child).setText(caption);
                                             break;
+                                        case R.id.qrButton: child.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                Intent qrIntent = new Intent(FreebieDescription.this, QRActivity.class);
+                                                qrIntent.putExtra("vendorId", vendorid);
+                                                qrIntent.putExtra("offerId", offerid);
+                                                startActivity(qrIntent);
+                                            }
+                                        });
                                     }
                                 }
                                 confirmPopup.showAtLocation(freebielayout, Gravity.CENTER, 0, 0);

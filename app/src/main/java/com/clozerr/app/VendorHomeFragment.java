@@ -23,11 +23,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.koushikdutta.ion.Ion;
-
-import java.util.ArrayList;
-import java.util.Observable;
 
 
 public class VendorHomeFragment extends Fragment {

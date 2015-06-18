@@ -101,7 +101,8 @@ public class VendorActivity extends ActionBarActivity {
                         e.printStackTrace();
                         //Toast.makeText(CouponDetails.this, "Error - " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                     }
-                    if (object.has("beacons") && object.getJSONObject("beacons").has("major")) {
+                    if (object.has("beacons") && object.getJSONObject("beacons").has("major") &&
+                            object.getJSONObject("beacons").has("minor")) {
                         params = new BeaconFinderService.BeaconDBParams(object.getJSONObject("beacons"));
                         Log.e(TAG, "BDB params - " + params.toString());
                     }
@@ -170,7 +171,8 @@ public class VendorActivity extends ActionBarActivity {
                         }
                     });
                     mtabs.setViewPager(pager);
-
+                    if (callingIntent.getBooleanExtra("from_periodic_scan", false))
+                        pager.setCurrentItem(1);
 
                     detailsBundle.putString("vendorTitle", currentItem.getTitle());
                     //detailsBundle.putString("offerText", currentItem.getOfferDescription() );
@@ -329,114 +331,6 @@ public class VendorActivity extends ActionBarActivity {
         });
 
         return popupWindow;
-    }
-
-    private void slidingtaboffers() {
-        SharedPreferences status = getSharedPreferences("USER", 0);
-        String TOKEN = status.getString("token", "");
-
-        String urlVisited = "http://api.clozerr.com/vendor/offers/myofferspage?vendor_id=" + vendorId + "&access_token=" + TOKEN;
-        String urlUser = "http://api.clozerr.com/auth?fid=" + detailsBundle.getString("fid") + "&access_token=" + TOKEN;
-
-        Log.e("urlslide", urlVisited);
-        //Toast.makeText(getApplicationContext(),urlVisited,Toast.LENGTH_SHORT).show();
-
-        new AsyncGet(this, urlVisited, new AsyncGet.AsyncResult() {
-            @Override
-            public void gotResult(String s) {
-                //  t1.setText(s);
-
-
-                Log.e("resultSlide", s);
-                Toast.makeText(VendorActivity.this,s, Toast.LENGTH_SHORT).show();
-                detailsBundle.putString("offerstring", s);
-
-                try {
-                    Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
-
-                    t.setScreenName(detailsBundle.getString("vendorId") + "_offer");
-
-                    t.send(new HitBuilders.AppViewBuilder().build());
-                } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), "Error" + e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-                //l1.setAdapter(adapter);
-                if (s == null) {
-                    Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
-                }
-
-                // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
-
-
-                          /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
-                          mRecyclerView.setAdapter(Cardadapter);*/
-            }
-        });
-    }
-
-    private void checkIn() {
-        SharedPreferences status = getSharedPreferences("USER", 0);
-        String TOKEN = status.getString("token", "");
-
-        String url="http://api.clozerr.com/checkin/create?access_token=" + TOKEN + "&vendor_id=" + detailsBundle.getString("vendorId")
-                + "&offer_id=" + detailsBundle.getString("offerId");
-        String gcm_id = GCMRegistrar.getRegistrationId(getApplicationContext());
-        if( !gcm_id.equals("") )
-            url += "&gcm_id=" + gcm_id;
-
-        Log.e(TAG, "checkin url - " + url);
-
-        // Login.showProgressDialog(getApplicationContext());
-        new AsyncGet(this, url, new AsyncGet.AsyncResult() {
-            @Override
-            public void gotResult(String s) {
-                Log.e("pin", s);
-                try {
-                    pinNumber = new JSONObject(s).getJSONObject("checkin").getString("pin");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                if(s==null) {
-                    Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
-                } else {
-                    FrameLayout currentLayout = (FrameLayout) pager.getFocusedChild();
-                    final PopupWindow confirmPopup = getNewPopupWindow(currentLayout, R.layout.checkin_pin_confirm);
-                    final LinearLayout displayView = ((LinearLayout)((CardView)((LinearLayout)(confirmPopup.getContentView())).
-                            getChildAt(0)).getChildAt(0));
-                    //currentLayout.getForeground().mutate().setAlpha(255);
-                    for (int i = 0; i < displayView.getChildCount(); ++i) {
-                        View child = displayView.getChildAt(i);
-                        switch(child.getId()) {
-                            /*case R.id.confirmFrameLayout:
-                                child.findViewById(R.id.confirmButton).setOnClickListener(
-                                        new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                // Intent homeIntent = new Intent(getApplicationContext(), Home.class);
-                                                // homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                //  getApplicationContext().startActivity(homeIntent);
-                                                CouponDetails.this.finish();
-                                            }
-                                        });
-                                break;*/
-                            case R.id.dateTimeLayout:
-                                String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis())),
-                                        time = new SimpleDateFormat("HH:mm").format(new Date(System.currentTimeMillis())) + " hrs";
-                                ((TextView)(child.findViewById(R.id.timeView))).setText(time);
-                                ((TextView)(child.findViewById(R.id.dateView))).setText(date);
-                                break;
-                            case R.id.pinView:  ((TextView) child).setText(pinNumber);
-                                break;
-                            case R.id.confirmTitleView: ((TextView) child).setText(detailsBundle.getString("vendorTitle"));
-                                break;
-                            case R.id.confirmOfferView: ((TextView) child).setText(detailsBundle.getString("offerCaption"));
-                                break;
-                        }
-                    }
-                    confirmPopup.showAtLocation(currentLayout, Gravity.CENTER, 0, 0);
-                }
-            }
-        });
     }
 
     @Override
