@@ -40,7 +40,7 @@ public class PeriodicBFS extends BeaconFinderService {
     private static final int NOTIFICATION_ID = 0;
     //private static final ConcurrentHashMap<String, DeviceParams> periodicScanDeviceMap = new ConcurrentHashMap<>();
     private static NotificationCompat.Builder notificationBuilder = null;
-    private static NotificationManager notificationManager = null;
+    //private static NotificationManager notificationManager = null;
     //private static WakeLockManager wakeLockManager;
     //private static Bitmap NOTIFICATION_LARGE_ICON;
     private static boolean running = false;
@@ -68,8 +68,8 @@ public class PeriodicBFS extends BeaconFinderService {
         //NOTIFICATION_LARGE_ICON = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
         //wakeLockManager = new WakeLockManager();
 
-        if (notificationManager == null)
-            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        /*if (notificationManager == null)
+            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);*/
         if (notificationBuilder == null)
             notificationBuilder = getDefaultNotificationBuilder(getApplicationContext());
 
@@ -216,7 +216,8 @@ public class PeriodicBFS extends BeaconFinderService {
                     .setWhen(System.currentTimeMillis())
                     .addAction(R.drawable.ic_action_accept, actionText, detailPendingIntent);
                     //.addAction(R.drawable.ic_refuse, "Not for this vendor", refusePendingIntent);
-            notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+            ((NotificationManager) context.getSystemService(NOTIFICATION_SERVICE)).
+                    notify(NOTIFICATION_ID, notificationBuilder.build());
 
             pauseScanningFor(context, SCAN_PAUSE_INTERVAL);
             /*}*/
@@ -266,7 +267,7 @@ public class PeriodicBFS extends BeaconFinderService {
     }*/
 
     public static void dismissNotifications(Context context) {
-        notificationManager.cancelAll();
+        ((NotificationManager) context.getSystemService(NOTIFICATION_SERVICE)).cancelAll();
         notificationBuilder = getDefaultNotificationBuilder(context);
     }
 
@@ -492,12 +493,14 @@ public class PeriodicBFS extends BeaconFinderService {
         }
     }
 
-    public static void checkAndStopScan(Context context) {
+    public static void checkAndStopScan(Context context, boolean stopDownloads) {
         if (running) {
             //context.stopService(new Intent(context, PeriodicBFS.class));
             running = false;
+            turnOffBluetooth();
             WakefulIntentService.cancelAlarms(context);
-            BeaconDBDownloadBaseReceiver.stopDownloads(context);
+            if (stopDownloads)
+                BeaconDBDownloadBaseReceiver.stopDownloads(context);
         }
     }
 

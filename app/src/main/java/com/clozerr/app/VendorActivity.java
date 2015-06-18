@@ -46,6 +46,7 @@ public class VendorActivity extends ActionBarActivity {
 
     private static final String TAG = "VendorActivity";
 
+    private boolean fromPeriodicBFS = false;
     private Toolbar toolbar;
     private ViewPager pager;
     private SlidingTabLayout mtabs;
@@ -65,12 +66,16 @@ public class VendorActivity extends ActionBarActivity {
         ColorFilter filter = new LightingColorFilter( Color.WHITE, Color.WHITE );
         myIcon.setColorFilter(filter);
 
+        callingIntent = getIntent();
+        fromPeriodicBFS = callingIntent != null && callingIntent.getBooleanExtra("from_periodic_scan", false);
+        if (fromPeriodicBFS)
+            PeriodicBFS.dismissNotifications(this);
 
         mCheckInButton = (FloatingActionButton) findViewById(R.id.checkinButton);
         mCheckInButton.setImageDrawable(myIcon);
 
         detailsBundle = new Bundle();
-        callingIntent = getIntent();
+
         final String vendor_id = callingIntent.getStringExtra("vendor_id");
         vendorId = vendor_id;
         final String urlVendor = "http://api.clozerr.com/vendor/get?vendor_id=" + vendor_id;
@@ -149,9 +154,9 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putString("phoneNumber", phoneNumber);
                     //currentItem.getQuestions();
                     try {
-                        if (!callingIntent.getBooleanExtra("from_periodic_scan", false) && params != null)
+                        if (!fromPeriodicBFS && params != null)
                             OneTimeBFS.checkAndStartScan(getApplicationContext(), params);
-                        else PeriodicBFS.dismissNotifications(VendorActivity.this);
+                        //else PeriodicBFS.dismissNotifications(VendorActivity.this);
                     }catch (Exception e){}
                     toolbar = (Toolbar) findViewById(R.id.toolbar_vendor);
                     if (toolbar != null) {
@@ -171,7 +176,7 @@ public class VendorActivity extends ActionBarActivity {
                         }
                     });
                     mtabs.setViewPager(pager);
-                    if (callingIntent.getBooleanExtra("from_periodic_scan", false))
+                    if (fromPeriodicBFS)
                         pager.setCurrentItem(1);
 
                     detailsBundle.putString("vendorTitle", currentItem.getTitle());
@@ -448,6 +453,13 @@ public class VendorActivity extends ActionBarActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onPause() {
+        if (isFinishing())
+            OneTimeBFS.checkAndStopScan(this);
+        super.onPause();
     }
 
     @Override

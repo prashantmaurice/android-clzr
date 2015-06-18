@@ -47,7 +47,7 @@ public class OneTimeBFS extends BeaconFinderService {
 
     @Override
     protected void onRangedBeacons(final List<Beacon> beaconList) {
-        Log.e(TAG, "Ranged; size - " + beaconList.size());
+        //Log.e(TAG, "Ranged; size - " + beaconList.size());
         for (final Beacon beacon : beaconList) {
             BeaconDBParams params = new BeaconDBParams(beacon);
             Log.e(TAG, "found " + params.toString());
@@ -55,7 +55,7 @@ public class OneTimeBFS extends BeaconFinderService {
                 VendorParams vendorParams = VendorParams.findVendorParamsInFile(getApplicationContext(), new Predicate<VendorParams>() {
                     @Override
                     public boolean apply(VendorParams vendorParams) {
-                        return vendorParams.mBeaconParams.equals(beaconDBParams);
+                        return beaconDBParams.equals(vendorParams.mBeaconParams);
                     }
                 });
                 if (vendorParams != null) {
@@ -71,7 +71,6 @@ public class OneTimeBFS extends BeaconFinderService {
                     turnOffBluetooth();
                     Log.e(TAG, "Stopped Scan");
                     running = false;
-                    releaseLock();
                     return;
                 }
             }
@@ -152,7 +151,8 @@ public class OneTimeBFS extends BeaconFinderService {
     public static void checkAndStartScan(Context context, BeaconDBParams params) {
         if (!running && params != null && checkCompatibility(context) && checkPreferences(context)) {
             //context.stopService(new Intent(context, PeriodicBFS.class));
-            WakefulIntentService.cancelAlarms(context);
+            //WakefulIntentService.cancelAlarms(context);
+            PeriodicBFS.checkAndStopScan(context, false);
             beaconDBParams = params;
             //context.startService(new Intent(context, OneTimeBFS.class));
             WakefulIntentService.sendWakefulWork(context, OneTimeBFS.class);

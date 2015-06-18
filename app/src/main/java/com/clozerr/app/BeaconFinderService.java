@@ -295,7 +295,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
 
     public static void disallowScanning(Context context) {
         isScanningAllowed = false;
-        PeriodicBFS.checkAndStopScan(context);
+        PeriodicBFS.checkAndStopScan(context, true);
         OneTimeBFS.checkAndStopScan(context);
         Log.e(TAG, "scans blocked");
     }
@@ -428,8 +428,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         }
 
         public boolean equals(BeaconDBParams other) {
-            if (other == null) return false;
-            return mMajor == other.mMajor && mMinor == other.mMinor;
+            return other != null && mMajor == other.mMajor && mMinor == other.mMinor;
         }
 
         public String toString() {

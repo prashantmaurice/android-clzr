@@ -140,7 +140,7 @@ public class MyClubsFragment extends Fragment implements ObservableScrollViewCal
         JSONArray array;
         try {
             //Log.e("stringfunction", s);
-            Log.e("stringfunction", "processing..");
+            //Log.e("stringfunction", "processing..");
             temp = new JSONObject(s);
             array = temp.getJSONArray("data");
 

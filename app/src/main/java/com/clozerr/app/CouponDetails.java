@@ -887,6 +887,7 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
         if (drawer.isOpened()) {
             drawer.animateClose();
         } else {
+            OneTimeBFS.checkAndStopScan(getApplicationContext());
             super.onBackPressed();
         }
     }
@@ -894,8 +895,8 @@ public class CouponDetails extends ActionBarActivity implements ObservableScroll
     // ALTERNATE
     @Override
     public void onPause() {
-        OneTimeBFS.checkAndStopScan(getApplicationContext());
-        Log.d("HOME", "destroy");
+        //OneTimeBFS.checkAndStopScan(getApplicationContext());
+        //Log.d("HOME", "destroy");
         //startService(new Intent(this, LocationService.class));
         super.onPause();
     }

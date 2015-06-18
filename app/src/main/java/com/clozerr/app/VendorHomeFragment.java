@@ -48,9 +48,9 @@ public class VendorHomeFragment extends Fragment {
         mCallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!VendorActivity.detailsBundle.getString("phonenumber").isEmpty()) {
+                if (!VendorActivity.detailsBundle.getString("phoneNumber").isEmpty()) {
                     Intent dialIntent = new Intent(Intent.ACTION_DIAL);
-                    dialIntent.setData(Uri.parse("tel:" + VendorActivity.detailsBundle.getString("phonenumber")));
+                    dialIntent.setData(Uri.parse("tel:" + VendorActivity.detailsBundle.getString("phoneNumber")));
                     startActivity(dialIntent);
                 } else
                     Toast.makeText(getActivity(), "Sorry, the phone number has not been provided by the vendor.",
