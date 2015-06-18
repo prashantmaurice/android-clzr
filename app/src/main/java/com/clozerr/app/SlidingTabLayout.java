@@ -309,6 +309,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
             if (mViewPagerPageChangeListener != null) {
                 mViewPagerPageChangeListener.onPageSelected(position);
             }
+            if(mTabStrip.getChildCount()==3)
             switch (position){
                 case 0:CategoriesFragment.showToolbar();
                     CategoriesFragment.showSearchbarToInitial();
