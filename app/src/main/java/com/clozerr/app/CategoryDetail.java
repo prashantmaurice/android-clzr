@@ -29,8 +29,6 @@ import android.widget.Toast;
 
 import com.facebook.Session;
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
-import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
-import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.google.android.gms.plus.Plus;
 import com.nineoldandroids.animation.ValueAnimator;
 import com.nineoldandroids.view.ViewHelper;
@@ -42,7 +40,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class CategoryDetail extends ActionBarActivity implements ObservableScrollViewCallbacks{
+public class CategoryDetail extends ActionBarActivity{
 
     public static String TOKEN = "";
     Toolbar mToolbar;
@@ -51,7 +49,11 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
     private RecyclerView.LayoutManager mLayoutManager;
     private EndlessRecyclerOnScrollListener mOnScrollListener;
     private int mOffset;
+    static int scolled = 0;
+    static float SEARCH_CARD_INI_POS = 0;
     SearchView searchView;
+    View SearchCard;
+    View swipetab;
     private boolean mCardsLeft = true;
     private final int ITEMS_PER_PAGE = 7, INITIAL_LOAD_LIMIT = 8;
     private Bundle categorybundle;
@@ -67,13 +69,13 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
         TextView username = (TextView)findViewById(R.id.nav_text);
         if(Home.USERNAME.length()!=0)
             username.setText(Home.USERNAME);
-
+        swipetab = findViewById(R.id.tab);
         Log.e("pic", Home.USER_PIC_URL);
-
+        SearchCard = findViewById(R.id.card_view);
+        SEARCH_CARD_INI_POS = ViewHelper.getTranslationY(SearchCard);
         new DownloadImageTask((de.hdodenhof.circleimageview.CircleImageView)findViewById(R.id.nav_image))
                 .execute(Home.USER_PIC_URL);
         final ObservableRecyclerView mRecyclerView = (ObservableRecyclerView) findViewById(R.id.list);
-        mRecyclerView.setScrollViewCallbacks(this);
         searchView = (SearchView)findViewById(R.id.searchView);
         mScrollable=findViewById(R.id.drawerLayout);
         mToolbar=(Toolbar)findViewById(R.id.toolbar);
@@ -125,8 +127,33 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
 //                loadMoreItems();
 //            }
 //        };
-        mRecyclerView.setOnScrollListener(mOnScrollListener);
-
+        mRecyclerView.addItemDecoration(new SpaceItemDecoration(dpToPx(150), 0));
+        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged (RecyclerView recyclerView, int newState){
+                super.onScrollStateChanged(recyclerView,newState);
+                if(newState == 0){
+                    if(ViewHelper.getTranslationY(mToolbar)<0 && ViewHelper.getTranslationY(mToolbar)>=-mToolbar.getHeight()/2){
+                        showToolbar();
+                        return;
+                    }else if(ViewHelper.getTranslationY(mToolbar)<-mToolbar.getHeight()/2 && ViewHelper.getTranslationY(mToolbar)>-mToolbar.getHeight()){
+                        hideToolbar();
+                        return;
+                    }
+                    if(ViewHelper.getTranslationY(SearchCard)<-mToolbar.getHeight() && ViewHelper.getTranslationY(SearchCard)>=-mToolbar.getHeight()-SearchCard.getHeight()/2){
+                        showSearchbar();
+                    }
+                    else if(ViewHelper.getTranslationY(SearchCard)<-mToolbar.getHeight()-SearchCard.getHeight()/2 && ViewHelper.getTranslationY(SearchCard)>-mToolbar.getHeight()-SearchCard.getHeight()-dpToPx(10)){
+                        hideSearchbar();
+                    }
+                }
+            }
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                move(dy);
+            }
+        });
 
 
         //startService(new Intent(this, LocationService.class));
@@ -300,42 +327,7 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
         }
         return rowItems;
     }
-
-
-    @Override
-    public void onScrollChanged(int i, boolean b, boolean b2) {
-
-    }
-
-    @Override
-    public void onDownMotionEvent() {
-
-    }
-
-    @Override
-    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
-
-        if (scrollState == ScrollState.UP) {
-            if (toolbarIsShown()) {
-                hideToolbar();
-            }
-        } else if (scrollState == ScrollState.DOWN) {
-            if (toolbarIsHidden()) {
-                showToolbar();
-            }
-        }
-    }
-    private boolean toolbarIsShown() {
-        // Toolbar is 0 in Y-axis, so we can say it's shown.
-        return ViewHelper.getTranslationY(mToolbar) == 0;
-    }
-
-    private boolean toolbarIsHidden() {
-        // Toolbar is outside of the screen and absolute Y matches the height of it.
-        // So we can say it's hidden.
-        return ViewHelper.getTranslationY(mToolbar) == -mToolbar.getHeight();
-    }
-    private void showToolbar() {
+    public void showToolbar() {
         moveToolbar(0);
     }
 
@@ -343,6 +335,9 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
         moveToolbar(-mToolbar.getHeight());
     }
     private void moveToolbar(float toTranslationY) {
+        if(scolled<2*mToolbar.getHeight()){
+            toTranslationY = 0;
+        }
         if (ViewHelper.getTranslationY(mToolbar) == toTranslationY) {
             return;
         }
@@ -353,20 +348,71 @@ public class CategoryDetail extends ActionBarActivity implements ObservableScrol
                 float translationY = (float) animation.getAnimatedValue();
 
                 ViewHelper.setTranslationY(mToolbar, translationY);
-                ViewHelper.setTranslationY( mScrollable, translationY);
-                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) ( mScrollable).getLayoutParams();
-                lp.height = (int) -translationY + getScreenHeight() - lp.topMargin;
-                ((View) mScrollable).requestLayout();
+                float x=translationY;
+                ViewHelper.setTranslationY(swipetab, translationY);
+                ViewHelper.setTranslationY(SearchCard, translationY);
             }
         });
         animator.start();
     }
+    public void showSearchbar() {
+        moveSearchbar(-mToolbar.getHeight());
+    }
+    public void showSearchbarToInitial() {
+        moveSearchbar(SEARCH_CARD_INI_POS);
+    }
+    private void hideSearchbar() {
+        moveSearchbar(-SearchCard.getHeight() - dpToPx(10) - mToolbar.getHeight());
+    }
+    private void moveSearchbar(float toTranslationY) {
+        if (toTranslationY==SEARCH_CARD_INI_POS){
 
-    private int getScreenHeight() {
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int height = displaymetrics.heightPixels-2*searchView.getHeight()+dpToPx(10);
-        return height;
+        }
+        else if(scolled < 2*mToolbar.getHeight()){
+            toTranslationY = -mToolbar.getHeight();
+        }
+        if (ViewHelper.getTranslationY(SearchCard) == toTranslationY) {
+            return;
+        }
+        ValueAnimator animator = ValueAnimator.ofFloat(ViewHelper.getTranslationY(SearchCard), toTranslationY).setDuration(200);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float translationY = (float) animation.getAnimatedValue();
+
+                ViewHelper.setTranslationY(SearchCard, translationY);
+            }
+        });
+        animator.start();
+    }
+    void move(float dy){
+        scolled+=dy;
+        Log.d("Scrolling", dy + "//" + ViewHelper.getTranslationY(mToolbar) + "//" + mToolbar.getHeight() + "//" + SEARCH_CARD_INI_POS + "//" + ViewHelper.getTranslationY(SearchCard));
+        if(ViewHelper.getTranslationY(SearchCard)>=SEARCH_CARD_INI_POS-mToolbar.getHeight() && ViewHelper.getTranslationY(SearchCard)<=SEARCH_CARD_INI_POS)
+            if((!(ViewHelper.getTranslationY(mToolbar)<=-mToolbar.getHeight()) && dy>=0) || ((ViewHelper.getTranslationY(mToolbar)<0)&& dy<=0)) {
+                if (ViewHelper.getTranslationY(mToolbar) - dy > 0) {
+                    dy = ViewHelper.getTranslationY(mToolbar);
+                }
+                if (ViewHelper.getTranslationY(mToolbar)-dy<-mToolbar.getHeight())
+                    dy = ViewHelper.getTranslationY(mToolbar)+mToolbar.getHeight();
+                ViewHelper.setTranslationY(mToolbar, ViewHelper.getTranslationY(mToolbar) - dy);
+                ViewHelper.setTranslationY(swipetab, ViewHelper.getTranslationY(swipetab) - dy);
+                ViewHelper.setTranslationY(SearchCard, ViewHelper.getTranslationY(SearchCard) - dy);
+            }
+        if(ViewHelper.getTranslationY(mToolbar)==-mToolbar.getHeight())
+            if( (dy >=0 && ViewHelper.getTranslationY(SearchCard)+mToolbar.getHeight()>=-SearchCard.getHeight()-dpToPx(10)) || (dy<=0 && ViewHelper.getTranslationY(SearchCard)<=SEARCH_CARD_INI_POS-mToolbar.getHeight())){
+                if(ViewHelper.getTranslationY(SearchCard)-dy<-SearchCard.getHeight()-dpToPx(10)-mToolbar.getHeight()){
+                    dy = ViewHelper.getTranslationY(SearchCard)+SearchCard.getHeight()+dpToPx(10)+mToolbar.getHeight();
+                }
+                if(ViewHelper.getTranslationY(SearchCard)-dy>SEARCH_CARD_INI_POS - mToolbar.getHeight()){
+                    dy = ViewHelper.getTranslationY(SearchCard)-SEARCH_CARD_INI_POS+mToolbar.getHeight();
+                }
+                ViewHelper.setTranslationY(SearchCard, ViewHelper.getTranslationY(SearchCard) - dy);
+            }
+        /*if((!(swipetab.getTranslationY()<=SWIPE_TAB_INI_POS-swipetab.getHeight()) && dy>=0) || ((swipetab.getTranslationY()<SWIPE_TAB_INI_POS)&& dy<=0)) {
+            if (swipetab.getTranslationY() - dy > SWIPE_TAB_INI_POS)
+                dy = swipetab.getTranslationY()-SWIPE_TAB_INI_POS;
+        }*/
     }
     public int dpToPx(int dp) {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
