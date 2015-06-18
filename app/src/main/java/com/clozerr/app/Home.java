@@ -152,6 +152,7 @@ public class Home  extends ActionBarActivity {
         });
         mtabs.setViewPager(pager);
 
+
     }
 
     @Override

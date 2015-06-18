@@ -19,7 +19,7 @@
             android:layout_marginBottom="0dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="114dp"
             android:background="#eaeaea"
             card_view:cardBackgroundColor="#FFFFFF"
             card_view:cardCornerRadius="2dp"
@@ -38,6 +38,7 @@
                     android:queryHint=""
                     android:background="#FFFFFF"/>
 
+
                 <TextView
                     android:id="@+id/searchHint"
                     android:layout_width="wrap_content"
@@ -54,7 +55,7 @@
         <com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/list"
-            android:layout_marginTop="-48dp"
+            android:layout_marginTop="-154dp"
             android:background="#eaeaea"
             android:layout_marginBottom="0dp"
             android:layout_width="match_parent"

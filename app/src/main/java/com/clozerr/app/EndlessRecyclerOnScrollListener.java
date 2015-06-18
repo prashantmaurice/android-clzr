@@ -24,6 +24,8 @@ public abstract class EndlessRecyclerOnScrollListener extends
         totalItemCount = mLinearLayoutManager.getItemCount();
         lastVisibleItem = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
         if (totalItemCount == lastVisibleItem + 1) onLoadMore();
+
+
     }
 
     public abstract void onLoadMore();
