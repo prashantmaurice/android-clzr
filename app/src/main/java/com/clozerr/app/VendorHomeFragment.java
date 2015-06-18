@@ -8,6 +8,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -34,7 +36,7 @@ public class VendorHomeFragment extends Fragment {
     private ImageView mVendorImageView;
     private TextView mVendorTitleView;
     private TextView mVendorAddressView;
-    private ImageButton mCallButton, mDirButton, favorites;
+    private ImageButton mCallButton, mDirButton, favorites, whatsappshare;
     private RecyclerView gallerylist;
 
     @Override
@@ -93,6 +95,14 @@ public class VendorHomeFragment extends Fragment {
                     }
                 });
 
+
+            }
+        });
+
+        whatsappshare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onClickWhatsApp();
             }
         });
         gallerylist.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
@@ -125,6 +135,33 @@ public class VendorHomeFragment extends Fragment {
         mCallButton = (ImageButton) layout.findViewById(R.id.callButton);
         mDirButton = (ImageButton) layout.findViewById(R.id.dirButton);
         favorites = (ImageButton) layout.findViewById(R.id.favorites);
+        whatsappshare=(ImageButton) layout.findViewById(R.id.whatsappshare);
+    }
+
+    public void onClickWhatsApp() {
+
+        PackageManager pm=getActivity().getPackageManager();
+        try {
+
+            Intent waIntent = new Intent(Intent.ACTION_SEND);
+            waIntent.setType("text/plain");
+            String text = "Check out this place I found on Clozerr: "+VendorActivity.detailsBundle.getString("vendorTitle")+" https://play.google.com/store/apps/details?id=com.clozerr.app";
+
+            PackageInfo info=pm.getPackageInfo("com.whatsapp", PackageManager.GET_META_DATA);
+            //Check if package exists or not. If not then code
+            //in catch block will be called
+            waIntent.setPackage("com.whatsapp");
+
+            waIntent.putExtra(Intent.EXTRA_TEXT, text);
+            startActivity(Intent.createChooser(waIntent, "Share with"));
+
+        } catch (PackageManager.NameNotFoundException e) {
+            Toast.makeText(getActivity(), "WhatsApp not Installed", Toast.LENGTH_SHORT)
+                    .show();
+        }
+
     }
 }
+
+
 
