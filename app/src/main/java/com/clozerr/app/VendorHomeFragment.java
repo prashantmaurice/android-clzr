@@ -27,6 +27,10 @@ import android.widget.Toast;
 
 import com.koushikdutta.ion.Ion;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class VendorHomeFragment extends Fragment {
 
@@ -47,6 +51,33 @@ public class VendorHomeFragment extends Fragment {
         Ion.with(mVendorImageView).load(VendorActivity.detailsBundle.getString("vendorImage"));
         mVendorTitleView.setText(VendorActivity.detailsBundle.getString("vendorTitle"));
         mVendorAddressView.setText(VendorActivity.detailsBundle.getString("address"));
+        String urlFavorites = "http://api.clozerr.com/v2/user/add/favourites?access_token=" +Home.TOKEN;
+        new AsyncGet(c, urlFavorites , new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                try {
+                    JSONObject obj=new JSONObject(s);
+                    //Toast.makeText(getActivity(),VendorActivity.vendorId,Toast.LENGTH_SHORT).show();
+                    JSONArray vendors=obj.getJSONArray("vendor");
+                    for (int i = 0; i < vendors.length(); ++i) {
+
+                        if(VendorActivity.vendorId.equals(vendors.getString(i)))
+                        {
+                            favorites.setImageResource(R.drawable.favorited);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                //  t1.setText(s);
+                if(s==null) {
+                    Toast.makeText(c,"No internet connection",Toast.LENGTH_SHORT).show();
+                }
+                //l1.setAdapter(adapter);
+            }
+        });
+
+
         mCallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,8 +112,9 @@ public class VendorHomeFragment extends Fragment {
                 new AsyncGet(getActivity(), "http://api.clozerr.com/v2/user/add/favourites?vendor_id="+VendorActivity.vendorId+"&access_token="+TOKEN, new AsyncGet.AsyncResult() {
                     @Override
                     public void gotResult(String s) {
-                        Toast.makeText(getActivity(),"Successfully added to Favorites", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(),"Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
                         //l1.setAdapter(adapter);
+                        favorites.setImageResource(R.drawable.favorited);
                         if (s == null) {
                             Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
                         }

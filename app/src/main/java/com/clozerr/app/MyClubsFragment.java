@@ -27,6 +27,7 @@ import com.nineoldandroids.animation.ValueAnimator;
 import com.nineoldandroids.view.ViewHelper;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class MyClubsFragment extends Fragment{
     GridLayoutManager gridLayoutManager;
     int length_of_array=0;
     static float SEARCH_CARD_INI_POS = 0;
+    public ArrayList<CardModel> rowItems;
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
@@ -52,6 +54,7 @@ public class MyClubsFragment extends Fragment{
         mRecyclerView = (ObservableRecyclerView) layout.findViewById(R.id.sliding_list);
         searchView = (SearchView)layout.findViewById(R.id.searchView);
         SearchCard=layout.findViewById(R.id.card_view);
+        rowItems = new ArrayList<>();
         SEARCH_CARD_INI_POS = ViewHelper.getTranslationY(SearchCard);
         mScrollable=getActivity().findViewById(R.id.drawerLayout);
         mToolbar=(Toolbar)getActivity().findViewById(R.id.toolbar);
@@ -135,8 +138,8 @@ public class MyClubsFragment extends Fragment{
                 //  t1.setText(s);
 
                 Log.e("resultSlide", s);
-
-                MyCardRecyclerViewAdapter Cardadapter = new MyCardRecyclerViewAdapter(convertRowMyCard(s), c);
+                convertRowMyCard(s);
+                MyCardRecyclerViewAdapter Cardadapter = new MyCardRecyclerViewAdapter(rowItems, c);
                 mRecyclerView.setAdapter(Cardadapter);
                 try
                 {
@@ -157,12 +160,70 @@ public class MyClubsFragment extends Fragment{
             }
         });
 
+        String urlFavorites = "http://api.clozerr.com/v2/user/add/favourites?access_token=" +TOKEN;
+        new AsyncGet(c, urlFavorites , new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                try {
+                    JSONObject obj=new JSONObject(s);
+                    JSONArray vendors=obj.getJSONArray("vendor");
+                    for (int i = 0; i < vendors.length(); ++i) {
+                        String urlFavVendor="http://api.clozerr.com/vendor/get?vendor_id=" + vendors.getString(i);
+                        new AsyncGet(c, urlFavVendor, new AsyncGet.AsyncResult() {
+                            @Override
+                            public void gotResult(String s) {
+                                String address = "", phoneNumber = "", vendorDescription = "";
+                                double latitude = 0.0, longitude = 0.0;
+                                JSONObject object = null;
+                                try {
+                                    object = new JSONObject(s);
+                                    phoneNumber = object.getString("phone");
+                                    if (phoneNumber.equalsIgnoreCase("undefined"))
+                                        phoneNumber = "";
+                                    vendorDescription = object.getString("description");
+                                    if (vendorDescription.equalsIgnoreCase("undefined"))
+                                        vendorDescription = "";
+                                    latitude = object.getJSONArray("location").getDouble(0);
+                                    if (latitude <= 0.0)
+                                        latitude = 0.0;
+                                    longitude = object.getJSONArray("location").getDouble(1);
+                                    if (longitude <= 0.0)
+                                        longitude = 0.0;
+                                    CardModel item = new CardModel(
+                                            object.getString("name"),
+                                            phoneNumber,
+                                            vendorDescription,
+                                            object.getJSONArray("offers"),
+                                            latitude,
+                                            longitude,
+                                            object.getString("image"),
+                                            object.getString("fid"), object.getString("_id"),
+                                            0
+                                    );
+                                    rowItems.add(item);
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                //  t1.setText(s);
+                if(s==null) {
+                    Toast.makeText(c,"No internet connection",Toast.LENGTH_SHORT).show();
+                }
+                //l1.setAdapter(adapter);
+            }
+        });
+
 
 
         return layout;
     }
-    private ArrayList<CardModel> convertRowMyCard(String s) {
-        ArrayList<CardModel> rowItems = new ArrayList<>();
+    private void convertRowMyCard(String s) {
         JSONObject temp;
         JSONArray array;
         try {
@@ -199,7 +260,6 @@ public class MyClubsFragment extends Fragment{
             Log.e("uhoh",e.getMessage());
             e.printStackTrace();
         }
-        return rowItems;
     }
     @Override
     public void onAttach(Activity activity) {
