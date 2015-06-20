@@ -57,8 +57,10 @@ public class VendorHomeFragment extends Fragment {
             public void gotResult(String s) {
                 try {
                     JSONObject obj=new JSONObject(s);
-                    //Toast.makeText(getActivity(),VendorActivity.vendorId,Toast.LENGTH_SHORT).show();
-                    JSONArray vendors=obj.getJSONArray("vendor");
+                    //Toast.makeText(getActivity(),s,Toast.LENGTH_SHORT).show();
+                    JSONObject fav=obj.getJSONObject("favourites");
+                    JSONArray vendors=fav.getJSONArray("vendor");
+                    //Toast.makeText(getActivity(),vendors.toString(),Toast.LENGTH_SHORT).show();
                     for (int i = 0; i < vendors.length(); ++i) {
 
                         if(VendorActivity.vendorId.equals(vendors.getString(i)))

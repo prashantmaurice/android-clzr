@@ -163,7 +163,8 @@ public class MyClubsFragment extends Fragment {
             public void gotResult(String s) {
                 try {
                     JSONObject obj = new JSONObject(s);
-                    JSONArray vendors = obj.getJSONArray("vendor");
+                    JSONObject fav=obj.getJSONObject("favorites");
+                    JSONArray vendors = fav.getJSONArray("vendor");
                     for (int i = 0; i < vendors.length(); ++i) {
                         Boolean status = true;
                         Toast.makeText(getActivity(), Integer.toString(rowItems.size()), Toast.LENGTH_SHORT).show();
