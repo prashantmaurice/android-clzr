@@ -8,9 +8,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -36,13 +39,40 @@ public class UnusedOffersActivity extends ActionBarActivity {
         listview.setAdapter(adapter);
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), FreebieDescription.class);
-                intent.putExtra("offerid",offerid.get(position));
-                intent.putExtra("vendorid",VendorActivity.detailsBundle.getString("vendorId"));
-                intent.putExtra("caption",caption.get(position));
-                intent.putExtra("description",description.get(position));
+                intent.putExtra("offerid", offerid.get(position));
+                intent.putExtra("vendorid", VendorActivity.detailsBundle.getString("vendorId"));
+                intent.putExtra("caption", caption.get(position));
+                intent.putExtra("description", description.get(position));
                 startActivity(intent);
+                final ImageView pin=(ImageView)view.findViewById(R.id.pinimage);
+                pin.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String urlPinning = "http://api.clozerr.com/v2/user/add/pinned?access_token=" + Home.TOKEN +"&offer_id="+offerid.get(position);
+                        new AsyncGet(getApplicationContext(), urlPinning, new AsyncGet.AsyncResult() {
+                            @Override
+                            public void gotResult(String s) {
+                                try {
+                                    JSONObject obj = new JSONObject(s);
+                                    //Toast.makeText(getActivity(),s,Toast.LENGTH_SHORT).show();
+                                    pin.setImageResource(R.drawable.pinfilled);
+                                    Toast.makeText(getApplicationContext(), "Pin clicked", Toast.LENGTH_SHORT).show();
+                                    //Toast.makeText(getActivity(),vendors.toString(),Toast.LENGTH_SHORT).show();
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                //  t1.setText(s);
+                                if (s == null) {
+                                    Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+                                }
+                                //l1.setAdapter(adapter);
+                            }
+                        });
+                    }
+                });
             }
         });
     }
