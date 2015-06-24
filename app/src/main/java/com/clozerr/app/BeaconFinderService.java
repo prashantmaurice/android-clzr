@@ -49,7 +49,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
     protected static boolean isBLESupported = true;
     protected static boolean isScanningAllowed = true;
     protected static boolean isScanningPaused = false;
-    protected static boolean hasUserActivatedBluetooth = false;
+    //protected static boolean hasUserActivatedBluetooth = false;
     protected static boolean isUserLoggedIn = false;
 
     protected enum RequestCodes {
@@ -280,15 +280,23 @@ public abstract class BeaconFinderService extends WakefulIntentService {
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
     }
 
-    protected static void turnOnBluetooth() {
-        hasUserActivatedBluetooth = bluetoothAdapter.isEnabled();  // check if user has already enabled BT
-        if (!hasUserActivatedBluetooth)                            // disabled, so enable BT
+    protected static void turnOnBluetooth(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean shouldAppActivateBluetooth =
+                preferences.getBoolean("AppEnabledBT", false) || !bluetoothAdapter.isEnabled();
+                                                // check if it's this app that has to enable BT
+                                                // stored in (and read from) preferences to account for restart of
+                                                // process after OS/user kills app
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putBoolean("AppEnabledBT", shouldAppActivateBluetooth).apply();
+        if (shouldAppActivateBluetooth)                            // disabled, so enable BT
             bluetoothAdapter.enable();
         Log.e(TAG, "BT On");
     }
 
-    protected static void turnOffBluetooth() {
-        if (!hasUserActivatedBluetooth) // if user turned on BT, don't disable it as user might need it
+    protected static void turnOffBluetooth(Context context) {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("AppEnabledBT", false))
+                            // if app did not turn on BT, don't disable it as user might need it
             bluetoothAdapter.disable();
         Log.e(TAG, "BT Off");
     }
@@ -445,7 +453,8 @@ public abstract class BeaconFinderService extends WakefulIntentService {
                 Log.e(TAG, "scans resumed");
                 isScanningPaused = false;
                 //putToast(context, "scans resumed", Toast.LENGTH_SHORT);
-                WakefulIntentService.scheduleAlarms(new PeriodicBFS.AlarmListener(), context);
+                //WakefulIntentService.scheduleAlarms(new PeriodicBFS.AlarmListener(), context);
+                PeriodicBFS.scheduleAlarms(context);
                 disableComponent(context, ScanResumeReceiver.class);
             }
         }

@@ -68,7 +68,7 @@ public class OneTimeBFS extends BeaconFinderService {
                         toastText = "Mark your visit!";
                     putToast(getApplicationContext(), toastText, Toast.LENGTH_LONG);
                     beaconManager.stopRanging(scanningRegion);
-                    turnOffBluetooth();
+                    turnOffBluetooth(getApplicationContext());
                     Log.e(TAG, "Stopped Scan");
                     running = false;
                     return;
@@ -126,7 +126,7 @@ public class OneTimeBFS extends BeaconFinderService {
             }
         });*/
         setListener();
-        turnOnBluetooth();
+        turnOnBluetooth(getApplicationContext());
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -163,7 +163,7 @@ public class OneTimeBFS extends BeaconFinderService {
         if (running) {
             running = false;
             beaconManager.stopRanging(scanningRegion);
-            turnOffBluetooth();
+            turnOffBluetooth(context);
             PeriodicBFS.checkAndStartScan(context);
         }
     }

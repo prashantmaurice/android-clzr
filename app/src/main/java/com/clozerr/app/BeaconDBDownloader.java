@@ -16,7 +16,7 @@ import static com.clozerr.app.AsyncGet.isNetworkAvailable;
 
 public class BeaconDBDownloader extends BroadcastReceiver {
     private static final String TAG = "BDBDownloader";
-    private static final String DOWNLOAD_URL = "http://api.clozerr.com/vendor/get/all/beacons?access_token=";
+    private static final String DOWNLOAD_URL = "http://api.clozerr.com/v2/vendor/beacons/all?access_token=";
     public static final String BEACONS_FILE_NAME = "beacons.txt";
     public static final String ACTION_INITIATE_DOWNLOADER = "com.clozerr.app.ACTION_INITIATE_DOWNLOADER";
     private static boolean isDownloadDone = false;
@@ -38,11 +38,13 @@ public class BeaconDBDownloader extends BroadcastReceiver {
                         FileOutputStream fileOutputStream = context.openFileOutput(BEACONS_FILE_NAME, Context.MODE_PRIVATE);
                         fileOutputStream.write(s.getBytes());
                         fileOutputStream.close();
-                        isDownloadDone = true;
                         BeaconFinderService.CLOZERR_UUID = new JSONObject(s).getString("UUID");
                         PreferenceManager.getDefaultSharedPreferences(context).edit().
-                                putString("UUID", BeaconFinderService.CLOZERR_UUID).commit();
+                                putString("UUID", BeaconFinderService.CLOZERR_UUID).apply();
                         //BeaconDBDownloadBaseReceiver.releaseWakeLock();
+                        Log.e(TAG, "downloaded");
+                        PeriodicBFS.scheduleAlarms(context);
+                        isDownloadDone = true;
                         BeaconFinderService.disableComponent(context, BeaconDBDownloader.class);
                     } catch (Exception e) {
                         e.printStackTrace();

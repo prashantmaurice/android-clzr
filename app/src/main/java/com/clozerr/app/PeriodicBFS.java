@@ -30,9 +30,9 @@ public class PeriodicBFS extends BeaconFinderService {
     //private static final String ACTION_REMOVE_VENDOR = "RemoveVendor";
     //private static final String ACTION_FIRE_ALARM_SCAN = "com.clozerr.app.ACTION_FIRE_ALARM_SCAN";
 
-    private static final long ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(3L, TimeUnit.MINUTES);
-    private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(8L, TimeUnit.SECONDS);
-    private static final long SCAN_PAUSE_INTERVAL = TimeUnit.MILLISECONDS.convert(3L, TimeUnit.MINUTES);
+    private static final long ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.SECONDS);
+    private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(10L, TimeUnit.SECONDS);
+    private static final long SCAN_PAUSE_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.SECONDS);
     private static final long MAX_SCAN_RESTART_INTERVAL = ALARM_INTERVAL * 2 + SCAN_PAUSE_INTERVAL;
                                 // interval after which alarms have to be rescheduled no matter what
                                 // so it has to accommodate inexactness of alarm plus scan pausing
@@ -415,7 +415,7 @@ public class PeriodicBFS extends BeaconFinderService {
 
     public void startScanning() {
         setListener();
-        turnOnBluetooth();
+        turnOnBluetooth(getApplicationContext());
         pushedNotification = false;
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
@@ -453,7 +453,7 @@ public class PeriodicBFS extends BeaconFinderService {
     public void stopScanning() {
         //if (hasScanStarted) {
         beaconManager.stopRanging(scanningRegion);
-        turnOffBluetooth();
+        turnOffBluetooth(getApplicationContext());
         Log.e(TAG, "Stopped Scan");
         //hasScanStarted = false;
         releaseLock();
@@ -489,15 +489,21 @@ public class PeriodicBFS extends BeaconFinderService {
             //context.startService(new Intent(context, PeriodicBFS.class));
             BeaconDBDownloadBaseReceiver.scheduleDownload(context);
             CLOZERR_UUID = PreferenceManager.getDefaultSharedPreferences(context).getString("UUID", "");
-            WakefulIntentService.scheduleAlarms(new AlarmListener(), context);
+            // Downloader will initiate scanning i.e. schedule alarms
+            // WakefulIntentService.scheduleAlarms(new AlarmListener(), context);
         }
+    }
+
+    public static void scheduleAlarms(Context context) {
+        if (!OneTimeBFS.isRunning())
+            WakefulIntentService.scheduleAlarms(new PeriodicBFS.AlarmListener(), context);
     }
 
     public static void checkAndStopScan(Context context, boolean stopDownloads) {
         if (running) {
             //context.stopService(new Intent(context, PeriodicBFS.class));
             running = false;
-            turnOffBluetooth();
+            turnOffBluetooth(context);
             WakefulIntentService.cancelAlarms(context);
             if (stopDownloads)
                 BeaconDBDownloadBaseReceiver.stopDownloads(context);
@@ -586,6 +592,7 @@ public class PeriodicBFS extends BeaconFinderService {
 
         @Override
         public void sendWakefulWork(Context context) {
+            CLOZERR_UUID = PreferenceManager.getDefaultSharedPreferences(context).getString("UUID", "");
             if (checkPreferences(context) && !CLOZERR_UUID.isEmpty() && !isScanningPaused)
                 WakefulIntentService.sendWakefulWork(context, PeriodicBFS.class);
         }
