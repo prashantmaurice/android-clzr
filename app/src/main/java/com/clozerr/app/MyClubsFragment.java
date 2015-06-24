@@ -27,12 +27,13 @@ import com.nineoldandroids.animation.ValueAnimator;
 import com.nineoldandroids.view.ViewHelper;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 
-public class MyClubsFragment extends Fragment{
+public class MyClubsFragment extends Fragment {
     Context c;
     View layout;
     View mScrollable;
@@ -43,20 +44,22 @@ public class MyClubsFragment extends Fragment{
     ObservableRecyclerView mRecyclerView;
     static View SearchCard;
     GridLayoutManager gridLayoutManager;
-    int length_of_array=0;
+    int length_of_array = 0;
     static float SEARCH_CARD_INI_POS = 0;
+    public static ArrayList<CardModel> rowItems;
 
     @Override
-    public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         layout = inflater.inflate(R.layout.activity_my_clubs_fragment, container, false);
         mRecyclerView = (ObservableRecyclerView) layout.findViewById(R.id.sliding_list);
-        searchView = (SearchView)layout.findViewById(R.id.searchView);
-        SearchCard=layout.findViewById(R.id.card_view);
+        searchView = (SearchView) layout.findViewById(R.id.searchView);
+        SearchCard = layout.findViewById(R.id.card_view);
+        rowItems = new ArrayList<>();
         SEARCH_CARD_INI_POS = ViewHelper.getTranslationY(SearchCard);
-        mScrollable=getActivity().findViewById(R.id.drawerLayout);
-        mToolbar=(Toolbar)getActivity().findViewById(R.id.toolbar);
-        swipetab=getActivity().findViewById(R.id.tabs);
-        final TextView searchHint = (TextView)layout.findViewById(R.id.searchHint);
+        mScrollable = getActivity().findViewById(R.id.drawerLayout);
+        mToolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        swipetab = getActivity().findViewById(R.id.tabs);
+        final TextView searchHint = (TextView) layout.findViewById(R.id.searchHint);
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,7 +92,7 @@ public class MyClubsFragment extends Fragment{
             }
         });
 
-        gridLayoutManager = new GridLayoutManager(c,2);
+        gridLayoutManager = new GridLayoutManager(c, 2);
         mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.addItemDecoration(new SpaceItemDecoration(dpToPx(156), 1));
@@ -126,43 +129,111 @@ public class MyClubsFragment extends Fragment{
         SharedPreferences status = c.getSharedPreferences("USER", 0);
         String TOKEN = status.getString("token", "");
 
-        String urlVisited = "http://api.clozerr.com/vendor/get/visitedV2?access_token=" +TOKEN;
+        String urlVisited = "http://api.clozerr.com/vendor/get/visitedV2?access_token=" + TOKEN;
         Log.e("urlslide", urlVisited);
 
-        new AsyncGet(c, urlVisited , new AsyncGet.AsyncResult() {
+        new AsyncGet(c, urlVisited, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
                 //  t1.setText(s);
 
                 Log.e("resultSlide", s);
-
-                MyCardRecyclerViewAdapter Cardadapter = new MyCardRecyclerViewAdapter(convertRowMyCard(s), c);
+                convertRowMyCard(s);
+                MyCardRecyclerViewAdapter Cardadapter = new MyCardRecyclerViewAdapter(rowItems, c);
                 mRecyclerView.setAdapter(Cardadapter);
-                try
-                {
+                try {
                     Tracker t = ((Analytics) c.getApplicationContext()).getTracker(Analytics.TrackerName.APP_TRACKER);
 
                     t.setScreenName("MyCards");
 
                     t.send(new HitBuilders.AppViewBuilder().build());
-                }
-                catch(Exception  e)
-                {
+                } catch (Exception e) {
                     Toast.makeText(c, "Error" + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
-                if(s==null) {
-                    Toast.makeText(c,"No internet connection",Toast.LENGTH_SHORT).show();
+                if (s == null) {
+                    Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
+                }
+                //l1.setAdapter(adapter);
+            }
+        });
+
+        String urlFavorites = "http://api.clozerr.com/v2/user/add/favourites?access_token=" + TOKEN;
+        new AsyncGet(c, urlFavorites, new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                try {
+                    JSONObject obj = new JSONObject(s);
+                    JSONObject fav=obj.getJSONObject("favorites");
+                    JSONArray vendors = fav.getJSONArray("vendor");
+                    for (int i = 0; i < vendors.length(); ++i) {
+                        Boolean status = true;
+                        Toast.makeText(getActivity(), Integer.toString(rowItems.size()), Toast.LENGTH_SHORT).show();
+                        for (int j = 0; j < rowItems.size(); j++) {
+                            if (rowItems.get(j).getVendorId().equals(vendors.getString(i))) {
+                                status = false;
+                                break;
+                            }
+                        }
+                        if (status == true) {
+                            String urlFavVendor = "http://api.clozerr.com/vendor/get?vendor_id=" + vendors.getString(i);
+
+                            new AsyncGet(c, urlFavVendor, new AsyncGet.AsyncResult() {
+                                @Override
+                                public void gotResult(String s) {
+                                    String address = "", phoneNumber = "", vendorDescription = "";
+                                    double latitude = 0.0, longitude = 0.0;
+                                    JSONObject object = null;
+                                    try {
+                                        object = new JSONObject(s);
+                                        phoneNumber = object.getString("phone");
+                                        if (phoneNumber.equalsIgnoreCase("undefined"))
+                                            phoneNumber = "";
+                                        vendorDescription = object.getString("description");
+                                        if (vendorDescription.equalsIgnoreCase("undefined"))
+                                            vendorDescription = "";
+                                        latitude = object.getJSONArray("location").getDouble(0);
+                                        if (latitude <= 0.0)
+                                            latitude = 0.0;
+                                        longitude = object.getJSONArray("location").getDouble(1);
+                                        if (longitude <= 0.0)
+                                            longitude = 0.0;
+                                        CardModel item = new CardModel(
+                                                object.getString("name"),
+                                                phoneNumber,
+                                                vendorDescription,
+                                                object.getJSONArray("offers"),
+                                                latitude,
+                                                longitude,
+                                                object.getString("image"),
+                                                object.getString("fid"), object.getString("_id"),
+                                                0
+                                        );
+                                        rowItems.add(item);
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                        }
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                //  t1.setText(s);
+                if (s == null) {
+                    Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
                 }
                 //l1.setAdapter(adapter);
             }
         });
 
 
-
         return layout;
     }
-    private ArrayList<CardModel> convertRowMyCard(String s) {
-        ArrayList<CardModel> rowItems = new ArrayList<>();
+
+    private void convertRowMyCard(String s) {
         JSONObject temp;
         JSONArray array;
         try {
@@ -171,13 +242,13 @@ public class MyClubsFragment extends Fragment{
             temp = new JSONObject(s);
             array = temp.getJSONArray("data");
 
-            ImageView loyaltyempty=(ImageView)layout.findViewById(R.id.loyaltyempty);
-            if(array.length()==0){
-                Log.e("arrayLength", array.length()+"");
+            ImageView loyaltyempty = (ImageView) layout.findViewById(R.id.loyaltyempty);
+            if (array.length() == 0) {
+                Log.e("arrayLength", array.length() + "");
                 loyaltyempty.setVisibility(View.VISIBLE);
             }
             length_of_array = array.length();
-            for(int i = 0 ; i < array.length() ; i++){
+            for (int i = 0; i < array.length(); i++) {
                 loyaltyempty.setVisibility(View.GONE);
                 Log.e("stringfunction", "processing..");
                 CardModel item = new CardModel(
@@ -196,16 +267,17 @@ public class MyClubsFragment extends Fragment{
                 rowItems.add(item);
             }
         } catch (Exception e) {
-            Log.e("uhoh",e.getMessage());
+            Log.e("uhoh", e.getMessage());
             e.printStackTrace();
         }
-        return rowItems;
     }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        c=activity;
+        c = activity;
     }
+
     static public void showToolbar() {
         moveToolbar(0);
     }
@@ -213,8 +285,9 @@ public class MyClubsFragment extends Fragment{
     private void hideToolbar() {
         moveToolbar(-mToolbar.getHeight());
     }
+
     static private void moveToolbar(float toTranslationY) {
-        if(scolled<2*mToolbar.getHeight()){
+        if (scolled < 2 * mToolbar.getHeight()) {
             toTranslationY = 0;
         }
         if (ViewHelper.getTranslationY(mToolbar) == toTranslationY) {
@@ -227,27 +300,30 @@ public class MyClubsFragment extends Fragment{
                 float translationY = (float) animation.getAnimatedValue();
 
                 ViewHelper.setTranslationY(mToolbar, translationY);
-                float x=translationY;
+                float x = translationY;
                 ViewHelper.setTranslationY(swipetab, translationY);
                 ViewHelper.setTranslationY(SearchCard, translationY);
             }
         });
         animator.start();
     }
+
     public static void showSearchbar() {
         moveSearchbar(-mToolbar.getHeight());
     }
+
     public static void showSearchbarToInitial() {
         moveSearchbar(SEARCH_CARD_INI_POS);
     }
+
     private void hideSearchbar() {
         moveSearchbar(-SearchCard.getHeight() - dpToPx(10) - mToolbar.getHeight());
     }
-    private static void moveSearchbar(float toTranslationY) {
-        if (toTranslationY==SEARCH_CARD_INI_POS){
 
-        }
-        else if(scolled < 2*mToolbar.getHeight()){
+    private static void moveSearchbar(float toTranslationY) {
+        if (toTranslationY == SEARCH_CARD_INI_POS) {
+
+        } else if (scolled < 2 * mToolbar.getHeight()) {
             toTranslationY = -mToolbar.getHeight();
         }
         if (ViewHelper.getTranslationY(SearchCard) == toTranslationY) {
@@ -264,27 +340,28 @@ public class MyClubsFragment extends Fragment{
         });
         animator.start();
     }
-    void move(float dy){
-        scolled+=dy;
+
+    void move(float dy) {
+        scolled += dy;
         Log.d("Scrolling", dy + "//" + ViewHelper.getTranslationY(mToolbar) + "//" + mToolbar.getHeight() + "//" + SEARCH_CARD_INI_POS + "//" + ViewHelper.getTranslationY(SearchCard));
-        if(ViewHelper.getTranslationY(SearchCard)>=SEARCH_CARD_INI_POS-mToolbar.getHeight() && ViewHelper.getTranslationY(SearchCard)<=SEARCH_CARD_INI_POS)
-            if((!(ViewHelper.getTranslationY(mToolbar)<=-mToolbar.getHeight()) && dy>=0) || ((ViewHelper.getTranslationY(mToolbar)<0)&& dy<=0)) {
+        if (ViewHelper.getTranslationY(SearchCard) >= SEARCH_CARD_INI_POS - mToolbar.getHeight() && ViewHelper.getTranslationY(SearchCard) <= SEARCH_CARD_INI_POS)
+            if ((!(ViewHelper.getTranslationY(mToolbar) <= -mToolbar.getHeight()) && dy >= 0) || ((ViewHelper.getTranslationY(mToolbar) < 0) && dy <= 0)) {
                 if (ViewHelper.getTranslationY(mToolbar) - dy > 0) {
                     dy = ViewHelper.getTranslationY(mToolbar);
                 }
-                if (ViewHelper.getTranslationY(mToolbar)-dy<-mToolbar.getHeight())
-                    dy = ViewHelper.getTranslationY(mToolbar)+mToolbar.getHeight();
+                if (ViewHelper.getTranslationY(mToolbar) - dy < -mToolbar.getHeight())
+                    dy = ViewHelper.getTranslationY(mToolbar) + mToolbar.getHeight();
                 ViewHelper.setTranslationY(mToolbar, ViewHelper.getTranslationY(mToolbar) - dy);
                 ViewHelper.setTranslationY(swipetab, ViewHelper.getTranslationY(swipetab) - dy);
                 ViewHelper.setTranslationY(SearchCard, ViewHelper.getTranslationY(SearchCard) - dy);
             }
-        if(ViewHelper.getTranslationY(mToolbar)==-mToolbar.getHeight())
-            if( (dy >=0 && ViewHelper.getTranslationY(SearchCard)+mToolbar.getHeight()>=-SearchCard.getHeight()-dpToPx(10)) || (dy<=0 && ViewHelper.getTranslationY(SearchCard)<=SEARCH_CARD_INI_POS-mToolbar.getHeight())){
-                if(ViewHelper.getTranslationY(SearchCard)-dy<-SearchCard.getHeight()-dpToPx(10)-mToolbar.getHeight()){
-                    dy = ViewHelper.getTranslationY(SearchCard)+SearchCard.getHeight()+dpToPx(10)+mToolbar.getHeight();
+        if (ViewHelper.getTranslationY(mToolbar) == -mToolbar.getHeight())
+            if ((dy >= 0 && ViewHelper.getTranslationY(SearchCard) + mToolbar.getHeight() >= -SearchCard.getHeight() - dpToPx(10)) || (dy <= 0 && ViewHelper.getTranslationY(SearchCard) <= SEARCH_CARD_INI_POS - mToolbar.getHeight())) {
+                if (ViewHelper.getTranslationY(SearchCard) - dy < -SearchCard.getHeight() - dpToPx(10) - mToolbar.getHeight()) {
+                    dy = ViewHelper.getTranslationY(SearchCard) + SearchCard.getHeight() + dpToPx(10) + mToolbar.getHeight();
                 }
-                if(ViewHelper.getTranslationY(SearchCard)-dy>SEARCH_CARD_INI_POS - mToolbar.getHeight()){
-                    dy = ViewHelper.getTranslationY(SearchCard)-SEARCH_CARD_INI_POS+mToolbar.getHeight();
+                if (ViewHelper.getTranslationY(SearchCard) - dy > SEARCH_CARD_INI_POS - mToolbar.getHeight()) {
+                    dy = ViewHelper.getTranslationY(SearchCard) - SEARCH_CARD_INI_POS + mToolbar.getHeight();
                 }
                 ViewHelper.setTranslationY(SearchCard, ViewHelper.getTranslationY(SearchCard) - dy);
             }
@@ -293,6 +370,7 @@ public class MyClubsFragment extends Fragment{
                 dy = swipetab.getTranslationY()-SWIPE_TAB_INI_POS;
         }*/
     }
+
     public int dpToPx(int dp) {
         DisplayMetrics displayMetrics = c.getResources().getDisplayMetrics();
         int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));

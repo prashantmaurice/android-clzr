@@ -8,6 +8,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,6 +27,10 @@ import android.widget.Toast;
 
 import com.koushikdutta.ion.Ion;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class VendorHomeFragment extends Fragment {
 
@@ -34,7 +40,7 @@ public class VendorHomeFragment extends Fragment {
     private ImageView mVendorImageView;
     private TextView mVendorTitleView;
     private TextView mVendorAddressView;
-    private ImageButton mCallButton, mDirButton, favorites;
+    private ImageButton mCallButton, mDirButton, favorites, whatsappshare;
     private RecyclerView gallerylist;
 
     @Override
@@ -45,6 +51,35 @@ public class VendorHomeFragment extends Fragment {
         Ion.with(mVendorImageView).load(VendorActivity.detailsBundle.getString("vendorImage"));
         mVendorTitleView.setText(VendorActivity.detailsBundle.getString("vendorTitle"));
         mVendorAddressView.setText(VendorActivity.detailsBundle.getString("address"));
+        String urlFavorites = "http://api.clozerr.com/v2/user/add/favourites?access_token=" +Home.TOKEN;
+        new AsyncGet(c, urlFavorites , new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                try {
+                    JSONObject obj=new JSONObject(s);
+                    //Toast.makeText(getActivity(),s,Toast.LENGTH_SHORT).show();
+                    JSONObject fav=obj.getJSONObject("favourites");
+                    JSONArray vendors=fav.getJSONArray("vendor");
+                    //Toast.makeText(getActivity(),vendors.toString(),Toast.LENGTH_SHORT).show();
+                    for (int i = 0; i < vendors.length(); ++i) {
+
+                        if(VendorActivity.vendorId.equals(vendors.getString(i)))
+                        {
+                            favorites.setImageResource(R.drawable.favorited);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                //  t1.setText(s);
+                if(s==null) {
+                    Toast.makeText(c,"No internet connection",Toast.LENGTH_SHORT).show();
+                }
+                //l1.setAdapter(adapter);
+            }
+        });
+
+
         mCallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,8 +114,9 @@ public class VendorHomeFragment extends Fragment {
                 new AsyncGet(getActivity(), "http://api.clozerr.com/v2/user/add/favourites?vendor_id="+VendorActivity.vendorId+"&access_token="+TOKEN, new AsyncGet.AsyncResult() {
                     @Override
                     public void gotResult(String s) {
-                        Toast.makeText(getActivity(),"Successfully added to Favorites", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(),"Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
                         //l1.setAdapter(adapter);
+                        favorites.setImageResource(R.drawable.favorited);
                         if (s == null) {
                             Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
                         }
@@ -93,6 +129,14 @@ public class VendorHomeFragment extends Fragment {
                     }
                 });
 
+
+            }
+        });
+
+        whatsappshare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onClickWhatsApp();
             }
         });
         gallerylist.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
@@ -125,6 +169,32 @@ public class VendorHomeFragment extends Fragment {
         mCallButton = (ImageButton) layout.findViewById(R.id.callButton);
         mDirButton = (ImageButton) layout.findViewById(R.id.dirButton);
         favorites = (ImageButton) layout.findViewById(R.id.favorites);
+        whatsappshare=(ImageButton) layout.findViewById(R.id.whatsappshare);
+    }
+
+    public void onClickWhatsApp() {
+
+        PackageManager pm=getActivity().getPackageManager();
+        try {
+
+            Intent waIntent = new Intent(Intent.ACTION_SEND);
+            waIntent.setType("text/plain");
+            String text = "Check out this place I found on Clozerr: "+VendorActivity.detailsBundle.getString("vendorTitle")+" https://play.google.com/store/apps/details?id=com.clozerr.app";
+
+            PackageInfo info=pm.getPackageInfo("com.whatsapp", PackageManager.GET_META_DATA);
+            //Check if package exists or not. If not then code
+            //in catch block will be called
+            waIntent.setPackage("com.whatsapp");
+            waIntent.putExtra(Intent.EXTRA_TEXT, text);
+            startActivity(Intent.createChooser(waIntent, "Share with"));
+
+        } catch (PackageManager.NameNotFoundException e) {
+            Toast.makeText(getActivity(), "WhatsApp not Installed", Toast.LENGTH_SHORT)
+                    .show();
+        }
+
     }
 }
+
+
 
