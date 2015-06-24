@@ -30,9 +30,9 @@ public class PeriodicBFS extends BeaconFinderService {
     //private static final String ACTION_REMOVE_VENDOR = "RemoveVendor";
     //private static final String ACTION_FIRE_ALARM_SCAN = "com.clozerr.app.ACTION_FIRE_ALARM_SCAN";
 
-    private static final long ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.SECONDS);
+    private static final long ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(3L, TimeUnit.MINUTES);
     private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(10L, TimeUnit.SECONDS);
-    private static final long SCAN_PAUSE_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.SECONDS);
+    private static final long SCAN_PAUSE_INTERVAL = TimeUnit.MILLISECONDS.convert(3L, TimeUnit.MINUTES);
     private static final long MAX_SCAN_RESTART_INTERVAL = ALARM_INTERVAL * 2 + SCAN_PAUSE_INTERVAL;
                                 // interval after which alarms have to be rescheduled no matter what
                                 // so it has to accommodate inexactness of alarm plus scan pausing
@@ -326,7 +326,7 @@ public class PeriodicBFS extends BeaconFinderService {
 
     /*@Override
     protected Region createRegion() {
-        return new Region(REGION_ID, getUuidWithoutHyphens(CLOZERR_UUID), null, null); // search for all beacons, so no rules on major, minor
+        return new Region(REGION_ID, getUuidWithoutHyphens(commonBeaconUUID), null, null); // search for all beacons, so no rules on major, minor
     }*/
 
     @Override
@@ -425,7 +425,7 @@ public class PeriodicBFS extends BeaconFinderService {
                     public void onServiceReady() {
                         //hasScanStarted = true;
                         Log.e(TAG, "Started Scan");
-                        scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(CLOZERR_UUID), null, null);
+                        scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(commonBeaconUUID), null, null);
                                     // scan for all possible major & minor values, so no rules
                         beaconManager.startRangingAndDiscoverDevice(scanningRegion);
                     }
@@ -438,7 +438,7 @@ public class PeriodicBFS extends BeaconFinderService {
             public void onServiceReady() {
                 hasScanStarted = true;
                 Log.e(TAG, "Started Scan");
-                scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(CLOZERR_UUID), null, null);
+                scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(commonBeaconUUID), null, null);
                             // scan for all possible major & minor values, so no rules
                 new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                     @Override
@@ -488,7 +488,7 @@ public class PeriodicBFS extends BeaconFinderService {
             running = true;
             //context.startService(new Intent(context, PeriodicBFS.class));
             BeaconDBDownloadBaseReceiver.scheduleDownload(context);
-            CLOZERR_UUID = PreferenceManager.getDefaultSharedPreferences(context).getString("UUID", "");
+            commonBeaconUUID = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_BEACON_UUID, "");
             // Downloader will initiate scanning i.e. schedule alarms
             // WakefulIntentService.scheduleAlarms(new AlarmListener(), context);
         }
@@ -504,6 +504,7 @@ public class PeriodicBFS extends BeaconFinderService {
             //context.stopService(new Intent(context, PeriodicBFS.class));
             running = false;
             turnOffBluetooth(context);
+            PreferenceManager.getDefaultSharedPreferences(context).edit().remove(KEY_APP_ENABLED_BT).apply();
             WakefulIntentService.cancelAlarms(context);
             if (stopDownloads)
                 BeaconDBDownloadBaseReceiver.stopDownloads(context);
@@ -520,8 +521,8 @@ public class PeriodicBFS extends BeaconFinderService {
         public ScanStarter() {}
 
         public void startScanning(final Context context) {
-            if (!CLOZERR_UUID.isEmpty()) {
-                scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(CLOZERR_UUID), null, null);
+            if (!commonBeaconUUID.isEmpty()) {
+                scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(commonBeaconUUID), null, null);
                                             // scan for all possible major & minor values, so no rules
                 beaconManager.connect(new ServiceReadyCallback() {
                     @Override
@@ -592,8 +593,8 @@ public class PeriodicBFS extends BeaconFinderService {
 
         @Override
         public void sendWakefulWork(Context context) {
-            CLOZERR_UUID = PreferenceManager.getDefaultSharedPreferences(context).getString("UUID", "");
-            if (checkPreferences(context) && !CLOZERR_UUID.isEmpty() && !isScanningPaused)
+            commonBeaconUUID = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_BEACON_UUID, "");
+            if (checkPreferences(context) && !commonBeaconUUID.isEmpty() && !isScanningPaused)
                 WakefulIntentService.sendWakefulWork(context, PeriodicBFS.class);
         }
 

@@ -161,12 +161,12 @@
         <service
             android:name=".PeriodicBFS"
             android:enabled="true"
-            android:exported="true" >
+            android:exported="false" >
         </service>
         <service
             android:name=".OneTimeBFS"
             android:enabled="true"
-            android:exported="true" >
+            android:exported="false" >
         </service>
         <service
             android:name="com.jaalee.sdk.service.BeaconService"
@@ -175,7 +175,7 @@
         <receiver
             android:name=".BeaconDBDownloadBaseReceiver"
             android:enabled="true"
-            android:exported="true" >
+            android:exported="false" >
         </receiver>
         <receiver
             android:name=".BeaconDBDownloader"

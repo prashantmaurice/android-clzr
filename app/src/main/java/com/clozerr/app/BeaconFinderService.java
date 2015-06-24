@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -40,12 +41,15 @@ import java.util.concurrent.TimeUnit;
 @TargetApi(18)
 public abstract class BeaconFinderService extends WakefulIntentService {
     private static final String TAG = "BFS";
-    protected static final String REGION_ID = "com.clozerr.app";
-    protected static final String ACTION_RESUME_SCAN = "com.clozerr.app.ACTION_RESUME_SCAN";
-    protected static final long SCAN_START_DELAY = TimeUnit.MILLISECONDS.convert(2L, TimeUnit.SECONDS);
-    protected static final int THRESHOLD_RSSI = -100;
+    public static final String REGION_ID = "com.clozerr.app";
+    public static final String ACTION_RESUME_SCAN = "com.clozerr.app.ACTION_RESUME_SCAN";
+    public static final String KEY_BLE = "com.clozerr.app.KEY_BLE";
+    public static final String KEY_BEACON_UUID = "com.clozerr.app.KEY_BEACON_UUID";
+    public static final String KEY_APP_ENABLED_BT = "com.clozerr.app.KEY_APP_ENABLED_BT";
+    public static final long SCAN_START_DELAY = TimeUnit.MILLISECONDS.convert(2L, TimeUnit.SECONDS);
+    public static final int THRESHOLD_RSSI = -100;
 
-    protected static String CLOZERR_UUID = "";
+    protected static String commonBeaconUUID = "";
     protected static boolean isBLESupported = true;
     protected static boolean isScanningAllowed = true;
     protected static boolean isScanningPaused = false;
@@ -143,6 +147,19 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         });
     }
 
+    /*protected void connectServiceAndStartRanging() {
+        beaconManager.connect(new ServiceReadyCallback() {
+            @Override
+            public void onServiceReady() {
+                onManagerConnected();
+                scanningRegion = setScanningRegion();
+                beaconManager.startRangingAndDiscoverDevice(scanningRegion);
+            }
+        });
+    }
+
+    protected abstract Region setScanningRegion();
+    protected abstract void onManagerConnected();*/
     protected abstract void onRangedBeacons(final List<Beacon> beaconList);
     //protected abstract void runService();
 
@@ -194,7 +211,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
             else {
                 isBLESupported = true;
                 BeaconDBDownloadBaseReceiver.scheduleDownload(getApplicationContext());
-                CLOZERR_UUID = sharedPreferences.getString("UUID", "");
+                commonBeaconUUID = sharedPreferences.getString(KEY_BEACON_UUID, "");
                 return true;
             }
         }
@@ -203,7 +220,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
 
     protected static boolean checkCompatibility(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        if (!sharedPreferences.contains("BLE")) {
+        if (!sharedPreferences.contains(KEY_BLE)) {
             if (BluetoothAdapter.getDefaultAdapter() == null) {     // IntentService used, so
                                                                     // bluetoothAdapter may not have been initialized
                 putToast(context,
@@ -225,9 +242,9 @@ public abstract class BeaconFinderService extends WakefulIntentService {
             else {
                 isBLESupported = true;
                 /*BeaconDBDownloadBaseReceiver.scheduleDownload(getApplicationContext());
-                CLOZERR_UUID = sharedPreferences.getString("UUID", "");*/
+                commonBeaconUUID = sharedPreferences.getString(KEY_BEACON_UUID, "");*/
             }
-            sharedPreferences.edit().putBoolean("BLE", isBLESupported).apply();
+            sharedPreferences.edit().putBoolean(KEY_BLE, isBLESupported).apply();
         }
         return isBLESupported;
     }
@@ -251,7 +268,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         String data = new String(dataBytes);
         if (!data.isEmpty()) {
             JSONObject rootObject = new JSONObject(data);
-            CLOZERR_UUID = rootObject.getString("UUID");
+            commonBeaconUUID = rootObject.getString("UUID");
             JSONArray rootArray = rootObject.getJSONArray("vendors");
             beaconDatabase = new ArrayList<>();
             for (int i = 0; i < rootArray.length(); ++i)
@@ -282,23 +299,28 @@ public abstract class BeaconFinderService extends WakefulIntentService {
 
     protected static void turnOnBluetooth(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean shouldAppActivateBluetooth =
-                preferences.getBoolean("AppEnabledBT", false) || !bluetoothAdapter.isEnabled();
-                                                // check if it's this app that has to enable BT
+        boolean shouldAppDeactivateBluetooth =
+                preferences.getBoolean(KEY_APP_ENABLED_BT, false) || !bluetoothAdapter.isEnabled();
+                                                // check if it's this app that has to disable BT
                                                 // stored in (and read from) preferences to account for restart of
                                                 // process after OS/user kills app
         PreferenceManager.getDefaultSharedPreferences(context).edit()
-                .putBoolean("AppEnabledBT", shouldAppActivateBluetooth).apply();
-        if (shouldAppActivateBluetooth)                            // disabled, so enable BT
+                .putBoolean(KEY_APP_ENABLED_BT, shouldAppDeactivateBluetooth).apply();
+        if (!bluetoothAdapter.isEnabled()) {                            // disabled, so enable BT
+            /*context.registerReceiver(new BTStateChangeReceiver() {
+                @Override
+                public void onBluetoothOK() {
+                    connectServiceAndStartRanging();
+                }
+            }, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));*/
             bluetoothAdapter.enable();
-        Log.e(TAG, "BT On");
+        }
     }
 
     protected static void turnOffBluetooth(Context context) {
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("AppEnabledBT", false))
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(KEY_APP_ENABLED_BT, false))
                             // if app did not turn on BT, don't disable it as user might need it
             bluetoothAdapter.disable();
-        Log.e(TAG, "BT Off");
     }
 
     public static void disallowScanning(Context context) {
@@ -381,7 +403,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
                 byte[] dataBytes = new byte[fileInputStream.available()];
                 fileInputStream.read(dataBytes);
                 JSONObject rootObject = new JSONObject(new String(dataBytes));
-                CLOZERR_UUID = rootObject.getString("UUID");
+                commonBeaconUUID = rootObject.getString("UUID");
                 JSONArray rootArray = rootObject.getJSONArray("vendors");
                 //Log.e(TAG, "root - " + rootArray.toString());
                 VendorParams vendorParams;
@@ -458,5 +480,29 @@ public abstract class BeaconFinderService extends WakefulIntentService {
                 disableComponent(context, ScanResumeReceiver.class);
             }
         }
+    }
+
+    public static abstract class BTStateChangeReceiver extends BroadcastReceiver {
+        private static final String TAG = "BTSCR";
+        private static final long TIMEOUT = TimeUnit.MILLISECONDS.convert(3L, TimeUnit.SECONDS);
+
+        @Override
+        public void onReceive(final Context context, Intent intent) {
+            if (intent != null && intent.getAction() != null && intent.getAction().equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+                new Handler(Looper.myLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        context.unregisterReceiver(BTStateChangeReceiver.this);
+                    }
+                }, TIMEOUT);
+                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
+                if (state == BluetoothAdapter.STATE_ON) {
+                    onBluetoothOK();
+                    context.unregisterReceiver(this);
+                }
+            }
+        }
+
+        public abstract void onBluetoothOK();
     }
 }

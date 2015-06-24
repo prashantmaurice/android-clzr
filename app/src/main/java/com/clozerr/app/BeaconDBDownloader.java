@@ -38,9 +38,9 @@ public class BeaconDBDownloader extends BroadcastReceiver {
                         FileOutputStream fileOutputStream = context.openFileOutput(BEACONS_FILE_NAME, Context.MODE_PRIVATE);
                         fileOutputStream.write(s.getBytes());
                         fileOutputStream.close();
-                        BeaconFinderService.CLOZERR_UUID = new JSONObject(s).getString("UUID");
+                        BeaconFinderService.commonBeaconUUID = new JSONObject(s).getString("UUID");
                         PreferenceManager.getDefaultSharedPreferences(context).edit().
-                                putString("UUID", BeaconFinderService.CLOZERR_UUID).apply();
+                                putString(BeaconFinderService.KEY_BEACON_UUID, BeaconFinderService.commonBeaconUUID).apply();
                         //BeaconDBDownloadBaseReceiver.releaseWakeLock();
                         Log.e(TAG, "downloaded");
                         PeriodicBFS.scheduleAlarms(context);
