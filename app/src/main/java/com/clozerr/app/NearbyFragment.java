@@ -123,11 +123,11 @@ public class NearbyFragment extends Fragment {
                         String url;
 
                         if (!query.equals("")) {
-                            url = "http://api.clozerr.com/v2/vendor/search/name?access_token=" + TOKEN + "&text=" + query.replace(" ", "%20") + "&latitude=" + Home.lat + "&longitude=" + Home.longi;
+                            url = "http://api.clozerr.com/v2/vendor/search/near?access_token=" + TOKEN + "&name=" + query.replace(" ", "%20") + "&latitude=" + Home.lat + "&longitude=" + Home.longi;
                         } else {
                             mCardsLeft = true;
                             mOffset = 0;
-                            url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
+                            url = "http://api.clozerr.com/v2/vendor/search/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
                                     + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
                             Log.d("urlsearch", url);
                         }
@@ -221,7 +221,7 @@ public class NearbyFragment extends Fragment {
 //            addMargin();
         } else {
             mOffset = 0;
-            String url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
+            String url = "http://api.clozerr.com/v2/vendor/search/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
                     + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
             Log.e("url", url);
             new AsyncGet(c, url, new AsyncGet.AsyncResult() {
@@ -268,10 +268,10 @@ public class NearbyFragment extends Fragment {
                 String url;
                 mOffset = 0;
                 if(!TOKEN.equals(""))
-                    url = "http://api.clozerr.com/vendor/get/near?latitude="+Home.lat+"&longitude="+Home.longi+"&access_token="+TOKEN
+                    url = "http://api.clozerr.com/v2/vendor/search/near?latitude="+Home.lat+"&longitude="+Home.longi+"&access_token="+TOKEN
                             + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
                 else
-                    url = "http://api.clozerr.com/vendor/get/near?latitude="+Home.lat+"&longitude="+Home.longi
+                    url = "http://api.clozerr.com/v2/vendor/search/near?latitude="+Home.lat+"&longitude="+Home.longi
                             + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
                 Log.e("url", url);
 
@@ -334,10 +334,10 @@ public class NearbyFragment extends Fragment {
             mOffset += (mOffset == 0) ? INITIAL_LOAD_LIMIT : ITEMS_PER_PAGE;
             String url = "";
             if (!TOKEN.equals(""))
-                url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
+                url = "http://api.clozerr.com/v2/vendor/search/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
                         + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
             else
-                url = "http://api.clozerr.com/vendor/get/near?latitude=" + Home.lat + "&longitude=" + Home.longi
+                url = "http://api.clozerr.com/v2/vendor/search/near?latitude=" + Home.lat + "&longitude=" + Home.longi
                         + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
             Log.e("url", url);
             new AsyncGet(c, url, new AsyncGet.AsyncResult() {

@@ -133,7 +133,7 @@ public class LocationService extends Service {
         public void onLocationChanged(final Location location) {
             Log.d("change","location");
             Log.d("accuracy",""+location.getAccuracy());
-            String url ="http://api.clozerr.com/vendor/get/near?latitude=" + location.getLatitude() + "&longitude=" + location.getLongitude() + "&limit=" + MIN_NEAR_VENDOR;
+            String url ="http://api.clozerr.com/v2/vendor/search/near?latitude=" + location.getLatitude() + "&longitude=" + location.getLongitude() + "&limit=" + MIN_NEAR_VENDOR;
             new AsyncGet(LocationService.this, url , new AsyncGet.AsyncResult() {
                 @Override
                 public void gotResult(String s) {

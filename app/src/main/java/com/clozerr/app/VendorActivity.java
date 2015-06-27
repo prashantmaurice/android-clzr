@@ -78,7 +78,9 @@ public class VendorActivity extends ActionBarActivity {
 
         final String vendor_id = callingIntent.getStringExtra("vendor_id");
         vendorId = vendor_id;
-        final String urlVendor = "http://api.clozerr.com/vendor/get?vendor_id=" + vendor_id;
+
+        String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
+        final String urlVendor = "http://api.clozerr.com/v2/vendor/get/details?vendor_id=" + vendor_id + "&access_token=" + TOKEN;
         Log.e(TAG, "vendor url - " + urlVendor);
         new AsyncGet(this, urlVendor, new AsyncGet.AsyncResult() {
             @Override
@@ -218,10 +220,7 @@ public class VendorActivity extends ActionBarActivity {
             }
         });
 
-        SharedPreferences status = getSharedPreferences("USER", 0);
-        String TOKEN = status.getString("token", "");
-
-        String urlVisited = "http://api.clozerr.com/vendor/offers/myofferspage?vendor_id=" + vendorId + "&access_token=" + TOKEN;
+        /*String urlVisited = "http://api.clozerr.com/v2/vendor/offers/offerspage?vendor_id=" + vendorId + "&access_token=" + TOKEN;
         String urlUser = "http://api.clozerr.com/auth?fid=" + detailsBundle.getString("fid") + "&access_token=" + TOKEN;
 
         Log.e("urlslide", urlVisited);
@@ -253,12 +252,14 @@ public class VendorActivity extends ActionBarActivity {
                 // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
 
 
-                          /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
-                          mRecyclerView.setAdapter(Cardadapter);*/
+                          *//*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
+                          mRecyclerView.setAdapter(Cardadapter);*//*
             }
-        });
+        });*/
 
-        new AsyncGet(this, "http://api.clozerr.com/v2/vendor/offers/offerspage?access_token="+TOKEN+"&vendor_id="+vendorId , new AsyncGet.AsyncResult() {
+        String offersPageUrl = "http://api.clozerr.com/v2/vendor/offers/offerspage?access_token="+TOKEN+"&vendor_id="+vendorId;
+        Log.e(TAG, "MyStamps URL - " + offersPageUrl);
+        new AsyncGet(this, offersPageUrl, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
                 //  t1.setText(s);

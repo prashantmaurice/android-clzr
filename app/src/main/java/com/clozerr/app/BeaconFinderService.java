@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Handler;
@@ -25,6 +26,7 @@ import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.BeaconManager;
 import com.jaalee.sdk.RangingListener;
 import com.jaalee.sdk.Region;
+import com.jaalee.sdk.ServiceReadyCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,20 +43,14 @@ import java.util.concurrent.TimeUnit;
 @TargetApi(18)
 public abstract class BeaconFinderService extends WakefulIntentService {
     private static final String TAG = "BFS";
+
     public static final String REGION_ID = "com.clozerr.app";
     public static final String ACTION_RESUME_SCAN = "com.clozerr.app.ACTION_RESUME_SCAN";
     public static final String KEY_BLE = "com.clozerr.app.KEY_BLE";
     public static final String KEY_BEACON_UUID = "com.clozerr.app.KEY_BEACON_UUID";
     public static final String KEY_APP_ENABLED_BT = "com.clozerr.app.KEY_APP_ENABLED_BT";
-    public static final long SCAN_START_DELAY = TimeUnit.MILLISECONDS.convert(2L, TimeUnit.SECONDS);
+    public static final long BT_RECEIVER_TIMEOUT = TimeUnit.MILLISECONDS.convert(4L, TimeUnit.SECONDS);
     public static final int THRESHOLD_RSSI = -100;
-
-    protected static String commonBeaconUUID = "";
-    protected static boolean isBLESupported = true;
-    protected static boolean isScanningAllowed = true;
-    protected static boolean isScanningPaused = false;
-    //protected static boolean hasUserActivatedBluetooth = false;
-    protected static boolean isUserLoggedIn = false;
 
     protected enum RequestCodes {
         CODE_ALARM_INTENT(1000),
@@ -69,9 +65,12 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         public int code() { return mCode; }
     }
 
+    protected static String commonBeaconUUID = "";
+    protected static boolean isBLESupported = true;
+    protected static boolean isScanningAllowed = true;
+    protected static boolean isScanningPaused = false;
+    protected static boolean isUserLoggedIn = false;
     protected static BluetoothAdapter bluetoothAdapter;
-    //protected static ArrayList<BeaconDBParams> beaconDatabase = null;
-    //protected static Handler bgThreadHandler;
     protected static AlarmManager alarmManager = null;
     protected static BeaconManager beaconManager = null;
     protected static Region scanningRegion = null;
@@ -482,9 +481,14 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         }
     }
 
-    public static abstract class BTStateChangeReceiver extends BroadcastReceiver {
-        private static final String TAG = "BTSCR";
-        private static final long TIMEOUT = TimeUnit.MILLISECONDS.convert(3L, TimeUnit.SECONDS);
+    public abstract class BTStateChangeReceiver extends BroadcastReceiver {
+
+        private long mTimeout;
+
+        public BTStateChangeReceiver(long timeout) {
+            super();
+            mTimeout = timeout;
+        }
 
         @Override
         public void onReceive(final Context context, Intent intent) {
@@ -494,7 +498,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
                     public void run() {
                         context.unregisterReceiver(BTStateChangeReceiver.this);
                     }
-                }, TIMEOUT);
+                }, mTimeout);
                 int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
                 if (state == BluetoothAdapter.STATE_ON) {
                     onBluetoothOK();

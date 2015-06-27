@@ -129,7 +129,7 @@ public class MyClubsFragment extends Fragment {
         SharedPreferences status = c.getSharedPreferences("USER", 0);
         String TOKEN = status.getString("token", "");
 
-        String urlVisited = "http://api.clozerr.com/vendor/get/visitedV2?access_token=" + TOKEN;
+        /*String urlVisited = "http://api.clozerr.com/vendor/get/visitedV2?access_token=" + TOKEN;
         Log.e("urlslide", urlVisited);
 
         new AsyncGet(c, urlVisited, new AsyncGet.AsyncResult() {
@@ -155,9 +155,10 @@ public class MyClubsFragment extends Fragment {
                 }
                 //l1.setAdapter(adapter);
             }
-        });
+        });*/
 
-        String urlFavorites = "http://api.clozerr.com/v2/user/add/favourites?access_token=" + TOKEN;
+        String urlFavorites = "http://api.clozerr.com/v2/user/favourites/list?access_token=" + TOKEN;
+        // TODO remove vendor/get/details async get from the loop
         new AsyncGet(c, urlFavorites, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
@@ -175,7 +176,7 @@ public class MyClubsFragment extends Fragment {
                             }
                         }
                         if (status == true) {
-                            String urlFavVendor = "http://api.clozerr.com/vendor/get?vendor_id=" + vendors.getString(i);
+                            String urlFavVendor = "http://api.clozerr.com/v2/vendor/get/details?vendor_id=" + vendors.getString(i);
 
                             new AsyncGet(c, urlFavVendor, new AsyncGet.AsyncResult() {
                                 @Override

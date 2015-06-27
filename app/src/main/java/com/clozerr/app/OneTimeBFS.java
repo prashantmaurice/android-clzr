@@ -88,7 +88,7 @@ public class OneTimeBFS extends BeaconFinderService {
             public void run() {
                 beaconManager.startRangingAndDiscoverDevice(scanningRegion);
             }
-        }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
+        }, BT_RECEIVER_TIMEOUT); // delay required as scanning will not work right upon enabling BT
     }*/
 
     /*@Override
@@ -105,7 +105,7 @@ public class OneTimeBFS extends BeaconFinderService {
                     public void run() {
                         beaconManager.startRangingAndDiscoverDevice(scanningRegion);
                     }
-                }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
+                }, BT_RECEIVER_TIMEOUT); // delay required as scanning will not work right upon enabling BT
             }
         });
     }*/
@@ -128,7 +128,7 @@ public class OneTimeBFS extends BeaconFinderService {
                     public void run() {
                         beaconManager.startRangingAndDiscoverDevice(scanningRegion);
                     }
-                }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
+                }, BT_RECEIVER_TIMEOUT); // delay required as scanning will not work right upon enabling BT
             }
         });*/
         setListener();
@@ -146,7 +146,7 @@ public class OneTimeBFS extends BeaconFinderService {
                     }
                 });
             }
-        }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
+        }, BT_RECEIVER_TIMEOUT); // delay required as scanning will not work right upon enabling BT
     }
 
     @Override
