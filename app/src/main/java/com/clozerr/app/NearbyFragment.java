@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -166,7 +168,49 @@ public class NearbyFragment extends Fragment {
         });
         mRecyclerView.setLayoutManager(new LinearLayoutManager(c));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.addItemDecoration(new SpaceItemDecoration(dpToPx(156),0));
+        mToolbar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+            @Override
+            public void onGlobalLayout() {
+                ViewTreeObserver obs = mToolbar.getViewTreeObserver();
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    obs.removeOnGlobalLayoutListener(this);
+                } else {
+                    obs.removeGlobalOnLayoutListener(this);
+                }
+                swipetab.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                    @Override
+                    public void onGlobalLayout() {
+                        ViewTreeObserver obs = swipetab.getViewTreeObserver();
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            obs.removeOnGlobalLayoutListener(this);
+                        } else {
+                            obs.removeGlobalOnLayoutListener(this);
+                        }
+                        SearchCard.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                            @Override
+                            public void onGlobalLayout() {
+                                ViewTreeObserver obs = SearchCard.getViewTreeObserver();
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                    obs.removeOnGlobalLayoutListener(this);
+                                } else {
+                                    obs.removeGlobalOnLayoutListener(this);
+                                }
+                                mRecyclerView.addItemDecoration(new SpaceItemDecoration(dpToPx(12) + (mToolbar.getHeight() + swipetab.getHeight() + SearchCard.getHeight()), 0));
+                            }
+
+                        });
+                    }
+
+                });
+            }
+
+        });
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(c);
         mRecyclerView.setLayoutManager(mLayoutManager);
