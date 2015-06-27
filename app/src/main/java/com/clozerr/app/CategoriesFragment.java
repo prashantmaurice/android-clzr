@@ -175,10 +175,8 @@ public class CategoriesFragment extends Fragment{
         }
 
         else {
-
-            String urlCategories = "http://api.clozerr.com/v2/vendor/categories/get";
+            String urlCategories = "http://api.clozerr.com/v2/vendor/categories/get?access_token=" + TOKEN;
             Log.e(TAG, "url - " + urlCategories);
-
             new AsyncGet(c, urlCategories, new AsyncGet.AsyncResult() {
                 @Override
                 public void gotResult(String s) {

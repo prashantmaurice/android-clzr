@@ -168,6 +168,7 @@ public class CategoryDetail extends ActionBarActivity{
 
         SharedPreferences status = getSharedPreferences("USER", 0);
         final String cards = status.getString("home_cards", "");
+        TOKEN = status.getString("token", "");
         if(!cards.equals("")){
             Log.e("Cached Card", cards);
             mMainCardsList = convertRow(cards);
@@ -175,7 +176,8 @@ public class CategoryDetail extends ActionBarActivity{
             //mRecyclerView.setAdapter(mMainPageAdapter);
         } else {
             mOffset = 0;
-            String url = "http://api.clozerr.com/v2/vendor/list/category?category=" + categorybundle.getString("categoryname");
+            String url = "http://api.clozerr.com/v2/vendor/search/near?category=" + categorybundle.getString("categoryname").replace(" ", "%20") +
+                    "&latitude=" + Home.lat + "&longitude=" + Home.longi + ((TOKEN.isEmpty()) ? "" : ("&access_token=" + TOKEN));
             Log.e("url", url);
             new AsyncGet(this, url, new AsyncGet.AsyncResult() {
                 @Override
@@ -216,16 +218,13 @@ public class CategoryDetail extends ActionBarActivity{
                 }catch (Exception e){
                     e.printStackTrace();
                 }
-                SharedPreferences status = getSharedPreferences("USER", 0);
-                TOKEN = status.getString("token", "");
+
                 String url;
                 mOffset = 0;
-                if(!TOKEN.equals(""))
-                    url = "http://api.clozerr.com/v2/vendor/list/category?category="+categorybundle.getString("categoryname").replace(" ","%20");
-                else
-                    url = "http://api.clozerr.com/v2/vendor/list/category?category="+categorybundle.getString("categoryname").replace(" ","%20");
+                url = "http://api.clozerr.com/v2/vendor/search/near?category="+categorybundle.getString("categoryname").replace(" ","%20") +
+                        "&latitude=" + Home.lat + "&longitude=" + Home.longi + ((TOKEN.isEmpty()) ? "" : ("&access_token=" + TOKEN));
                 Log.e("url", url);
-
+                // TODO support pagination
                 new AsyncGet(CategoryDetail.this, url, new AsyncGet.AsyncResult() {
                     @Override
                     public void gotResult(String s) {

@@ -211,7 +211,7 @@ public class PeriodicBFS extends BeaconFinderService {
             notificationBuilder.setContentTitle(title)
                     .setTicker(title + " - " + contentText)
                     .setContentText(contentText)
-                    //.setContentIntent(detailPendingIntent)
+                    .setContentIntent(detailPendingIntent)
                     //.setContentInfo("Clozerr")
                     .setWhen(System.currentTimeMillis())
                     .addAction(R.drawable.ic_action_accept, actionText, detailPendingIntent);
@@ -431,7 +431,7 @@ public class PeriodicBFS extends BeaconFinderService {
                     }
                 });
             }
-        }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
+        }, BT_RECEIVER_TIMEOUT); // delay required as scanning will not work right upon enabling BT
 
         /*beaconManager.connect(new ServiceReadyCallback() {
             @Override
@@ -445,7 +445,7 @@ public class PeriodicBFS extends BeaconFinderService {
                     public void run() {
                         beaconManager.startRangingAndDiscoverDevice(scanningRegion);
                     }
-                }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
+                }, BT_RECEIVER_TIMEOUT); // delay required as scanning will not work right upon enabling BT
             }
         });*/
     }
@@ -538,7 +538,7 @@ public class PeriodicBFS extends BeaconFinderService {
                             public void run() {
                                 beaconManager.startRangingAndDiscoverDevice(scanningRegion);
                             }
-                        }, SCAN_START_DELAY); // delay required as scanning will not work right upon enabling BT
+                        }, BT_RECEIVER_TIMEOUT); // delay required as scanning will not work right upon enabling BT
                     }
                 });
             }

@@ -51,6 +51,7 @@ public class VendorHomeFragment extends Fragment {
         Ion.with(mVendorImageView).load(VendorActivity.detailsBundle.getString("vendorImage"));
         mVendorTitleView.setText(VendorActivity.detailsBundle.getString("vendorTitle"));
         mVendorAddressView.setText(VendorActivity.detailsBundle.getString("address"));
+        // TODO remove this AsyncGet altogether. Favorite details must be taken from elsewhere (vendor/get/details maybe)
         String urlFavorites = "http://api.clozerr.com/v2/user/add/favourites?access_token=" +Home.TOKEN;
         new AsyncGet(c, urlFavorites , new AsyncGet.AsyncResult() {
             @Override
