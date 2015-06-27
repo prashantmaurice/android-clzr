@@ -4,6 +4,10 @@
     android:layout_height="match_parent"
     android:background="#eaeaea"
     tools:context=".NearbyFragment">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -62,5 +66,19 @@
             android:layout_height="match_parent" />
 
     </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:id="@+id/locationunavailable"
+            android:visibility="gone"
+            android:paddingTop="100dp"
+            android:paddingLeft="50dp"
+            android:paddingRight="50dp"
+            android:paddingBottom="50dp"
+            android:src="@drawable/checkinbutton"
+            android:background="#eaeaea"/>
+    </RelativeLayout>
 
 </FrameLayout>

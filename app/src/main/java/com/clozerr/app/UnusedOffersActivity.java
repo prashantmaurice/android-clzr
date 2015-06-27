@@ -23,6 +23,7 @@ public class UnusedOffersActivity extends ActionBarActivity {
     ArrayList<String> offerid = new ArrayList<>();
     ArrayList<String> caption = new ArrayList<>();
     ArrayList<String> description = new ArrayList<>();
+    JSONArray arrpinned=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +38,25 @@ public class UnusedOffersActivity extends ActionBarActivity {
         final ArrayList<String> values = convertRowMyOffers(VendorActivity.detailsBundle.getString("Alloffers"));
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.freebies_item_layout, R.id.freebiename, values);
         listview.setAdapter(adapter);
+        String urlPinning = "http://api.clozerr.com/v2/user/add/pinned?access_token=" + Home.TOKEN;
+        new AsyncGet(getApplicationContext(), urlPinning, new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                try {
+                    JSONObject obj = new JSONObject(s);
+                    arrpinned=obj.getJSONArray("pinned");
+                    //Toast.makeText(getActivity(),vendors.toString(),Toast.LENGTH_SHORT).show();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                //  t1.setText(s);
+                if (s == null) {
+                    Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+                }
+                //l1.setAdapter(adapter);
+            }
+        });
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -75,6 +95,30 @@ public class UnusedOffersActivity extends ActionBarActivity {
                 });
             }
         });
+
+        String pinnedoffers = VendorActivity.detailsBundle.getString("PinnedOffers");
+        Toast.makeText(getApplicationContext(),pinnedoffers,Toast.LENGTH_SHORT).show();
+        try {
+            JSONObject obj=new JSONObject(pinnedoffers);
+            JSONArray pinned = obj.getJSONArray("pinned");
+            View v;
+            ImageView pin;
+            for(int i=0;i<listview.getCount();i++) {
+                v=listview.getChildAt(i);
+                //pin = (ImageView) v.findViewById(R.id.pinimage);
+                for(int j=0;j<pinned.length();j++) {
+
+                    if (offerid.get(i).equals(pinned.getString(j))) {
+                        //pin.setImageResource(R.drawable.pinfilled);
+                        break;
+                    }
+                }
+
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override

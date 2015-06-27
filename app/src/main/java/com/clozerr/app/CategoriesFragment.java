@@ -166,37 +166,48 @@ public class CategoriesFragment extends Fragment{
         });
         SharedPreferences status = c.getSharedPreferences("USER", 0);
         String TOKEN = status.getString("token", "");
+        final String cards = status.getString("categories_cards", "");
+        if(!cards.equals("")){
+            Log.e("Cached Card", cards);
+            CategoryRecyclerViewAdapter categoryAdapter = new CategoryRecyclerViewAdapter(convertRowCategory(cards), c);
+            mRecyclerView.setAdapter(categoryAdapter);
+//            addMargin();
+        }
 
-        String urlCategories = "http://api.clozerr.com/v2/vendor/categories/get";
-        Log.e(TAG, "url - " + urlCategories);
+        else {
 
-        new AsyncGet(c, urlCategories , new AsyncGet.AsyncResult() {
-            @Override
-            public void gotResult(String s) {
-                //  t1.setText(s);
+            String urlCategories = "http://api.clozerr.com/v2/vendor/categories/get";
+            Log.e(TAG, "url - " + urlCategories);
 
-                Log.e(TAG, "result - " + s);
+            new AsyncGet(c, urlCategories, new AsyncGet.AsyncResult() {
+                @Override
+                public void gotResult(String s) {
+                    //  t1.setText(s);
 
-                CategoryRecyclerViewAdapter categoryAdapter = new CategoryRecyclerViewAdapter(convertRowCategory(s), c);
-                mRecyclerView.setAdapter(categoryAdapter);
-                try
-                {
-                    Tracker t = ((Analytics) c.getApplicationContext()).getTracker(Analytics.TrackerName.APP_TRACKER);
+                    Log.e(TAG, "result - " + s);
 
-                    t.setScreenName("MyCards");
+                    CategoryRecyclerViewAdapter categoryAdapter = new CategoryRecyclerViewAdapter(convertRowCategory(s), c);
+                    mRecyclerView.setAdapter(categoryAdapter);
+                    final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+                    editor.putString("categories_cards", s);
+                    editor.apply();
+                    Log.e("app", "categories caching done");
+                    try {
+                        Tracker t = ((Analytics) c.getApplicationContext()).getTracker(Analytics.TrackerName.APP_TRACKER);
 
-                    t.send(new HitBuilders.AppViewBuilder().build());
+                        t.setScreenName("MyCards");
+
+                        t.send(new HitBuilders.AppViewBuilder().build());
+                    } catch (Exception e) {
+                        Toast.makeText(c, "Error" + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                    if (s == null) {
+                        Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
+                    }
+
                 }
-                catch(Exception  e)
-                {
-                    Toast.makeText(c, "Error" + e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-                if(s==null) {
-                    Toast.makeText(c,"No internet connection",Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        });
+            });
+        }
 
 
 

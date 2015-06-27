@@ -1,9 +1,13 @@
 package com.clozerr.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -18,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -53,6 +58,7 @@ public class NearbyFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
     private EndlessRecyclerOnScrollListener mOnScrollListener;
     private int mOffset;
+    private ImageView locationimage;
     private boolean mCardsLeft = true;
     private final int ITEMS_PER_PAGE = 7, INITIAL_LOAD_LIMIT = 8;
     View mScrollable;
@@ -66,6 +72,7 @@ public class NearbyFragment extends Fragment {
         mRecyclerView = (ObservableRecyclerView) layout.findViewById(R.id.list);
         searchView = (SearchView)layout.findViewById(R.id.searchView);
         SearchCard = layout.findViewById(R.id.card_view);
+        locationimage=(ImageView)layout.findViewById(R.id.locationunavailable);
         SEARCH_CARD_INI_POS = ViewHelper.getTranslationY(SearchCard);
         mScrollable=getActivity().findViewById(R.id.drawerLayout);
         mToolbar=(Toolbar)getActivity().findViewById(R.id.toolbar);
@@ -214,6 +221,7 @@ public class NearbyFragment extends Fragment {
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(c);
         mRecyclerView.setLayoutManager(mLayoutManager);
+        locationEnabledCheck();
 
         //mLayoutManager.offsetChildrenVertical(dpToPx(52));
         mOnScrollListener = new EndlessRecyclerOnScrollListener(
@@ -459,6 +467,21 @@ public class NearbyFragment extends Fragment {
             e.printStackTrace();
         }
         return rowItems;
+    }
+
+    private void locationEnabledCheck() {
+        boolean gps_enabled=false ,network_enabled=false;
+        LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        try{
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        }catch(Exception ex){ex.printStackTrace();}
+        try{
+            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        }catch(Exception ex){ex.printStackTrace();}
+        //LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        if(!gps_enabled && !network_enabled) {
+            locationimage.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

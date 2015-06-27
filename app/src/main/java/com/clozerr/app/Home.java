@@ -98,7 +98,7 @@ public class Home  extends ActionBarActivity {
         if (logincheck()==0)
             return;
 
-        locationEnabledCheck();   // Enable if strict location is required
+           // Enable if strict location is required
         c = Home.this;
         setContentView(R.layout.activity_my);
         nitView();
@@ -163,35 +163,35 @@ public class Home  extends ActionBarActivity {
         PeriodicBFS.checkAndStartScan(getApplicationContext());
     }
 
-    private void locationEnabledCheck() {
-        boolean gps_enabled=false ,network_enabled=false;
-        LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        try{
-            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        }catch(Exception ex){ex.printStackTrace();}
-        try{
-            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        }catch(Exception ex){ex.printStackTrace();}
-        //LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        if(!gps_enabled && !network_enabled) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Location not enabled");  // GPS not found
-            builder.setCancelable(false);
-            builder.setMessage("Please enable location services to continue"); // Want to enable?
-            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                }
-            });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    finish();
-                    //startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                }
-            });
-            builder.create().show();
-        }
-    }
+//    private void locationEnabledCheck() {
+//        boolean gps_enabled=false ,network_enabled=false;
+//        LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+//        try{
+//            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+//        }catch(Exception ex){ex.printStackTrace();}
+//        try{
+//            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+//        }catch(Exception ex){ex.printStackTrace();}
+//        //LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+//        if(!gps_enabled && !network_enabled) {
+//            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//            builder.setTitle("Location not enabled");  // GPS not found
+//            builder.setCancelable(false);
+//            builder.setMessage("Please enable location services to continue"); // Want to enable?
+//            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialogInterface, int i) {
+//                    startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+//                }
+//            });
+//            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialogInterface, int i) {
+//                    finish();
+//                    //startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+//                }
+//            });
+//            builder.create().show();
+//        }
+//    }
     public String resetImageSize( String url ){
         return url.split("\\?")[0] + "?sz=200";
     }
