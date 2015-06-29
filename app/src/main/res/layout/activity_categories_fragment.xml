@@ -22,6 +22,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginTop="114dp"
             android:background="#eaeaea"
+            android:visibility="gone"
             card_view:cardBackgroundColor="#FFFFFF"
             card_view:cardCornerRadius="2dp"
             card_view:cardUseCompatPadding="false">
@@ -57,7 +58,7 @@
             android:id="@+id/sliding_list"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
-            android:layout_marginTop="-154dp"
+            android:layout_marginTop="-8dp"
             android:background="#eaeaea"
             android:layout_marginBottom="0dp"
             android:layout_width="match_parent"

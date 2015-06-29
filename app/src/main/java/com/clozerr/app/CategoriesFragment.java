@@ -172,7 +172,26 @@ public class CategoriesFragment extends Fragment{
             CategoryRecyclerViewAdapter categoryAdapter = new CategoryRecyclerViewAdapter(convertRowCategory(cards), c);
             mRecyclerView.setAdapter(categoryAdapter);
 //            addMargin();
+            String urlCategories = "http://api.clozerr.com/v2/vendor/categories/get?access_token=" + TOKEN;
+            Log.e(TAG, "url - " + urlCategories);
+            new AsyncGet(c, urlCategories, new AsyncGet.AsyncResult() {
+                @Override
+                public void gotResult(String s) {
+                    //  t1.setText(s);
+
+                    Log.e(TAG, "result - " + s);
+                    final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+                    editor.putString("categories_cards", s);
+                    editor.apply();
+                    Log.e("app", "categories caching done");
+                    if (s == null) {
+                        Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            },false);
         }
+
 
         else {
             String urlCategories = "http://api.clozerr.com/v2/vendor/categories/get?access_token=" + TOKEN;

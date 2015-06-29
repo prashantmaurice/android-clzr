@@ -78,7 +78,7 @@ public class VendorHomeFragment extends Fragment {
                 }
                 //l1.setAdapter(adapter);
             }
-        });
+        },false);
 
 
         mCallButton.setOnClickListener(new View.OnClickListener() {
@@ -112,14 +112,15 @@ public class VendorHomeFragment extends Fragment {
             public void onClick(View view) {
                 SharedPreferences status = getActivity().getSharedPreferences("USER", 0);
                 String TOKEN = status.getString("token", "");
+                favorites.setImageResource(R.drawable.favorited);
                 new AsyncGet(getActivity(), "http://api.clozerr.com/v2/user/add/favourites?vendor_id="+VendorActivity.vendorId+"&access_token="+TOKEN, new AsyncGet.AsyncResult() {
                     @Override
                     public void gotResult(String s) {
                         Toast.makeText(getActivity(),"Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
                         //l1.setAdapter(adapter);
-                        favorites.setImageResource(R.drawable.favorited);
                         if (s == null) {
                             Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
+                            favorites.setImageResource(R.drawable.like);
                         }
 
                         // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
@@ -128,7 +129,7 @@ public class VendorHomeFragment extends Fragment {
                           /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
                           mRecyclerView.setAdapter(Cardadapter);*/
                     }
-                });
+                },false);
 
 
             }
