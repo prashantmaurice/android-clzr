@@ -13,7 +13,6 @@ import android.graphics.LightingColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -160,7 +159,7 @@ public class Home  extends ActionBarActivity {
         //stopService(new Intent(this, LocationService.class));
         Log.d("HOME","start");
         super.onResume();
-        PeriodicBFS.checkAndStartScan(getApplicationContext());
+        //PeriodicBFS.checkAndStartScan(getApplicationContext());
     }
 
 //    private void locationEnabledCheck() {

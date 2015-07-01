@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
@@ -13,23 +12,18 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
@@ -37,9 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 
 public class VendorActivity extends ActionBarActivity {
@@ -87,7 +79,7 @@ public class VendorActivity extends ActionBarActivity {
             public void gotResult(String s) {
                 try {
                     String address = "", phoneNumber = "", vendorDescription = "";
-                    BeaconFinderService.BeaconDBParams params = null;
+                    //BeaconFinderService.BeaconDBParams params = null;
                     double latitude = 0.0, longitude = 0.0;
                     JSONObject object = new JSONObject(s);
 
@@ -108,11 +100,11 @@ public class VendorActivity extends ActionBarActivity {
                         e.printStackTrace();
                         //Toast.makeText(CouponDetails.this, "Error - " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                     }
-                    if (object.has("beacons") && object.getJSONObject("beacons").has("major") &&
+                    /*if (object.has("beacons") && object.getJSONObject("beacons").has("major") &&
                             object.getJSONObject("beacons").has("minor")) {
                         params = new BeaconFinderService.BeaconDBParams(object.getJSONObject("beacons"));
                         Log.e(TAG, "BDB params - " + params.toString());
-                    }
+                    }*/
                     //Log.e("description", vendorDescription);
                     address = object.getString("address");
                     final CardModel currentItem = new CardModel(
@@ -155,11 +147,11 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putString("distanceString", currentItem.getDistanceString());
                     detailsBundle.putString("phoneNumber", phoneNumber);
                     //currentItem.getQuestions();
-                    try {
+                    /*try {
                         if (!fromPeriodicBFS && params != null)
                             OneTimeBFS.checkAndStartScan(getApplicationContext(), params);
                         //else PeriodicBFS.dismissNotifications(VendorActivity.this);
-                    }catch (Exception e){}
+                    }catch (Exception e){}*/
                     toolbar = (Toolbar) findViewById(R.id.toolbar_vendor);
                     if (toolbar != null) {
                         setSupportActionBar(toolbar);
@@ -357,8 +349,8 @@ public class VendorActivity extends ActionBarActivity {
 
     @Override
     public void onPause() {
-        if (isFinishing())
-            OneTimeBFS.checkAndStopScan(this);
+        /*if (isFinishing())
+            OneTimeBFS.checkAndStopScan(this);*/
         super.onPause();
     }
 
