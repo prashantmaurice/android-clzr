@@ -23,13 +23,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.nineoldandroids.animation.ValueAnimator;
 import com.nineoldandroids.view.ViewHelper;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -206,19 +203,19 @@ public class MyClubsFragment extends Fragment {
         new AsyncGet(c, urlFavorites, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
-                try {
-                    JSONObject obj = new JSONObject(s);
-                    JSONObject fav=obj.getJSONObject("favorites");
-                    JSONArray vendors = fav.getJSONArray("vendor");
-                    for (int i = 0; i < vendors.length(); ++i) {
+/*                    JSONArray obj = new JSONArray(s);
+                    //JSONObject fav=obj.getJSONObject("favorites");
+                    //JSONArray vendors = fav.getJSONArray("vendor");
+                    for (int i = 0; i < obj.length(); ++i) {
                         Boolean status = true;
-                        Toast.makeText(getActivity(), Integer.toString(rowItems.size()), Toast.LENGTH_SHORT).show();
-                        for (int j = 0; j < rowItems.size(); j++) {
-                            if (rowItems.get(j).getVendorId().equals(vendors.getString(i))) {
+                        Toast.makeText(getActivity(), Integer.toString(obj.size()), Toast.LENGTH_SHORT).show();
+*//*                        for (int j = 0; j < obj.size(); j++) {
+                           if (obj.get(j).getVendorId().equals(vendors.getString(i))) {
                                 status = false;
                                 break;
                             }
-                        }
+                        }*//*
+                        S
                         if (status == true) {
                             String urlFavVendor = "http://api.clozerr.com/v2/vendor/get/details?vendor_id=" + vendors.getString(i);
 
@@ -262,10 +259,10 @@ public class MyClubsFragment extends Fragment {
                             });
                         }
 
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                    }*/
+                    convertRowMyCard(s);
+                    MyCardRecyclerViewAdapter Cardadapter = new MyCardRecyclerViewAdapter(rowItems, c);
+                    mRecyclerView.setAdapter(Cardadapter);
                 //  t1.setText(s);
                 if (s == null) {
                     Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
@@ -284,8 +281,8 @@ public class MyClubsFragment extends Fragment {
         try {
             //Log.e("stringfunction", s);
             //Log.e("stringfunction", "processing..");
-            temp = new JSONObject(s);
-            array = temp.getJSONArray("data");
+            //temp = new JSONObject(s);
+            array = new JSONArray(s);
 
             ImageView loyaltyempty = (ImageView) layout.findViewById(R.id.loyaltyempty);
             if (array.length() == 0) {
@@ -306,7 +303,8 @@ public class MyClubsFragment extends Fragment {
                         array.getJSONObject(i).getString("image"),
                         array.getJSONObject(i).getString("fid"),
                         array.getJSONObject(i).getString("_id"),
-                        array.getJSONObject(i).getInt("stamps")
+                        //array.getJSONObject(i).getInt("stamps")
+                        0
                 );
                 Log.e("stringfunction", "processed");
                 rowItems.add(item);

@@ -72,7 +72,7 @@ public class VendorActivity extends ActionBarActivity {
         vendorId = vendor_id;
 
         String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
-        final String urlVendor = "http://api.clozerr.com/v2/vendor/get/details?vendor_id=" + vendor_id + "&access_token=" + TOKEN;
+        final String urlVendor = "http://api.clozerr.com/v2/vendor/get/details?vendor_id=" + vendor_id;
         Log.e(TAG, "vendor url - " + urlVendor);
         new AsyncGet(this, urlVendor, new AsyncGet.AsyncResult() {
             @Override
@@ -248,6 +248,7 @@ public class VendorActivity extends ActionBarActivity {
                           mRecyclerView.setAdapter(Cardadapter);*//*
             }
         });*/
+
 
         String offersPageUrl = "http://api.clozerr.com/v2/vendor/offers/offerspage?access_token="+TOKEN+"&vendor_id="+vendorId;
         Log.e(TAG, "MyStamps URL - " + offersPageUrl);
