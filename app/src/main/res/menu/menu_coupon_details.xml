@@ -1,8 +1,0 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context="com.clozerr.app.CouponDetails">
-    <item android:id="@+id/imageView2"
-        android:title="pin"
-        android:icon="@drawable/ic_pin_grey600_48dp"
-        android:orderInCategory="100" app:showAsAction="always" />
-</menu>
