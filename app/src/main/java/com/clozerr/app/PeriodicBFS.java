@@ -37,7 +37,7 @@ public class PeriodicBFS extends BeaconFinderService {
                                 // interval after which alarms have to be rescheduled no matter what
                                 // so it has to accommodate inexactness of alarm plus scan pausing
     //private static final int PERIODIC_SCAN_BEACON_LIMIT = 3;
-    private static final int NOTIFICATION_ID = 0;
+    private static final int NOTIFICATION_ID = 10;
     //private static final ConcurrentHashMap<String, DeviceParams> periodicScanDeviceMap = new ConcurrentHashMap<>();
     private static NotificationCompat.Builder notificationBuilder = null;
     //private static NotificationManager notificationManager = null;

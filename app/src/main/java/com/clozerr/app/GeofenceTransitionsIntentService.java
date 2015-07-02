@@ -40,8 +40,7 @@ public class GeofenceTransitionsIntentService extends WakefulIntentService {
 
         // Test that the reported transition was of interest.
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
-                geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT ||
-                geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL) {
+                geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
 
             // Get the geofences that were triggered. A single event can trigger multiple geofences.
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
@@ -54,7 +53,7 @@ public class GeofenceTransitionsIntentService extends WakefulIntentService {
             );
 
             sendNotification(geofenceTransitionDetails);
-            Log.i(TAG, geofenceTransitionDetails);
+            Log.e(TAG, geofenceTransitionDetails);
         } else {
             Log.e(TAG, "invalid transition type " + geofenceTransition);
         }
@@ -75,24 +74,32 @@ public class GeofenceTransitionsIntentService extends WakefulIntentService {
 
         // Get the Ids of each geofence that was triggered.
         ArrayList<String> triggeringGeofencesIdsList = new ArrayList<>();
+        ArrayList<String> paramsArrayList = new ArrayList<>();
         for (Geofence geofence : triggeringGeofences) {
             triggeringGeofencesIdsList.add(geofence.getRequestId());
+            GeofenceManagerService.GeofenceParams params =
+                    GeofenceManagerService.geofenceParamsHashMap.get(geofence.getRequestId());
+            paramsArrayList.add(params.getTypeString());
         }
         String triggeringGeofencesIdsString = TextUtils.join(", ", triggeringGeofencesIdsList);
+        String paramsString = TextUtils.join(", ", paramsArrayList);
 
-        return geofenceTransitionString + ": " + triggeringGeofencesIdsString;
+        return geofenceTransitionString + ": " + triggeringGeofencesIdsString + "@" + paramsString;
     }
 
     private void sendNotification(String notificationDetails) {
         // Get a notification builder that's compatible with platform versions >= 4
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 
+        String[] split = notificationDetails.split("@");
+
         // Define the notification settings.
         builder.setSmallIcon(R.drawable.ic_launcher)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setColor(Color.RED)
-                .setContentTitle(notificationDetails)
-                .setContentText("Geofence notification")
+                .setContentTitle(split[0])
+                .setContentText(split[1])
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(split[1]))
                 .setAutoCancel(true);
 
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).notify(0, builder.build());
