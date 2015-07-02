@@ -116,21 +116,8 @@ public class CategoriesFragment extends Fragment{
                         } else {
                             obs.removeGlobalOnLayoutListener(this);
                         }
-                        SearchCard.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
-                            @Override
-                            public void onGlobalLayout() {
-                                ViewTreeObserver obs = SearchCard.getViewTreeObserver();
-
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                    obs.removeOnGlobalLayoutListener(this);
-                                } else {
-                                    obs.removeGlobalOnLayoutListener(this);
-                                }
-                                mRecyclerView.addItemDecoration(new SpaceItemDecoration(dpToPx(12)+(mToolbar.getHeight()+swipetab.getHeight()+SearchCard.getHeight()), 1));
-                            }
-
-                        });
+                        mRecyclerView.addItemDecoration(new SpaceItemDecoration(dpToPx(12)+(mToolbar.getHeight()+swipetab.getHeight()+SearchCard.getHeight()), 1));
                     }
 
                 });
