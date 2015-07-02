@@ -127,7 +127,7 @@ public class MyClubsFragment extends Fragment {
                                 } else {
                                     obs.removeGlobalOnLayoutListener(this);
                                 }
-                                mRecyclerView.addItemDecoration(new SpaceItemDecoration(dpToPx(12) + (mToolbar.getHeight() + swipetab.getHeight() + SearchCard.getHeight()), 1));
+                                mRecyclerView.addItemDecoration(new SpaceItemDecoration(dpToPx(14) + (mToolbar.getHeight() + swipetab.getHeight() + SearchCard.getHeight()), 1));
                             }
 
                         });

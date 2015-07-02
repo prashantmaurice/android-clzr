@@ -212,6 +212,8 @@
             android:name=".QRActivity"
             android:label="@string/title_activity_qr" >
         </activity>
+        <service android:name=".GeofenceManagerService"/>
+        <service android:name=".GeofenceTransitionsIntentService"/>
     </application>
 
 </manifest>

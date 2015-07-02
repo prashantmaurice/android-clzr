@@ -167,13 +167,13 @@ public class CategoryDetail extends ActionBarActivity{
         });
 
         SharedPreferences status = getSharedPreferences("USER", 0);
-        final String cards = status.getString("home_cards", "");
+        final String cards = status.getString(categorybundle.getString("categoryname")+"category_cards", "");
         TOKEN = status.getString("token", "");
         if(!cards.equals("")){
             Log.e("Cached Card", cards);
             mMainCardsList = convertRow(cards);
             mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, this);
-            //mRecyclerView.setAdapter(mMainPageAdapter);
+            mRecyclerView.setAdapter(mMainPageAdapter);
         } else {
             mOffset = 0;
             String url = "http://api.clozerr.com/v2/vendor/search/near?category=" + categorybundle.getString("categoryname").replace(" ", "%20") +
@@ -193,7 +193,7 @@ public class CategoryDetail extends ActionBarActivity{
                         mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, CategoryDetail.this);
                         mRecyclerView.setAdapter(mMainPageAdapter);
                         final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-                        editor.putString("home_cards", s);
+                        editor.putString(categorybundle.getString("categoryname")+"category_cards", s);
                         editor.apply();
                         Log.e("app", "editing done");
                     }
@@ -236,7 +236,7 @@ public class CategoryDetail extends ActionBarActivity{
                                 mRecyclerView.setAdapter(mMainPageAdapter);
 
                                 final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-                                editor.putString("home_cards", s);
+                                editor.putString(categorybundle.getString("categoryname")+"category_cards", s);
                                 editor.apply();
                             } else {
                                 mCardsLeft = false;
@@ -273,7 +273,7 @@ public class CategoryDetail extends ActionBarActivity{
 //                    if (CardList.size() != 0) {
 //                        mMainCardsList.addAll(convertRow(s));
 //                        final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-//                        editor.putString("home_cards", s);
+//                        editor.putString(categorybundle.getString("categoryname")+"category_cards", s);
 //                        editor.apply();
 //                        Log.e("app", "editing done");
 //                        mMainPageAdapter.notifyDataSetChanged();
@@ -287,45 +287,57 @@ public class CategoryDetail extends ActionBarActivity{
 //            });
 //        }
 //    }
-    private ArrayList<CardModel> convertRow(String s) {
-        ArrayList<CardModel> rowItems = new ArrayList<>();
-        JSONArray array;
-        try {
-            array = new JSONArray(s);
-            for(int i = 0 ; i < array.length() ; i++){
-                String phonenumber;
-                try {
-                    phonenumber = array.getJSONObject(i).getString("phonenumber");
-                }
-                catch(Exception e)
-                {
-                    phonenumber="0123456789";
-                }
-                String vendorDescription;
-                try {
-                    vendorDescription = array.getJSONObject(i).getString("description");
-                }
-                catch(Exception e)
-                {
-                    vendorDescription="No Restaurant Description Available Now";
-                }
-                Log.e("description", vendorDescription);
-                CardModel item = new CardModel(
-                        array.getJSONObject(i).getString("name"),
-                        phonenumber, vendorDescription,
-                        array.getJSONObject(i).getJSONArray("offers"),
-                        array.getJSONObject(i).getJSONArray("location").getDouble(0),
-                        array.getJSONObject(i).getJSONArray("location").getDouble(1),
-                        array.getJSONObject(i).getString("image"),
-                        array.getJSONObject(i).getString("fid"),array.getJSONObject(i).getString("_id"),0
-                );
-                rowItems.add(item);
+private ArrayList<CardModel> convertRow(String s) {
+    ArrayList<CardModel> rowItems = new ArrayList<>();
+    JSONArray array;
+    try {
+        array = new JSONArray(s);
+        for(int i = 0 ; i < array.length() ; i++){
+            String phonenumber;
+            try {
+                phonenumber = array.getJSONObject(i).getString("phonenumber");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            catch(Exception e)
+            {
+                phonenumber="0123456789";
+            }
+            String vendorDescription;
+            try {
+                vendorDescription = array.getJSONObject(i).getString("description");
+            }
+            catch(Exception e)
+            {
+                vendorDescription="No Restaurant Description Available Now";
+            }
+            String fid;
+            try {
+                fid=array.getJSONObject(i).getString("fid");
+            }catch (Exception e){
+                fid="";
+            }
+            JSONArray offers;
+            try{
+                offers = array.getJSONObject(i).getJSONArray("offers");
+            }catch (Exception e){
+                offers = new JSONArray("[{}]");
+            }
+            Log.e("description", vendorDescription);
+            CardModel item = new CardModel(
+                    array.getJSONObject(i).getString("name"),
+                    phonenumber, vendorDescription,
+                    offers,
+                    array.getJSONObject(i).getJSONArray("location").getDouble(0),
+                    array.getJSONObject(i).getJSONArray("location").getDouble(1),
+                    array.getJSONObject(i).getString("image"),
+                    fid,array.getJSONObject(i).getString("_id"),0
+            );
+            rowItems.add(item);
         }
-        return rowItems;
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+    return rowItems;
+}
     public void showToolbar() {
         moveToolbar(0);
     }

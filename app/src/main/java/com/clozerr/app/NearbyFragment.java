@@ -1,10 +1,7 @@
 package com.clozerr.app;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
@@ -130,7 +127,7 @@ public class NearbyFragment extends Fragment {
                     public void onFinish() {
                         countDownTimer.cancel();
                         String url;
-
+                        showToolbar();
                         if (!query.equals("")) {
                             url = "http://api.clozerr.com/v2/vendor/search/near?access_token=" + TOKEN + "&name=" + query.replace(" ", "%20") + "&latitude=" + Home.lat + "&longitude=" + Home.longi;
                         } else {
@@ -208,7 +205,7 @@ public class NearbyFragment extends Fragment {
                                 } else {
                                     obs.removeGlobalOnLayoutListener(this);
                                 }
-                                mRecyclerView.addItemDecoration(new SpaceItemDecoration(dpToPx(12) + (mToolbar.getHeight() + swipetab.getHeight() + SearchCard.getHeight()), 0));
+                                mRecyclerView.addItemDecoration(new SpaceItemDecoration(dpToPx(14) + (mToolbar.getHeight() + swipetab.getHeight() + SearchCard.getHeight()), 0));
                             }
 
                         });

@@ -32,8 +32,10 @@ public class GeofenceManagerService extends Service implements
 
     private static final String TAG = "GeofenceManagerService";
     private static final ArrayList<GeofenceParams> TEMPORARY_GEOFENCE_LIST = new ArrayList<>();
-    private static final float GEOFENCE_RADIUS_IN_METERS = 16.0F;
+    private static final float GEOFENCE_RADIUS_IN_METERS = 100.0F;
     private static final long GEOFENCE_EXPIRATION = TimeUnit.MILLISECONDS.convert(1L, TimeUnit.DAYS);
+    private static final int GEOFENCE_DWELL_TIME = (int)TimeUnit.MILLISECONDS.convert(5L, TimeUnit.SECONDS);
+        // of the int type as Geofencing API accepts only int delay
 
     private static ArrayList<Geofence> geofenceList = null;
     private static PendingIntent geofencePendingIntent = null;
@@ -43,7 +45,7 @@ public class GeofenceManagerService extends Service implements
         TEMPORARY_GEOFENCE_LIST.add(new GeofenceParams("House", new LatLng(12.9791381, 80.2617326), GEOFENCE_RADIUS_IN_METERS, 0));
 
         // IITM RP.
-        TEMPORARY_GEOFENCE_LIST.add(new GeofenceParams("IITMRP", new LatLng(12.9803496, 80.2608911), GEOFENCE_RADIUS_IN_METERS, 0));
+        TEMPORARY_GEOFENCE_LIST.add(new GeofenceParams("IITMRP", new LatLng(12.9909858, 80.2427169), GEOFENCE_RADIUS_IN_METERS, 0));
     }
 
     private GoogleApiClient mGoogleApiClient = null;
@@ -95,9 +97,11 @@ public class GeofenceManagerService extends Service implements
 
     private PendingIntent getGeofencePendingIntent() {
         if (geofencePendingIntent == null) {
+            Log.e(TAG, "building pending intent");
             Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
             geofencePendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
+        Log.e(TAG, "built pending intent");
         return geofencePendingIntent;
     }
 
@@ -115,17 +119,21 @@ public class GeofenceManagerService extends Service implements
                             .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
                                     Geofence.GEOFENCE_TRANSITION_EXIT |
                                     Geofence.GEOFENCE_TRANSITION_DWELL)
+                            .setLoiteringDelay(GEOFENCE_DWELL_TIME)
                             .build()
             );
         }
+        Log.e(TAG, "populated list");
     }
 
     public static void startService(Context context) {
         context.startService(new Intent(context, GeofenceManagerService.class));
+        Log.e(TAG, "started service");
     }
 
     public static void stopService(Context context) {
         context.stopService(new Intent(context, GeofenceManagerService.class));
+        Log.e(TAG, "stopped service");
     }
 
     @Override
@@ -151,6 +159,12 @@ public class GeofenceManagerService extends Service implements
     @Override
     public void onResult(Status status) {
         Log.e(TAG, "in onResult(" + status.getStatusMessage() + ")");
+        if (status.isSuccess())
+            Log.e(TAG, "success");
+        else if (status.isCanceled())
+            Log.e(TAG, "canceled");
+        else if (status.isInterrupted())
+            Log.e(TAG, "interrupted");
     }
 
     public static class GeofenceParams {
