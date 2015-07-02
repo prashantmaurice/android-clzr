@@ -205,7 +205,7 @@ public class NearbyFragment extends Fragment {
                                 } else {
                                     obs.removeGlobalOnLayoutListener(this);
                                 }
-                                mRecyclerView.addItemDecoration(new SpaceItemDecoration(dpToPx(16) + (mToolbar.getHeight() + swipetab.getHeight() + SearchCard.getHeight()), 0));
+                                mRecyclerView.addItemDecoration(new SpaceItemDecoration(dpToPx(14) + (mToolbar.getHeight() + swipetab.getHeight() + SearchCard.getHeight()), 0));
                             }
 
                         });

@@ -10,11 +10,18 @@ import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created by junaid on 2/11/14.
@@ -66,12 +73,49 @@ public class AsyncGet extends AsyncTask<String, String, String> {
     @Override
     protected String doInBackground(String... strings) {
         String content = "";
-        HttpClient hc = new DefaultHttpClient();
+        HttpResponse httpResponse = null;
+        HttpEntity httpEntity = null;
+        DefaultHttpClient hc = new DefaultHttpClient();
         HttpGet hGet = new HttpGet(Url);
-        ResponseHandler<String> rHand = new BasicResponseHandler();
+//        ResponseHandler<String> rHand = new BasicResponseHandler();
+//        try {
+//            content = hc.execute(hGet,rHand);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            if (toDisplayProgress)
+//                handler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Toast.makeText(c, "Network error. Check your network connections and try again.",
+//                                Toast.LENGTH_LONG).show();
+//                    }
+//                });
+//        }
         try {
-            content = hc.execute(hGet,rHand);
-        } catch (Exception e) {
+            httpResponse = hc.execute(hGet);
+            httpEntity = httpResponse.getEntity();
+            content= EntityUtils.toString(httpEntity);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            if (toDisplayProgress)
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(c, "Network error. Check your network connections and try again.",
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+            if (toDisplayProgress)
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(c, "Network error. Check your network connections and try again.",
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+        } catch (IOException e) {
             e.printStackTrace();
             if (toDisplayProgress)
                 handler.post(new Runnable() {
@@ -82,6 +126,7 @@ public class AsyncGet extends AsyncTask<String, String, String> {
                     }
                 });
         }
+
         return content;
     }
     @Override
