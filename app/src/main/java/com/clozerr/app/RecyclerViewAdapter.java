@@ -184,6 +184,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             final SharedPreferences status = c.getSharedPreferences("USER",0);
             final String NotNow = status.getString("notNow","false");
             final ArrayList<String> fav = new ArrayList<String>();
+            like.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.i("tag",like.getTag().toString());
+                }
+            });
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -211,11 +217,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
             });
             //if(currentItem.getVendorId())
-            like.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                }
-            });
         }
 //suggest rest
         //border -- lines

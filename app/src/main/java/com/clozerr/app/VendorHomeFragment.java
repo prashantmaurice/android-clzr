@@ -16,6 +16,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,8 @@ import com.koushikdutta.ion.Ion;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 
 public class VendorHomeFragment extends Fragment {
@@ -51,6 +54,34 @@ public class VendorHomeFragment extends Fragment {
         Ion.with(mVendorImageView).load(VendorActivity.detailsBundle.getString("vendorImage"));
         mVendorTitleView.setText(VendorActivity.detailsBundle.getString("vendorTitle"));
         mVendorAddressView.setText(VendorActivity.detailsBundle.getString("address"));
+        final SharedPreferences status = c.getSharedPreferences("USER",0);
+        final String NotNow = status.getString("notNow","false");
+        final ArrayList<String> fav = new ArrayList<String>();
+        JSONArray favourites ;
+        if(NotNow.equals("false")) {
+            try {
+                JSONObject userobj = new JSONObject(status.getString("user", "null"));
+                favourites = userobj.getJSONArray("favourites");
+                Log.i("favourites", favourites.toString());
+                if (favourites != null) {
+                    int len = favourites.length();
+                    for (int i = 0; i < len; i++) {
+                        fav.add(favourites.get(i).toString());
+                    }
+                }
+
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        Log.i("fav","changing favs");
+        if(fav.indexOf(VendorActivity.detailsBundle.getString("vendorId"))!=-1)
+            favorites.setImageResource(R.drawable.favorited);
+        else
+            favorites.setImageResource(R.drawable.unfavorited);
+        Log.i("fave","leaving favs");
         // TODO remove this AsyncGet altogether. Favorite details must be taken from elsewhere (vendor/get/details maybe)
         String urlFavorites = "http://api.clozerr.com/v2/user/add/favourites?access_token=" +Home.TOKEN;
         new AsyncGet(c, urlFavorites , new AsyncGet.AsyncResult() {
