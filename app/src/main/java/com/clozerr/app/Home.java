@@ -14,7 +14,9 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -40,10 +42,14 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.plus.Plus;
 
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.TimeZone;
 
 import static com.clozerr.app.R.drawable.rest1;
 import static com.clozerr.app.R.drawable.rest2;
@@ -112,6 +118,31 @@ public class Home  extends ActionBarActivity {
 
         }
         initDrawer();
+        SharedPreferences status2 = getSharedPreferences("USER", 0);
+        TOKEN = status2.getString("token", "");
+        TimeZone tz = TimeZone.getTimeZone("GMT+0530");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+        df.setTimeZone(tz);
+        String nowAsISO = df.format(new Date());
+        final String analyticsurl= Constants.URLBuilders.ANALYTICS
+                .appendQueryParameter("metric","Clozerr_Home_Screen")
+                .appendQueryParameter("dimensions[device]", "Android API " + Build.VERSION.SDK_INT)
+                .appendQueryParameter("dimensions[id]", Settings.Secure.getString(this.getContentResolver(),
+                        Settings.Secure.ANDROID_ID))
+                .appendQueryParameter("time", nowAsISO)
+                .appendQueryParameter("access_token", TOKEN)
+                .build().toString();
+        //Toast.makeText(getApplicationContext(),analyticsurl,Toast.LENGTH_SHORT).show();
+        //+"?metric=Clozerr+Home+Screen&dimensions%5Bdevice%5D=Android+API+"+ Build.VERSION.SDK_INT+"&dimensions%5Bid%5D=,jau65asas76&time="+nowAsISO+"&access_token="+TOKEN;
+        new AsyncGet(Home.this, analyticsurl, new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                Log.e(analyticsurl,"");
+                Constants.URLBuilders.ANALYTICS.clearQuery();
+                //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),analyticsurl,Toast.LENGTH_SHORT).show();
+            }
+        },false);
         TextView username = (TextView)findViewById(R.id.nav_text);
         if(USERNAME.length()!=0)
             username.setText(USERNAME);
@@ -129,8 +160,8 @@ public class Home  extends ActionBarActivity {
         if (regId.equals("")) {
             GCMRegistrar.register(this, SENDER_ID);
         }else{
-            SharedPreferences status2 = getSharedPreferences("USER", 0);
-            TOKEN = status2.getString("token", "");
+            SharedPreferences status = getSharedPreferences("USER", 0);
+            TOKEN = status.getString("token", "");
             new AsyncGet(Home.this, "http://api.clozerr.com/auth/update/gcm?gcm_id=" + regId + "&access_token=" + TOKEN, new AsyncGet.AsyncResult() {
                 @Override
                 public void gotResult(String s) {
