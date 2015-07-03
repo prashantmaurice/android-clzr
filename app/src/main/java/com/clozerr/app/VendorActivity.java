@@ -232,14 +232,14 @@ public class VendorActivity extends ActionBarActivity {
                 .appendQueryParameter("time", nowAsISO)
                 .appendQueryParameter("access_token",TOKEN)
                 .build().toString();
-        Toast.makeText(getApplicationContext(),analyticsurlvendor,Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(),analyticsurlvendor,Toast.LENGTH_SHORT).show();
 
         //"?metric=Clozerr+Home+Screen&dimensions%5Bdevice%5D=Android+API+"+ Build.VERSION.SDK_INT+"&dimensions%5Bid%5D=,jau65asas76&time="+nowAsISO+"&access_token="+TOKEN;
         new AsyncGet(VendorActivity.this, analyticsurlvendor, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
                 Log.e(analyticsurlvendor,"");
-                Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
                 Constants.URLBuilders.ANALYTICS.clearQuery();
             }
         },false);
