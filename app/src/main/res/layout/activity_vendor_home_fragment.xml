@@ -56,8 +56,7 @@
                         android:layout_marginRight="0dp"
                         android:background="#00000000"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/unfavorited"
-                        />
+                        android:src="@drawable/unfavorited" />
 
                     <ImageButton
                         android:id="@+id/share"
@@ -261,13 +260,33 @@
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/GalleryRecyclerView"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="55dp"
-                        android:layout_marginLeft="11dp"
-                        android:layout_marginRight="11dp"
-                        android:layout_marginTop="5dp" />
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:orientation="horizontal"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp">
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/GalleryRecyclerView"
+                            android:layout_width="0dp"
+                            android:clipChildren="true"
+                            android:layout_weight="7"
+                            android:layout_height="55dp"
+                            android:layout_marginTop="5dp" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="55dp"
+                            android:src="@drawable/dotdotdot"
+                            android:layout_marginTop="5dp"/>
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="55dp"
+                            android:src="@drawable/addgallery"
+                            android:layout_marginTop="5dp"/>
+                    </LinearLayout>
 
                     <View
                         style="@style/DividerHorizontal"
