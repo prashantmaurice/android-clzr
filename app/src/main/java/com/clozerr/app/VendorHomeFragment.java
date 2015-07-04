@@ -16,6 +16,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 
 public class VendorHomeFragment extends Fragment {
 
@@ -40,7 +43,7 @@ public class VendorHomeFragment extends Fragment {
     private ImageView mVendorImageView;
     private TextView mVendorTitleView;
     private TextView mVendorAddressView;
-    private ImageButton mCallButton, mDirButton, favorites, whatsappshare;
+    private ImageButton mCallButton, mDirButton, favorites, whatsappshare,fb,gplus,twitter;
     private RecyclerView gallerylist;
 
     @Override
@@ -51,36 +54,35 @@ public class VendorHomeFragment extends Fragment {
         Ion.with(mVendorImageView).load(VendorActivity.detailsBundle.getString("vendorImage"));
         mVendorTitleView.setText(VendorActivity.detailsBundle.getString("vendorTitle"));
         mVendorAddressView.setText(VendorActivity.detailsBundle.getString("address"));
-        // TODO remove this AsyncGet altogether. Favorite details must be taken from elsewhere (vendor/get/details maybe)
-        String urlFavorites = "http://api.clozerr.com/v2/user/add/favourites?access_token=" +Home.TOKEN;
-        new AsyncGet(c, urlFavorites , new AsyncGet.AsyncResult() {
-            @Override
-            public void gotResult(String s) {
-                try {
-                    JSONObject obj=new JSONObject(s);
-                    //Toast.makeText(getActivity(),s,Toast.LENGTH_SHORT).show();
-                    JSONObject fav=obj.getJSONObject("favourites");
-                    JSONArray vendors=fav.getJSONArray("vendor");
-                    //Toast.makeText(getActivity(),vendors.toString(),Toast.LENGTH_SHORT).show();
-                    for (int i = 0; i < vendors.length(); ++i) {
-
-                        if(VendorActivity.vendorId.equals(vendors.getString(i)))
-                        {
-                            favorites.setImageResource(R.drawable.favorited);
-                        }
+        final SharedPreferences status = c.getSharedPreferences("USER",0);
+        final String NotNow = status.getString("notNow","false");
+        final ArrayList<String> fav = new ArrayList<String>();
+        JSONArray favourites ;
+        if(NotNow.equals("false")) {
+            try {
+                JSONObject userobj = new JSONObject(status.getString("user", "null"));
+                favourites = userobj.getJSONArray("favourites");
+                Log.i("favourites", favourites.toString());
+                if (favourites != null) {
+                    int len = favourites.length();
+                    for (int i = 0; i < len; i++) {
+                        fav.add(favourites.get(i).toString());
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
-                //  t1.setText(s);
-                if(s==null) {
-                    Toast.makeText(c,"No internet connection",Toast.LENGTH_SHORT).show();
-                }
-                //l1.setAdapter(adapter);
+
             }
-        },false);
-
-
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        Log.i("fav","changing favs");
+        if(fav.indexOf(VendorActivity.detailsBundle.getString("vendorId"))!=-1)
+            favorites.setImageResource(R.drawable.favorited);
+        else
+            favorites.setImageResource(R.drawable.unfavorited);
+        Log.i("fave","leaving favs");
+        // TODO remove this AsyncGet altogether. Favorite details must be taken from elsewhere (vendor/get/details maybe)
         mCallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,26 +114,55 @@ public class VendorHomeFragment extends Fragment {
             public void onClick(View view) {
                 SharedPreferences status = getActivity().getSharedPreferences("USER", 0);
                 String TOKEN = status.getString("token", "");
-                favorites.setImageResource(R.drawable.favorited);
-                new AsyncGet(getActivity(), "http://api.clozerr.com/v2/user/add/favourites?vendor_id="+VendorActivity.vendorId+"&access_token="+TOKEN, new AsyncGet.AsyncResult() {
-                    @Override
-                    public void gotResult(String s) {
-                        Toast.makeText(getActivity(),"Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
-                        //l1.setAdapter(adapter);
-                        if (s == null) {
-                            Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
-                            favorites.setImageResource(R.drawable.like);
-                        }
+                Log.i("name",getResources().getResourceName(R.id.favorites));
+                if(fav.indexOf(VendorActivity.detailsBundle.getString("vendorId"))==-1)
+                {
+                    favorites.setImageResource(R.drawable.favorited);
+                    new AsyncGet(getActivity(), "http://api.clozerr.com/v2/user/add/favourites?vendor_id="+VendorActivity.vendorId+"&access_token="+TOKEN, new AsyncGet.AsyncResult() {
+                        @Override
+                        public void gotResult(String s) {
+                            final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+                            editor.putString("user",s);
+                            editor.apply();
+                            Toast.makeText(getActivity(),"Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
+                            //l1.setAdapter(adapter);
+                            if (s == null) {
+                                Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
+                                favorites.setImageResource(R.drawable.like);
+                            }
 
-                        // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
+                            // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
 
 
                           /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
                           mRecyclerView.setAdapter(Cardadapter);*/
-                    }
-                },false);
+                        }
+                    },false);
+                }
+                else
+                {
+                    favorites.setImageResource(R.drawable.unfavorited);
+                    new AsyncGet(getActivity(), "http://api.clozerr.com/v2/user/remove/favourites?vendor_id="+VendorActivity.vendorId+"&access_token="+TOKEN, new AsyncGet.AsyncResult() {
+                        @Override
+                        public void gotResult(String s) {
+                            final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+                            editor.putString("user",s);
+                            editor.apply();
+                            Toast.makeText(getActivity(),"Unfavorited and removed to My Clubs.", Toast.LENGTH_LONG).show();
+                            //l1.setAdapter(adapter);
+                            if (s == null) {
+                                Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
+                                favorites.setImageResource(R.drawable.like);
+                            }
+
+                            // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
 
 
+                          /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
+                          mRecyclerView.setAdapter(Cardadapter);*/
+                        }
+                    },false);
+                }
             }
         });
 
@@ -139,6 +170,32 @@ public class VendorHomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 onClickWhatsApp();
+            }
+        });
+        twitter.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                if(!VendorActivity.detailsBundle.getString("twitter").equals(""))
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(VendorActivity.detailsBundle.getString("twitter"))));
+                else
+                    Toast.makeText(getActivity(),"This Vendor Doesnt have a active twitter page",Toast.LENGTH_SHORT).show();
+            }
+        });
+        fb.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                String facebookUrl = VendorActivity.detailsBundle.getString("fb");
+
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(facebookUrl)));
+            }
+        });
+        gplus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!VendorActivity.detailsBundle.getString("gplus").equals(""))
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(VendorActivity.detailsBundle.getString("gplus"))));
+                else
+                    Toast.makeText(getActivity(),"This Vendor Doesnt have a active google plus page",Toast.LENGTH_SHORT).show();
             }
         });
         gallerylist.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
@@ -172,6 +229,9 @@ public class VendorHomeFragment extends Fragment {
         mDirButton = (ImageButton) layout.findViewById(R.id.dirButton);
         favorites = (ImageButton) layout.findViewById(R.id.favorites);
         whatsappshare=(ImageButton) layout.findViewById(R.id.whatsappshare);
+        fb = (ImageButton) layout.findViewById(R.id.fb);
+        gplus = (ImageButton) layout.findViewById(R.id.gplus);
+        twitter = (ImageButton) layout.findViewById(R.id.twitter);
     }
 
     public void onClickWhatsApp() {

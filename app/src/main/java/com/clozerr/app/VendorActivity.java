@@ -9,7 +9,9 @@ import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -31,7 +33,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimeZone;
 
 
 public class VendorActivity extends ActionBarActivity {
@@ -50,6 +56,7 @@ public class VendorActivity extends ActionBarActivity {
     public static String vendorId;
     static String vendorTitle;
     static int i=1;
+    public String analyticsurlvendor=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +85,8 @@ public class VendorActivity extends ActionBarActivity {
             @Override
             public void gotResult(String s) {
                 try {
-                    String address = "", phoneNumber = "", vendorDescription = "";
+                    //Toast.makeText(getApplicationContext(), Constants.URLBuilders.ANALYTICSCOPY.toString(),Toast.LENGTH_SHORT).show();
+                    String address = "", phoneNumber = "", vendorDescription = "",fb = "",gplus = "",twitter = "";
                     //BeaconFinderService.BeaconDBParams params = null;
                     double latitude = 0.0, longitude = 0.0;
                     JSONObject object = new JSONObject(s);
@@ -96,6 +104,16 @@ public class VendorActivity extends ActionBarActivity {
                         longitude = object.getJSONArray("location").getDouble(1);
                         if (longitude <= 0.0)
                             longitude = 0.0;
+                        fb =object.getString("fb");
+                        if(fb.equalsIgnoreCase("undefined"))
+                            fb = "";
+                        gplus = object.getString("gplus");
+                        if(gplus.equalsIgnoreCase("undefined"))
+                            gplus = "";
+                        twitter = object.getString("twitter");
+                        if(twitter.equalsIgnoreCase("undefined"))
+                            twitter = "";
+
                     } catch (Exception e) {
                         e.printStackTrace();
                         //Toast.makeText(CouponDetails.this, "Error - " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
@@ -146,6 +164,9 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putDouble("distance", currentItem.getDistance());
                     detailsBundle.putString("distanceString", currentItem.getDistanceString());
                     detailsBundle.putString("phoneNumber", phoneNumber);
+                    detailsBundle.putString("fb",fb);
+                    detailsBundle.putString("gplus",gplus);
+                    detailsBundle.putString("twitter",twitter);
                     //currentItem.getQuestions();
                     /*try {
                         if (!fromPeriodicBFS && params != null)
@@ -211,6 +232,30 @@ public class VendorActivity extends ActionBarActivity {
                 }
             }
         });
+
+        TimeZone tz = TimeZone.getTimeZone("GMT+0530");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+        df.setTimeZone(tz);
+        String nowAsISO = df.format(new Date());
+        analyticsurlvendor= Constants.URLBuilders.ANALYTICS
+                .appendQueryParameter("metric",detailsBundle.getString("vendorTitle")+" Vendor Screen")
+                .appendQueryParameter("dimensions[device]", "Android API " + Build.VERSION.SDK_INT)
+                .appendQueryParameter("dimensions[id]", Settings.Secure.getString(this.getContentResolver(),
+                        Settings.Secure.ANDROID_ID))
+                .appendQueryParameter("time", nowAsISO)
+                .appendQueryParameter("access_token",TOKEN)
+                .build().toString();
+        //Toast.makeText(getApplicationContext(),analyticsurlvendor,Toast.LENGTH_SHORT).show();
+
+        //"?metric=Clozerr+Home+Screen&dimensions%5Bdevice%5D=Android+API+"+ Build.VERSION.SDK_INT+"&dimensions%5Bid%5D=,jau65asas76&time="+nowAsISO+"&access_token="+TOKEN;
+        new AsyncGet(VendorActivity.this, analyticsurlvendor, new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                Log.e(analyticsurlvendor,"");
+                //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
+                Constants.URLBuilders.ANALYTICS.clearQuery();
+            }
+        },false);
 
         /*String urlVisited = "http://api.clozerr.com/v2/vendor/offers/offerspage?vendor_id=" + vendorId + "&access_token=" + TOKEN;
         String urlUser = "http://api.clozerr.com/auth?fid=" + detailsBundle.getString("fid") + "&access_token=" + TOKEN;

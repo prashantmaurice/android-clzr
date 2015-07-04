@@ -28,6 +28,10 @@ import android.widget.Toast;
 import com.facebook.Session;
 import com.koushikdutta.ion.Ion;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -39,6 +43,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private List<CardModel> items;
     static Context c;
+
 
     //public static String vendor_name_temp = "";
 
@@ -74,6 +79,34 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         viewHolder.txtTitle.setText(model.getTitle());
         viewHolder.txtCaption.setText(model.getCaption());
         viewHolder.txtDist.setText(model.getDistanceString());
+        final SharedPreferences status = c.getSharedPreferences("USER",0);
+        final String NotNow = status.getString("notNow","false");
+        final ArrayList<String> fav = new ArrayList<String>();
+        JSONArray favourites ;
+        if(NotNow.equals("false")) {
+            try {
+                JSONObject userobj = new JSONObject(status.getString("user", "null"));
+                favourites = userobj.getJSONArray("favourites");
+                Log.i("favourites",favourites.toString());
+                if (favourites != null) {
+                    int len = favourites.length();
+                    for (int i = 0; i < len; i++) {
+                        fav.add(favourites.get(i).toString());
+                    }
+                }
+
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        Log.i("fav","changing favs");
+        if(fav.indexOf(model.getVendorId())!=-1)
+            viewHolder.like.setImageResource(R.drawable.favorited);
+        else
+            viewHolder.like.setImageResource(R.drawable.like);
+        Log.i("fave","leaving favs");
         /*LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 dpToPx(viewHolder.linearLayout.getWidth())/2
@@ -138,6 +171,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             imageView = (ImageView) itemView.findViewById(R.id.imageView);
             linearLayout = (LinearLayout)itemView.findViewById(R.id.cardlayout);
             like = (ImageButton)itemView.findViewById(R.id.like);
+            like.setImageResource(R.drawable.favorited);
+           // Log.i("currentItem",currentItem.toString());
            /* LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     linearLayout.getWidth()/2
@@ -146,17 +181,19 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             linearLayout.setLayoutParams(params);*/
 
             //txtrating=(TextView) itemView.findViewById(R.id.txtrating);
+            final SharedPreferences status = c.getSharedPreferences("USER",0);
+            final String NotNow = status.getString("notNow","false");
+            final ArrayList<String> fav = new ArrayList<String>();
             like.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    Log.i("tag",like.getTag().toString());
                 }
             });
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    SharedPreferences status = c.getSharedPreferences("USER", 0);
-                    String NotNow = status.getString("notNow", "false");
                     if (VendorActivity.i == 0 && NotNow.equals("false"))
                     {
                         Intent detailIntent = new Intent(c, VendorActivity.class);
@@ -179,6 +216,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     }
                 }
             });
+            //if(currentItem.getVendorId())
         }
 //suggest rest
         //border -- lines

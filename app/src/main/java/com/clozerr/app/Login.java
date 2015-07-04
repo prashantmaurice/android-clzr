@@ -267,6 +267,7 @@ public class Login extends FragmentActivity implements
                                             if (res.getString("result").equals("true")) {
                                                 editor.putString("loginskip", "true");
                                                 editor.putString("token", res.getString("token"));
+                                                editor.putString("user",res.getString("user"));
                                                 editor.apply();
                                                 startActivity(new Intent(Login.this, Home.class));
                                                 finish();
@@ -391,6 +392,7 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                                     if (res.getString("result").equals("true")) {
                                         editor.putString("loginskip", "true");
                                         editor.putString("token", res.getString("token"));
+                                        editor.putString("user",res.getString("user"));
                                         editor.apply();
                                         startActivity(new Intent(Login.this, Home.class));
                                         finish();
