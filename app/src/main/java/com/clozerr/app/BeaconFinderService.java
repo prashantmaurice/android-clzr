@@ -8,7 +8,6 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Handler;
@@ -26,7 +25,6 @@ import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.BeaconManager;
 import com.jaalee.sdk.RangingListener;
 import com.jaalee.sdk.Region;
-import com.jaalee.sdk.ServiceReadyCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,7 +46,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
     public static final String ACTION_RESUME_SCAN = "com.clozerr.app.ACTION_RESUME_SCAN";
     public static final String KEY_BLE = "com.clozerr.app.KEY_BLE";
     public static final String KEY_BEACON_UUID = "com.clozerr.app.KEY_BEACON_UUID";
-    public static final String KEY_APP_ENABLED_BT = "com.clozerr.app.KEY_APP_ENABLED_BT";
+    public static final String KEY_APP_DISABLE_BT = "com.clozerr.app.KEY_APP_DISABLE_BT";
     public static final long BT_RECEIVER_TIMEOUT = TimeUnit.MILLISECONDS.convert(4L, TimeUnit.SECONDS);
     public static final int THRESHOLD_RSSI = -100;
 
@@ -253,7 +251,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         isScanningAllowed = sharedPreferences.getBoolean(context.getResources().getString(R.string.beacon_detection), true);
         sharedPreferences = context.getSharedPreferences("USER", 0);
         isUserLoggedIn = !sharedPreferences.getString("token", "").isEmpty();
-        return (isScanningAllowed && isUserLoggedIn);
+        return (!isUserLoggedIn || isScanningAllowed);
     }
 
     /*protected static void readBeaconDBFromFile(Context context) throws IOException, JSONException {
@@ -299,12 +297,12 @@ public abstract class BeaconFinderService extends WakefulIntentService {
     protected static void turnOnBluetooth(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         boolean shouldAppDeactivateBluetooth =
-                preferences.getBoolean(KEY_APP_ENABLED_BT, false) || !bluetoothAdapter.isEnabled();
+                preferences.getBoolean(KEY_APP_DISABLE_BT, false) || !bluetoothAdapter.isEnabled();
                                                 // check if it's this app that has to disable BT
                                                 // stored in (and read from) preferences to account for restart of
                                                 // process after OS/user kills app
         PreferenceManager.getDefaultSharedPreferences(context).edit()
-                .putBoolean(KEY_APP_ENABLED_BT, shouldAppDeactivateBluetooth).apply();
+                .putBoolean(KEY_APP_DISABLE_BT, shouldAppDeactivateBluetooth).apply();
         if (!bluetoothAdapter.isEnabled()) {                            // disabled, so enable BT
             /*context.registerReceiver(new BTStateChangeReceiver() {
                 @Override
@@ -317,14 +315,14 @@ public abstract class BeaconFinderService extends WakefulIntentService {
     }
 
     protected static void turnOffBluetooth(Context context) {
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(KEY_APP_ENABLED_BT, false))
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(KEY_APP_DISABLE_BT, false))
                             // if app did not turn on BT, don't disable it as user might need it
             bluetoothAdapter.disable();
     }
 
     public static void disallowScanning(Context context) {
         isScanningAllowed = false;
-        PeriodicBFS.checkAndStopScan(context, true);
+        PeriodicBFS.checkAndStopScan(context/*, true*/);
         OneTimeBFS.checkAndStopScan(context);
         Log.e(TAG, "scans blocked");
     }
@@ -359,9 +357,9 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         public String mNextOfferCaption;
         public String mNextOfferDescription;*/
         //public boolean mIsNotifiable;
-        public boolean mHasOffers;
+        //public boolean mHasOffers;
         //public String mPaymentType;
-        public String mLoyaltyType;
+        //public String mLoyaltyType;
         public int mThresholdRssi;
 
         public VendorParams(/*Context context, */JSONObject object) throws JSONException {
@@ -378,9 +376,9 @@ public abstract class BeaconFinderService extends WakefulIntentService {
             mNextOfferCaption = (nextOffer == null) ? "" : nextOffer.getString("caption");
             mNextOfferDescription = (nextOffer == null) ? "" : nextOffer.getString("description");*/
             //mIsNotifiable = /*!mNextOfferID.isEmpty() && isVendorWithThisUUIDNotifiable(context, mUUID)*/true;
-            mHasOffers = object.getBoolean("hasOffers");
+            /*mHasOffers = object.getBoolean("hasOffers");
             mLoyaltyType = (object.has("settings") && object.getJSONObject("settings").getBoolean("sxEnabled")) ?
-                    "SX" : "S1";
+                    "SX" : "S1";*/
             //mPaymentType = object.getString("paymentType");
             //mPaymentType = "counter";
             mThresholdRssi = THRESHOLD_RSSI;

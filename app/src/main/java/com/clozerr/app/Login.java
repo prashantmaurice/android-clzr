@@ -378,7 +378,9 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                     @Override
                     public void run() {
                         //Toast.makeText(Login.this, "G+ Token:\n" + s, Toast.LENGTH_LONG).show();
-                        new AsyncGet(Login.this, "http://api.clozerr.com/auth/login/google?token=" + s, new AsyncGet.AsyncResult() {
+                        String clozerrAuthURL = "http://api.clozerr.com/auth/login/google?token=" + s;
+                        Log.e(TAG, "token generating url - " + clozerrAuthURL);
+                        new AsyncGet(Login.this, clozerrAuthURL, new AsyncGet.AsyncResult() {
                             @Override
                             public void gotResult(String s) {
                                 //Log.i("urltest","http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken());

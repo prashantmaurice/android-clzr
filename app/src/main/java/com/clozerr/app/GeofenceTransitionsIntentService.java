@@ -1,32 +1,27 @@
 package com.clozerr.app;
 
-import android.app.NotificationManager;
-import android.content.Context;
+import android.app.IntentService;
 import android.content.Intent;
-import android.graphics.Color;
-import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by aravind on 2/7/15.
  */
-public class GeofenceTransitionsIntentService extends WakefulIntentService {
+public class GeofenceTransitionsIntentService extends IntentService {
 
     private static final String TAG = "FenceTransitionService";
 
     public GeofenceTransitionsIntentService() { super(TAG); }
 
     @Override
-    protected void doWakefulWork(Intent intent) {
-        Log.e(TAG, "doing wakeful work");
+    protected void onHandleIntent(Intent intent) {
+        Log.e(TAG, "handling intent");
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
         if (geofencingEvent.hasError()) {
             String errorMessage = GeofenceManagerService.GeofenceErrorMessages.getErrorString(this,
@@ -35,10 +30,36 @@ public class GeofenceTransitionsIntentService extends WakefulIntentService {
             return;
         }
 
-        // Get the transition type.
         int geofenceTransition = geofencingEvent.getGeofenceTransition();
+        // TODO check for possibilities that this may need to check multiple geofences
+        Geofence triggeringGeofence = geofencingEvent.getTriggeringGeofences().get(0);
+        GeofenceManagerService.GeofenceParams params =
+                GeofenceManagerService.geofenceParamsHashMap.get(triggeringGeofence.getRequestId());
+        ArrayList<Integer> geofenceTypes = params.getIncludedTypes();
+        Log.e(TAG, "included types - " + TextUtils.join(", ", geofenceTypes));
 
-        // Test that the reported transition was of interest.
+        switch (geofenceTransition) {
+            case Geofence.GEOFENCE_TRANSITION_ENTER:
+                Log.e(TAG, "entered " + triggeringGeofence.getRequestId());
+                if (geofenceTypes.contains(GeofenceManagerService.GEOFENCE_TYPE_RANGE)) {
+                    PeriodicBFS.checkAndStartScan(this);
+                }
+                break;
+            case Geofence.GEOFENCE_TRANSITION_EXIT:
+                Log.e(TAG, "exited " + triggeringGeofence.getRequestId());
+                if (geofenceTypes.contains(GeofenceManagerService.GEOFENCE_TYPE_RANGE)) {
+                    PeriodicBFS.checkAndStopScan(this);
+                }
+                break;
+            case Geofence.GEOFENCE_TRANSITION_DWELL:
+                Log.e(TAG, "dwelling in " + triggeringGeofence.getRequestId());
+                break;
+            default:
+                Log.e(TAG, "unknown transition for " + triggeringGeofence.getRequestId());
+                break;
+        }
+
+        /*
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
                 geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
 
@@ -57,15 +78,10 @@ public class GeofenceTransitionsIntentService extends WakefulIntentService {
         } else {
             Log.e(TAG, "invalid transition type " + geofenceTransition);
         }
-        releaseLock();
+        */
     }
 
-    @Override
-    protected boolean isListeningAfterWork() {
-        return true;
-    }
-
-    private String getGeofenceTransitionDetails(
+    /*private String getGeofenceTransitionDetails(
             Context context,
             int geofenceTransition,
             List<Geofence> triggeringGeofences) {
@@ -116,5 +132,5 @@ public class GeofenceTransitionsIntentService extends WakefulIntentService {
             default:
                 return "Unknown Transition";
         }
-    }
+    }*/
 }

@@ -43,7 +43,8 @@ public class BeaconDBDownloader extends BroadcastReceiver {
                                 putString(BeaconFinderService.KEY_BEACON_UUID, BeaconFinderService.commonBeaconUUID).apply();
                         //BeaconDBDownloadBaseReceiver.releaseWakeLock();
                         Log.e(TAG, "downloaded");
-                        PeriodicBFS.scheduleAlarms(context);
+                        //PeriodicBFS.scheduleAlarms(context);
+                        context.startService(new Intent(context, GeofenceManagerService.class));
                         isDownloadDone = true;
                         BeaconFinderService.disableComponent(context, BeaconDBDownloader.class);
                     } catch (Exception e) {

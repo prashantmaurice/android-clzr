@@ -110,7 +110,7 @@ abstract public class WakefulIntentService extends IntentService {
       doWakefulWork(intent);
     }
     finally {
-      Log.e("WakefulIntentService", "out of doWakefulWork()");
+      //Log.e("WakefulIntentService", "out of doWakefulWork()");
       if (!isListeningAfterWork())
         releaseLock();
     }
@@ -144,7 +144,7 @@ abstract public class WakefulIntentService extends IntentService {
 
   @Override
   public void onDestroy() {
-    Log.e("WakefulIntentService", "onDestroy");
+    //Log.e("WakefulIntentService", "onDestroy");
     //super.onDestroy();
   }
 }
