@@ -86,7 +86,7 @@ public class VendorActivity extends ActionBarActivity {
             public void gotResult(String s) {
                 try {
                     //Toast.makeText(getApplicationContext(), Constants.URLBuilders.ANALYTICSCOPY.toString(),Toast.LENGTH_SHORT).show();
-                    String address = "", phoneNumber = "", vendorDescription = "";
+                    String address = "", phoneNumber = "", vendorDescription = "",fb = "",gplus = "",twitter = "";
                     //BeaconFinderService.BeaconDBParams params = null;
                     double latitude = 0.0, longitude = 0.0;
                     JSONObject object = new JSONObject(s);
@@ -104,6 +104,16 @@ public class VendorActivity extends ActionBarActivity {
                         longitude = object.getJSONArray("location").getDouble(1);
                         if (longitude <= 0.0)
                             longitude = 0.0;
+                        fb =object.getString("fb");
+                        if(fb.equalsIgnoreCase("undefined"))
+                            fb = "";
+                        gplus = object.getString("gplus");
+                        if(gplus.equalsIgnoreCase("undefined"))
+                            gplus = "";
+                        twitter = object.getString("twitter");
+                        if(twitter.equalsIgnoreCase("undefined"))
+                            twitter = "";
+
                     } catch (Exception e) {
                         e.printStackTrace();
                         //Toast.makeText(CouponDetails.this, "Error - " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
@@ -154,6 +164,9 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putDouble("distance", currentItem.getDistance());
                     detailsBundle.putString("distanceString", currentItem.getDistanceString());
                     detailsBundle.putString("phoneNumber", phoneNumber);
+                    detailsBundle.putString("fb",fb);
+                    detailsBundle.putString("gplus",gplus);
+                    detailsBundle.putString("twitter",twitter);
                     //currentItem.getQuestions();
                     /*try {
                         if (!fromPeriodicBFS && params != null)

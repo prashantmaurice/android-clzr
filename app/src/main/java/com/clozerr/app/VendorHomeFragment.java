@@ -43,7 +43,7 @@ public class VendorHomeFragment extends Fragment {
     private ImageView mVendorImageView;
     private TextView mVendorTitleView;
     private TextView mVendorAddressView;
-    private ImageButton mCallButton, mDirButton, favorites, whatsappshare;
+    private ImageButton mCallButton, mDirButton, favorites, whatsappshare,fb,gplus,twitter;
     private RecyclerView gallerylist;
 
     @Override
@@ -172,6 +172,32 @@ public class VendorHomeFragment extends Fragment {
                 onClickWhatsApp();
             }
         });
+        twitter.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                if(!VendorActivity.detailsBundle.getString("twitter").equals(""))
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(VendorActivity.detailsBundle.getString("twitter"))));
+                else
+                    Toast.makeText(getActivity(),"This Vendor Doesnt have a active twitter page",Toast.LENGTH_SHORT).show();
+            }
+        });
+        fb.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                String facebookUrl = VendorActivity.detailsBundle.getString("fb");
+
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(facebookUrl)));
+            }
+        });
+        gplus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!VendorActivity.detailsBundle.getString("gplus").equals(""))
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(VendorActivity.detailsBundle.getString("gplus"))));
+                else
+                    Toast.makeText(getActivity(),"This Vendor Doesnt have a active google plus page",Toast.LENGTH_SHORT).show();
+            }
+        });
         gallerylist.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         gallerylist.setItemAnimator(new DefaultItemAnimator());
         gallerylist.setHasFixedSize(true);
@@ -203,6 +229,9 @@ public class VendorHomeFragment extends Fragment {
         mDirButton = (ImageButton) layout.findViewById(R.id.dirButton);
         favorites = (ImageButton) layout.findViewById(R.id.favorites);
         whatsappshare=(ImageButton) layout.findViewById(R.id.whatsappshare);
+        fb = (ImageButton) layout.findViewById(R.id.fb);
+        gplus = (ImageButton) layout.findViewById(R.id.gplus);
+        twitter = (ImageButton) layout.findViewById(R.id.twitter);
     }
 
     public void onClickWhatsApp() {
