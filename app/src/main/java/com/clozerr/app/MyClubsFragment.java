@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
@@ -46,6 +47,7 @@ public class MyClubsFragment extends Fragment {
     int length_of_array = 0;
     static float SEARCH_CARD_INI_POS = 0;
     public static ArrayList<CardModel> rowItems;
+    ImageButton like;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,6 +60,8 @@ public class MyClubsFragment extends Fragment {
         mScrollable = getActivity().findViewById(R.id.drawerLayout);
         mToolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         swipetab = getActivity().findViewById(R.id.tabs);
+        like = (ImageButton)getActivity().findViewById(R.id.like);
+
         final TextView searchHint = (TextView) layout.findViewById(R.id.searchHint);
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override

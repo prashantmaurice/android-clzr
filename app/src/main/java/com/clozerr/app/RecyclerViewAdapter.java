@@ -43,6 +43,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private List<CardModel> items;
     static Context c;
+    SharedPreferences status;
+    String NotNow;
+    ArrayList<String> fav;
+    JSONArray favourites;
 
 
     //public static String vendor_name_temp = "";
@@ -79,29 +83,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         viewHolder.txtTitle.setText(model.getTitle());
         viewHolder.txtCaption.setText(model.getCaption());
         viewHolder.txtDist.setText(model.getDistanceString());
-        final SharedPreferences status = c.getSharedPreferences("USER",0);
-        final String NotNow = status.getString("notNow","false");
-        final ArrayList<String> fav = new ArrayList<String>();
-        JSONArray favourites ;
-        if(NotNow.equals("false")) {
-            try {
-                JSONObject userobj = new JSONObject(status.getString("user", "null"));
-                favourites = userobj.getJSONArray("favourites");
-                Log.i("favourites",favourites.toString());
-                if (favourites != null) {
-                    int len = favourites.length();
-                    for (int i = 0; i < len; i++) {
-                        fav.add(favourites.get(i).toString());
-                    }
-                }
-
-            }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
         Log.i("fav","changing favs");
+        updateFavs();
         if(fav.indexOf(model.getVendorId())!=-1)
             viewHolder.like.setImageResource(R.drawable.favorited);
         else
@@ -151,6 +134,29 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public int getItemCount() {
         return items.size();
     }
+    public void updateFavs(){
+        status = c.getSharedPreferences("USER",0);
+        NotNow = status.getString("notNow","false");
+        fav = new ArrayList<String>();
+        if(NotNow.equals("false")) {
+            try {
+                JSONObject userobj = new JSONObject(status.getString("user", "null"));
+                favourites = userobj.getJSONArray("favourites");
+                Log.i("favourites",favourites.toString());
+                if (favourites != null) {
+                    int len = favourites.length();
+                    for (int i = 0; i < len; i++) {
+                        fav.add(favourites.get(i).toString());
+                    }
+                }
+
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public final static class ListItemViewHolder
             extends RecyclerView.ViewHolder {
@@ -187,7 +193,63 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             like.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.i("tag",like.getTag().toString());
+                    //Log.i("tag",like.getTag().toString());
+                    //Toast.makeText(c,"clicked",Toast.LENGTH_SHORT).show();
+                    SharedPreferences status = c.getSharedPreferences("USER", 0);
+                    String TOKEN = status.getString("token", "");
+                    //Log.i("name",getResources().getResourceName(R.id.favorites));
+                    if(fav.indexOf(currentItem.getVendorId())==-1)
+                    {
+                        like.setImageResource(R.drawable.favorited);
+                        new AsyncGet(c, "http://api.clozerr.com/v2/user/add/favourites?vendor_id="+currentItem.getVendorId()+"&access_token="+TOKEN, new AsyncGet.AsyncResult() {
+                            @Override
+                            public void gotResult(String s) {
+                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+                                editor.putString("user",s);
+                                editor.apply();
+                                Toast.makeText(c,"Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
+
+                                //l1.setAdapter(adapter);
+                                if (s == null) {
+                                    Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
+                                    like.setImageResource(R.drawable.like);
+                                }
+
+                                // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
+
+
+                          /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
+                          mRecyclerView.setAdapter(Cardadapter);*/
+                                fav.add(currentItem.getVendorId());
+                            }
+                        },false);
+
+                    }
+                    else
+                    {
+                        like.setImageResource(R.drawable.like);
+                        new AsyncGet(c, "http://api.clozerr.com/v2/user/remove/favourites?vendor_id="+currentItem.getVendorId()+"&access_token="+TOKEN, new AsyncGet.AsyncResult() {
+                            @Override
+                            public void gotResult(String s) {
+                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+                                editor.putString("user",s);
+                                editor.apply();
+                                Toast.makeText(c,"Unfavorited and removed to My Clubs.", Toast.LENGTH_LONG).show();
+                                //l1.setAdapter(adapter);
+                                if (s == null) {
+                                    Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
+                                    like.setImageResource(R.drawable.like);
+                                }
+
+                                // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
+
+
+                          /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
+                          mRecyclerView.setAdapter(Cardadapter);*/
+                                fav.remove(fav.indexOf(currentItem.getVendorId()));
+                            }
+                        },false);
+                    }
                 }
             });
 
