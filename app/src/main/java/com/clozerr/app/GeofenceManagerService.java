@@ -5,6 +5,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -16,12 +17,15 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -31,21 +35,44 @@ public class GeofenceManagerService extends Service implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
 
     private static final String TAG = "GeofenceManagerService";
-    private static final ArrayList<GeofenceParams> TEMPORARY_GEOFENCE_LIST = new ArrayList<>();
     private static final float GEOFENCE_RADIUS_IN_METERS = 100.0F;
     private static final long GEOFENCE_EXPIRATION = TimeUnit.MILLISECONDS.convert(1L, TimeUnit.DAYS);
     private static final int GEOFENCE_DWELL_TIME = (int)TimeUnit.MILLISECONDS.convert(5L, TimeUnit.SECONDS);
         // of the int type as Geofencing API accepts only int delay
 
-    private static ArrayList<Geofence> geofenceList = null;
+    // Geofence types
+    public static final int GEOFENCE_TYPE_RANGE = 0x1;
+    public static final int GEOFENCE_TYPE_RELOAD = 0x2;
+    public static final int GEOFENCE_TYPE_PING = 0x4;
+    public static final int GEOFENCE_TYPE_PUSH = 0x8;
+    public static final int GEOFENCE_TYPE_ON_EXIT = 0x10;
+    // Convenience array of all the GEOFENCE_TYPE fields' values.
+    public static final ArrayList<Integer> GEOFENCE_TYPES = new ArrayList<>();
+
+    public static HashMap<String, GeofenceParams> geofenceParamsHashMap = new HashMap<>();
+    private static GeofencingRequest geofencingRequest = null;
     private static PendingIntent geofencePendingIntent = null;
 
     static {
-        // My house.
-        TEMPORARY_GEOFENCE_LIST.add(new GeofenceParams("House", new LatLng(12.9791381, 80.2617326), GEOFENCE_RADIUS_IN_METERS, 0));
+        for (Field field : GeofenceManagerService.class.getDeclaredFields())
+            if (field.getName().matches("GEOFENCE_TYPE_.*") && field.getType().equals(int.class))
+                try {
+                    GEOFENCE_TYPES.add(field.getInt(null));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
 
-        // IITM RP.
-        TEMPORARY_GEOFENCE_LIST.add(new GeofenceParams("IITMRP", new LatLng(12.9909858, 80.2427169), GEOFENCE_RADIUS_IN_METERS, 0));
+        // My house.
+        geofenceParamsHashMap.put("House", new GeofenceParams(new LatLng(12.9792007, 80.2617149),
+                GEOFENCE_RADIUS_IN_METERS, GEOFENCE_TYPE_RANGE));
+
+        // IITM IC.
+        geofenceParamsHashMap.put("IITM IC", new GeofenceParams(new LatLng(12.9909858, 80.2427169),
+                GEOFENCE_RADIUS_IN_METERS, GEOFENCE_TYPE_RANGE));
+
+        // West Mambalam - Postal Colony 1st St.
+        geofenceParamsHashMap.put("West Mambalam", new GeofenceParams(new LatLng(13.0377082,80.2175648),
+                GEOFENCE_RADIUS_IN_METERS, GEOFENCE_TYPE_RANGE));
     }
 
     private GoogleApiClient mGoogleApiClient = null;
@@ -53,8 +80,7 @@ public class GeofenceManagerService extends Service implements
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.e(TAG, "in onCreate");
-        populateGeofenceList();
+        //getGeofencingRequest();
         buildGoogleApiClient();
     }
 
@@ -67,7 +93,6 @@ public class GeofenceManagerService extends Service implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        Log.e(TAG, "in onStartCommand()");
         mGoogleApiClient.connect();
         return START_STICKY;
     }
@@ -85,55 +110,63 @@ public class GeofenceManagerService extends Service implements
 
     private synchronized void buildGoogleApiClient() {
         if (mGoogleApiClient == null) {
-            Log.e(TAG, "building client");
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
         }
-        Log.e(TAG, "built client");
     }
 
     private PendingIntent getGeofencePendingIntent() {
         if (geofencePendingIntent == null) {
-            Log.e(TAG, "building pending intent");
             Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
             geofencePendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
-        Log.e(TAG, "built pending intent");
         return geofencePendingIntent;
     }
 
-    public void populateGeofenceList() {
-        geofenceList = new ArrayList<>();
-        for (GeofenceParams params : TEMPORARY_GEOFENCE_LIST) {
-            geofenceList.add(new Geofence.Builder()
-                            .setRequestId(params.mId)
-                            .setCircularRegion(
-                                    params.mCoordinates.latitude,
-                                    params.mCoordinates.longitude,
-                                    params.mRadius
-                            )
-                            .setExpirationDuration(GEOFENCE_EXPIRATION)
-                            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
-                                    Geofence.GEOFENCE_TRANSITION_EXIT |
-                                    Geofence.GEOFENCE_TRANSITION_DWELL)
-                            .setLoiteringDelay(GEOFENCE_DWELL_TIME)
-                            .build()
-            );
+    public GeofencingRequest getGeofencingRequest() {
+        if (geofencingRequest == null) {
+            ArrayList<Geofence> geofenceList = new ArrayList<>();
+            for (HashMap.Entry<String, GeofenceParams> entry : geofenceParamsHashMap.entrySet()) {
+                String id = entry.getKey();
+                GeofenceParams params = entry.getValue();
+                geofenceList.add(new Geofence.Builder()
+                                .setRequestId(id)
+                                .setCircularRegion(
+                                        params.mCoordinates.latitude,
+                                        params.mCoordinates.longitude,
+                                        params.mRadius
+                                )
+                                .setExpirationDuration(GEOFENCE_EXPIRATION)
+                                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
+                                                    Geofence.GEOFENCE_TRANSITION_EXIT)
+
+                                // use this if DWELL type is added
+                                //.setLoiteringDelay(GEOFENCE_DWELL_TIME)
+                                .build()
+                );
+            }
+            geofencingRequest = new GeofencingRequest.Builder()
+                    .addGeofences(geofenceList)
+
+                    // TODO temporarily set this trigger; default is INITIAL_TRIGGER_DWELL
+                    .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                    .build();
         }
-        Log.e(TAG, "populated list");
+        return geofencingRequest;
     }
 
     public static void startService(Context context) {
-        context.startService(new Intent(context, GeofenceManagerService.class));
-        Log.e(TAG, "started service");
+        BeaconDBDownloadBaseReceiver.scheduleDownload(context);
+        //wait for downloader to start service
+        //context.startService(new Intent(context, GeofenceManagerService.class));
     }
 
     public static void stopService(Context context) {
+        BeaconDBDownloadBaseReceiver.stopDownloads(context);
         context.stopService(new Intent(context, GeofenceManagerService.class));
-        Log.e(TAG, "stopped service");
     }
 
     @Override
@@ -141,9 +174,28 @@ public class GeofenceManagerService extends Service implements
         Log.e(TAG, "in onConnected()");
         LocationServices.GeofencingApi.addGeofences(
                 mGoogleApiClient,
-                geofenceList,
+                getGeofencingRequest(),
                 getGeofencePendingIntent()
         ).setResultCallback(this);
+        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (lastLocation != null) {
+            Log.e(TAG, "last location - (" + lastLocation.getLatitude() + "," + lastLocation.getLongitude() + ")");
+            GeofenceParams house = geofenceParamsHashMap.get("House");
+            GeofenceParams ic = geofenceParamsHashMap.get("IITM IC");
+            float[] resultHome = new float[3], resultIc = new float[3];
+            Location.distanceBetween(
+                    lastLocation.getLatitude(), lastLocation.getLongitude(),
+                    house.mCoordinates.latitude, house.mCoordinates.longitude,
+                    resultHome
+            );
+            Location.distanceBetween(
+                    lastLocation.getLatitude(), lastLocation.getLongitude(),
+                    ic.mCoordinates.latitude, ic.mCoordinates.longitude,
+                    resultIc
+            );
+            Log.e(TAG, "distance from home (m): " + String.valueOf(resultHome[0]));
+            Log.e(TAG, "distance from IC (m): " + String.valueOf(resultIc[0]));
+        }
     }
 
     @Override
@@ -168,7 +220,6 @@ public class GeofenceManagerService extends Service implements
     }
 
     public static class GeofenceParams {
-        public String mId;
         public LatLng mCoordinates;
         public float mRadius;
         public int mType;
@@ -177,12 +228,40 @@ public class GeofenceManagerService extends Service implements
 
         public GeofenceParams(JSONObject geofenceObject) {}
 
-        public GeofenceParams(String id, LatLng coordinates, float radius, int type) {
-            mId = id;
+        public GeofenceParams(LatLng coordinates, float radius, int type) {
             mCoordinates = coordinates;
             mRadius = radius;
             mType = type;
         }
+
+        public ArrayList<Integer> getIncludedTypes() { return getIncludedTypes(mType); }
+
+        public static ArrayList<Integer> getIncludedTypes(int type) {
+            ArrayList<Integer> res = new ArrayList<>();
+            for (Integer i : GEOFENCE_TYPES)
+                if ((type & i) != 0)
+                    res.add(i);
+            return res;
+        }
+
+        /*public String getTypeString() { return getTypeString(mType); }
+
+        public static String getTypeString(int type) {
+            String res = "";
+            if ((type & GEOFENCE_TYPE_RANGE) != 0)
+                res += "RANGE|";
+            if ((type & GEOFENCE_TYPE_RELOAD) != 0)
+                res += "RELOAD|";
+            if ((type & GEOFENCE_TYPE_PING) != 0)
+                res += "PING|";
+            if ((type & GEOFENCE_TYPE_PUSH) != 0)
+                res += "PUSH|";
+            if ((type & GEOFENCE_TYPE_ON_EXIT) != 0)
+                res += "ON_EXIT|";
+            if (res.charAt(res.length() - 1) == '|')
+                res = res.substring(0, res.length() - 1);
+            return res;
+        }*/
     }
 
     public static class GeofenceErrorMessages {

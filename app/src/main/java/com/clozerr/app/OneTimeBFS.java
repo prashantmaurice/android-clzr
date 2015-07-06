@@ -61,12 +61,12 @@ public class OneTimeBFS extends BeaconFinderService {
                 });
                 if (vendorParams != null) {
                     String toastText;
-                    if (vendorParams.mHasOffers)
+                    /*if (vendorParams.mHasOffers)*/
                         toastText = "Redeem your rewards here!";
-                    else if (vendorParams.mLoyaltyType.equalsIgnoreCase("sx"))
+                    /*else if (vendorParams.mLoyaltyType.equalsIgnoreCase("sx"))
                         toastText = "Get your stamps during billing!";
                     else
-                        toastText = "Mark your visit!";
+                        toastText = "Mark your visit!";*/
                     putToast(getApplicationContext(), toastText, Toast.LENGTH_LONG);
                     beaconManager.stopRanging(scanningRegion);
                     turnOffBluetooth(getApplicationContext());
@@ -158,7 +158,7 @@ public class OneTimeBFS extends BeaconFinderService {
         if (!running && params != null && checkCompatibility(context) && checkPreferences(context)) {
             //context.stopService(new Intent(context, PeriodicBFS.class));
             //WakefulIntentService.cancelAlarms(context);
-            PeriodicBFS.checkAndStopScan(context, false);
+            PeriodicBFS.checkAndStopScan(context/*, false*/);
             beaconDBParams = params;
             //context.startService(new Intent(context, OneTimeBFS.class));
             WakefulIntentService.sendWakefulWork(context, OneTimeBFS.class);
@@ -170,7 +170,7 @@ public class OneTimeBFS extends BeaconFinderService {
             running = false;
             beaconManager.stopRanging(scanningRegion);
             turnOffBluetooth(context);
-            PreferenceManager.getDefaultSharedPreferences(context).edit().remove(KEY_APP_ENABLED_BT).apply();
+            PreferenceManager.getDefaultSharedPreferences(context).edit().remove(KEY_APP_DISABLE_BT).apply();
             PeriodicBFS.checkAndStartScan(context);
         }
     }

@@ -30,14 +30,14 @@ public class PeriodicBFS extends BeaconFinderService {
     //private static final String ACTION_REMOVE_VENDOR = "RemoveVendor";
     //private static final String ACTION_FIRE_ALARM_SCAN = "com.clozerr.app.ACTION_FIRE_ALARM_SCAN";
 
-    private static final long ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(3L, TimeUnit.MINUTES);
+    private static final long ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.SECONDS);
     private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(10L, TimeUnit.SECONDS);
-    private static final long SCAN_PAUSE_INTERVAL = TimeUnit.MILLISECONDS.convert(3L, TimeUnit.MINUTES);
+    private static final long SCAN_PAUSE_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.SECONDS);
     private static final long MAX_SCAN_RESTART_INTERVAL = ALARM_INTERVAL * 2 + SCAN_PAUSE_INTERVAL;
                                 // interval after which alarms have to be rescheduled no matter what
                                 // so it has to accommodate inexactness of alarm plus scan pausing
     //private static final int PERIODIC_SCAN_BEACON_LIMIT = 3;
-    private static final int NOTIFICATION_ID = 0;
+    private static final int NOTIFICATION_ID = 10;
     //private static final ConcurrentHashMap<String, DeviceParams> periodicScanDeviceMap = new ConcurrentHashMap<>();
     private static NotificationCompat.Builder notificationBuilder = null;
     //private static NotificationManager notificationManager = null;
@@ -182,18 +182,18 @@ public class PeriodicBFS extends BeaconFinderService {
             String title = "Welcome to " + vendorParams.mName;
             Log.e(TAG, "vendor - " + vendorParams.mName);
             String contentText = "", actionText = "";
-            if (vendorParams.mHasOffers) {
+            //if (vendorParams.mHasOffers) {
                 contentText = "Redeem your rewards!";
                 actionText = "See rewards";
-            }
-            else if (vendorParams.mLoyaltyType.equalsIgnoreCase("s1")) {
+            //}
+            /*else if (vendorParams.mLoyaltyType.equalsIgnoreCase("s1")) {
                 contentText = "Mark your visit here!";
                 actionText = "Mark visit";
             }
             else if (vendorParams.mLoyaltyType.equalsIgnoreCase("sx")) {
                 contentText = "Get your stamps here during billing!";
                 actionText = "Get stamps";
-            }
+            }*/
             Intent detailIntent = vendorParams.getDetailsIntent(context);
             detailIntent.putExtra("from_periodic_scan", true);
             PendingIntent detailPendingIntent = PendingIntent.getActivity(context,
@@ -487,10 +487,9 @@ public class PeriodicBFS extends BeaconFinderService {
         if (!running && checkCompatibility(context) && checkPreferences(context)/* && areAnyVendorsNotifiable(context)*/) {
             running = true;
             //context.startService(new Intent(context, PeriodicBFS.class));
-            BeaconDBDownloadBaseReceiver.scheduleDownload(context);
+            //BeaconDBDownloadBaseReceiver.scheduleDownload(context);
             commonBeaconUUID = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_BEACON_UUID, "");
-            // Downloader will initiate scanning i.e. schedule alarms
-            // WakefulIntentService.scheduleAlarms(new AlarmListener(), context);
+            WakefulIntentService.scheduleAlarms(new AlarmListener(), context);
         }
     }
 
@@ -499,15 +498,15 @@ public class PeriodicBFS extends BeaconFinderService {
             WakefulIntentService.scheduleAlarms(new PeriodicBFS.AlarmListener(), context);
     }
 
-    public static void checkAndStopScan(Context context, boolean stopDownloads) {
+    public static void checkAndStopScan(Context context/*, boolean stopDownloads*/) {
         if (running) {
             //context.stopService(new Intent(context, PeriodicBFS.class));
             running = false;
             turnOffBluetooth(context);
-            PreferenceManager.getDefaultSharedPreferences(context).edit().remove(KEY_APP_ENABLED_BT).apply();
+            PreferenceManager.getDefaultSharedPreferences(context).edit().remove(KEY_APP_DISABLE_BT).apply();
             WakefulIntentService.cancelAlarms(context);
-            if (stopDownloads)
-                BeaconDBDownloadBaseReceiver.stopDownloads(context);
+            /*if (stopDownloads)
+                BeaconDBDownloadBaseReceiver.stopDownloads(context);*/
         }
     }
 
