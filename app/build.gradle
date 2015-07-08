@@ -43,7 +43,7 @@ dependencies {
     compile 'com.koushikdutta.ion:ion:2.+'
     compile files('libraries/android-support-v13.jar')
     compile 'com.google.android.gms:play-services:7.5.0'
-    compile 'com.getbase:floatingactionbutton:1.9.0'
+    compile 'com.android.support:design:22.2.0'
     compile project(':app:libraries:wakeful')
     compile 'me.dm7.barcodescanner:zxing:1.7.2'
 }
