@@ -26,6 +26,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -458,6 +459,22 @@ public class Home  extends ActionBarActivity {
         myIcon.setColorFilter(filter);
         menu.findItem(R.id.search).setIcon(myIcon);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.search) {
+            Intent giftboxintent = new Intent(this,GiftBoxActivity.class);
+            startActivity(giftboxintent);
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 
