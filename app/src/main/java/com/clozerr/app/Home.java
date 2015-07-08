@@ -85,7 +85,8 @@ public class Home  extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        GeofenceManagerService.startService(this);
+        GenUtils.RunManager.initKeys(this);
+        GeofenceManagerService.checkAndStartService(this);
         /*try
         {
             Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
@@ -124,7 +125,7 @@ public class Home  extends ActionBarActivity {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
         df.setTimeZone(tz);
         String nowAsISO = df.format(new Date());
-        final String analyticsurl= Constants.URLBuilders.ANALYTICS
+        final String analyticsurl= GenUtils.getClearedUriBuilder(Constants.URLBuilders.ANALYTICS)
                 .appendQueryParameter("metric","Clozerr_Home_Screen")
                 .appendQueryParameter("dimensions[device]", "Android API " + Build.VERSION.SDK_INT)
                 .appendQueryParameter("dimensions[id]", Settings.Secure.getString(this.getContentResolver(),
@@ -137,8 +138,8 @@ public class Home  extends ActionBarActivity {
         new AsyncGet(Home.this, analyticsurl, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
-                Log.e(analyticsurl,"");
-                Constants.URLBuilders.ANALYTICS.clearQuery();
+                Log.e("Home","analytics url - " + analyticsurl);
+                //Constants.URLBuilders.ANALYTICS.clearQuery();
                 //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
                 //Toast.makeText(getApplicationContext(),analyticsurl,Toast.LENGTH_SHORT).show();
             }

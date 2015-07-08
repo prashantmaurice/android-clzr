@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
 import com.android.internal.util.Predicate;
@@ -43,6 +44,9 @@ public class PeriodicBFS extends BeaconFinderService {
     //private static NotificationManager notificationManager = null;
     //private static WakeLockManager wakeLockManager;
     //private static Bitmap NOTIFICATION_LARGE_ICON;
+
+    public static final String ACTION_RESUME_SCAN = "com.clozerr.app.ACTION_RESUME_SCAN";
+
     private static boolean running = false;
     private static boolean pushedNotification = false;
     //private static boolean hasScanStarted = false;
@@ -484,18 +488,17 @@ public class PeriodicBFS extends BeaconFinderService {
     public static boolean isRunning() { return running; }
 
     public static void checkAndStartScan(Context context) {
-        if (!running && checkCompatibility(context) && checkPreferences(context)/* && areAnyVendorsNotifiable(context)*/) {
+        if (!running && !OneTimeBFS.isRunning() && checkCompatibility(context) && checkPreferences(context)/* && areAnyVendorsNotifiable(context)*/) {
             running = true;
             //context.startService(new Intent(context, PeriodicBFS.class));
             //BeaconDBDownloadBaseReceiver.scheduleDownload(context);
             commonBeaconUUID = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_BEACON_UUID, "");
-            WakefulIntentService.scheduleAlarms(new AlarmListener(), context);
+            scheduleAlarms(context);
         }
     }
 
     public static void scheduleAlarms(Context context) {
-        if (!OneTimeBFS.isRunning())
-            WakefulIntentService.scheduleAlarms(new PeriodicBFS.AlarmListener(), context);
+        WakefulIntentService.scheduleAlarms(new PeriodicBFS.AlarmListener(), context);
     }
 
     public static void checkAndStopScan(Context context/*, boolean stopDownloads*/) {
@@ -508,6 +511,22 @@ public class PeriodicBFS extends BeaconFinderService {
             /*if (stopDownloads)
                 BeaconDBDownloadBaseReceiver.stopDownloads(context);*/
         }
+    }
+
+    public static void pauseScanningFor(final Context context, long intervalMillis) {
+        Log.e(TAG, "scans paused for " + intervalMillis + " ms");
+        //putToast(context, "scans paused for " + intervalMillis + " ms", Toast.LENGTH_SHORT);
+        long triggerTimeMillis = intervalMillis + SystemClock.elapsedRealtime();
+        GenUtils.enableComponent(context, ScanResumeReceiver.class);
+        Intent resumeIntent = new Intent(context, ScanResumeReceiver.class);
+        resumeIntent.setAction(ACTION_RESUME_SCAN);
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTimeMillis,
+                PendingIntent.getBroadcast(context, RequestCodes.CODE_RESUME_SCAN_INTENT.code(), resumeIntent, 0));
+        //disallowScanning(context);
+        //isScanningAllowed = false;
+        isScanningPaused = true;
+        //WakefulIntentService.cancelAlarms(context);
+        PeriodicBFS.checkAndStopScan(context);
     }
 
     /*public static class ScanStarter extends WakefulBroadcastReceiver {
@@ -600,6 +619,22 @@ public class PeriodicBFS extends BeaconFinderService {
         @Override
         public long getMaxAge() {
             return MAX_SCAN_RESTART_INTERVAL;
+        }
+    }
+
+    public static class ScanResumeReceiver extends WakefulBroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null && intent.getAction().equals(ACTION_RESUME_SCAN)) {
+                //allowScanning(context);
+                //isScanningAllowed = true;
+                Log.e(TAG, "scans resumed");
+                isScanningPaused = false;
+                //putToast(context, "scans resumed", Toast.LENGTH_SHORT);
+                //WakefulIntentService.scheduleAlarms(new PeriodicBFS.AlarmListener(), context);
+                PeriodicBFS.checkAndStartScan(context);
+                GenUtils.disableComponent(context, ScanResumeReceiver.class);
+            }
         }
     }
 
