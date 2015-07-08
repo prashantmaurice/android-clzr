@@ -7,6 +7,11 @@
     android:orientation="vertical"
     tools:context=".Home">
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/homeframe"
+        android:foreground="#55000000">
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawerLayout"
@@ -62,5 +67,6 @@
         <!--</RelativeLayout>-->
 
     </android.support.v4.widget.DrawerLayout>
+    </FrameLayout>
 
 </LinearLayout>
