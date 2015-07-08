@@ -121,7 +121,7 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
 
             txtTitle = (TextView) itemView.findViewById(R.id.textTitle);
             txtStamps = (TextView) itemView.findViewById(R.id.txtCaption);
-            imageView = (ImageView) itemView.findViewById(R.id.imageView)
+            imageView = (ImageView) itemView.findViewById(R.id.imageView);
             txtDist=(TextView)itemView.findViewById(R.id.textDistance);
             like = (ImageButton) itemView.findViewById(R.id.like);
             like.setOnClickListener(new View.OnClickListener() {
