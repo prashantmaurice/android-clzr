@@ -82,7 +82,7 @@ public class Home  extends ActionBarActivity {
     private ListView leftDrawerList;
     //private ArrayAdapter<String> navigationDrawerAdapter;
     private NavDrawAdapter nav;
-    private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Tell Friends about Clozerr", "Settings", "Log out"};
+    private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Tell Friends about Clozerr", "My Pinned Offers", "Settings", "Log out"};
     private FrameLayout freebielayout;
     //private boolean nav_drawer_open = false;
 
@@ -303,6 +303,10 @@ public class Home  extends ActionBarActivity {
                 }
 
                 else if(i==5){
+                    startActivity(new Intent(Home.this,PinnedOffersActivity.class));
+                }
+
+                else if(i==6){
                     startActivity(new Intent(Home.this,SettingsActivity.class));
                 }
 

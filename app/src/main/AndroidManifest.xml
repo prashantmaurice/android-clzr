@@ -222,6 +222,10 @@
             android:name=".GiftBoxActivity"
             android:label="@string/title_activity_gift_box" >
         </activity>
+        <activity
+            android:name=".PinnedOffersActivity"
+            android:label="@string/title_activity_pinned_offers" >
+        </activity>
     </application>
 
 </manifest>
