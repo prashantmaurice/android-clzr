@@ -10,7 +10,6 @@
         android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        card_view:cardElevation="5dp"
         card_view:cardCornerRadius="2dp"
         card_view:cardUseCompatPadding="false"
         card_view:cardBackgroundColor="#FFFFFF"
@@ -18,7 +17,9 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="4dp"
-        android:layout_marginTop="4dp">
+        android:layout_marginTop="4dp"
+        card_view:cardElevation="0dp"
+        card_view:cardMaxElevation="0dp">
 
         <FrameLayout
             android:padding="0dp"
