@@ -43,7 +43,7 @@ public class VendorHomeFragment extends Fragment {
     private ImageView mVendorImageView;
     private TextView mVendorTitleView;
     private TextView mVendorAddressView;
-    private ImageButton mCallButton, mDirButton, favorites, whatsappshare,fb,gplus,twitter;
+    private ImageButton mCallButton, mDirButton, favorites, whatsappshare,fb,gplus,twitter,share;
     private RecyclerView gallerylist;
 
     @Override
@@ -51,7 +51,7 @@ public class VendorHomeFragment extends Fragment {
         layout = (FrameLayout) inflater.inflate(R.layout.activity_vendor_home_fragment, container, false);
         initViews();
 
-        Ion.with(mVendorImageView).load(VendorActivity.detailsBundle.getString("vendorImage"));
+        Ion.with(mVendorImageView).load(VendorActivity.detailsBundle.getString("vendorImage")) ;
         mVendorTitleView.setText(VendorActivity.detailsBundle.getString("vendorTitle"));
         mVendorAddressView.setText(VendorActivity.detailsBundle.getString("address"));
         final SharedPreferences status = c.getSharedPreferences("USER",0);
@@ -198,6 +198,17 @@ public class VendorHomeFragment extends Fragment {
                     Toast.makeText(getActivity(),"This Vendor Doesnt have a active google plus page",Toast.LENGTH_SHORT).show();
             }
         });
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareBody = "Check out this place I found on Clozerr: "+VendorActivity.detailsBundle.getString("vendorTitle")+" https://play.google.com/store/apps/details?id=com.clozerr.app";;
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Clozerr");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, "Share via"));
+            }
+        });
         gallerylist.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         gallerylist.setItemAnimator(new DefaultItemAnimator());
         gallerylist.setHasFixedSize(true);
@@ -232,6 +243,7 @@ public class VendorHomeFragment extends Fragment {
         fb = (ImageButton) layout.findViewById(R.id.fb);
         gplus = (ImageButton) layout.findViewById(R.id.gplus);
         twitter = (ImageButton) layout.findViewById(R.id.twitter);
+        share = (ImageButton) layout.findViewById(R.id.share);
     }
 
     public void onClickWhatsApp() {

@@ -57,4 +57,6 @@
     <string name="geofence_transition_invalid_type">
         Geofence transition error: invalid transition type %1$d
     </string>
+    <string name="title_activity_gift_box">Giftbox Page</string>
+    <string name="title_activity_pinned_offers">My Pinned Offers</string>
 </resources>
