@@ -180,6 +180,7 @@ public class Home  extends ActionBarActivity {
         }
         pager=(ViewPager)findViewById(R.id.pager);
         pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager(),Home.this));
+        pager.setOffscreenPageLimit(0);
         mtabs=(SlidingTabLayout)findViewById(R.id.tabs);
         mtabs.setDistributeEvenly(true);
         mtabs.setCustomTabView(R.layout.custom_tab_view_home, R.id.tabtitle);

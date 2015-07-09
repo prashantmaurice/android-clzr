@@ -127,6 +127,7 @@ public class VendorHomeFragment extends Fragment {
                             editor.putString("user",s);
                             editor.apply();
                             Toast.makeText(getActivity(),"Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
+                            
                             //l1.setAdapter(adapter);
                             if (s == null) {
                                 Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
