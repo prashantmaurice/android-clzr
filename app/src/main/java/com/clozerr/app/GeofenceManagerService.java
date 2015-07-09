@@ -1,8 +1,10 @@
 package com.clozerr.app;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,6 +16,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -57,6 +60,7 @@ public class GeofenceManagerService extends Service implements
     private static final long GEOFENCE_EXPIRATION = TimeUnit.MILLISECONDS.convert(1L, TimeUnit.DAYS);
     private static final int GEOFENCE_DWELL_TIME = (int)TimeUnit.MILLISECONDS.convert(5L, TimeUnit.SECONDS);
         // of the int type as Geofencing API accepts only int delay
+    private static final int NOTIFICATION_ID = 100;
     private static final GenUtils.RunManager runManager = new GenUtils.RunManager(KEY_GEOFENCE_SERVICE_RUNNING);
 
     public static final HashMap<String, GeofenceParams> geofenceParamsHashMap = new HashMap<>();
@@ -424,16 +428,15 @@ public class GeofenceManagerService extends Service implements
             df.setTimeZone(tz);
             String nowAsISO = df.format(new Date());
             final Uri.Builder analytics = GenUtils.getClearedUriBuilder(Constants.URLBuilders.ANALYTICS)
-                    .appendQueryParameter("metric","Clozerr_Home_Screen")
+                    .appendQueryParameter("metric","Geofence_Transition")
                     .appendQueryParameter("dimensions[device]", "Android API " + Build.VERSION.SDK_INT)
                     .appendQueryParameter("dimensions[id]", Settings.Secure.getString(this.getContentResolver(),
                             Settings.Secure.ANDROID_ID))
                     .appendQueryParameter("time", nowAsISO)
                     .appendQueryParameter("access_token", TOKEN);
             if (lastLocation != null)
-                analytics.appendQueryParameter("latitude", String.valueOf(lastLocation.getLatitude()))
-                    .appendQueryParameter("longitude", String.valueOf(lastLocation.getLongitude()));
-            // TODO put more analytics about entry/exit etc and ping this URL
+                analytics.appendQueryParameter("dimensions[latitude]", String.valueOf(lastLocation.getLatitude()))
+                    .appendQueryParameter("dimensions[longitude]", String.valueOf(lastLocation.getLongitude()));
 
             for (Geofence triggeringGeofence : geofencingEvent.getTriggeringGeofences()) {
                 params = geofenceParamsHashMap.get(triggeringGeofence.getRequestId());
@@ -443,6 +446,18 @@ public class GeofenceManagerService extends Service implements
                 switch (geofenceTransition) {
                     case Geofence.GEOFENCE_TRANSITION_ENTER:
                         Log.e(TAG, "entered " + triggeringGeofence.getRequestId());
+                        analytics.appendQueryParameter("dimensions[geofence]", "entered " + triggeringGeofence.getRequestId());
+                        final String urlEntry = analytics.build().toString();
+                        Ion.with(this).load(urlEntry).asString()
+                                .setCallback(new FutureCallback<String>() {
+                                    @Override
+                                    public void onCompleted(Exception e, String result) {
+                                        if (e != null)
+                                            e.printStackTrace();
+                                        else
+                                            Log.e(TAG, urlEntry);
+                                    }
+                                });
                         if (geofenceTypes.contains(GEOFENCE_TYPE_RANGE)) {
                             PeriodicBFS.checkAndStartScan(this);
                         }
@@ -450,11 +465,23 @@ public class GeofenceManagerService extends Service implements
                             GeofenceManagerService.this.loadURLAndAddGeofences();
                         }
                         if (geofenceTypes.contains(GEOFENCE_TYPE_PUSH)) {
-                            // TODO push a notification to the user using the details in 'params'
+                            setupNotification(this, params);
                         }
                         break;
                     case Geofence.GEOFENCE_TRANSITION_EXIT:
                         Log.e(TAG, "exited " + triggeringGeofence.getRequestId());
+                        analytics.appendQueryParameter("dimensions[geofence]", "exited " + triggeringGeofence.getRequestId());
+                        final String urlExit = analytics.build().toString();
+                        Ion.with(this).load(urlExit).asString()
+                                .setCallback(new FutureCallback<String>() {
+                                    @Override
+                                    public void onCompleted(Exception e, String result) {
+                                        if (e != null)
+                                            e.printStackTrace();
+                                        else
+                                            Log.e(TAG, urlExit);
+                                    }
+                                });
                         if (geofenceTypes.contains(GEOFENCE_TYPE_RANGE)) {
                             PeriodicBFS.checkAndStopScan(this);
                         }
@@ -463,7 +490,7 @@ public class GeofenceManagerService extends Service implements
                                 GeofenceManagerService.this.loadURLAndAddGeofences();
                             }
                             if (geofenceTypes.contains(GEOFENCE_TYPE_PUSH)) {
-                                // TODO push a notification to the user using the details in 'params'
+                                setupNotification(this, params);
                             }
                         }
                         break;
@@ -497,57 +524,98 @@ public class GeofenceManagerService extends Service implements
             */
         }
 
-        /*private String getGeofenceTransitionDetails(
-                Context context,
-                int geofenceTransition,
-                List<Geofence> triggeringGeofences) {
-
-            String geofenceTransitionString = getTransitionString(geofenceTransition);
-
-            // Get the Ids of each geofence that was triggered.
-            ArrayList<String> triggeringGeofencesIdsList = new ArrayList<>();
-            ArrayList<String> paramsArrayList = new ArrayList<>();
-            for (Geofence geofence : triggeringGeofences) {
-                triggeringGeofencesIdsList.add(geofence.getRequestId());
-                GeofenceManagerService.GeofenceParams params =
-                        GeofenceManagerService.geofenceParamsHashMap.get(geofence.getRequestId());
-                paramsArrayList.add(params.getTypeString());
-            }
-            String triggeringGeofencesIdsString = TextUtils.join(", ", triggeringGeofencesIdsList);
-            String paramsString = TextUtils.join(", ", paramsArrayList);
-
-            return geofenceTransitionString + ": " + triggeringGeofencesIdsString + "@" + paramsString;
+        private void notify( String title, String content ){
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(this)
+                            .setSmallIcon( R.drawable.ic_launcher )
+                            .setContentTitle( title )
+                            .setContentText( content )
+                            .setDefaults(NotificationCompat.DEFAULT_ALL);
+            Intent resultIntent = new Intent(this, Home.class);
+            // The stack builder object will contain an artificial back stack for the
+            // started Activity.
+            // This ensures that navigating backward from the Activity leads out of
+            // your application to the Home screen.
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+            // Adds the back stack for the Intent (but not the Intent itself)
+            stackBuilder.addParentStack(Home.class);
+            // Adds the Intent that starts the Activity to the top of the stack
+            stackBuilder.addNextIntent(resultIntent);
+            PendingIntent resultPendingIntent =
+                    stackBuilder.getPendingIntent(
+                            0,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+            mBuilder.setContentIntent(resultPendingIntent);
+            NotificationManager mNotificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
         }
 
-        private void sendNotification(String notificationDetails) {
-            // Get a notification builder that's compatible with platform versions >= 4
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-
-            String[] split = notificationDetails.split("@");
-
-            // Define the notification settings.
-            builder.setSmallIcon(R.drawable.ic_launcher)
-                    .setDefaults(NotificationCompat.DEFAULT_ALL)
-                    .setColor(Color.RED)
-                    .setContentTitle(split[0])
-                    .setContentText(split[1])
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(split[1]))
-                    .setAutoCancel(true);
-
-            ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).notify(0, builder.build());
+        @SuppressWarnings("deprecation")
+        protected void setupNotification(Context context, GeofenceParams params) {
+            Log.e(TAG, "setting up");
+            try {
+                String type = params.mParams.has("type") ? params.mParams.getString("type") : "";
+                String message = "", title = "";
+                // make notifications here
+                switch (type) {
+                    case "STANDARD":
+                        message = params.mParams.getString("message");
+                        title = params.mParams.getString("title");
+                        notify(title, message);
+                        break;
+                    case "REVIEW":
+                        String checkin_id = params.mParams.getString("checkin_id");
+                        String vendor_id = params.mParams.getString("vendor_id");
+                        message = params.mParams.getString("message");
+                        title = params.mParams.getString("title");
+                        notifyreview(title, message, checkin_id, vendor_id);
+                        break;
+                    default: break;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        private String getTransitionString(int transitionType) {
-            switch (transitionType) {
-                case Geofence.GEOFENCE_TRANSITION_ENTER:
-                    return "Entered";
-                case Geofence.GEOFENCE_TRANSITION_EXIT:
-                    return "Exited";
-                case Geofence.GEOFENCE_TRANSITION_DWELL:
-                    return "Dwelling";
-                default:
-                    return "Unknown Transition";
-            }
-        }*/
+        private void notifyreview(String title, String message, String checkin_id, String vendor_id) {
+            //Uri sound_uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            //builder.setSound(alarmSound);
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(this)
+                            .setSmallIcon( R.drawable.ic_launcher )
+                            .setContentTitle( title )
+                            .setContentText( message )
+                            .setDefaults(NotificationCompat.DEFAULT_ALL)
+                            .setAutoCancel( true );
+
+            // Creates an explicit intent for an Activity in your app
+            Intent resultIntent = new Intent(this, VendorActivity.class);
+            resultIntent.putExtra("from_notify_review",true);
+            resultIntent.putExtra("checkin_id",checkin_id);
+            resultIntent.putExtra("vendor_id", vendor_id);
+
+            // The stack builder object will contain an artificial back stack for the
+            // started Activity.
+            // This ensures that navigating backward from the Activity leads out of
+            // your application to the Home screen.
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+            // Adds the back stack for the Intent (but not the Intent itself)
+            stackBuilder.addParentStack(Home.class);
+            // Adds the Intent that starts the Activity to the top of the stack
+            stackBuilder.addNextIntent(resultIntent);
+            PendingIntent resultPendingIntent =
+                    stackBuilder.getPendingIntent(
+                            0,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+            mBuilder.setContentIntent(resultPendingIntent);
+            NotificationManager mNotificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            // mId allows you to update the notification later on.
+            //int mId = 1234;
+            mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        }
     }
 }

@@ -41,7 +41,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
     public static final String KEY_BLE = "com.clozerr.app.KEY_BLE";
     public static final String KEY_BEACON_UUID = "com.clozerr.app.KEY_BEACON_UUID";
     public static final String KEY_APP_DISABLE_BT = "com.clozerr.app.KEY_APP_DISABLE_BT";
-    public static final long BT_RECEIVER_TIMEOUT = TimeUnit.MILLISECONDS.convert(4L, TimeUnit.SECONDS);
+    public static final long BT_RECEIVER_TIMEOUT = TimeUnit.MILLISECONDS.convert(2L, TimeUnit.SECONDS);
     public static final int THRESHOLD_RSSI = -100;
 
     protected enum RequestCodes {
@@ -424,7 +424,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         }
 
         public String toString() {
-            return "major: " + mMajor + "; minor: " + mMinor;
+            return "major:" + mMajor + ";minor:" + mMinor;
         }
     }
 

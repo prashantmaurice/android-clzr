@@ -7,10 +7,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
@@ -20,8 +23,14 @@ import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.Region;
 import com.jaalee.sdk.ServiceReadyCallback;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 @TargetApi(18)
@@ -33,7 +42,7 @@ public class PeriodicBFS extends BeaconFinderService {
 
     private static final long ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.SECONDS);
     private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(10L, TimeUnit.SECONDS);
-    private static final long SCAN_PAUSE_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.SECONDS);
+    private static final long SCAN_PAUSE_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.MINUTES);
     private static final long MAX_SCAN_RESTART_INTERVAL = ALARM_INTERVAL * 2 + SCAN_PAUSE_INTERVAL;
                                 // interval after which alarms have to be rescheduled no matter what
                                 // so it has to accommodate inexactness of alarm plus scan pausing
@@ -223,6 +232,8 @@ public class PeriodicBFS extends BeaconFinderService {
             ((NotificationManager) context.getSystemService(NOTIFICATION_SERVICE)).
                     notify(NOTIFICATION_ID, notificationBuilder.build());
 
+            pushedNotification = true;
+
             pauseScanningFor(context, SCAN_PAUSE_INTERVAL);
             /*}*/
         } catch (Exception e) {
@@ -388,7 +399,34 @@ public class PeriodicBFS extends BeaconFinderService {
                 if (vendorParams != null) {
                     //deviceParams.mCount = 0;
                     //putToast(getApplicationContext(), "found params", Toast.LENGTH_SHORT);
-                    pushedNotification = true;
+                    SharedPreferences sharedPreferences = getSharedPreferences("USER", 0);
+                    String TOKEN = sharedPreferences.getString("token", "");
+                    TimeZone tz = TimeZone.getTimeZone("GMT+0530");
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+                    df.setTimeZone(tz);
+                    String nowAsISO = df.format(new Date());
+                    final String analyticsURL = GenUtils.getClearedUriBuilder(Constants.URLBuilders.ANALYTICS)
+                            .appendQueryParameter("metric","Beacon_Detection")
+                            .appendQueryParameter("dimensions[device]", "Android API " + Build.VERSION.SDK_INT)
+                            .appendQueryParameter("dimensions[id]", Settings.Secure.getString(this.getContentResolver(),
+                                    Settings.Secure.ANDROID_ID))
+                            .appendQueryParameter("time", nowAsISO)
+                            .appendQueryParameter("access_token", TOKEN)
+                            .appendQueryParameter("dimensions[vendor_id]", vendorParams.mVendorID)
+                            .appendQueryParameter("dimensions[beacon]", vendorParams.mBeaconParams.toString())
+                            .build().toString();
+
+                    Ion.with(this).load(analyticsURL).asString()
+                            .setCallback(new FutureCallback<String>() {
+                                @Override
+                                public void onCompleted(Exception e, String result) {
+                                    if (e != null)
+                                        e.printStackTrace();
+                                    else
+                                        Log.e(TAG, analyticsURL);
+                                }
+                            });
+
                     showNotificationForVendor(this, vendorParams);
                     //deviceParams.mToBeNotified = true;
                 }
@@ -647,174 +685,6 @@ public class PeriodicBFS extends BeaconFinderService {
             mCount = count;
             mFoundInThisScan = foundInThisScan;
             //mToBeNotified = false;
-        }
-    }*/
-
-    /*public static class VendorListActivity extends ActionBarActivity {
-
-        private static final String TAG = "VendorListActivity";
-
-        public static ArrayList<VendorParams> vendorList = null;
-
-        private ListView mVendorListView;
-        private VendorListAdapter mVendorListAdapter;
-        private Button mDismissButton;
-
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_vendor_list);
-            getVendorListFromIntent();
-            initViews();
-        }
-
-        private void initViews() {
-            mVendorListView = (ListView) findViewById(R.id.vendorListView);
-            mVendorListAdapter = new VendorListAdapter(this, vendorList);
-            mVendorListView.setAdapter(mVendorListAdapter);
-            mDismissButton = (Button) findViewById(R.id.dismissButton);
-            mDismissButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish();
-                    System.exit(0);
-                }
-            });
-        }
-
-        private void getVendorListFromIntent() {
-            ArrayList<String> uuids = getIntent().getStringArrayListExtra("uuidList");
-            vendorList = new ArrayList<>();
-            for (final String uuid : uuids) {
-                VendorParams vendorParams = VendorParams.findVendorParamsInFile(this, new Predicate<VendorParams>() {
-                    @Override
-                    public boolean apply(VendorParams vendorParams) {
-                        return areUuidsEqual(vendorParams.mUUID, uuid);
-                    }
-                });
-                if (vendorParams != null && vendorParams.mIsNotifiable) {
-                    vendorList.add(vendorParams);
-                    Log.e(TAG, "vendor added - " + vendorParams.mName);
-                }
-            }
-        }
-
-        @Override
-        public boolean onCreateOptionsMenu(Menu menu) {
-            // Inflate the menu; this adds items to the action bar if it is present.
-            getMenuInflater().inflate(R.menu.menu_vendor_list, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            // Handle action bar item clicks here. The action bar will
-            // automatically handle clicks on the Home/Up button, so long
-            // as you specify a parent activity in AndroidManifest.xml.
-            int id = item.getItemId();
-
-            //noinspection SimplifiableIfStatement
-            if (id == R.id.action_settings) {
-                return true;
-            }
-
-            return super.onOptionsItemSelected(item);
-        }
-
-        private class VendorListAdapter extends BaseAdapter {
-            private static final String TAG = "VendorListAdapter";
-            private static final long REMOVE_ANIMATION_DURATION = 500;
-
-            private ArrayList<VendorParams> mVendorList;
-            private Context mContext;
-            private ViewHolder mViewHolder;
-
-            public VendorListAdapter(Context context, ArrayList<VendorParams> vendorList) {
-                super();
-                mVendorList = vendorList;
-                mContext = context;
-            }
-
-            @Override
-            public int getCount () {
-                return mVendorList.size();
-            }
-
-            @Override
-            public long getItemId (int position) {
-                return position;
-            }
-
-            @Override
-            public Object getItem (int position) {
-                return mVendorList.get(position);
-            }
-
-            @Override
-            public View getView(final int position, View convertView, ViewGroup parent) {
-                if (convertView == null) {
-                    LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    int idToInflate = ((position + 1) % 2 == 0) ? R.layout.vendor_list_item_even :
-                            R.layout.vendor_list_item_odd;
-                    convertView = inflater.inflate(idToInflate, null);
-                }
-
-                final VendorParams params = mVendorList.get(position);
-
-                mViewHolder = new ViewHolder(convertView);
-                mViewHolder.mTitleView.setText(params.mName);
-                mViewHolder.mNextOfferView.setText(params.mNextOfferCaption);
-                mViewHolder.mViewVendorButton.setOnClickListener(new Button.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent detailIntent = params.getDetailsIntent(mContext);
-                        detailIntent.putExtra("from_periodic_scan", true);
-                        mContext.startActivity(detailIntent);
-                    }
-                });
-                mViewHolder.mTurnOffVendorButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        PeriodicBFS.turnOffNotificationsForVendor(mContext, params);
-                        Animation removalAnimation = AnimationUtils.loadAnimation(mContext,
-                                                    android.R.anim.slide_out_right);
-                        removalAnimation.setDuration(REMOVE_ANIMATION_DURATION);
-                        removalAnimation.setAnimationListener(new Animation.AnimationListener() {
-                            @Override
-                            public void onAnimationStart(Animation animation) {}
-
-                            @Override
-                            public void onAnimationEnd(Animation animation) {
-                                mVendorList.remove(params);
-                                mVendorListAdapter.notifyDataSetChanged();
-                                if (mVendorList.isEmpty()) {
-                                    finish();
-                                    System.exit(0);
-                                }
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animation animation) {}
-                        });
-                        mVendorListView.getChildAt(position).startAnimation(removalAnimation);
-                    }
-                });
-                return convertView;
-            }
-
-            private class ViewHolder {
-                public TextView mTitleView;
-                public TextView mNextOfferView;
-                public Button mViewVendorButton;
-                public Button mTurnOffVendorButton;
-
-                public ViewHolder(View parentView) {
-                    mTitleView = (TextView) parentView.findViewById(R.id.vendorNameView);
-                    mNextOfferView = (TextView) parentView.findViewById(R.id.nextOfferView);
-                    mViewVendorButton = (Button) parentView.findViewById(R.id.viewVendorButton);
-                    mTurnOffVendorButton = (Button) parentView.findViewById(R.id.turnOffVendorButton);
-                }
-            }
         }
     }*/
 
