@@ -34,6 +34,8 @@ public class PinnedOffersActivity extends ActionBarActivity {
             toolbar.setTitle("");
         }
         mRecyclerView = (RecyclerView) findViewById(R.id.giftboxoffers);
+
+
         c= this;
         String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
         new AsyncGet(this, "http://api.clozerr.com/v2/vendor/offers/rewardspage?access_token=" +TOKEN, new AsyncGet.AsyncResult() {
