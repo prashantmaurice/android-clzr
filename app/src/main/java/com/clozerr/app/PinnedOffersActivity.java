@@ -29,6 +29,8 @@ public class PinnedOffersActivity extends ActionBarActivity {
         if (toolbar != null) {
             setSupportActionBar(toolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
             toolbar.setTitle("");
         }
         mRecyclerView = (RecyclerView) findViewById(R.id.giftboxoffers);
