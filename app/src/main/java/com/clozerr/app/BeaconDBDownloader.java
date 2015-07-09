@@ -8,15 +8,17 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
-import java.io.FileOutputStream;
+import org.json.JSONObject;
 
 import static com.clozerr.app.AsyncGet.isNetworkAvailable;
 
 public class BeaconDBDownloader extends BroadcastReceiver {
     private static final String TAG = "BDBDownloader";
-    private static final String DOWNLOAD_URL = "http://api.clozerr.com/v2/vendor/beacons/all?access_token=";
+    //private static final String DOWNLOAD_URL = "http://api.clozerr.com/v2/vendor/beacons/all?access_token=";
     public static final String BEACONS_FILE_NAME = "beacons.txt";
     public static final String ACTION_INITIATE_DOWNLOADER = "com.clozerr.app.ACTION_INITIATE_DOWNLOADER";
     private static boolean isDownloadDone = false;
@@ -27,24 +29,24 @@ public class BeaconDBDownloader extends BroadcastReceiver {
 
     private static void downloadBeaconDB(final Context context) {
         String token = context.getSharedPreferences("USER", 0).getString("token", "");
-        final String url = DOWNLOAD_URL + token;
+        final String url = GenUtils.getClearedUriBuilder(Constants.URLBuilders.BEACON_DOWNLOAD)
+                            .appendQueryParameter("access_token", token)
+                            .build().toString();
         Log.e(TAG, "downloading; url - " + url);
-        new AsyncGet(context, DOWNLOAD_URL + token, new AsyncGet.AsyncResult() {
+        /*new AsyncGet(context, url, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
                 //Log.e(TAG, "results - " + s);
                 if (s != null && !s.isEmpty()) {
                     try {
-                        FileOutputStream fileOutputStream = context.openFileOutput(BEACONS_FILE_NAME, Context.MODE_PRIVATE);
-                        fileOutputStream.write(s.getBytes());
-                        fileOutputStream.close();
+                        GenUtils.writeDownloadedStringToFile(context, s, BEACONS_FILE_NAME);
                         BeaconFinderService.commonBeaconUUID = new JSONObject(s).getString("UUID");
                         PreferenceManager.getDefaultSharedPreferences(context).edit().
                                 putString(BeaconFinderService.KEY_BEACON_UUID, BeaconFinderService.commonBeaconUUID).apply();
                         //BeaconDBDownloadBaseReceiver.releaseWakeLock();
                         Log.e(TAG, "downloaded");
                         //PeriodicBFS.scheduleAlarms(context);
-                        context.startService(new Intent(context, GeofenceManagerService.class));
+                        //context.startService(new Intent(context, GeofenceManagerService.class));
                         isDownloadDone = true;
                         BeaconFinderService.disableComponent(context, BeaconDBDownloader.class);
                     } catch (Exception e) {
@@ -55,7 +57,35 @@ public class BeaconDBDownloader extends BroadcastReceiver {
                     }
                 }
             }
-        }, false);
+        }, false);*/
+        Ion.with(context).load(url).asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null)
+                            e.printStackTrace();
+                        else {
+                            try {
+                                String s = result.toString();
+                                GenUtils.writeDownloadedStringToFile(context, s, BEACONS_FILE_NAME);
+                                BeaconFinderService.commonBeaconUUID = new JSONObject(s).getString("UUID");
+                                PreferenceManager.getDefaultSharedPreferences(context).edit().
+                                        putString(BeaconFinderService.KEY_BEACON_UUID, BeaconFinderService.commonBeaconUUID).apply();
+                                //BeaconDBDownloadBaseReceiver.releaseWakeLock();
+                                Log.e(TAG, "downloaded");
+                                //PeriodicBFS.scheduleAlarms(context);
+                                //context.startService(new Intent(context, GeofenceManagerService.class));
+                                isDownloadDone = true;
+                                GenUtils.disableComponent(context, BeaconDBDownloader.class);
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                                Intent nextTrialIntent = new Intent(context, BeaconDBDownloader.class);
+                                nextTrialIntent.setAction(ACTION_INITIATE_DOWNLOADER);
+                                LocalBroadcastManager.getInstance(context).sendBroadcast(nextTrialIntent);
+                            }
+                        }
+                    }
+                });
     }
 
     public static boolean isDoneDownloading() { return isDownloadDone; }

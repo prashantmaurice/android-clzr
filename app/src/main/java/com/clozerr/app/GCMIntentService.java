@@ -6,8 +6,6 @@ import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -40,25 +38,21 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 
     private void notify( String title, String content ){
-        Uri sound_uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        //builder.setSound(alarmSound);
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon( R.drawable.ic_launcher )
                         .setContentTitle( title )
                         .setContentText( content )
-                        .setSound( sound_uri );
-// Creates an explicit intent for an Activity in your app
+                        .setDefaults(NotificationCompat.DEFAULT_ALL);
         Intent resultIntent = new Intent(this, Home.class);
-
-// The stack builder object will contain an artificial back stack for the
-// started Activity.
-// This ensures that navigating backward from the Activity leads out of
-// your application to the Home screen.
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-// Adds the back stack for the Intent (but not the Intent itself)
+        // Adds the back stack for the Intent (but not the Intent itself)
         stackBuilder.addParentStack(Home.class);
-// Adds the Intent that starts the Activity to the top of the stack
+        // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(
@@ -68,11 +62,11 @@ public class GCMIntentService extends GCMBaseIntentService {
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-// mId allows you to update the notification later on.
+        // mId allows you to update the notification later on.
         //int mId = 1234;
         mNotificationManager.notify(1234, mBuilder.build());
     }
-    
+
     @SuppressWarnings("deprecation")
 	@ Override
     protected void onMessage(Context context, Intent intent) {
@@ -109,30 +103,30 @@ public class GCMIntentService extends GCMBaseIntentService {
     }
 
     private void notifyreview(String title, String message, String checkin_id, String vendor_id) {
-        Uri sound_uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        //Uri sound_uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         //builder.setSound(alarmSound);
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon( R.drawable.ic_launcher )
                         .setContentTitle( title )
                         .setContentText( message )
-                        .setSound( sound_uri )
+                        .setDefaults(NotificationCompat.DEFAULT_ALL)
                         .setAutoCancel( true );
 
-// Creates an explicit intent for an Activity in your app
+        // Creates an explicit intent for an Activity in your app
         Intent resultIntent = new Intent(this, VendorActivity.class);
         resultIntent.putExtra("from_notify_review",true);
         resultIntent.putExtra("checkin_id",checkin_id);
         resultIntent.putExtra("vendor_id", vendor_id);
 
-// The stack builder object will contain an artificial back stack for the
-// started Activity.
-// This ensures that navigating backward from the Activity leads out of
-// your application to the Home screen.
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-// Adds the back stack for the Intent (but not the Intent itself)
+        // Adds the back stack for the Intent (but not the Intent itself)
         stackBuilder.addParentStack(Home.class);
-// Adds the Intent that starts the Activity to the top of the stack
+        // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(
@@ -142,7 +136,7 @@ public class GCMIntentService extends GCMBaseIntentService {
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-// mId allows you to update the notification later on.
+        // mId allows you to update the notification later on.
         //int mId = 1234;
         mNotificationManager.notify(1234, mBuilder.build());
     }

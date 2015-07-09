@@ -69,7 +69,7 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
     }
 
     private void initiateBDBDownloader(Context context) {
-        BeaconFinderService.enableComponent(context, BeaconDBDownloader.class);
+        GenUtils.enableComponent(context, BeaconDBDownloader.class);
         Intent initiateIntent = new Intent(context, BeaconDBDownloader.class);
         initiateIntent.setAction(BeaconDBDownloader.ACTION_INITIATE_DOWNLOADER);
         context.sendBroadcast(initiateIntent);
@@ -109,7 +109,7 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
                         public void run() {
                             if (!BeaconDBDownloader.isDoneDownloading()) {
                                 Log.e(TAG, "Timeout; disabling BDBDownloader");
-                                BeaconFinderService.disableComponent(context, BeaconDBDownloader.class);
+                                GenUtils.disableComponent(context, BeaconDBDownloader.class);
                                 if (alarmInterval > MINIMUM_ALARM_INTERVAL) {
                                     alarmInterval /= REDUCTION_FACTOR;
                                     if (alarmInterval < MINIMUM_ALARM_INTERVAL)

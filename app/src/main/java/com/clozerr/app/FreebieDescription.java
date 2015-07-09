@@ -76,7 +76,7 @@ public class FreebieDescription extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+Home.TOKEN+"&offer_id="+offerid+"&vendor_id="+vendorid+"&gcm_id"+ GCMRegistrar.getRegistrationId(getApplicationContext());
-                Log.d(url, "");
+                Log.d("FreebieDescription", "checkin url - " + url);
                 //Toast.makeText(getApplicationContext(),url,Toast.LENGTH_LONG).show();
                 new AsyncGet(getApplicationContext(), url, new AsyncGet.AsyncResult() {
                     @Override
