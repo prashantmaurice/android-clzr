@@ -42,7 +42,7 @@ public class RecyclerViewAdapter2 extends RecyclerView.Adapter<RecyclerViewAdapt
 
     @Override
     public int getItemCount() {
-        return 0;
+        return rewards.size();
     }
     public final static class ListItemViewHolder extends RecyclerView.ViewHolder{
         ImageView rewardImage;

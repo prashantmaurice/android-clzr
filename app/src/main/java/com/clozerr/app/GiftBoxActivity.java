@@ -3,10 +3,14 @@ package com.clozerr.app;
 import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,6 +30,10 @@ public class GiftBoxActivity extends ActionBarActivity {
         setContentView(R.layout.activity_gift_box);
         toolbar = (Toolbar) findViewById(R.id.toolbar_giftbox);
         mRecyclerView = (RecyclerView) findViewById(R.id.giftboxoffers);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         c= this;
         if (toolbar != null) {
             setSupportActionBar(toolbar);
@@ -47,9 +55,11 @@ public class GiftBoxActivity extends ActionBarActivity {
                         int stamps = obj.getInt("stamps");
                         String type = obj.getString("type");
                         //String vendor_id = obj.getString("vendor_id");
-                        MyOffer item = new MyOffer(type,"","",caption,description,stamps,false,true,null);
+                        MyOffer item = new MyOffer(type,null,null,caption,description,stamps,false,true,null);
                         rowItems.add(item);
-                                            }
+                        //Toast.makeText(getApplicationContext(),String.valueOf(rowItems.size()),Toast.LENGTH_SHORT).show();
+                        Log.i("row", String.valueOf(rowItems.size()));
+                    }
                     mMainPageAdapter = new RecyclerViewAdapter2(c,rowItems);
                     mRecyclerView.setAdapter(mMainPageAdapter);
                 } catch (JSONException e) {

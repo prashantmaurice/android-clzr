@@ -3,6 +3,8 @@ package com.clozerr.app;
 import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -34,6 +36,9 @@ public class PinnedOffersActivity extends ActionBarActivity {
             toolbar.setTitle("");
         }
         mRecyclerView = (RecyclerView) findViewById(R.id.giftboxoffers);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
 
         c= this;
