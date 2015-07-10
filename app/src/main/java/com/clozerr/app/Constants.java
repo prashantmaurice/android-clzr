@@ -6,7 +6,9 @@ import android.net.Uri;
  * Created by Adarsh on 7/2/2015.
  */
 public class Constants {
-    
+
+    public static final String SERVER_CLIENT_ID = "http://496568600186-o52fjump15ric3ct4rfoc9i73mnehu2f.apps.googleusercontent.com/";
+
     public static class URLBuilders {
 
         private static final String DEFAULT_SCHEME = "http";
@@ -17,6 +19,8 @@ public class Constants {
         }
         
         public static final Uri.Builder ANALYTICS = getNewDefaultBuilder().path("v2/analytics/hit");
+        public static final Uri.Builder AUTH_LOGIN_FACEBOOK = getNewDefaultBuilder().path("auth/login/facebook");
+        public static final Uri.Builder AUTH_LOGIN_GOOGLE = getNewDefaultBuilder().path("auth/login/google");
         public static final Uri.Builder GCMREGISTRATION = getNewDefaultBuilder().path("auth/update/gcm");
         public static final Uri.Builder SUGGESTRESTAURANT = getNewDefaultBuilder().path("vendor/request");
         public static final Uri.Builder CATEGORIES = getNewDefaultBuilder().path("v2/vendor/categories/get");

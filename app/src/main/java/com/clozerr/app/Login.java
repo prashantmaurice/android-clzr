@@ -13,7 +13,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
@@ -31,7 +30,9 @@ import com.facebook.SessionState;
 import com.facebook.model.GraphUser;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 
@@ -45,6 +46,9 @@ public class Login extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         View.OnClickListener {
     private static final String TAG = "clozerr";
+    /* Keys for persisting instance variables in savedInstanceState */
+    private static final String KEY_IS_RESOLVING = "is_resolving";
+    private static final String KEY_SHOULD_RESOLVE = "should_resolve";
     public static String userName;
     public static String dispPicUrl;
     private static final int STATE_DEFAULT = 0;
@@ -55,7 +59,7 @@ public class Login extends FragmentActivity implements
 //ImageView slide2=(ImageView)findViewById(R.id.slide2);
 //ImageView slide3=(ImageView)findViewById(R.id.slide3);
 //ImageView slide4=(ImageView)findViewById(R.id.slide4);
-    private static final int RC_SIGN_IN = 0;
+    private static final int RC_SIGN_IN = 9001;
     private static final int DIALOG_PLAY_SERVICES_ERROR = 0;
     private static final String SAVED_PROGRESS = "sign_in_progress";
     // GoogleApiClient wraps our service connection to Google Play services and
@@ -93,10 +97,22 @@ public class Login extends FragmentActivity implements
     private ViewPager mPager;
     int i=0;
 
+    /* Is there a ConnectionResult resolution in progress? */
+    private boolean mIsResolving = false;
+
+    /* Should we automatically resolve ConnectionResults when possible? */
+    private boolean mShouldResolve = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 // domain = getString(R.string.domain);
+
+        if (savedInstanceState != null) {
+            mIsResolving = savedInstanceState.getBoolean(KEY_IS_RESOLVING);
+            mShouldResolve = savedInstanceState.getBoolean(KEY_SHOULD_RESOLVE);
+        }
+
         pDialog = new ProgressDialog(this);
         pDialog.setMessage("Loading...");
 //pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -178,8 +194,9 @@ public class Login extends FragmentActivity implements
         return new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
-                .addApi(Plus.API, Plus.PlusOptions.builder().build())
-                .addScope(Plus.SCOPE_PLUS_LOGIN)
+                .addApi(Plus.API)
+                .addScope(new Scope(Scopes.PLUS_LOGIN))
+                .addScope(new Scope(Scopes.PROFILE))
                 .build();
     }
     @Override
@@ -191,6 +208,9 @@ public class Login extends FragmentActivity implements
     }
     @Override
     public void onStop() {
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
         if (pDialog != null)
             pDialog.dismiss();
         AsyncGet.dismissDialog();
@@ -198,39 +218,20 @@ public class Login extends FragmentActivity implements
         super.onStop();
 //EasyTracker.getInstance().activityStop(this);
 // The rest of your onStop() code.
-        /*if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }*/
     }
     @Override
-    protected void onActivityResult(final int requestCode,
-                                    final int resultCode, final Intent data) {
-        if(googleOrFb==1) {
-            try {
-                Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
-            } catch (Exception e) {
-                Toast.makeText(Login.this, "Oops. Something went wrong. Please try again later", Toast.LENGTH_SHORT).show();
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
+
+        if (requestCode == RC_SIGN_IN) {
+            // If the error resolution was not successful we should not resolve further errors.
+            if (resultCode != RESULT_OK) {
+                mShouldResolve = false;
             }
-        }
-        else{
-            switch (requestCode) {
-                case RC_SIGN_IN:
-                    if (resultCode == RESULT_OK) {
-// If the error resolution was successful we should continue
-// processing errors.
-                        mSignInProgress = STATE_SIGN_IN;
-                    } else {
-// If the error resolution was not successful or the user canceled,
-// we should stop processing errors.
-                        mSignInProgress = STATE_DEFAULT;
-                    }
-                    if (!mGoogleApiClient.isConnecting()) {
-// If Google Play services resolved the issue with a dialog then
-// onStart is not called so we need to re-attempt connection here.
-                        mGoogleApiClient.connect();
-                    }
-                    break;
-            }
+
+            mIsResolving = false;
+            mGoogleApiClient.connect();
         }
     }
     private static final List<String> PERMISSIONS = Arrays.asList(
@@ -350,7 +351,8 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(SAVED_PROGRESS, mSignInProgress);
+        outState.putBoolean(KEY_IS_RESOLVING, mIsResolving);
+        outState.putBoolean(KEY_SHOULD_RESOLVE, mIsResolving);
     }
     @Override
     public void onConnected(Bundle connectionHint) {
@@ -371,49 +373,52 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
         editor.apply();
 
 
-        final Handler handler = getWindow().getDecorView().getHandler();
         new AsyncTokenGet(this, new AsyncTokenGet.AsyncTokenResult() {
             @Override
-            public void gotResult(final String s) {
-                handler.post(new Runnable() {
+            public void onError() {
+                updateUI(false);
+                GenUtils.putToast(Login.this, "Something went wrong, please try again", Toast.LENGTH_SHORT);
+            }
+
+            @Override
+            public void onResult(final String s) {
+                String clozerrAuthURL = GenUtils.getClearedUriBuilder(Constants.URLBuilders.AUTH_LOGIN_GOOGLE)
+                                                .appendQueryParameter("token", s)
+                                                .build().toString();
+                Log.e(TAG, "token generating url - " + clozerrAuthURL);
+                new AsyncGet(Login.this, clozerrAuthURL, new AsyncGet.AsyncResult() {
                     @Override
-                    public void run() {
-                        //Toast.makeText(Login.this, "G+ Token:\n" + s, Toast.LENGTH_LONG).show();
-                        String clozerrAuthURL = "http://api.clozerr.com/auth/login/google?token=" + s;
-                        Log.e(TAG, "token generating url - " + clozerrAuthURL);
-                        new AsyncGet(Login.this, clozerrAuthURL, new AsyncGet.AsyncResult() {
-                            @Override
-                            public void gotResult(String s) {
-                                //Log.i("urltest","http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken());
-                                //Log.i("token result", s);
-                                //Toast.makeText(Login.this, "result - " + s, Toast.LENGTH_SHORT).show();
-                                try {
-                                    JSONObject res = new JSONObject(s);
-                                    if (res.getString("result").equals("true")) {
-                                        editor.putString("loginskip", "true");
-                                        editor.putString("token", res.getString("token"));
-                                        editor.putString("user",res.getString("user"));
-                                        editor.apply();
-                                        startActivity(new Intent(Login.this, Home.class));
-                                        finish();
-                                    } else {
-                                        //Toast.makeText(Login.this, s,Toast.LENGTH_SHORT).show();
-                                        Toast.makeText(Login.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
-                                    }
-                                } catch (JSONException e) {
-                                    Toast.makeText(Login.this, "Something went wrong...", Toast.LENGTH_SHORT).show();
-                                    e.printStackTrace();
-                                }
+                    public void gotResult(String s) {
+                        try {
+                            JSONObject res = new JSONObject(s);
+                            if (res.getBoolean("result")) {
+                                editor.putString("loginskip", "true");
+                                editor.putString("token", res.getString("token"));
+                                editor.putString("user",res.getString("user"));
+                                editor.apply();
+                                startActivity(new Intent(Login.this, Home.class));
+                                finish();
+                            } else {
+                                updateUI(false);
+                                GenUtils.putToast(Login.this, "Something went wrong, please try again", Toast.LENGTH_SHORT);
+                                Log.e(TAG, "error : " + res.get("err").toString());
                             }
-                        });
+                        } catch (Exception e) {
+                            updateUI(false);
+                            GenUtils.putToast(Login.this, "Something went wrong, please try again", Toast.LENGTH_SHORT);
+                            e.printStackTrace();
+                        }
                     }
                 });
             }
-        }, this);
+        });
     }
     @Override
     public void onConnectionSuspended(int i) {
-        mGoogleApiClient.connect();
+        // The connection to Google Play services was lost. The GoogleApiClient will automatically
+        // attempt to re-connect. Any UI elements that depend on connection to Google APIs should
+        // be hidden or disabled until onConnected is called again.
+        Log.w(TAG, "onConnectionSuspended:" + i);
     }
     @Override
     public void onClick(View v) {
@@ -423,48 +428,69 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
 // between connected and not connected.
             switch (v.getId()) {
                 case R.id.sign_in_button:
-                    //Toast.makeText(this, "Signing in...", Toast.LENGTH_LONG).show();
+                    // User clicked the sign-in button, so begin the sign-in process and automatically
+                    // attempt to resolve any errors that occur.
+                    mShouldResolve = true;
                     mGoogleApiClient.connect();
-                    //resolveSignInError();
                     break;
             }
         }
     }
     @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        Log.i(TAG, "onConnectionFailed: ConnectionResult.getErrorCode() = "
-                + result.getErrorCode());
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        // Could not connect to Google Play Services.  The user needs to select an account,
+        // grant permissions or resolve an error in order to sign in. Refer to the javadoc for
+        // ConnectionResult to see possible error codes.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
 
-        if( result.getErrorCode() == ConnectionResult.SIGN_IN_REQUIRED ){
-            try {
-                result.startResolutionForResult(Login.this, 0);
-            }catch( Exception e ){
-                e.printStackTrace();
+        if (!mIsResolving && mShouldResolve) {
+            if (connectionResult.hasResolution()) {
+                try {
+                    connectionResult.startResolutionForResult(this, RC_SIGN_IN);
+                    mIsResolving = true;
+                } catch (IntentSender.SendIntentException e) {
+                    Log.e(TAG, "Could not resolve ConnectionResult.", e);
+                    mIsResolving = false;
+                    mGoogleApiClient.connect();
+                }
+            } else {
+                // Could not resolve the connection result, show the user an
+                // error dialog.
+                showErrorDialog(connectionResult);
             }
+        } else {
+            // Show the signed-out UI
+            updateUI(false);
         }
-        else if (result.getErrorCode() == ConnectionResult.API_UNAVAILABLE) {
-// An API requested for GoogleApiClient is not available. The device's current
-// configuration might not be supported with the requested API or a required component
-// may not be installed, such as the Android Wear application. You may need to use a
-// second GoogleApiClient to manage the application's optional APIs.
-            Toast.makeText(this, "Google+ API(s) unavailable", Toast.LENGTH_LONG).show();
-        } else if (mSignInProgress != STATE_IN_PROGRESS) {
-// We do not have an intent in progress so we should store the latest
-// error resolution intent for use when the sign in button is clicked.
-            //Toast.makeText(this, "Error; try signing in again", Toast.LENGTH_LONG).show();
-            mSignInIntent = result.getResolution();
-            mSignInError = result.getErrorCode();
-            if (mSignInProgress == STATE_SIGN_IN) {
-// STATE_SIGN_IN indicates the user already clicked the sign in button
-// so we should continue processing errors until the user is signed in
-// or they click cancel.
-                Toast.makeText(this, "Error processing is going on...", Toast.LENGTH_LONG).show();
-                resolveSignInError();
-            }
-        }
-        else onSignedOut();
-        mSignInButton.setEnabled(true);
     }
+    private void showErrorDialog(ConnectionResult connectionResult) {
+        int errorCode = connectionResult.getErrorCode();
+
+        if (GooglePlayServicesUtil.isUserRecoverableError(errorCode)) {
+            // Show the default Google Play services error dialog which may still start an intent
+            // on our behalf if the user can resolve the issue.
+            GooglePlayServicesUtil.getErrorDialog(errorCode, this, RC_SIGN_IN,
+                    new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            mShouldResolve = false;
+                            updateUI(false);
+                        }
+                    }).show();
+        } else {
+            // No default Google Play Services error, display a message to the user.
+            String errorString = getString(R.string.play_services_error_fmt, errorCode);
+            Toast.makeText(this, errorString, Toast.LENGTH_SHORT).show();
+
+            mShouldResolve = false;
+            updateUI(false);
+        }
+    }
+
+    private void updateUI(boolean isSignedIn) {
+        mSignInButton.setEnabled(!isSignedIn);
+    }
+
     private void onSignedOut() {
         Toast.makeText(this, "An error occurred while signing in... please try signing in again.",
                 Toast.LENGTH_LONG).show();

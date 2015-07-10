@@ -59,4 +59,7 @@
     </string>
     <string name="title_activity_gift_box">Giftbox Page</string>
     <string name="title_activity_pinned_offers">My Pinned Offers</string>
+
+    <!-- Google Play Services error for Toast -->
+    <string name="play_services_error_fmt">Google Play Services Error: %i, please try signing in again</string>
 </resources>
