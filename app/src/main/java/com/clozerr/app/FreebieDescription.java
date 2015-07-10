@@ -75,7 +75,7 @@ public class FreebieDescription extends ActionBarActivity {
         findViewById(R.id.useit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+Home.TOKEN+"&offer_id="+offerid+"&vendor_id="+vendorid+"&gcm_id"+ GCMRegistrar.getRegistrationId(getApplicationContext());
+                String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+Home.TOKEN+"&offer_id="+offerid+"&vendor_id="+vendorid+"&gcm_id="+ GCMRegistrar.getRegistrationId(getApplicationContext());
                 Log.d("FreebieDescription", "checkin url - " + url);
                 //Toast.makeText(getApplicationContext(),url,Toast.LENGTH_LONG).show();
                 new AsyncGet(getApplicationContext(), url, new AsyncGet.AsyncResult() {
@@ -83,6 +83,8 @@ public class FreebieDescription extends ActionBarActivity {
                     public void gotResult(String s) {
                         try {
                             JSONObject jsonObject = new JSONObject(s);
+                            if(jsonObject.getString("result").equals("false"))
+                                Toast.makeText(getApplicationContext(),"Sorry you are yet to unlock the reward",Toast.LENGTH_SHORT).show();
                             //Toast.makeText(getApplicationContext(),jsonObject.getString("vendor"),Toast.LENGTH_LONG).show();
                             if(jsonObject.getString("vendor")!=null){
                                 Toast.makeText(getApplicationContext(),"Checked In Successfully. Please contact the billing staff.",Toast.LENGTH_SHORT).show();

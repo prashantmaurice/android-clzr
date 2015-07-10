@@ -126,8 +126,8 @@
     <orderEntry type="library" exported="" name="play-services-drive-7.5.0" level="project" />
     <orderEntry type="library" exported="" name="zxing-1.7.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-gcm-7.5.0" level="project" />
-    <orderEntry type="library" exported="" name="core-3.2.0" level="project" />
     <orderEntry type="library" exported="" name="androidasync-2.1.6" level="project" />
+    <orderEntry type="library" exported="" name="core-3.2.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-appindexing-7.5.0" level="project" />
     <orderEntry type="library" exported="" name="core-1.7.2" level="project" />
     <orderEntry type="library" exported="" name="ion-2.1.6" level="project" />

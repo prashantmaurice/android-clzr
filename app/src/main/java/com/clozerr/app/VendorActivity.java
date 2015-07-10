@@ -352,6 +352,24 @@ public class VendorActivity extends ActionBarActivity {
             }
         });
 
+        String unlockedOffersUrl = "http://api.clozerr.com/v2/vendor/offers/unlocked?access_token="+TOKEN+"&vendor_id="+vendorId;
+/*        Log.e(TAG, "MyStamps URL - " + unlockedOffersUrl);
+        new AsyncGet(this, unlockedOffersUrl, new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                //  t1.setText(s);
+
+                Log.e("Offers", s);
+                detailsBundle.putString("unlockedoffers", s);
+                //Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+                //l1.setAdapter(adapter);
+                if (s == null) {
+                    Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });*/
+
         new AsyncGet(this, "http://api.clozerr.com/v2/user/add/pinned?access_token="+TOKEN , new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {

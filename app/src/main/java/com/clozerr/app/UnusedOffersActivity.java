@@ -3,6 +3,10 @@ package com.clozerr.app;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,10 +38,14 @@ public class UnusedOffersActivity extends ActionBarActivity {
                 finish();
             }
         });
-        final ListView listview=(ListView)findViewById(R.id.unusedoffers);
-        final ArrayList<String> values = convertRowMyOffers(VendorActivity.detailsBundle.getString("Alloffers"));
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.freebies_item_layout, R.id.freebiename, values);
-        listview.setAdapter(adapter);
+        final RecyclerView mRecyclerView=(RecyclerView) findViewById(R.id.unusedoffers);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        final ArrayList<MyOffer> values = convertRowMyOffers(VendorActivity.detailsBundle.getString("Alloffers"));
+        //ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.freebies_item_layout, R.id.freebiename, values);
+        UnusedOffersAdapter adapter = new UnusedOffersAdapter(values,this);
+        mRecyclerView.setAdapter(adapter);
         String urlPinning = "http://api.clozerr.com/v2/user/add/pinned?access_token=" + Home.TOKEN;
         new AsyncGet(getApplicationContext(), urlPinning, new AsyncGet.AsyncResult() {
             @Override
@@ -57,7 +65,7 @@ public class UnusedOffersActivity extends ActionBarActivity {
                 //l1.setAdapter(adapter);
             }
         });
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+/*        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), FreebieDescription.class);
@@ -94,9 +102,9 @@ public class UnusedOffersActivity extends ActionBarActivity {
                     }
                 });
             }
-        });
+        });*/
 
-        String pinnedoffers = VendorActivity.detailsBundle.getString("PinnedOffers");
+/*        String pinnedoffers = VendorActivity.detailsBundle.getString("PinnedOffers");
         Toast.makeText(getApplicationContext(),pinnedoffers,Toast.LENGTH_SHORT).show();
         try {
             JSONObject obj=new JSONObject(pinnedoffers);
@@ -117,7 +125,7 @@ public class UnusedOffersActivity extends ActionBarActivity {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-        }
+        }*/
 
     }
 
@@ -128,19 +136,24 @@ public class UnusedOffersActivity extends ActionBarActivity {
         return true;
     }
 
-    private ArrayList<String> convertRowMyOffers(String s){
-        ArrayList<String> rowItems = new ArrayList<String>();
+    private ArrayList<MyOffer> convertRowMyOffers(String s){
+        ArrayList<MyOffer> rowItems = new ArrayList<MyOffer>();
 
         MyOffer item = null;
         try {
             //Log.e(TAG, "json passed - " + s);
             JSONObject offerObject = new JSONObject(s);
+            JSONObject params ;
+            String description;
             JSONArray array = offerObject.getJSONArray("offers");
             MyOffer.SXOfferExtras extras = null;
             for (int i = 0; i < array.length(); ++i) {
                 offerObject = array.getJSONObject(i);
+                Log.i("id",offerObject.getString("_id"));
+                params = offerObject.getJSONObject("params");
+
                 extras = null;
-                String type = offerObject.getString("type");
+                //String type = offerObject.getString("type");
 //                if (type.equalsIgnoreCase("SX"))
 //                    extras = new MyOffer.SXOfferExtras(offerObject.getJSONObject("stampStatus").getInt("total"),
 //                            offerObject.getDouble("billAmt"));
@@ -152,11 +165,22 @@ public class UnusedOffersActivity extends ActionBarActivity {
 //                        offerObject.getInt("stamps"),
 //                        extras);
                 //if((offerObject.getJSONObject("params").getBoolean("unlocked")==true) && (offerObject.getJSONObject("params").getBoolean("used")==false)) {
-                    rowItems.add(offerObject.getString("caption"));
-                    offerid.add(offerObject.getString("_id"));
-                    caption.add(offerObject.getString("caption"));
-                    description.add(offerObject.getString("description"));
+                    //rowItems.add(offerObject.getString("caption"));
+                    //offerid.add(offerObject.getString("_id"));
+                    //caption.add(offerObject.getString("caption"));
+                    //description.add(offerObject.getString("description"));
                 //}
+                item = new MyOffer(offerObject.getString("type"),
+                        null,
+                        null,
+                        offerObject.getString("caption"),
+                        offerObject.getString("description"),
+                        params.getInt("stamps"),
+                        params.getBoolean("used"),
+                        params.getBoolean("unlocked"),null,
+                        offerObject.getString("_id")
+                        );
+                rowItems.add(item);
             }
         } catch (Exception e) {
             e.printStackTrace();

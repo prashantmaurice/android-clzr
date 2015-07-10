@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 public class GiftBoxActivity extends ActionBarActivity {
     private Toolbar toolbar;
-    private RecyclerViewAdapter2 mMainPageAdapter;
+    private UnusedOffersAdapter mMainPageAdapter;
     private RecyclerView mRecyclerView;
     Context c;
     @Override
@@ -55,12 +55,12 @@ public class GiftBoxActivity extends ActionBarActivity {
                         int stamps = obj.getInt("stamps");
                         String type = obj.getString("type");
                         //String vendor_id = obj.getString("vendor_id");
-                        MyOffer item = new MyOffer(type,null,null,caption,description,stamps,false,true,null);
+                        MyOffer item = new MyOffer(type,null,null,caption,description,stamps,false,true,null,obj.getString("_id"));
                         rowItems.add(item);
                         //Toast.makeText(getApplicationContext(),String.valueOf(rowItems.size()),Toast.LENGTH_SHORT).show();
                         Log.i("row", String.valueOf(rowItems.size()));
                     }
-                    mMainPageAdapter = new RecyclerViewAdapter2(c,rowItems);
+                    mMainPageAdapter = new UnusedOffersAdapter(rowItems,c);
                     mRecyclerView.setAdapter(mMainPageAdapter);
                 } catch (JSONException e) {
                     e.printStackTrace();

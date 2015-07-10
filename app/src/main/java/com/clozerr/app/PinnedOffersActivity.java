@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class PinnedOffersActivity extends ActionBarActivity {
     private Toolbar toolbar;
     private RecyclerView mRecyclerView;
-    private RecyclerViewAdapter2 mMainPageAdapter;
+    private UnusedOffersAdapter mMainPageAdapter;
     private Context c;
 
     @Override
@@ -43,7 +43,7 @@ public class PinnedOffersActivity extends ActionBarActivity {
 
         c= this;
         String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
-        new AsyncGet(this, "http://api.clozerr.com/v2/vendor/offers/rewardspage?access_token=" +TOKEN, new AsyncGet.AsyncResult() {
+        new AsyncGet(this, "http://api.clozerr.com/v2/user/pinned/list?access_token=" +TOKEN, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
                 try {
@@ -57,10 +57,10 @@ public class PinnedOffersActivity extends ActionBarActivity {
                         int stamps = obj.getInt("stamps");
                         String type = obj.getString("type");
                         //String vendor_id = obj.getString("vendor_id");
-                        MyOffer item = new MyOffer(type,"","",caption,description,stamps,false,true,null);
+                        MyOffer item = new MyOffer(type,"","",caption,description,stamps,false,true,null,obj.getString("_id"));
                         rowItems.add(item);
                     }
-                    mMainPageAdapter = new RecyclerViewAdapter2(c,rowItems);
+                    mMainPageAdapter = new UnusedOffersAdapter(rowItems,c);
                     mRecyclerView.setAdapter(mMainPageAdapter);
                 } catch (JSONException e) {
                     e.printStackTrace();

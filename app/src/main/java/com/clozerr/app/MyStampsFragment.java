@@ -81,7 +81,8 @@ public class MyStampsFragment extends Fragment {
                         offerObject.getJSONObject("params").getInt("stamps"),
                         offerObject.getJSONObject("params").getBoolean("used"),
                         offerObject.getJSONObject("params").getBoolean("unlocked"),
-                        extras);
+                        extras,
+                        offerObject.getString("_id"));
                 rowItems.add(item);
             }
         } catch (Exception e) {
