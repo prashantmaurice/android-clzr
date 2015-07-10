@@ -2,8 +2,6 @@ package com.clozerr.app;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -12,15 +10,10 @@ import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.facebook.Request;
@@ -89,13 +82,13 @@ public class Login extends FragmentActivity implements
     private int mSignInError;
     private ImageButton mSignInButton;
     public static ProgressDialog pDialog;
-    private static final int NUM_PAGES = 5;
+    //private static final int NUM_PAGES = 5;
     /**
      * The pager widget, which handles animation and allows swiping horizontally to access previous
      * and next wizard steps.
      */
-    private ViewPager mPager;
-    int i=0;
+    //private ViewPager mPager;
+    //int i=0;
 
     /* Is there a ConnectionResult resolution in progress? */
     private boolean mIsResolving = false;
@@ -123,11 +116,11 @@ public class Login extends FragmentActivity implements
         mSignInButton = (ImageButton) findViewById(R.id.sign_in_button);
         mSignInButton.setOnClickListener(this);
         final Resources reso = this.getResources();
-        mPager = (ViewPager) findViewById(R.id.pager);
+        /*mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setPageTransformer(true, new ZoomOutPageTransformer());
-        /*
-      The pager adapter, which provides the pages to the view pager widget.
-     */
+        *//*
+            The pager adapter, which provides the pages to the view pager widget.
+        *//*
         PagerAdapter mPagerAdapter = new ScreenSlidePagerAdapter(getFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -168,13 +161,13 @@ public class Login extends FragmentActivity implements
         if (savedInstanceState != null) {
             mSignInProgress = savedInstanceState
                     .getInt(SAVED_PROGRESS, STATE_DEFAULT);
-        }
+        }*/
         mGoogleApiClient = buildGoogleApiClient();
         //int found=0;
         //slideToImage(2);
-        change();
+        //change();
     }
-    public void change(){
+    /*public void change(){
         new CountDownTimer(5000, 5000) {
             public void onTick(long millisUntilFinished) {
                 slideToImage(i);
@@ -186,7 +179,7 @@ public class Login extends FragmentActivity implements
                 change();
             }
         }.start();
-    }
+    }*/
     public GoogleApiClient buildGoogleApiClient() {
 // When we build the GoogleApiClient we specify where connected and
 // connection failed callbacks should be returned, which Google APIs our
@@ -308,46 +301,46 @@ public class Login extends FragmentActivity implements
         }
         return true;
     }
-    public void slide(View v) {
+    /*public void slide(View v) {
         //final Resources reso = this.getResources();
         switch (v.getId()) {
             case R.id.slide1:
                 mPager.setCurrentItem(0);
                 i=0;
-/*slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
+*//*slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
 slide2.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
 slide3.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
-slide4.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));*/
+slide4.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));*//*
                 break;
             case R.id.slide2:
                 mPager.setCurrentItem(1);
                 i=1;
-/* slide2.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
+*//* slide2.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
 slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
 slide3.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
-slide4.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));*/
+slide4.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));*//*
                 break;
             case R.id.slide3:
                 mPager.setCurrentItem(2);
                 i=2;
-/*slide3.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
+*//*slide3.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
 slide2.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
 slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
-slide4.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));*/
+slide4.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));*//*
                 break;
             case R.id.slide4:
                 mPager.setCurrentItem(3);
                 i=3;
-/* slide4.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
+*//* slide4.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
 slide2.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
 slide3.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
-slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));*/
+slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));*//*
                 break;
             case R.id.slide5:
                 mPager.setCurrentItem(4);
                 i=4;
         }
-    }
+    }*/
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -560,7 +553,7 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                 return super.onCreateDialog(id);
         }
     }
-    public void slideToImage(int position){
+    /*public void slideToImage(int position){
         mPager.setCurrentItem(position);
     }
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
@@ -575,5 +568,5 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
         public int getCount() {
             return NUM_PAGES;
         }
-    }
+    }*/
 }
