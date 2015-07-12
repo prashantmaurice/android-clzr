@@ -2,7 +2,6 @@ package com.clozerr.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -205,14 +204,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         new AsyncGet(c, "http://api.clozerr.com/v2/user/add/favourites?vendor_id="+currentItem.getVendorId()+"&access_token="+TOKEN, new AsyncGet.AsyncResult() {
                             @Override
                             public void gotResult(String s) {
-                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                                editor.putString("user",s);
-                                editor.apply();
-                                Toast.makeText(c,"Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
                                 //l1.setAdapter(adapter);
                                 if (s == null) {
                                     Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
                                     like.setImageResource(R.drawable.like);
+                                } else {
+                                    fav.add(currentItem.getVendorId());
+                                    final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+                                    editor.putString("user",s);
+                                    editor.apply();
+                                    Toast.makeText(c,"Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
                                 }
 
                                 // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
@@ -220,7 +221,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
                           /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
                           mRecyclerView.setAdapter(Cardadapter);*/
-                                fav.add(currentItem.getVendorId());
+
                             }
                         },false);
 
@@ -231,22 +232,23 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         new AsyncGet(c, "http://api.clozerr.com/v2/user/remove/favourites?vendor_id="+currentItem.getVendorId()+"&access_token="+TOKEN, new AsyncGet.AsyncResult() {
                             @Override
                             public void gotResult(String s) {
-                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                                editor.putString("user",s);
-                                editor.apply();
-                                Toast.makeText(c,"Unfavorited and removed to My Clubs.", Toast.LENGTH_LONG).show();
                                 //l1.setAdapter(adapter);
                                 if (s == null) {
                                     Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
-                                    like.setImageResource(R.drawable.like);
+                                    like.setImageResource(R.drawable.favorited);
+                                } else {
+                                    fav.remove(fav.indexOf(currentItem.getVendorId()));
+                                    final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+                                    editor.putString("user",s);
+                                    editor.apply();
+                                    Toast.makeText(c,"Unfavorited and removed from My Clubs.", Toast.LENGTH_LONG).show();
                                 }
-
                                 // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
 
 
                           /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
                           mRecyclerView.setAdapter(Cardadapter);*/
-                                fav.remove(fav.indexOf(currentItem.getVendorId()));
+
                             }
                         },false);
                     }
