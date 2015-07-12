@@ -47,27 +47,37 @@
             android:layout_height="match_parent"
             android:id="@+id/unusedoffers"
             android:clipToPadding="false"/>
-        <Button
-            android:id="@+id/useit"
-            android:layout_width="wrap_content"
-            android:paddingLeft="40dp"
-            android:paddingRight="40dp"
-            android:layout_marginBottom="10dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_alignParentBottom="true"
-            android:text="CHECKIN WITHOUT REDEEMING"
-            android:textColor="#ffffff"
-            android:background="@color/colorPrimary"
-            android:layout_centerHorizontal="true" />
+        <!--<Button-->
+            <!--android:id="@+id/useit"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:paddingLeft="40dp"-->
+            <!--android:paddingRight="40dp"-->
+            <!--android:layout_marginBottom="10dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_horizontal"-->
+            <!--android:layout_alignParentBottom="true"-->
+            <!--android:text="CHECKIN WITHOUT REDEEMING"-->
+            <!--android:textColor="#ffffff"-->
+            <!--android:background="@color/colorPrimary"-->
+            <!--android:layout_centerHorizontal="true" />-->
 
-        <TextView
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="By clicking on this, you can save your offer for future visits."
-            android:id="@+id/textView5"
-            android:layout_gravity="center_horizontal" />
+        <!--<TextView-->
+            <!--android:layout_width="300dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:gravity="center"-->
+            <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
+            <!--android:text="By clicking on this, you can save your offer for future visits."-->
+            <!--android:id="@+id/textView5"-->
+            <!--android:layout_gravity="center_horizontal" />-->
     </LinearLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Sorry! \n You currently have\nno offers to check-in with."
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#777777"
+        android:visibility="invisible"
+        android:id="@+id/alertoffer"/>
 </RelativeLayout>

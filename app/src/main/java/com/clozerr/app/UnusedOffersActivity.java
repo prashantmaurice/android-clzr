@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gcm.GCMRegistrar;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -180,12 +182,31 @@ public class UnusedOffersActivity extends ActionBarActivity {
                         params.getBoolean("unlocked"),null,
                         offerObject.getString("_id")
                         );
+                if(params.getBoolean("used")==false&&params.getBoolean("unlocked")==true)
                 rowItems.add(item);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            Toast.makeText(getApplicationContext(),"An error occurred. Please try again later.",Toast.LENGTH_SHORT).show();
         }
-        return rowItems;
+        if(rowItems.size()==0)
+        {
+            findViewById(R.id.alertoffer).setVisibility(View.VISIBLE);
+            Toast.makeText(getApplicationContext(),"No offer unlocked. Marking checkin as a visit",Toast.LENGTH_SHORT).show();
+            String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+Home.TOKEN+"&offer_id="+offerid+"&vendor_id="+VendorActivity.vendorId+"&gcm_id="+ GCMRegistrar.getRegistrationId(getApplicationContext());
+            new AsyncGet(getApplicationContext(), url, new AsyncGet.AsyncResult() {
+                @Override
+                public void gotResult(String s) {
+                    try {
+                        JSONObject jsonObject = new JSONObject(s);
+                        Toast.makeText(getApplicationContext(),"No offer unlocked. Marking checkin as a visit.",Toast.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+            return rowItems;
     }
 
     @Override
