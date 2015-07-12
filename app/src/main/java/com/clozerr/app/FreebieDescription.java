@@ -103,9 +103,9 @@ public class FreebieDescription extends ActionBarActivity {
                     public void gotResult(String s) {
                         try {
                             JSONObject jsonObject = new JSONObject(s);
-                            if(jsonObject.getString("result").equals("false"))
-                                Toast.makeText(getApplicationContext(),"Sorry you are yet to unlock the reward",Toast.LENGTH_SHORT).show();
-                            //Toast.makeText(getApplicationContext(),jsonObject.getString("vendor"),Toast.LENGTH_LONG).show();
+//                            if(jsonObject.getString("result").equals("false"))
+//                                Toast.makeText(getApplicationContext(),"Sorry you are yet to unlock the reward",Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
                             if(jsonObject.getString("vendor")!=null){
                                 Toast.makeText(getApplicationContext(),"Checked In Successfully. Please contact the billing staff.",Toast.LENGTH_SHORT).show();
                                 final PopupWindow confirmPopup = getNewPopupWindow(freebielayout, R.layout.checkin_pin_confirm);

@@ -60,6 +60,7 @@ public class GiftBoxActivity extends ActionBarActivity {
                         //Toast.makeText(getApplicationContext(),String.valueOf(rowItems.size()),Toast.LENGTH_SHORT).show();
                         Log.i("row", String.valueOf(rowItems.size()));
                     }
+                    //Toast.makeText(getApplicationContext(),String.valueOf(rowItems.size()),Toast.LENGTH_SHORT).show();
                     mMainPageAdapter = new UnusedOffersAdapter(rowItems,c);
                     mRecyclerView.setAdapter(mMainPageAdapter);
                 } catch (JSONException e) {
