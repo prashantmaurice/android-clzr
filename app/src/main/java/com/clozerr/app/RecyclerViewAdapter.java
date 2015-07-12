@@ -2,6 +2,7 @@ package com.clozerr.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -208,7 +209,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                 editor.putString("user",s);
                                 editor.apply();
                                 Toast.makeText(c,"Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
-
                                 //l1.setAdapter(adapter);
                                 if (s == null) {
                                     Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();

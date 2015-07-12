@@ -15,6 +15,7 @@ class MyPagerAdapter extends FragmentPagerAdapter {
         super(fm);
         this.c=c;
         tabheadings=c.getResources().getStringArray(R.array.tabheadings);
+        
     }
 
     @Override
@@ -41,5 +42,9 @@ class MyPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         return tabheadings.length;
+    }
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
     }
 }

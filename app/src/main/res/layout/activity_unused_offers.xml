@@ -42,10 +42,11 @@
                 android:textColor="#ffffff"/>
 
         </android.support.v7.widget.Toolbar>
-        <ListView
+        <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:id="@+id/unusedoffers" />
+            android:layout_height="match_parent"
+            android:id="@+id/unusedoffers"
+            android:clipToPadding="false"/>
         <Button
             android:id="@+id/useit"
             android:layout_width="wrap_content"

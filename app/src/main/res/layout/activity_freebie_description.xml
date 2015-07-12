@@ -79,7 +79,7 @@
                 android:src="@drawable/whatsappblack" />
 
             <ImageButton
-                android:id="@+id/favorites"
+                android:id="@+id/pin"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginLeft="30dp"

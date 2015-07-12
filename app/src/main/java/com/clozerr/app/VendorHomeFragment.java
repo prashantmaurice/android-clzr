@@ -40,7 +40,7 @@ public class VendorHomeFragment extends Fragment {
     private Context c;
     private FrameLayout layout;
 
-    private ImageView mVendorImageView;
+    private ImageView mVendorImageView,mVendorGalleryImageView;
     private TextView mVendorTitleView;
     private TextView mVendorAddressView;
     private ImageButton mCallButton, mDirButton, favorites, whatsappshare,fb,gplus,twitter,share;
@@ -52,6 +52,8 @@ public class VendorHomeFragment extends Fragment {
         initViews();
 
         Ion.with(mVendorImageView).load(VendorActivity.detailsBundle.getString("vendorImage")) ;
+        if(!VendorActivity.detailsBundle.getString("logo").equalsIgnoreCase("undefined"))
+              new DownloadImageTask(mVendorGalleryImageView).execute(VendorActivity.detailsBundle.getString("logo"));
         mVendorTitleView.setText(VendorActivity.detailsBundle.getString("vendorTitle"));
         mVendorAddressView.setText(VendorActivity.detailsBundle.getString("address"));
         final SharedPreferences status = c.getSharedPreferences("USER",0);
@@ -125,6 +127,7 @@ public class VendorHomeFragment extends Fragment {
                             editor.putString("user",s);
                             editor.apply();
                             Toast.makeText(getActivity(),"Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
+                            
                             //l1.setAdapter(adapter);
                             if (s == null) {
                                 Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
@@ -244,6 +247,7 @@ public class VendorHomeFragment extends Fragment {
         gplus = (ImageButton) layout.findViewById(R.id.gplus);
         twitter = (ImageButton) layout.findViewById(R.id.twitter);
         share = (ImageButton) layout.findViewById(R.id.share);
+        mVendorGalleryImageView = (ImageView) layout.findViewById(R.id.logo);
     }
 
     public void onClickWhatsApp() {
