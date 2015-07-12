@@ -226,6 +226,8 @@ public class Login extends FragmentActivity implements
             mIsResolving = false;
             mGoogleApiClient.connect();
         }
+        else
+            Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
     }
     private static final List<String> PERMISSIONS = Arrays.asList(
             "email");
