@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -59,6 +60,11 @@ public class GiftBoxActivity extends ActionBarActivity {
                         rowItems.add(item);
                         //Toast.makeText(getApplicationContext(),String.valueOf(rowItems.size()),Toast.LENGTH_SHORT).show();
                         Log.i("row", String.valueOf(rowItems.size()));
+                    }
+                    //Toast.makeText(getApplicationContext(),String.valueOf(rowItems.size()),Toast.LENGTH_SHORT).show();
+                    if(rowItems.size()==0)
+                    {
+                        findViewById(R.id.alertgiftbox).setVisibility(View.VISIBLE);
                     }
                     mMainPageAdapter = new UnusedOffersAdapter(rowItems,c);
                     mRecyclerView.setAdapter(mMainPageAdapter);

@@ -226,6 +226,8 @@ public class Login extends FragmentActivity implements
             mIsResolving = false;
             mGoogleApiClient.connect();
         }
+        else
+            Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
     }
     private static final List<String> PERMISSIONS = Arrays.asList(
             "email");
@@ -258,7 +260,7 @@ public class Login extends FragmentActivity implements
                                         Log.i("token result", s);*/
                                         try {
                                             JSONObject res = new JSONObject(s);
-                                            if (res.getString("result").equals("true")) {
+                                            if (res.getBoolean("result")) {
                                                 editor.putString("loginskip", "true");
                                                 editor.putString("token", res.getString("token"));
                                                 editor.putString("user",res.getString("user"));
@@ -266,12 +268,11 @@ public class Login extends FragmentActivity implements
                                                 startActivity(new Intent(Login.this, Home.class));
                                                 finish();
                                             } else {
-
-                                                Toast.makeText(Login.this,session.getAccessToken(),Toast.LENGTH_SHORT).show();
-                                                Toast.makeText(Login.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
+                                                //Toast.makeText(Login.this,session.getAccessToken(),Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(Login.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
                                             }
                                         } catch (JSONException e) {
-                                            Toast.makeText(Login.this, "Something went wrong...", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(Login.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
                                             e.printStackTrace();
                                         }
                                     }

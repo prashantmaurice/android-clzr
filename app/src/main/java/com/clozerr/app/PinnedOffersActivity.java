@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -59,6 +60,10 @@ public class PinnedOffersActivity extends ActionBarActivity {
                         //String vendor_id = obj.getString("vendor_id");
                         MyOffer item = new MyOffer(type,"","",caption,description,stamps,false,true,null,obj.getString("_id"));
                         rowItems.add(item);
+                    }
+                    if(rowItems.size()==0)
+                    {
+                        findViewById(R.id.alertpinned).setVisibility(View.VISIBLE);
                     }
                     mMainPageAdapter = new UnusedOffersAdapter(rowItems,c);
                     mRecyclerView.setAdapter(mMainPageAdapter);
