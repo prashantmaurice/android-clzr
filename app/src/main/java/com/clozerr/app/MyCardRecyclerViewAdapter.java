@@ -56,7 +56,7 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
         viewHolder.currentItem = items.get(position);
         CardModel model = items.get(position);
         viewHolder.txtTitle.setText(model.getTitle());
-        viewHolder.txtStamps.setText(model.getStampString());
+        //viewHolder.txtStamps.setText(model.getStampString());
         viewHolder.txtDist.setText(model.getDistanceString());
         Ion.with(c)
              //   .placeholder(R.drawable.call)

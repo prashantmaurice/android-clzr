@@ -9,39 +9,39 @@
         android:id="@+id/drawerLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/layout"
-        android:orientation="vertical">
-        <include layout="@layout/toolbar" />
-
         <LinearLayout
-            android:id="@+id/tab"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:elevation="5dp"
-        android:background="@color/colorPrimary"
-        android:orientation="horizontal">
-    <ImageButton
-        android:id="@+id/close"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_close"
-        android:textColor="#ffffff"
-        android:background="#00000000"
-        android:paddingLeft="10dp"
-        android:layout_gravity="center_vertical"/>
-        <TextView
-            android:id="@+id/categoryheader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="100"
-            android:text="Electronics"
-            android:paddingLeft="10dp"
-            android:textColor="#ffffff"
-            android:layout_gravity="center_vertical"/>
-        </LinearLayout>
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/layout"
+            android:orientation="vertical">
+            <include layout="@layout/toolbar" />
+
+            <LinearLayout
+                android:id="@+id/tab"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:elevation="5dp"
+                android:background="@color/colorPrimary"
+                android:orientation="horizontal">
+                <ImageButton
+                    android:id="@+id/close"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_close"
+                    android:textColor="#ffffff"
+                    android:background="#00000000"
+                    android:paddingLeft="10dp"
+                    android:layout_gravity="center_vertical"/>
+                <TextView
+                    android:id="@+id/categoryheader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="100"
+                    android:text="Electronics"
+                    android:paddingLeft="10dp"
+                    android:textColor="#ffffff"
+                    android:layout_gravity="center_vertical"/>
+            </LinearLayout>
 
             <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/card_view"
@@ -88,6 +88,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </LinearLayout>
-    <include layout="@layout/navdrawer_content" />
+        <include layout="@layout/navdrawer_content" />
     </android.support.v4.widget.DrawerLayout>
 </LinearLayout>

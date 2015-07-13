@@ -32,6 +32,7 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Freebie 1"
             android:lines="2"
+            android:ellipsize="end"
             android:id="@+id/freebiecontent" />
     </LinearLayout>
     <ImageView
