@@ -73,7 +73,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Sorry! \n You currently have\nno offers to check-in with."
+        android:text="Sorry! \n You currently have\nno offers to check-in with.\nPlease contact store staff to validate check-in."
         android:gravity="center"
         android:textSize="20sp"
         android:textStyle="bold"
