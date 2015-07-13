@@ -37,7 +37,7 @@ import java.util.Date;
 
 public class FreebieDescription extends ActionBarActivity {
     String offerid="";
-    String vendorid="",caption="",description="";
+    String vendorid="",caption="",description="", name="";
     SharedPreferences status;
     String NotNow;
     ArrayList<String> pinned;
@@ -81,6 +81,11 @@ public class FreebieDescription extends ActionBarActivity {
         }catch (Exception e){
 
         }
+        try {
+            name += intent.getStringExtra("vendorName");
+        }catch (Exception e) {
+
+        }
         if(!caption.equals("")){
             ((TextView)findViewById(R.id.caption)).setText(caption);
             ((TextView)findViewById(R.id.title)).setText(caption);
@@ -107,7 +112,7 @@ public class FreebieDescription extends ActionBarActivity {
 //                                Toast.makeText(getApplicationContext(),"Sorry you are yet to unlock the reward",Toast.LENGTH_SHORT).show();
                             //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
                             if(jsonObject.getString("vendor")!=null){
-                                Toast.makeText(getApplicationContext(),"Checked In Successfully. Please contact the billing staff.",Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getApplicationContext(),"Checked In Successfully. Please contact the billing staff.",Toast.LENGTH_SHORT).show();
                                 final PopupWindow confirmPopup = getNewPopupWindow(freebielayout, R.layout.checkin_pin_confirm);
                                 final LinearLayout displayView = ((LinearLayout)((CardView)((LinearLayout)(confirmPopup.getContentView())).
                                         getChildAt(0)).getChildAt(0));
@@ -133,9 +138,9 @@ public class FreebieDescription extends ActionBarActivity {
                                             ((TextView)(child.findViewById(R.id.timeView))).setText(time);
                                             ((TextView)(child.findViewById(R.id.dateView))).setText(date);
                                             break;
-                                        case R.id.pinView:  ((TextView) child).setText("");
+                                        case R.id.pinView:  ((TextView) child).setText(jsonObject.getString("pin"));
                                             break;
-                                        case R.id.confirmTitleView: ((TextView) child).setText(VendorActivity.detailsBundle.getString("vendorTitle"));
+                                        case R.id.confirmTitleView: ((TextView) child).setText(name);
                                             break;
                                         case R.id.confirmOfferView: ((TextView) child).setText(caption);
                                             break;

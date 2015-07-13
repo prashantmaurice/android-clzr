@@ -1,17 +1,15 @@
 package com.clozerr.app;
 
 import android.content.Context;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,13 +51,14 @@ public class GiftBoxActivity extends ActionBarActivity {
                         JSONObject obj = rewards.getJSONObject(i);
                         String caption = obj.getString("caption");
                         String description = obj.getString("description");
-                        int stamps = obj.getInt("stamps");
+                        //int stamps = obj.getInt("stamps");
                         String type = obj.getString("type");
-                        //String vendor_id = obj.getString("vendor_id");
-                        MyOffer item = new MyOffer(type,null,null,caption,description,stamps,false,true,null,obj.getString("_id"));
+                        String vendor_id = obj.getJSONObject("vendor").getString("_id");
+                        String vendorName = obj.getJSONObject("vendor").getString("name");
+                        MyOffer item = new MyOffer(type,null,null,caption,description,0,false,true,null,obj.getString("_id"), vendor_id, vendorName);
                         rowItems.add(item);
                         //Toast.makeText(getApplicationContext(),String.valueOf(rowItems.size()),Toast.LENGTH_SHORT).show();
-                        Log.i("row", String.valueOf(rowItems.size()));
+                        //Log.i("row", String.valueOf(rowItems.size()));
                     }
                     //Toast.makeText(getApplicationContext(),String.valueOf(rowItems.size()),Toast.LENGTH_SHORT).show();
                     if(rowItems.size()==0)

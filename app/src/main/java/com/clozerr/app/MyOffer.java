@@ -37,6 +37,8 @@ public class MyOffer {
     private Boolean mused;
     private Boolean munlocked;
     private SXOfferExtras mSXOfferExtras;
+    private String mVendorId;
+    private String mVendorName;
 
     public String getType() {
         return mType;
@@ -70,9 +72,13 @@ public class MyOffer {
 
     public Boolean getUnlocked() {return munlocked;}
 
+    public String getVendorId() { return mVendorId; }
+
+    public String getVendorName() { return mVendorName; }
+
     public MyOffer(String type, String imageUrl, String optionalImageUrl, String caption,
             String description, int stamps, Boolean used, Boolean unlocked, SXOfferExtras sxOfferExtras,
-                   String offerid) {
+                   String offerid, String vendorId, String vendorName) {
         this.mType = type;
         this.mImageUrl = imageUrl;
         this.mOptionalImageUrl = optionalImageUrl;
@@ -83,6 +89,15 @@ public class MyOffer {
         this.mused=used;
         this.munlocked=unlocked;
         this.offerid = offerid;
+        this.mVendorId = vendorId;
+        this.mVendorName = vendorName;
+    }
+
+    public MyOffer(String type, String imageUrl, String optionalImageUrl, String caption,
+                   String description, int stamps, Boolean used, Boolean unlocked, SXOfferExtras sxOfferExtras,
+                   String offerid) {
+        this(type, imageUrl, optionalImageUrl, caption, description, stamps, used, unlocked, sxOfferExtras,
+                offerid, "", "");
     }
 
     public static class SXOfferExtras {
