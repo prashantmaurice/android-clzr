@@ -66,24 +66,49 @@ public class MyStampsFragment extends Fragment {
             JSONArray array = offerObject.getJSONArray("offers");
             //Toast.makeText(getActivity(),s, Toast.LENGTH_LONG).show();
             MyOffer.SXOfferExtras extras = null;
-            for (int i = 0; i < array.length(); ++i) {
-                offerObject = array.getJSONObject(i);
-                extras = null;
-                String type = offerObject.getString("type");
-                if (type.equalsIgnoreCase("SX"))
-                    extras = new MyOffer.SXOfferExtras(offerObject.getJSONObject("stampStatus").getInt("total"),
-                            offerObject.getDouble("billAmt"));
-                item = new MyOffer(type,
-                        null,
-                        null,
-                        offerObject.getString("caption"),
-                        offerObject.getString("description"),
-                        offerObject.getJSONObject("params").getInt("stamps"),
-                        offerObject.getJSONObject("params").getBoolean("used"),
-                        offerObject.getJSONObject("params").getBoolean("unlocked"),
-                        extras,
-                        offerObject.getString("_id"));
-                rowItems.add(item);
+            int i=0;
+            for(int j=0;;j++) {
+                int flag=0;
+                for (i = 0; i < array.length(); ++i) {
+                    offerObject = array.getJSONObject(i);
+                    extras = null;
+                    String type = offerObject.getString("type");
+                    if (type.equalsIgnoreCase("SX"))
+                        extras = new MyOffer.SXOfferExtras(offerObject.getJSONObject("stampStatus").getInt("total"),
+                                offerObject.getDouble("billAmt"));
+                    if (j == offerObject.getJSONObject("params").getInt("stamps") - 1) {
+                        item = new MyOffer(type,
+                                null,
+                                null,
+                                offerObject.getString("caption"),
+                                offerObject.getString("description"),
+                                offerObject.getJSONObject("params").getInt("stamps"),
+                                offerObject.getJSONObject("params").getBoolean("used"),
+                                offerObject.getJSONObject("params").getBoolean("unlocked"),
+                                extras,
+                                offerObject.getString("_id"));
+                        rowItems.add(item);
+                        flag = 1;
+                        break;
+                    }
+                }
+                    if(flag==0)
+                    {
+                        item = new MyOffer(null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                j+1,
+                                false,
+                                true,
+                                extras,
+                                null);
+                        rowItems.add(item);
+                    }
+
+
+                if(j==array.length()-1) break;
             }
         } catch (Exception e) {
             e.printStackTrace();
