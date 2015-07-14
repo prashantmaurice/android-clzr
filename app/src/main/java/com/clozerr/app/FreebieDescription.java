@@ -107,7 +107,7 @@ public class FreebieDescription extends ActionBarActivity {
                     @Override
                     public void gotResult(String s) {
                         try {
-                            JSONObject jsonObject = new JSONObject(s);
+                            final JSONObject jsonObject = new JSONObject(s);
 //                            if(jsonObject.getString("result").equals("false"))
 //                                Toast.makeText(getApplicationContext(),"Sorry you are yet to unlock the reward",Toast.LENGTH_SHORT).show();
                             //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
@@ -150,6 +150,11 @@ public class FreebieDescription extends ActionBarActivity {
                                                 Intent qrIntent = new Intent(FreebieDescription.this, QRActivity.class);
                                                 qrIntent.putExtra("vendorId", vendorid);
                                                 qrIntent.putExtra("offerId", offerid);
+                                                try {
+                                                    qrIntent.putExtra("checkinId", jsonObject.getString("_id"));
+                                                } catch (JSONException ex) {
+                                                    ex.printStackTrace();
+                                                }
                                                 startActivity(qrIntent);
                                             }
                                         });

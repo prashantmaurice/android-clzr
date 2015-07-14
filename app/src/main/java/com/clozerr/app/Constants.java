@@ -34,5 +34,6 @@ public class Constants {
         public static final Uri.Builder CHECKIN = getNewDefaultBuilder().path("v2/vendor/offers/checkin");
         public static final Uri.Builder ADSOMETHINGHERE = getNewDefaultBuilder().path("v2/user/add/favourites");
         public static final Uri.Builder GEOFENCE_LIST_NEAR = getNewDefaultBuilder().path("v2/geofence/list/near");
+        public static final Uri.Builder QRCODE_VALIDATE = getNewDefaultBuilder().path("v2/offers/checkin/qrcodevalidate");
     }
 }
