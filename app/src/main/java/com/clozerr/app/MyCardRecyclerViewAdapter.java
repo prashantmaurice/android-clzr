@@ -135,26 +135,33 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
                     if(fav.indexOf(currentItem.getVendorId())==-1)
                     {
                         like.setImageResource(R.drawable.favorited);
+                        Log.e("MyCardRVA", "favs url - " + "http://api.clozerr.com/v2/user/add/favourites?vendor_id="+currentItem.getVendorId()+"&access_token="+TOKEN);
                         new AsyncGet(c, "http://api.clozerr.com/v2/user/add/favourites?vendor_id="+currentItem.getVendorId()+"&access_token="+TOKEN, new AsyncGet.AsyncResult() {
                             @Override
                             public void gotResult(String s) {
-                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                                editor.putString("user",s);
-                                editor.apply();
-                                Toast.makeText(c, "Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
-
                                 //l1.setAdapter(adapter);
-                                if (s == null) {
-                                    Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
+                                //try {
+                                    if (s == null/* || !(new JSONObject(s).getBoolean("result"))*/) {
+                                        Toast.makeText(c, "Connection error", Toast.LENGTH_SHORT).show();
+                                        like.setImageResource(R.drawable.like);
+                                    } else {
+                                        fav.add(currentItem.getVendorId());
+                                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+                                        editor.putString("user", s);
+                                        editor.apply();
+                                        Toast.makeText(c, "Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
+                                    }
+                                /*} catch (JSONException e) {
+                                    e.printStackTrace();
+                                    Toast.makeText(c, "Connection error", Toast.LENGTH_SHORT).show();
                                     like.setImageResource(R.drawable.like);
-                                }
-
+                                }*/
                                 // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
 
 
                           /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
                           mRecyclerView.setAdapter(Cardadapter);*/
-                                fav.add(currentItem.getVendorId());
+
                             }
                         },false);
 
@@ -162,25 +169,32 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
                     else
                     {
                         like.setImageResource(R.drawable.like);
+                        Log.e("MyCardRVA", "favs url - " + "http://api.clozerr.com/v2/user/remove/favourites?vendor_id="+currentItem.getVendorId()+"&access_token="+TOKEN);
                         new AsyncGet(c, "http://api.clozerr.com/v2/user/remove/favourites?vendor_id="+currentItem.getVendorId()+"&access_token="+TOKEN, new AsyncGet.AsyncResult() {
                             @Override
                             public void gotResult(String s) {
-                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                                editor.putString("user",s);
-                                editor.apply();
-                                Toast.makeText(c,"Unfavorited and removed to My Clubs.", Toast.LENGTH_LONG).show();
                                 //l1.setAdapter(adapter);
-                                if (s == null) {
-                                    Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
-                                    like.setImageResource(R.drawable.like);
-                                }
-
-                                // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
-
+                                //try {
+                                    if (s == null/* || !(new JSONObject(s).getBoolean("result"))*/) {
+                                        Toast.makeText(c, "Connection error", Toast.LENGTH_SHORT).show();
+                                        like.setImageResource(R.drawable.favorited);
+                                    } else {
+                                        fav.remove(fav.indexOf(currentItem.getVendorId()));
+                                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+                                        editor.putString("user", s);
+                                        editor.apply();
+                                        Toast.makeText(c, "Unfavorited and removed from My Clubs.", Toast.LENGTH_LONG).show();
+                                    }
+                                    // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
+                                /*} catch (JSONException e) {
+                                    e.printStackTrace();
+                                    Toast.makeText(c, "Connection error", Toast.LENGTH_SHORT).show();
+                                    like.setImageResource(R.drawable.favorited);
+                                }*/
 
                           /*RecyclerViewAdapter1 Cardadapter = new RecyclerViewAdapter1(convertRowMyOffers(s), CouponDetails.this);
                           mRecyclerView.setAdapter(Cardadapter);*/
-                                fav.remove(fav.indexOf(currentItem.getVendorId()));
+
                             }
                         },false);
                     }
