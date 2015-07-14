@@ -277,16 +277,16 @@
                             android:layout_height="55dp"
                             android:layout_marginTop="5dp" />
 
-                        <ImageView
+                        <!--<ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="55dp"
                             android:src="@drawable/dotdotdot"
-                            android:layout_marginTop="5dp"/>
-                        <ImageView
+                            android:layout_marginTop="5dp"/>-->
+                        <!--<ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="55dp"
                             android:src="@drawable/addgallery"
-                            android:layout_marginTop="5dp"/>
+                            android:layout_marginTop="5dp"/>-->
                     </LinearLayout>
 
                     <View

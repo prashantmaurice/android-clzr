@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,7 +37,7 @@ public class MyStampsFragment extends Fragment {
                         mRecyclerView.setAdapter(myOffersAdapter);*/
         MyOffersRecyclerViewAdapter adapter = new MyOffersRecyclerViewAdapter(myOffers, getActivity());
         recyclerview.setAdapter(adapter);
-        final String[] values = new String[] { "1","2","3","4","5","6","7","8","9","10" };
+        //final String[] values = new String[] { "1","2","3","4","5","6","7","8","9","10" };
         //ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.stamp_layout, R.id.stampnumber, values);
         //recyclerview.setAdapter(new MyStampsRecyclerViewAdapter(values,getActivity()));
         return layout;

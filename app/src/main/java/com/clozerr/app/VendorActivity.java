@@ -25,6 +25,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 import android.widget.Toast;
+
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
@@ -164,16 +165,26 @@ public class VendorActivity extends ActionBarActivity {
                             object.getString("fid"), object.getString("_id"),
                             0
                     );
-                    ArrayList<String> stringArray = new ArrayList<String>();
-                    JSONArray jsonArray = object.getJSONArray("question");
-                    for (int i = 0, count = jsonArray.length(); i < count; i++) {
+                    ArrayList<String> questions = new ArrayList<String>();
+                    JSONArray questionArray = object.getJSONArray("question");
+                    for (int i = 0, count = questionArray.length(); i < count; i++) {
                         try {
-                            stringArray.add(jsonArray.getString(i));
+                            questions.add(questionArray.getString(i));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
-                    detailsBundle.putStringArrayList("questions", stringArray);
+                    detailsBundle.putStringArrayList("questions", questions);
+                    ArrayList<String> gallery = new ArrayList<String>();
+                    JSONArray galleryArray = object.getJSONArray("gallery");
+                    for (int i = 0, count = galleryArray.length(); i < count; i++) {
+                        try {
+                            gallery.add(galleryArray.getString(i));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    detailsBundle.putStringArrayList("gallery", gallery);
                      /*JSONArray question= object.getJSONArray("question");
                     for(int i=0;i<question.length();i++){
                       ques_arr.add(question.getString(i));
@@ -196,6 +207,7 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putString("gplus",gplus);
                     detailsBundle.putString("twitter",twitter);
                     detailsBundle.putString("logo",logo);
+
                     //currentItem.getQuestions();
                     /*try {
                         if (!fromPeriodicBFS && params != null)
