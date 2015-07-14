@@ -157,8 +157,11 @@
                 android:layout_gravity="end"
                 android:layout_margin="0dp"
                 android:gravity="center"
-                android:text="USE QR CODE INSTEAD"
-                android:id="@+id/qrButton"/>
+                android:padding="5dp"
+                android:text="USE QR CODE"
+                android:id="@+id/qrButton"
+                android:textColor="#ffffff"
+                android:background="@color/colorPrimary"/>
 
         </LinearLayout>
 
