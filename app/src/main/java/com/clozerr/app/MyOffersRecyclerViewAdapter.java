@@ -104,7 +104,7 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
         viewHolder.mCaptionView.setText(currentItem.getCaption());
         viewHolder.stampnumber.setText(String.valueOf(currentItem.getStamps()));
         //viewHolder.stampnumber.setBackgroundResource(R.drawable.cirkbackhover);
-        if(currentItem.getUsedState()) {
+        if(currentItem.getVisitedstatus()==true) {
             viewHolder.stampnumber.setTextColor(Color.WHITE);
             //viewHolder.stampcheck.setVisibility(View.VISIBLE);
             viewHolder.stampnumber.setBackgroundResource(R.drawable.cirkbackhover);

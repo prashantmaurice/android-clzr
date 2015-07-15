@@ -182,7 +182,8 @@ public class UnusedOffersActivity extends ActionBarActivity {
                         //params.getBoolean("used"),
                         //params.getBoolean("unlocked"),
                         false,true,null,
-                        offerObject.getString("_id")
+                        offerObject.getString("_id"),
+                        false
                         );
                 //if(params.getBoolean("used")==false&&params.getBoolean("unlocked")==true)
                 rowItems.add(item);

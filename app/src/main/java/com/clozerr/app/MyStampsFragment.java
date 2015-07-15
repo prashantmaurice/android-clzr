@@ -2,6 +2,7 @@ package com.clozerr.app;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -61,15 +62,15 @@ public class MyStampsFragment extends Fragment {
         MyOffer item = null;
         try {
             //Log.e(TAG, "json passed - " + s);
-            JSONObject offerObject = new JSONObject(s);
-            JSONArray array = offerObject.getJSONArray("offers");
+            JSONObject someObject = new JSONObject(s);
+            JSONArray array = someObject.getJSONArray("offers");
             //Toast.makeText(getActivity(),s, Toast.LENGTH_LONG).show();
             MyOffer.SXOfferExtras extras = null;
             int i=0;
             for(int j=0;;j++) {
                 int flag=0;
                 for (i = 0; i < array.length(); ++i) {
-                    offerObject = array.getJSONObject(i);
+                    JSONObject offerObject = array.getJSONObject(i);
                     extras = null;
                     String type = offerObject.getString("type");
                     if (type.equalsIgnoreCase("SX"))
@@ -85,7 +86,8 @@ public class MyStampsFragment extends Fragment {
                                 offerObject.getJSONObject("params").getBoolean("used"),
                                 offerObject.getJSONObject("params").getBoolean("unlocked"),
                                 extras,
-                                offerObject.getString("_id"));
+                                offerObject.getString("_id"),
+                                someObject.getInt("stamps")>=offerObject.getJSONObject("params").getInt("stamps")?true:false);
                         rowItems.add(item);
                         flag = 1;
                         break;
@@ -102,7 +104,8 @@ public class MyStampsFragment extends Fragment {
                                 false,
                                 true,
                                 extras,
-                                null);
+                                null,
+                                someObject.getInt("stamps")>=j+1?true:false);
                         rowItems.add(item);
                     }
 

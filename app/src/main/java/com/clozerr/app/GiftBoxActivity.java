@@ -55,7 +55,7 @@ public class GiftBoxActivity extends ActionBarActivity {
                         String type = obj.getString("type");
                         String vendor_id = obj.getJSONObject("vendor").getString("_id");
                         String vendorName = obj.getJSONObject("vendor").getString("name");
-                        MyOffer item = new MyOffer(type,null,null,caption,description,0,false,true,null,obj.getString("_id"), vendor_id, vendorName);
+                        MyOffer item = new MyOffer(type,null,null,caption,description,0,false,true,null,obj.getString("_id"), vendor_id, vendorName,false);
                         rowItems.add(item);
                         //Toast.makeText(getApplicationContext(),String.valueOf(rowItems.size()),Toast.LENGTH_SHORT).show();
                         //Log.i("row", String.valueOf(rowItems.size()));

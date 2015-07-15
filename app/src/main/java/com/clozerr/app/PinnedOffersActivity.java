@@ -58,7 +58,7 @@ public class PinnedOffersActivity extends ActionBarActivity {
                         int stamps = obj.getInt("stamps");
                         String type = obj.getString("type");
                         //String vendor_id = obj.getString("vendor_id");
-                        MyOffer item = new MyOffer(type,"","",caption,description,stamps,false,true,null,obj.getString("_id"));
+                        MyOffer item = new MyOffer(type,"","",caption,description,stamps,false,true,null,obj.getString("_id"),false);
                         rowItems.add(item);
                     }
                     if(rowItems.size()==0)
