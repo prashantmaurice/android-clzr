@@ -50,8 +50,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by aravind on 1/7/15.
  */
-public class GeofenceManagerService extends Service implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
+public class GeofenceManagerService extends Service {
 
     private static final String TAG = "GeofenceManagerService";
     private static final String KEY_GEOFENCE_SERVICE_RUNNING = "com.clozerr.app.KEY_GEOFENCE_SERVICE_RUNNING";
@@ -100,7 +99,7 @@ public class GeofenceManagerService extends Service implements
                 GEOFENCE_MINIMUM_RADIUS_METERS, GEOFENCE_TYPE_RANGE));*/
     }
 
-    private GoogleApiClient mGoogleApiClient = null;
+    private static GoogleApiClient googleApiClient = null;
 
     @Override
     public void onCreate() {
@@ -118,7 +117,7 @@ public class GeofenceManagerService extends Service implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        mGoogleApiClient.connect();
+        googleApiClient.connect();
         return START_REDELIVER_INTENT;
     }
 
@@ -126,33 +125,61 @@ public class GeofenceManagerService extends Service implements
     public void onDestroy() {
         Log.e(TAG, "in onDestroy()");
         LocationServices.GeofencingApi.removeGeofences(
-                mGoogleApiClient,
-                getGeofencePendingIntent()
-        ).setResultCallback(this);
-        mGoogleApiClient.disconnect();
+                googleApiClient,
+                getGeofencePendingIntent(this)
+        ).setResultCallback(new ResultCallback<Status>() {
+            @Override
+            public void onResult(Status status) {
+                Log.e(TAG, "in onResult(" + status.getStatusMessage() + ") - for onDestroy removal of geofences");
+                if (status.isSuccess())
+                    Log.e(TAG, "success");
+                else if (status.isCanceled())
+                    Log.e(TAG, "canceled");
+                else if (status.isInterrupted())
+                    Log.e(TAG, "interrupted");
+            }
+        });
+        googleApiClient.disconnect();
         checkAndStopService(this);
         super.onDestroy();
     }
 
     private synchronized void buildGoogleApiClient() {
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
+        if (googleApiClient == null) {
+            googleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                        @Override
+                        public void onConnected(Bundle bundle) {
+                            Log.e(TAG, "in onConnected()");
+                            loadURLAndAddGeofences(GeofenceManagerService.this);
+                        }
+
+                        @Override
+                        public void onConnectionSuspended(int i) {
+                            Log.e(TAG, "in onConnectionSuspended(" + i + ")");
+                        }
+                    })
+                    .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                        @Override
+                        public void onConnectionFailed(ConnectionResult connectionResult) {
+                            Log.e(TAG, "in onConnectionFailed(" + connectionResult.getErrorCode() + ")");
+                            googleApiClient.connect();
+                        }
+                    })
                     .addApi(LocationServices.API)
                     .build();
         }
     }
 
-    private PendingIntent getGeofencePendingIntent() {
+    private static PendingIntent getGeofencePendingIntent(Context context) {
         if (geofencePendingIntent == null) {
-            Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
-            geofencePendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            Intent intent = new Intent(context, GeofenceTransitionsIntentService.class);
+            geofencePendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
         return geofencePendingIntent;
     }
 
-    private GeofencingRequest getGeofencingRequest() {
+    private static GeofencingRequest getGeofencingRequest() {
         if (geofencingRequest == null) {
             ArrayList<Geofence> geofenceList = new ArrayList<>();
             for (HashMap.Entry<String, GeofenceParams> entry : geofenceParamsHashMap.entrySet()) {
@@ -182,18 +209,18 @@ public class GeofenceManagerService extends Service implements
         return geofencingRequest;
     }
 
-    private Location getLastLocation() {
+    private static Location getLastLocation() {
         /*Location result;
         do {
             result = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         } while (result == null);
         return result;*/
-        if (mGoogleApiClient.isConnected())
-            return LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (googleApiClient.isConnected())
+            return LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         else return null;
     }
 
-    private String getGeofenceUriString() {
+    private static String getGeofenceUriString() {
         Location lastLocation = getLastLocation();
         Uri.Builder listNearBuilder = GenUtils.getClearedUriBuilder(Constants.URLBuilders.GEOFENCE_LIST_NEAR);
         if (lastLocation != null) {
@@ -205,18 +232,20 @@ public class GeofenceManagerService extends Service implements
         return listNearBuilder.build().toString();
     }
 
-    private void loadURLAndAddGeofences() {
+    private static void loadURLAndAddGeofences(final Context context) {
         String geofenceUriString = getGeofenceUriString();
-        Ion.with(this).load(geofenceUriString).asJsonArray()
+        Log.e(TAG, "fence url - " + geofenceUriString);
+        Ion.with(context).load(geofenceUriString).asJsonArray()
                 .setCallback(new FutureCallback<JsonArray>() {
                     @Override
                     public void onCompleted(Exception e, JsonArray result) {
                         if (e != null) {
                             e.printStackTrace();
+                            loadURLAndAddGeofences(context);
                         } else {
                             try {
                                 JSONArray root = new JSONArray(result.toString());
-                                GenUtils.writeDownloadedStringToFile(GeofenceManagerService.this,
+                                GenUtils.writeDownloadedStringToFile(context,
                                         root.toString(), GEOFENCE_PARAMS_FILE_NAME);
                                 for (int i = 0; i < root.length(); ++i) {
                                     JSONObject fenceObject = root.getJSONObject(i);
@@ -224,17 +253,29 @@ public class GeofenceManagerService extends Service implements
                                             new GeofenceParams(fenceObject));
                                 }
                                 LocationServices.GeofencingApi.removeGeofences(
-                                        mGoogleApiClient,
-                                        getGeofencePendingIntent()
+                                        googleApiClient,
+                                        getGeofencePendingIntent(context)
                                 ).setResultCallback(new ResultCallback<Status>() {
                                     @Override
                                     public void onResult(Status status) {
                                         if (status.isSuccess())
                                             LocationServices.GeofencingApi.addGeofences(
-                                                    mGoogleApiClient,
+                                                    googleApiClient,
                                                     getGeofencingRequest(),
-                                                    getGeofencePendingIntent()
-                                            ).setResultCallback(GeofenceManagerService.this);
+                                                    getGeofencePendingIntent(context)
+                                            ).setResultCallback(new ResultCallback<Status>() {
+                                                @Override
+                                                public void onResult(Status status) {
+                                                    Log.e(TAG, "in onResult(" + status.getStatusMessage() + ")" +
+                                                    " - for adding geofences");
+                                                    if (status.isSuccess())
+                                                        Log.e(TAG, "success");
+                                                    else if (status.isCanceled())
+                                                        Log.e(TAG, "canceled");
+                                                    else if (status.isInterrupted())
+                                                        Log.e(TAG, "interrupted");
+                                                }
+                                            });
                                         else Log.e(TAG, "error : " + status.getStatusMessage());
                                     }
                                 });
@@ -277,11 +318,11 @@ public class GeofenceManagerService extends Service implements
         }
     }
 
-    @Override
+    /*@Override
     public void onConnected(Bundle bundle) {
         Log.e(TAG, "in onConnected()");
-        loadURLAndAddGeofences();
-        /*GeofenceParams house = geofenceParamsHashMap.get("House");
+        loadURLAndAddGeofences(this);
+        *//*GeofenceParams house = geofenceParamsHashMap.get("House");
         GeofenceParams ic = geofenceParamsHashMap.get("IITM IC");
         float[] resultHome = new float[3], resultIc = new float[3];
         Location.distanceBetween(
@@ -295,19 +336,19 @@ public class GeofenceManagerService extends Service implements
                 resultIc
         );
         Log.e(TAG, "distance from home (m): " + String.valueOf(resultHome[0]));
-        Log.e(TAG, "distance from IC (m): " + String.valueOf(resultIc[0]));*/
+        Log.e(TAG, "distance from IC (m): " + String.valueOf(resultIc[0]));*//*
     }
 
     @Override
     public void onConnectionSuspended(int i) {
         Log.e(TAG, "in onConnectionSuspended(" + i + ")");
-        mGoogleApiClient.connect();
+        //googleApiClient.connect();
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.e(TAG, "in onConnectionFailed(" + connectionResult.getErrorCode() + ")");
-        mGoogleApiClient.connect();
+        googleApiClient.connect();
     }
 
     @Override
@@ -319,7 +360,7 @@ public class GeofenceManagerService extends Service implements
             Log.e(TAG, "canceled");
         else if (status.isInterrupted())
             Log.e(TAG, "interrupted");
-    }
+    }*/
 
     public static class GeofenceParams {
         public LatLng mCoordinates;
@@ -397,7 +438,7 @@ public class GeofenceManagerService extends Service implements
         }
     }
 
-    public class GeofenceTransitionsIntentService extends IntentService {
+    public static class GeofenceTransitionsIntentService extends IntentService {
 
         private static final String TAG = "FenceTransitionService";
 
@@ -420,7 +461,7 @@ public class GeofenceManagerService extends Service implements
 
             readGeofenceParamsFromFile(this);
 
-            Location lastLocation = GeofenceManagerService.this.getLastLocation();
+            Location lastLocation = GeofenceManagerService.getLastLocation();
             SharedPreferences sharedPreferences = getSharedPreferences("USER", 0);
             String TOKEN = sharedPreferences.getString("token", "");
             TimeZone tz = TimeZone.getTimeZone("GMT+0530");
@@ -462,7 +503,7 @@ public class GeofenceManagerService extends Service implements
                             PeriodicBFS.checkAndStartScan(this);
                         }
                         if (geofenceTypes.contains(GEOFENCE_TYPE_RELOAD)) {
-                            GeofenceManagerService.this.loadURLAndAddGeofences();
+                            GeofenceManagerService.loadURLAndAddGeofences(this);
                         }
                         if (geofenceTypes.contains(GEOFENCE_TYPE_PUSH)) {
                             setupNotification(this, params);
@@ -487,7 +528,7 @@ public class GeofenceManagerService extends Service implements
                         }
                         if (geofenceTypes.contains(GEOFENCE_TYPE_ON_EXIT)) {
                             if (geofenceTypes.contains(GEOFENCE_TYPE_RELOAD)) {
-                                GeofenceManagerService.this.loadURLAndAddGeofences();
+                                GeofenceManagerService.loadURLAndAddGeofences(this);
                             }
                             if (geofenceTypes.contains(GEOFENCE_TYPE_PUSH)) {
                                 setupNotification(this, params);
