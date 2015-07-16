@@ -185,7 +185,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             );
 
             linearLayout.setLayoutParams(params);*/
-
+            VendorActivity.Rewards = "";
             //txtrating=(TextView) itemView.findViewById(R.id.txtrating);
             final SharedPreferences status = c.getSharedPreferences("USER",0);
             final String NotNow = status.getString("notNow","false");

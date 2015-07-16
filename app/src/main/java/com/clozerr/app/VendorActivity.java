@@ -50,13 +50,14 @@ public class VendorActivity extends ActionBarActivity {
     private SlidingTabLayout mtabs;
     private Intent callingIntent;
     private FloatingActionButton mCheckInButton;
-
+    static String Rewards="";
     private String pinNumber;
     public static Bundle detailsBundle;
     public static String vendorId;
     static String vendorTitle;
     static int i=1;
     public String analyticsurlvendor=null;
+    static String TOKEN="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +79,7 @@ public class VendorActivity extends ActionBarActivity {
         final String vendor_id = callingIntent.getStringExtra("vendor_id");
         vendorId = vendor_id;
 
-        String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
+        TOKEN = getSharedPreferences("USER", 0).getString("token", "");
         final String urlVendor = "http://api.clozerr.com/v2/vendor/get/details?vendor_id=" + vendor_id;
         Log.e(TAG, "vendor url - " + urlVendor);
         new AsyncGet(this, urlVendor, new AsyncGet.AsyncResult() {
@@ -292,11 +293,12 @@ public class VendorActivity extends ActionBarActivity {
         new AsyncGet(VendorActivity.this, analyticsurlvendor, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
-                Log.e(analyticsurlvendor,"");
+                Log.e(analyticsurlvendor, "");
                 //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
                 Constants.URLBuilders.ANALYTICS.clearQuery();
             }
         },false);
+
 
         /*String urlVisited = "http://api.clozerr.com/v2/vendor/offers/offerspage?vendor_id=" + vendorId + "&access_token=" + TOKEN;
         String urlUser = "http://api.clozerr.com/auth?fid=" + detailsBundle.getString("fid") + "&access_token=" + TOKEN;
