@@ -1,8 +1,5 @@
 package com.clozerr.app;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -39,47 +36,13 @@ public class Login extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         View.OnClickListener {
     private static final String TAG = "clozerr";
-    /* Keys for persisting instance variables in savedInstanceState */
+    // Keys for persisting instance variables in savedInstanceState
     private static final String KEY_IS_RESOLVING = "is_resolving";
     private static final String KEY_SHOULD_RESOLVE = "should_resolve";
     public static String userName;
     public static String dispPicUrl;
-    private static final int STATE_DEFAULT = 0;
-    private static final int STATE_SIGN_IN = 1;
-    private static final int STATE_IN_PROGRESS = 2;
     static int googleOrFb=3;
-    //ImageView slide1=(ImageView)findViewById(R.id.slide1);
-//ImageView slide2=(ImageView)findViewById(R.id.slide2);
-//ImageView slide3=(ImageView)findViewById(R.id.slide3);
-//ImageView slide4=(ImageView)findViewById(R.id.slide4);
-    private static final int RC_SIGN_IN = 9001;
-    private static final int DIALOG_PLAY_SERVICES_ERROR = 0;
-    private static final String SAVED_PROGRESS = "sign_in_progress";
-    // GoogleApiClient wraps our service connection to Google Play services and
-    // provides access to the users sign in state and Google's APIs.
-    public static GoogleApiClient mGoogleApiClient;
-    // We use mSignInProgress to track whether user has clicked sign in.
-// mSignInProgress can be one of three values:
-//
-// STATE_DEFAULT: The default state of the application before the user
-// has clicked 'sign in', or after they have clicked
-// 'sign out'. In this state we will not attempt to
-// resolve sign in errors and so will display our
-// Activity in a signed out state.
-// STATE_SIGN_IN: This state indicates that the user has clicked 'sign
-// in', so resolve successive errors preventing sign in
-// until the user has successfully authorized an account
-// for our app.
-// STATE_IN_PROGRESS: This state indicates that we have started an intent to
-// resolve an error, and so we should not start further
-// intents until the current intent completes.
-    private int mSignInProgress;
-    // Used to store the PendingIntent most recently returned by Google Play
-// services until the user clicks 'sign in'.
-    private PendingIntent mSignInIntent;
-    // Used to store the error code most recently returned by Google Play services
-// until the user clicks 'sign in'.
-    private int mSignInError;
+    public static GoogleApiClient googleApiClient;
     private ImageButton mSignInButton;
     public static ProgressDialog pDialog;
     //private static final int NUM_PAGES = 5;
@@ -90,10 +53,9 @@ public class Login extends FragmentActivity implements
     //private ViewPager mPager;
     //int i=0;
 
-    /* Is there a ConnectionResult resolution in progress? */
+    // Is there a ConnectionResult resolution in progress?
     private boolean mIsResolving = false;
-
-    /* Should we automatically resolve ConnectionResults when possible? */
+    // Should we automatically resolve ConnectionResults when possible?
     private boolean mShouldResolve = false;
 
     @Override
@@ -162,7 +124,7 @@ public class Login extends FragmentActivity implements
             mSignInProgress = savedInstanceState
                     .getInt(SAVED_PROGRESS, STATE_DEFAULT);
         }*/
-        mGoogleApiClient = buildGoogleApiClient();
+        googleApiClient = buildGoogleApiClient();
         //int found=0;
         //slideToImage(2);
         //change();
@@ -197,12 +159,12 @@ public class Login extends FragmentActivity implements
         super.onStart();
 // EasyTracker.getInstance().activityStart(this);
 // The rest of your onStart() code.
-        //mGoogleApiClient.connect();
+        //googleApiClient.connect();
     }
     @Override
     public void onStop() {
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
+        if (googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
         }
         if (pDialog != null)
             pDialog.dismiss();
@@ -217,14 +179,14 @@ public class Login extends FragmentActivity implements
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
 
-        if (requestCode == RC_SIGN_IN) {
+        if (requestCode == Constants.RequestCodes.GOOGLE_SIGN_IN_ACTIVITY) {
             // If the error resolution was not successful we should not resolve further errors.
             if (resultCode != RESULT_OK) {
                 mShouldResolve = false;
             }
 
             mIsResolving = false;
-            mGoogleApiClient.connect();
+            googleApiClient.connect();
         }
         else
             Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
@@ -354,11 +316,9 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
         /*// Update the user interface to reflect that the user is signed in.
         // mSignInButton.setEnabled(false);*/
 
-        final Person currentUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+        final Person currentUser = Plus.PeopleApi.getCurrentPerson(googleApiClient);
         userName = currentUser.getDisplayName();
         dispPicUrl = currentUser.getImage().getUrl();
-        // Indicate that the sign in process is complete.
-        mSignInProgress = STATE_DEFAULT;
 
         final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
         editor.putString("gplus_name", userName);
@@ -417,7 +377,7 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
     @Override
     public void onClick(View v) {
         googleOrFb = 2;
-        if (!mGoogleApiClient.isConnecting()) {
+        if (!googleApiClient.isConnecting()) {
 // We only process button clicks when GoogleApiClient is not transitioning
 // between connected and not connected.
             switch (v.getId()) {
@@ -425,7 +385,7 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                     // User clicked the sign-in button, so begin the sign-in process and automatically
                     // attempt to resolve any errors that occur.
                     mShouldResolve = true;
-                    mGoogleApiClient.connect();
+                    googleApiClient.connect();
                     break;
             }
         }
@@ -440,12 +400,12 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
         if (!mIsResolving && mShouldResolve) {
             if (connectionResult.hasResolution()) {
                 try {
-                    connectionResult.startResolutionForResult(this, RC_SIGN_IN);
+                    connectionResult.startResolutionForResult(this, Constants.RequestCodes.GOOGLE_SIGN_IN_ACTIVITY);
                     mIsResolving = true;
                 } catch (IntentSender.SendIntentException e) {
                     Log.e(TAG, "Could not resolve ConnectionResult.", e);
                     mIsResolving = false;
-                    mGoogleApiClient.connect();
+                    googleApiClient.connect();
                 }
             } else {
                 // Could not resolve the connection result, show the user an
@@ -463,7 +423,7 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
         if (GooglePlayServicesUtil.isUserRecoverableError(errorCode)) {
             // Show the default Google Play services error dialog which may still start an intent
             // on our behalf if the user can resolve the issue.
-            GooglePlayServicesUtil.getErrorDialog(errorCode, this, RC_SIGN_IN,
+            GooglePlayServicesUtil.getErrorDialog(errorCode, this, Constants.RequestCodes.GOOGLE_SIGN_IN_ACTIVITY,
                     new DialogInterface.OnCancelListener() {
                         @Override
                         public void onCancel(DialogInterface dialog) {
@@ -485,75 +445,6 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
         mSignInButton.setEnabled(!isSignedIn);
     }
 
-    private void onSignedOut() {
-        Toast.makeText(this, "An error occurred while signing in... please try signing in again.",
-                Toast.LENGTH_LONG).show();
-    }
-    private void resolveSignInError() {
-        if (mSignInIntent != null) {
-// We have an intent which will allow our user to sign in or
-// resolve an error. For example if the user needs to
-// select an account to sign in with, or if they need to consent
-// to the permissions your app is requesting.
-            try {
-// Send the pending intent that we stored on the most recent
-// OnConnectionFailed callback. This will allow the user to
-// resolve the error currently preventing our connection to
-// Google Play services.
-                mSignInProgress = STATE_IN_PROGRESS;
-                startIntentSenderForResult(mSignInIntent.getIntentSender(),
-                        RC_SIGN_IN, null, 0, 0, 0);
-            } catch (IntentSender.SendIntentException e) {
-                Log.i(TAG, "Sign in intent could not be sent: "
-                        + e.getLocalizedMessage());
-// The intent was canceled before it was sent. Attempt to connect to
-// get an updated ConnectionResult.
-                mSignInProgress = STATE_SIGN_IN;
-                mGoogleApiClient.connect();
-            }
-        } else {
-// Google Play services wasn't able to provide an intent for some
-// error types, so we show the default Google Play services error
-// dialog which may still start an intent on our behalf if the
-// user can resolve the issue.
-            showDialog(DIALOG_PLAY_SERVICES_ERROR);
-        }
-    }
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        switch(id) {
-            case DIALOG_PLAY_SERVICES_ERROR:
-                if (GooglePlayServicesUtil.isUserRecoverableError(mSignInError)) {
-                    return GooglePlayServicesUtil.getErrorDialog(
-                            mSignInError,
-                            this,
-                            RC_SIGN_IN,
-                            new DialogInterface.OnCancelListener() {
-                                @Override
-                                public void onCancel(DialogInterface dialog) {
-                                    Log.e(TAG, "Google Play services resolution cancelled");
-                                    mSignInProgress = STATE_DEFAULT;
-                                    Toast.makeText(getApplicationContext(),"Signed out",Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                } else {
-                    return new AlertDialog.Builder(this)
-                            .setMessage("Google Play services is not available. This application will close.")
-                            .setPositiveButton("Close",
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            Log.e(TAG, "Google Play services error could not be "
-                                                    + "resolved: " + mSignInError);
-                                            mSignInProgress = STATE_DEFAULT;
-                                            Toast.makeText(getApplicationContext(),"Signed out",Toast.LENGTH_SHORT).show();
-                                        }
-                                    }).create();
-                }
-            default:
-                return super.onCreateDialog(id);
-        }
-    }
     /*public void slideToImage(int position){
         mPager.setCurrentItem(position);
     }

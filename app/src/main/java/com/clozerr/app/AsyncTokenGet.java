@@ -43,7 +43,7 @@ public class AsyncTokenGet extends AsyncTask<Void, Void, String> {
         try {
             token = GoogleAuthUtil.getToken(
                     mInvokingActivity,
-                    Plus.AccountApi.getAccountName(Login.mGoogleApiClient),
+                    Plus.AccountApi.getAccountName(Login.googleApiClient),
                     scopes);
             // Log.e("AccessToken", token);
         } catch (IOException transientEx) {
@@ -100,7 +100,7 @@ public class AsyncTokenGet extends AsyncTask<Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... params) {
-        String accountName = Plus.AccountApi.getAccountName(Login.mGoogleApiClient);
+        String accountName = Plus.AccountApi.getAccountName(Login.googleApiClient);
         Account account = new Account(accountName, GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
         //String scopes = "audience:server:client_id:" + Constants.SERVER_CLIENT_ID; // Not the app's client ID.
         String scopes = "oauth2:" + Scopes.PLUS_LOGIN + " " + Scopes.PROFILE;

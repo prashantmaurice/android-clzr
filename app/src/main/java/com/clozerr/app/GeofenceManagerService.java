@@ -212,7 +212,7 @@ public class GeofenceManagerService extends Service {
     private static Location getLastLocation() {
         /*Location result;
         do {
-            result = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            result = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         } while (result == null);
         return result;*/
         if (googleApiClient.isConnected())

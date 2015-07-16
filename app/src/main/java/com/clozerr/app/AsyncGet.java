@@ -3,8 +3,6 @@ package com.clozerr.app;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,10 +11,7 @@ import android.widget.Toast;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
@@ -36,7 +31,7 @@ public class AsyncGet extends AsyncTask<String, String, String> {
     boolean toDisplayProgress;
     public AsyncGet(Context context, String url, AsyncResult as, boolean displayProgress) {
         handler = new Handler(Looper.getMainLooper());
-        if(isNetworkAvailable(context)) {
+        if(GenUtils.isNetworkAvailable(context)) {
             c=context;
             asyncResult=as;
             this.Url = url;
@@ -61,13 +56,6 @@ public class AsyncGet extends AsyncTask<String, String, String> {
 
     public AsyncGet(Context context, String url, AsyncResult as) {
         this(context, url, as, true);
-    }
-
-    static boolean isNetworkAvailable(Context context) {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     @Override

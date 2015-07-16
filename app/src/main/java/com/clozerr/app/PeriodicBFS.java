@@ -5,6 +5,7 @@ import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -209,9 +210,14 @@ public class PeriodicBFS extends BeaconFinderService {
             }*/
             Intent detailIntent = vendorParams.getDetailsIntent(context);
             detailIntent.putExtra("from_periodic_scan", true);
-            PendingIntent detailPendingIntent = PendingIntent.getActivity(context,
+            TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(context)
+                                        .addParentStack(Home.class)
+                                        .addNextIntent(detailIntent);
+            /*PendingIntent detailPendingIntent = PendingIntent.getActivity(context,
                     RequestCodes.CODE_DETAILS_INTENT.code(),
-                    detailIntent, PendingIntent.FLAG_ONE_SHOT);
+                    detailIntent, PendingIntent.FLAG_ONE_SHOT);*/
+
+            PendingIntent detailPendingIntent = taskStackBuilder.getPendingIntent(Constants.RequestCodes.DETAILS_INTENT, 0);
 
             /*Intent refuseIntent = new Intent(context, NotificationRemovalReceiver.class);
             refuseIntent.setAction(ACTION_REMOVE_VENDOR);
@@ -559,7 +565,7 @@ public class PeriodicBFS extends BeaconFinderService {
         Intent resumeIntent = new Intent(context, ScanResumeReceiver.class);
         resumeIntent.setAction(ACTION_RESUME_SCAN);
         alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTimeMillis,
-                PendingIntent.getBroadcast(context, RequestCodes.CODE_RESUME_SCAN_INTENT.code(), resumeIntent, 0));
+                PendingIntent.getBroadcast(context, Constants.RequestCodes.RESUME_SCAN_INTENT, resumeIntent, 0));
         //disallowScanning(context);
         //isScanningAllowed = false;
         isScanningPaused = true;

@@ -9,6 +9,26 @@ public class Constants {
 
     public static final String SERVER_CLIENT_ID = "http://496568600186-o52fjump15ric3ct4rfoc9i73mnehu2f.apps.googleusercontent.com/";
 
+    /*public enum RequestCodes {
+        CODE_ALARM_INTENT(1000),
+        CODE_DETAILS_INTENT(1234),
+        CODE_REFUSE_INTENT(1235),
+        CODE_VENDOR_LIST_INTENT(1236),
+        CODE_RESUME_SCAN_INTENT(1237);
+
+        private int mCode;
+
+        RequestCodes(int code) { mCode = code; }
+        public int code() { return mCode; }
+    }*/
+
+    public static class RequestCodes {
+        public static final int DETAILS_INTENT = 1000;
+        public static final int RESUME_SCAN_INTENT = 1001;
+
+        public static final int GOOGLE_SIGN_IN_ACTIVITY = 9000;
+    }
+
     public static class URLBuilders {
 
         private static final String DEFAULT_SCHEME = "http";

@@ -44,19 +44,6 @@ public abstract class BeaconFinderService extends WakefulIntentService {
     public static final long BT_RECEIVER_TIMEOUT = TimeUnit.MILLISECONDS.convert(3L, TimeUnit.SECONDS);
     public static final int THRESHOLD_RSSI = -100;
 
-    protected enum RequestCodes {
-        CODE_ALARM_INTENT(1000),
-        CODE_DETAILS_INTENT(1234),
-        CODE_REFUSE_INTENT(1235),
-        CODE_VENDOR_LIST_INTENT(1236),
-        CODE_RESUME_SCAN_INTENT(1237);
-
-        private int mCode;
-
-        RequestCodes(int code) { mCode = code; }
-        public int code() { return mCode; }
-    }
-
     protected static String commonBeaconUUID = "";
     protected static boolean isBLESupported = true;
     protected static boolean isScanningAllowed = true;
