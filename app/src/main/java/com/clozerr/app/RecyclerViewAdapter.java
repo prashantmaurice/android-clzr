@@ -185,7 +185,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             );
 
             linearLayout.setLayoutParams(params);*/
-
+            VendorActivity.Rewards = "";
             //txtrating=(TextView) itemView.findViewById(R.id.txtrating);
             final SharedPreferences status = c.getSharedPreferences("USER",0);
             final String NotNow = status.getString("notNow","false");
@@ -208,7 +208,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                 editor.putString("user",s);
                                 editor.apply();
                                 Toast.makeText(c,"Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
-
                                 //l1.setAdapter(adapter);
                                 if (s == null) {
                                     Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();

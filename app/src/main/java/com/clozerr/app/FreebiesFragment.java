@@ -5,47 +5,49 @@ package com.clozerr.app;
  */
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ListView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 
 public class FreebiesFragment extends Fragment {
 
     Context c;
     FrameLayout layout;
-
+    RecyclerView listview;
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         layout = (FrameLayout) inflater.inflate(R.layout.activity_freebies_fragment, container, false);
-        final ListView listview=(ListView)layout.findViewById(R.id.freebietypes);
-        final String[] values = new String[] { "Welcome Reward",
-                "Facebook Check-In Reward",
-                "Happy Hour Reward",
-                "Lucky Reward"
-        };
-        List<String> l = Arrays.asList(values);
-
+        listview=(RecyclerView)layout.findViewById(R.id.freebietypes);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        listview.setLayoutManager(linearLayoutManager);
 // if List<String> isnt specific enough:
-        ArrayList<String> al = new ArrayList<>(l);
-        RewardsAdapter adapter = new RewardsAdapter(getActivity(),al);
-        listview.setAdapter(adapter);
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        if(VendorActivity.Rewards.equals("")) {
+            final String rewardsurl = "http://api.clozerr.com/v2/vendor/offers/rewardspage/?vendor_id=" + VendorActivity.vendorId + "&access_token=" + VendorActivity.TOKEN;
+            new AsyncGet(c, rewardsurl, new AsyncGet.AsyncResult() {
+                @Override
+                public void gotResult(String s) {
+                    Log.d("rewardsurl", rewardsurl);
+                    VendorActivity.Rewards = s;
+                    init();
+                }
+            }, true);
+        }
+        else init();
+        /*listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(position==1) {
@@ -66,10 +68,25 @@ public class FreebiesFragment extends Fragment {
                 else
                     startActivity(new Intent(getActivity(),FreebieDescription.class));
             }
-        });
+        });*/
         return layout;
     }
-
+    public void init(){
+        ArrayList<RewardItem> al = new ArrayList<>();
+        try {
+            JSONObject obj = new JSONObject(VendorActivity.Rewards);
+            JSONArray arr = obj.getJSONArray("rewards");
+            for(int i=0;i<arr.length();i++){
+                JSONObject jsonObject = arr.getJSONObject(i);
+                RewardItem rewardItem = new RewardItem(jsonObject.getJSONObject("params").getString("type"),jsonObject.getString("caption"),jsonObject.getString("description"),jsonObject.getString("image"),jsonObject.getString("_id"));
+                al.add(rewardItem);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        RewardsAdapter adapter = new RewardsAdapter(al,getActivity());
+        listview.setAdapter(adapter);
+    }
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

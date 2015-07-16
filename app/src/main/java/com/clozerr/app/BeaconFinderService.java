@@ -2,10 +2,8 @@ package com.clozerr.app;
 
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,9 +11,7 @@ import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -30,7 +26,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -43,11 +38,10 @@ public abstract class BeaconFinderService extends WakefulIntentService {
     private static final String TAG = "BFS";
 
     public static final String REGION_ID = "com.clozerr.app";
-    public static final String ACTION_RESUME_SCAN = "com.clozerr.app.ACTION_RESUME_SCAN";
     public static final String KEY_BLE = "com.clozerr.app.KEY_BLE";
     public static final String KEY_BEACON_UUID = "com.clozerr.app.KEY_BEACON_UUID";
     public static final String KEY_APP_DISABLE_BT = "com.clozerr.app.KEY_APP_DISABLE_BT";
-    public static final long BT_RECEIVER_TIMEOUT = TimeUnit.MILLISECONDS.convert(4L, TimeUnit.SECONDS);
+    public static final long BT_RECEIVER_TIMEOUT = TimeUnit.MILLISECONDS.convert(2L, TimeUnit.SECONDS);
     public static final int THRESHOLD_RSSI = -100;
 
     protected enum RequestCodes {
@@ -282,18 +276,6 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         }
     }*/
 
-    public static void enableComponent(Context context, Class componentClass) {
-        ComponentName component = new ComponentName(context, componentClass);
-        context.getPackageManager().setComponentEnabledSetting(component,
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-    }
-
-    public static void disableComponent(Context context, Class componentClass) {
-        ComponentName component = new ComponentName(context, componentClass);
-        context.getPackageManager().setComponentEnabledSetting(component,
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-    }
-
     protected static void turnOnBluetooth(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         boolean shouldAppDeactivateBluetooth =
@@ -331,21 +313,6 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         isScanningAllowed = true;
         PeriodicBFS.checkAndStartScan(context);
         Log.e(TAG, "scans allowed");
-    }
-
-    public static void pauseScanningFor(final Context context, long intervalMillis) {
-        Log.e(TAG, "scans paused for " + intervalMillis + " ms");
-        //putToast(context, "scans paused for " + intervalMillis + " ms", Toast.LENGTH_SHORT);
-        long triggerTimeMillis = intervalMillis + SystemClock.elapsedRealtime();
-        enableComponent(context, ScanResumeReceiver.class);
-        Intent resumeIntent = new Intent(context, ScanResumeReceiver.class);
-        resumeIntent.setAction(ACTION_RESUME_SCAN);
-        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTimeMillis,
-                PendingIntent.getBroadcast(context, RequestCodes.CODE_RESUME_SCAN_INTENT.code(), resumeIntent, 0));
-        //disallowScanning(context);
-        //isScanningAllowed = false;
-        isScanningPaused = true;
-        WakefulIntentService.cancelAlarms(context);
     }
 
     protected static class VendorParams {
@@ -396,10 +363,8 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         public static ArrayList<VendorParams> readVendorParamsFromFile(Context context) {
             ArrayList<VendorParams> result = null;
             try {
-                FileInputStream fileInputStream = context.openFileInput(BeaconDBDownloader.BEACONS_FILE_NAME);
-                byte[] dataBytes = new byte[fileInputStream.available()];
-                fileInputStream.read(dataBytes);
-                JSONObject rootObject = new JSONObject(new String(dataBytes));
+                String fileContents = GenUtils.readFileContentsAsString(context, BeaconDBDownloader.BEACONS_FILE_NAME);
+                JSONObject rootObject = new JSONObject(fileContents);
                 commonBeaconUUID = rootObject.getString("UUID");
                 JSONArray rootArray = rootObject.getJSONArray("vendors");
                 //Log.e(TAG, "root - " + rootArray.toString());
@@ -459,23 +424,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         }
 
         public String toString() {
-            return "major: " + mMajor + "; minor: " + mMinor;
-        }
-    }
-
-    public static class ScanResumeReceiver extends WakefulBroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent != null && intent.getAction().equals(ACTION_RESUME_SCAN)) {
-                //allowScanning(context);
-                //isScanningAllowed = true;
-                Log.e(TAG, "scans resumed");
-                isScanningPaused = false;
-                //putToast(context, "scans resumed", Toast.LENGTH_SHORT);
-                //WakefulIntentService.scheduleAlarms(new PeriodicBFS.AlarmListener(), context);
-                PeriodicBFS.scheduleAlarms(context);
-                disableComponent(context, ScanResumeReceiver.class);
-            }
+            return "major:" + mMajor + ";minor:" + mMinor;
         }
     }
 

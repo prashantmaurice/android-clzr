@@ -49,13 +49,14 @@ public class VendorActivity extends ActionBarActivity {
     private SlidingTabLayout mtabs;
     private Intent callingIntent;
     private FloatingActionButton mCheckInButton;
-
+    static String Rewards="";
     private String pinNumber;
     public static Bundle detailsBundle;
     public static String vendorId;
     static String vendorTitle;
     static int i=1;
     public String analyticsurlvendor=null;
+    static String TOKEN="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +78,7 @@ public class VendorActivity extends ActionBarActivity {
         final String vendor_id = callingIntent.getStringExtra("vendor_id");
         vendorId = vendor_id;
 
-        String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
+        TOKEN = getSharedPreferences("USER", 0).getString("token", "");
         final String urlVendor = "http://api.clozerr.com/v2/vendor/get/details?vendor_id=" + vendor_id;
         Log.e(TAG, "vendor url - " + urlVendor);
         new AsyncGet(this, urlVendor, new AsyncGet.AsyncResult() {
@@ -85,7 +86,7 @@ public class VendorActivity extends ActionBarActivity {
             public void gotResult(String s) {
                 try {
                     //Toast.makeText(getApplicationContext(), Constants.URLBuilders.ANALYTICSCOPY.toString(),Toast.LENGTH_SHORT).show();
-                    String address = "", phoneNumber = "", vendorDescription = "",fb = "",gplus = "",twitter = "";
+                    String address = "", phoneNumber = "", vendorDescription = "",fb = "",gplus = "",twitter = "",logo = "";
                     //BeaconFinderService.BeaconDBParams params = null;
                     double latitude = 0.0, longitude = 0.0;
                     JSONObject object = new JSONObject(s);
@@ -103,16 +104,6 @@ public class VendorActivity extends ActionBarActivity {
                         longitude = object.getJSONArray("location").getDouble(1);
                         if (longitude <= 0.0)
                             longitude = 0.0;
-                        fb =object.getString("fb");
-                        if(fb.equalsIgnoreCase("undefined"))
-                            fb = "";
-                        gplus = object.getString("gplus");
-                        if(gplus.equalsIgnoreCase("undefined"))
-                            gplus = "";
-                        twitter = object.getString("twitter");
-                        if(twitter.equalsIgnoreCase("undefined"))
-                            twitter = "";
-
                     } catch (Exception e) {
                         e.printStackTrace();
                         //Toast.makeText(CouponDetails.this, "Error - " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
@@ -123,6 +114,45 @@ public class VendorActivity extends ActionBarActivity {
                         Log.e(TAG, "BDB params - " + params.toString());
                     }*/
                     //Log.e("description", vendorDescription);
+                    try
+                    {
+                        logo = object.getString("logo");
+                        Log.i("logo",logo);
+                    }
+                    catch(Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    try
+                    {
+                        fb =object.getString("fb");
+                        if(fb.equalsIgnoreCase("undefined"))
+                            fb = "";
+                    }
+                    catch(Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    try
+                    {
+                        gplus = object.getString("gplus");
+                        if(gplus.equalsIgnoreCase("undefined"))
+                            gplus = "";
+                    }
+                    catch(Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    try
+                    {
+                        twitter = object.getString("twitter");
+                        if(twitter.equalsIgnoreCase("undefined"))
+                            twitter = "";
+                    }
+                    catch(Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                     address = object.getString("address");
                     final CardModel currentItem = new CardModel(
                             object.getString("name"),
@@ -166,6 +196,7 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putString("fb",fb);
                     detailsBundle.putString("gplus",gplus);
                     detailsBundle.putString("twitter",twitter);
+                    detailsBundle.putString("logo",logo);
                     //currentItem.getQuestions();
                     /*try {
                         if (!fromPeriodicBFS && params != null)
@@ -250,11 +281,12 @@ public class VendorActivity extends ActionBarActivity {
         new AsyncGet(VendorActivity.this, analyticsurlvendor, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
-                Log.e(analyticsurlvendor,"");
+                Log.e(analyticsurlvendor, "");
                 //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
                 Constants.URLBuilders.ANALYTICS.clearQuery();
             }
         },false);
+
 
         /*String urlVisited = "http://api.clozerr.com/v2/vendor/offers/offerspage?vendor_id=" + vendorId + "&access_token=" + TOKEN;
         String urlUser = "http://api.clozerr.com/auth?fid=" + detailsBundle.getString("fid") + "&access_token=" + TOKEN;
@@ -321,6 +353,24 @@ public class VendorActivity extends ActionBarActivity {
 
             }
         });
+
+        String unlockedOffersUrl = "http://api.clozerr.com/v2/vendor/offers/unlocked?access_token="+TOKEN+"&vendor_id="+vendorId;
+/*        Log.e(TAG, "MyStamps URL - " + unlockedOffersUrl);
+        new AsyncGet(this, unlockedOffersUrl, new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                //  t1.setText(s);
+
+                Log.e("Offers", s);
+                detailsBundle.putString("unlockedoffers", s);
+                //Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+                //l1.setAdapter(adapter);
+                if (s == null) {
+                    Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });*/
 
         new AsyncGet(this, "http://api.clozerr.com/v2/user/add/pinned?access_token="+TOKEN , new AsyncGet.AsyncResult() {
             @Override

@@ -58,7 +58,7 @@ public class CategoryDetail extends ActionBarActivity{
     private final int ITEMS_PER_PAGE = 7, INITIAL_LOAD_LIMIT = 8;
     private Bundle categorybundle;
     View mScrollable;
-    private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Tell Friends about Clozerr", "Settings", "Log out"};
+    private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Tell Friends about Clozerr", "My Pinned Offers", "Settings", "Log out"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -490,6 +490,10 @@ private ArrayList<CardModel> convertRow(String s) {
                 }
 
                 else if(i==5){
+                    startActivity(new Intent(CategoryDetail.this,PinnedOffersActivity.class));
+                }
+
+                else if(i==6){
                     startActivity(new Intent(CategoryDetail.this,SettingsActivity.class));
                 }
 

@@ -23,13 +23,18 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SlidingDrawer;
@@ -77,7 +82,8 @@ public class Home  extends ActionBarActivity {
     private ListView leftDrawerList;
     //private ArrayAdapter<String> navigationDrawerAdapter;
     private NavDrawAdapter nav;
-    private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Tell Friends about Clozerr", "Settings", "Log out"};
+    private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Tell Friends about Clozerr", "My Pinned Offers", "Settings", "Log out"};
+    private FrameLayout freebielayout;
     //private boolean nav_drawer_open = false;
 
 
@@ -85,7 +91,8 @@ public class Home  extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        GeofenceManagerService.startService(this);
+        GenUtils.RunManager.initKeys(this);
+        GeofenceManagerService.checkAndStartService(this);
         /*try
         {
             Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
@@ -118,13 +125,16 @@ public class Home  extends ActionBarActivity {
 
         }
         initDrawer();
+        freebielayout=(FrameLayout)findViewById(R.id.homeframe);
+        //freebielayout.getForeground().setAlpha(0);
+        offerdialog();
         SharedPreferences status2 = getSharedPreferences("USER", 0);
         TOKEN = status2.getString("token", "");
         TimeZone tz = TimeZone.getTimeZone("GMT+0530");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
         df.setTimeZone(tz);
         String nowAsISO = df.format(new Date());
-        final String analyticsurl= Constants.URLBuilders.ANALYTICS
+        final String analyticsurl= GenUtils.getClearedUriBuilder(Constants.URLBuilders.ANALYTICS)
                 .appendQueryParameter("metric","Clozerr_Home_Screen")
                 .appendQueryParameter("dimensions[device]", "Android API " + Build.VERSION.SDK_INT)
                 .appendQueryParameter("dimensions[id]", Settings.Secure.getString(this.getContentResolver(),
@@ -137,8 +147,8 @@ public class Home  extends ActionBarActivity {
         new AsyncGet(Home.this, analyticsurl, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
-                Log.e(analyticsurl,"");
-                Constants.URLBuilders.ANALYTICS.clearQuery();
+                Log.e("Home","analytics url - " + analyticsurl);
+                //Constants.URLBuilders.ANALYTICS.clearQuery();
                 //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
                 //Toast.makeText(getApplicationContext(),analyticsurl,Toast.LENGTH_SHORT).show();
             }
@@ -171,6 +181,7 @@ public class Home  extends ActionBarActivity {
         }
         pager=(ViewPager)findViewById(R.id.pager);
         pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager(),Home.this));
+        pager.setOffscreenPageLimit(0);
         mtabs=(SlidingTabLayout)findViewById(R.id.tabs);
         mtabs.setDistributeEvenly(true);
         mtabs.setCustomTabView(R.layout.custom_tab_view_home, R.id.tabtitle);
@@ -294,6 +305,10 @@ public class Home  extends ActionBarActivity {
                 }
 
                 else if(i==5){
+                    startActivity(new Intent(Home.this,PinnedOffersActivity.class));
+                }
+
+                else if(i==6){
                     startActivity(new Intent(Home.this,SettingsActivity.class));
                 }
 
@@ -382,7 +397,7 @@ public class Home  extends ActionBarActivity {
 
     private void initDrawer() {
 
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close) {
 
             @Override
             public void onDrawerClosed(View drawerView) {
@@ -452,10 +467,75 @@ public class Home  extends ActionBarActivity {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.search) {
+            Intent giftboxintent = new Intent(this,GiftBoxActivity.class);
+            startActivity(giftboxintent);
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
 
+    public void offerdialog()
+    {
+        freebielayout.getForeground().setAlpha(255);
+        LayoutInflater li = LayoutInflater.from(c);
+        View ltdofferView = li.inflate(R.layout.popupofferlayout, null);
+
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                c);
+        final Button okbutton = (Button) ltdofferView.findViewById(R.id.okbutton);
+        final ImageButton cancelbutton= (ImageButton) ltdofferView.findViewById(R.id.cancelbutton);
+
+        alertDialogBuilder.setView(ltdofferView);
+        alertDialogBuilder
+                .setCancelable(true);
+        // create alert dialog
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(alertDialog.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        lp.gravity= Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL;
+        //alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        alertDialog.show();
+        alertDialog.getWindow().setAttributes(lp);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        okbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog.dismiss();
+                freebielayout.getForeground().setAlpha(0);
+            }
+        });
+        cancelbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog.dismiss();
+                freebielayout.getForeground().setAlpha(0);
+            }
+        });
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                freebielayout.getForeground().setAlpha(0);
+            }
+        });
+        //alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
 
+        // show it
+        //alertDialog.show();
+    }
 
     public void prompt(View v)
     { // get prompts.xml view
