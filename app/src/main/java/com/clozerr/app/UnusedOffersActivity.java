@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gcm.GCMRegistrar;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,7 +44,7 @@ public class UnusedOffersActivity extends ActionBarActivity {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        final ArrayList<MyOffer> values = convertRowMyOffers(VendorActivity.detailsBundle.getString("Alloffers"));
+        final ArrayList<MyOffer> values = convertRowMyOffers(VendorActivity.detailsBundle.getString("unlockedoffers"));
         //ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.freebies_item_layout, R.id.freebiename, values);
         UnusedOffersAdapter adapter = new UnusedOffersAdapter(values,this);
         mRecyclerView.setAdapter(adapter);
@@ -150,7 +152,7 @@ public class UnusedOffersActivity extends ActionBarActivity {
             for (int i = 0; i < array.length(); ++i) {
                 offerObject = array.getJSONObject(i);
                 Log.i("id",offerObject.getString("_id"));
-                params = offerObject.getJSONObject("params");
+                //params = offerObject.getJSONObject("params");
 
                 extras = null;
                 //String type = offerObject.getString("type");
@@ -175,17 +177,40 @@ public class UnusedOffersActivity extends ActionBarActivity {
                         null,
                         offerObject.getString("caption"),
                         offerObject.getString("description"),
-                        params.getInt("stamps"),
-                        params.getBoolean("used"),
-                        params.getBoolean("unlocked"),null,
-                        offerObject.getString("_id")
+                        //params.getInt("stamps"),
+                        0,
+                        //params.getBoolean("used"),
+                        //params.getBoolean("unlocked"),
+                        false,true,null,
+                        offerObject.getString("_id"),
+                        false
                         );
+                //if(params.getBoolean("used")==false&&params.getBoolean("unlocked")==true)
                 rowItems.add(item);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            Toast.makeText(getApplicationContext(),"An error occurred. Please try again later.",Toast.LENGTH_SHORT).show();
         }
-        return rowItems;
+        if(rowItems.size()==0)
+        {
+            findViewById(R.id.alertoffer).setVisibility(View.VISIBLE);
+            //Toast.makeText(getApplicationContext(),"No offer unlocked. Marking checkin as a visit",Toast.LENGTH_SHORT).show();
+            String url = "http://api.clozerr.com/v2/vendor/checkin?access_token="+Home.TOKEN+"&vendor_id="+VendorActivity.vendorId+"&gcm_id="+ GCMRegistrar.getRegistrationId(getApplicationContext());
+            new AsyncGet(getApplicationContext(), url, new AsyncGet.AsyncResult() {
+                @Override
+                public void gotResult(String s) {
+                    try {
+                        JSONObject jsonObject = new JSONObject(s);
+                        if(jsonObject.getString("vendor").equals(VendorActivity.vendorId))
+                        Toast.makeText(getApplicationContext(),"No offer unlocked. Marking checkin as a visit",Toast.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+            return rowItems;
     }
 
     @Override
