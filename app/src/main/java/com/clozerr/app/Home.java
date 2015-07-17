@@ -127,8 +127,8 @@ public class Home  extends ActionBarActivity {
         }
         initDrawer();
         freebielayout=(FrameLayout)findViewById(R.id.homeframe);
-        //freebielayout.getForeground().setAlpha(0);
-        offerdialog();
+        freebielayout.getForeground().setAlpha(0);
+        //offerdialog();
         SharedPreferences status2 = getSharedPreferences("USER", 0);
         TOKEN = status2.getString("token", "");
         TimeZone tz = TimeZone.getTimeZone("GMT+0530");
