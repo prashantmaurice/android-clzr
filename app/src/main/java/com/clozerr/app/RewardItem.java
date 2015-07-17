@@ -10,7 +10,7 @@ public class RewardItem {
     String Image;
     String RewardId;
     public RewardItem(String Name,String Caption,String Description,String Image, String RewardId){
-        this.Name = splitCamelCase(Name);
+        this.Name = capitalise(splitCamelCase(Name));
         this.Caption = Caption;
         this.Description = Description;
         this.Image = Image;
@@ -25,5 +25,10 @@ public class RewardItem {
                 ),
                 " "
         );
+    }
+    String capitalise(String s){
+        char[] c = s.toCharArray();
+        c[0] = Character.toUpperCase(c[0]);
+        return new String(c);
     }
 }
