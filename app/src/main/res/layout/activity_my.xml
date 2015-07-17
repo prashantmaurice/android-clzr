@@ -6,6 +6,11 @@
     android:background="#00eaeaea"
     android:orientation="vertical"
     tools:context=".Home">
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#eaeaea">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -13,11 +18,7 @@
         android:id="@+id/homeframe"
         android:foreground="#55000000">
 
-    <android.support.v4.widget.DrawerLayout
-        android:id="@+id/drawerLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#eaeaea">
+
 
         <RelativeLayout
             android:id="@+id/layout"
@@ -49,7 +50,6 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <include layout="@layout/navdrawer_content" />
         <!-- navigation drawer -->
         <!--<RelativeLayout-->
         <!--android:layout_gravity="left|start"-->
@@ -65,8 +65,9 @@
         <!--android:background="#fff"-->
         <!--android:dividerHeight="1dp" />-->
         <!--</RelativeLayout>-->
+    </FrameLayout>
+        <include layout="@layout/navdrawer_content" />
 
     </android.support.v4.widget.DrawerLayout>
-    </FrameLayout>
 
 </LinearLayout>

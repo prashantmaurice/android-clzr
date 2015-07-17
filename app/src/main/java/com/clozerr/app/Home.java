@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -429,6 +430,8 @@ public class Home  extends ActionBarActivity {
             }
         };
         drawerLayout.setDrawerListener(drawerToggle);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
     }
 
     @Override
@@ -479,7 +482,10 @@ public class Home  extends ActionBarActivity {
             Intent giftboxintent = new Intent(this,GiftBoxActivity.class);
             startActivity(giftboxintent);
         }
-
+        if(id == android.R.id.home) {
+                drawerLayout.openDrawer(GravityCompat.START);  // OPEN DRAWER
+                return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
