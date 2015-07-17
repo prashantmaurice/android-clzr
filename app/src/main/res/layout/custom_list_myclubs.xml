@@ -68,13 +68,16 @@
             android:layout_alignParentRight="true" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="6dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="0dp"
+            android:layout_marginRight="40dp"
             android:paddingTop="0dp"
             android:textSize="16sp"
+            android:ellipsize="end"
+            android:singleLine="true"
             android:text="Name"
             android:textColor="#393F3F"
             android:id="@+id/textTitle" />

@@ -41,21 +41,8 @@ public abstract class BeaconFinderService extends WakefulIntentService {
     public static final String KEY_BLE = "com.clozerr.app.KEY_BLE";
     public static final String KEY_BEACON_UUID = "com.clozerr.app.KEY_BEACON_UUID";
     public static final String KEY_APP_DISABLE_BT = "com.clozerr.app.KEY_APP_DISABLE_BT";
-    public static final long BT_RECEIVER_TIMEOUT = TimeUnit.MILLISECONDS.convert(2L, TimeUnit.SECONDS);
+    public static final long BT_RECEIVER_TIMEOUT = TimeUnit.MILLISECONDS.convert(3L, TimeUnit.SECONDS);
     public static final int THRESHOLD_RSSI = -100;
-
-    protected enum RequestCodes {
-        CODE_ALARM_INTENT(1000),
-        CODE_DETAILS_INTENT(1234),
-        CODE_REFUSE_INTENT(1235),
-        CODE_VENDOR_LIST_INTENT(1236),
-        CODE_RESUME_SCAN_INTENT(1237);
-
-        private int mCode;
-
-        RequestCodes(int code) { mCode = code; }
-        public int code() { return mCode; }
-    }
 
     protected static String commonBeaconUUID = "";
     protected static boolean isBLESupported = true;

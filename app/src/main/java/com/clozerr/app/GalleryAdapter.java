@@ -5,12 +5,13 @@ package com.clozerr.app;
  */
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import com.koushikdutta.ion.Ion;
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ListItemViewHolder> {
 
@@ -35,11 +36,12 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ListItem
     public void onBindViewHolder(ListItemViewHolder viewHolder, int position) {
         viewHolder.currentItem = numbers[position];
         //CategoryModel model = items.get(position);
+        Ion.with(viewHolder.imageView).load(viewHolder.currentItem);
     }
 
     @Override
     public int getItemCount() {
-        return numbers.length;
+        return (numbers != null) ? numbers.length : 0;
     }
 
     public final static class ListItemViewHolder extends RecyclerView.ViewHolder {

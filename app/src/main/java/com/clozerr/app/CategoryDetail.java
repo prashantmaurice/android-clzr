@@ -547,11 +547,11 @@ private ArrayList<CardModel> convertRow(String s) {
                     editor.clear();
                     editor.apply();
                     Home.USER_PIC_URL = Home.USERNAME = Home.USERID = TOKEN = "";
-                    if (Login.googleOrFb == 2 && Login.mGoogleApiClient != null)
+                    if (Login.googleOrFb == 2 && Login.googleApiClient != null)
                     {
-                        if (Login.mGoogleApiClient.isConnected()) {
-                            Plus.AccountApi.clearDefaultAccount(Login.mGoogleApiClient);
-                            Login.mGoogleApiClient.disconnect();
+                        if (Login.googleApiClient.isConnected()) {
+                            Plus.AccountApi.clearDefaultAccount(Login.googleApiClient);
+                            Login.googleApiClient.disconnect();
                         }
                     }
                     else if (Login.googleOrFb == 1)

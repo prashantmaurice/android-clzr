@@ -25,6 +25,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 import android.widget.Toast;
+
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
@@ -49,13 +50,14 @@ public class VendorActivity extends ActionBarActivity {
     private SlidingTabLayout mtabs;
     private Intent callingIntent;
     private FloatingActionButton mCheckInButton;
-
+    static String Rewards="";
     private String pinNumber;
     public static Bundle detailsBundle;
     public static String vendorId;
     static String vendorTitle;
     static int i=1;
     public String analyticsurlvendor=null;
+    static String TOKEN="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +79,7 @@ public class VendorActivity extends ActionBarActivity {
         final String vendor_id = callingIntent.getStringExtra("vendor_id");
         vendorId = vendor_id;
 
-        String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
+        TOKEN = getSharedPreferences("USER", 0).getString("token", "");
         final String urlVendor = "http://api.clozerr.com/v2/vendor/get/details?vendor_id=" + vendor_id;
         Log.e(TAG, "vendor url - " + urlVendor);
         new AsyncGet(this, urlVendor, new AsyncGet.AsyncResult() {
@@ -164,16 +166,26 @@ public class VendorActivity extends ActionBarActivity {
                             object.getString("fid"), object.getString("_id"),
                             0
                     );
-                    ArrayList<String> stringArray = new ArrayList<String>();
-                    JSONArray jsonArray = object.getJSONArray("question");
-                    for (int i = 0, count = jsonArray.length(); i < count; i++) {
+                    ArrayList<String> questions = new ArrayList<String>();
+                    JSONArray questionArray = object.getJSONArray("question");
+                    for (int i = 0, count = questionArray.length(); i < count; i++) {
                         try {
-                            stringArray.add(jsonArray.getString(i));
+                            questions.add(questionArray.getString(i));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
-                    detailsBundle.putStringArrayList("questions", stringArray);
+                    detailsBundle.putStringArrayList("questions", questions);
+                    ArrayList<String> gallery = new ArrayList<String>();
+                    JSONArray galleryArray = object.getJSONArray("gallery");
+                    for (int i = 0, count = galleryArray.length(); i < count; i++) {
+                        try {
+                            gallery.add(galleryArray.getString(i));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    detailsBundle.putStringArrayList("gallery", gallery);
                      /*JSONArray question= object.getJSONArray("question");
                     for(int i=0;i<question.length();i++){
                       ques_arr.add(question.getString(i));
@@ -196,6 +208,7 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putString("gplus",gplus);
                     detailsBundle.putString("twitter",twitter);
                     detailsBundle.putString("logo",logo);
+
                     //currentItem.getQuestions();
                     /*try {
                         if (!fromPeriodicBFS && params != null)
@@ -280,11 +293,12 @@ public class VendorActivity extends ActionBarActivity {
         new AsyncGet(VendorActivity.this, analyticsurlvendor, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
-                Log.e(analyticsurlvendor,"");
+                Log.e(analyticsurlvendor, "");
                 //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
                 Constants.URLBuilders.ANALYTICS.clearQuery();
             }
         },false);
+
 
         /*String urlVisited = "http://api.clozerr.com/v2/vendor/offers/offerspage?vendor_id=" + vendorId + "&access_token=" + TOKEN;
         String urlUser = "http://api.clozerr.com/auth?fid=" + detailsBundle.getString("fid") + "&access_token=" + TOKEN;
@@ -353,13 +367,14 @@ public class VendorActivity extends ActionBarActivity {
         });
 
         String unlockedOffersUrl = "http://api.clozerr.com/v2/vendor/offers/unlocked?access_token="+TOKEN+"&vendor_id="+vendorId;
-/*        Log.e(TAG, "MyStamps URL - " + unlockedOffersUrl);
+        Log.e(TAG, "MyStamps URL - " + unlockedOffersUrl);
         new AsyncGet(this, unlockedOffersUrl, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
                 //  t1.setText(s);
 
                 Log.e("Offers", s);
+                //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
                 detailsBundle.putString("unlockedoffers", s);
                 //Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
                 //l1.setAdapter(adapter);
@@ -368,7 +383,7 @@ public class VendorActivity extends ActionBarActivity {
                 }
 
             }
-        });*/
+        });
 
         new AsyncGet(this, "http://api.clozerr.com/v2/user/add/pinned?access_token="+TOKEN , new AsyncGet.AsyncResult() {
             @Override

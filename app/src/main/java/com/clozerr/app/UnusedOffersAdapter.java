@@ -54,6 +54,8 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
         MyOffer current=values.get(position);
         //viewHolder.txtvisitno.setText(model.getStamps()+"");
         viewHolder.caption.setText(current.getCaption());
+        viewHolder.vendorId = current.getVendorId();
+        viewHolder.vendorName = current.getVendorName();
         String desc = current.getDescription();
         if(current.getDescription().length()>=32)
         desc= current.getDescription().substring(0,32)+"...";
@@ -125,6 +127,8 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
         TextView caption;
         TextView description;
         public MyOffer currentItem;
+        public String vendorId;
+        public String vendorName;
         ImageView pin;
 
         public ListItemViewHolder(View itemView) {
@@ -132,6 +136,7 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
             //txtvisitno = (TextView) itemView.findViewById(R.id.txtNum);
             caption = (TextView) itemView.findViewById(R.id.freebiename);
             description = (TextView) itemView.findViewById(R.id.freebiedescription);
+            vendorId = vendorName = "";
 
             pin=(ImageView)itemView.findViewById(R.id.pinimage);
             pin.setOnClickListener(new View.OnClickListener() {
@@ -198,7 +203,8 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
                 public void onClick(View view) {
                     Intent intent = new Intent(c, FreebieDescription.class);
                     intent.putExtra("offerid", currentItem.getOfferid());
-                    intent.putExtra("vendorid", VendorActivity.detailsBundle.getString("vendorId"));
+                    intent.putExtra("vendorid", (!vendorId.isEmpty()) ? vendorId : VendorActivity.detailsBundle.getString("vendorId"));
+                    intent.putExtra("vendorName", (!vendorName.isEmpty()) ? vendorName : VendorActivity.detailsBundle.getString("vendorTitle"));
                     intent.putExtra("caption", currentItem.getCaption());
                     intent.putExtra("description", currentItem.getDescription());
                     c.startActivity(intent);
