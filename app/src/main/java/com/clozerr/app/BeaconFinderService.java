@@ -3,7 +3,6 @@ package com.clozerr.app;
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.bluetooth.BluetoothAdapter;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,7 +27,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by S.ARAVIND on 3/3/2015.
@@ -41,8 +39,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
     public static final String KEY_BLE = "com.clozerr.app.KEY_BLE";
     public static final String KEY_BEACON_UUID = "com.clozerr.app.KEY_BEACON_UUID";
     public static final String KEY_APP_DISABLE_BT = "com.clozerr.app.KEY_APP_DISABLE_BT";
-    public static final long BT_RECEIVER_TIMEOUT = TimeUnit.MILLISECONDS.convert(3L, TimeUnit.SECONDS);
-    public static final int THRESHOLD_RSSI = -100;
+    public static final int DEFAULT_THRESHOLD_RSSI = -100;
 
     protected static String commonBeaconUUID = "";
     protected static boolean isBLESupported = true;
@@ -236,10 +233,10 @@ public abstract class BeaconFinderService extends WakefulIntentService {
     }
 
     /*protected static void readBeaconDBFromFile(Context context) throws IOException, JSONException {
-        FileOutputStream dummyOutputStream = context.openFileOutput(BeaconDBDownloader.BEACONS_FILE_NAME, MODE_APPEND);
+        FileOutputStream dummyOutputStream = context.openFileOutput(BeaconDBDownloader.BEACONS, MODE_APPEND);
                                             // for creating the file if not present
         dummyOutputStream.close();
-        FileInputStream fileInputStream = context.openFileInput(BeaconDBDownloader.BEACONS_FILE_NAME);
+        FileInputStream fileInputStream = context.openFileInput(BeaconDBDownloader.BEACONS);
         byte[] dataBytes = new byte[fileInputStream.available()];
         fileInputStream.read(dataBytes);
         fileInputStream.close();
@@ -273,12 +270,6 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         PreferenceManager.getDefaultSharedPreferences(context).edit()
                 .putBoolean(KEY_APP_DISABLE_BT, shouldAppDeactivateBluetooth).apply();
         if (!bluetoothAdapter.isEnabled()) {                            // disabled, so enable BT
-            /*context.registerReceiver(new BTStateChangeReceiver() {
-                @Override
-                public void onBluetoothOK() {
-                    connectServiceAndStartRanging();
-                }
-            }, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));*/
             bluetoothAdapter.enable();
         }
     }
@@ -335,7 +326,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
                     "SX" : "S1";*/
             //mPaymentType = object.getString("paymentType");
             //mPaymentType = "counter";
-            mThresholdRssi = THRESHOLD_RSSI;
+            mThresholdRssi = (object.has("thresh")) ? object.getInt("thresh") : DEFAULT_THRESHOLD_RSSI;
         }
 
         public Intent getDetailsIntent(Context context) {
@@ -350,7 +341,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         public static ArrayList<VendorParams> readVendorParamsFromFile(Context context) {
             ArrayList<VendorParams> result = null;
             try {
-                String fileContents = GenUtils.readFileContentsAsString(context, BeaconDBDownloader.BEACONS_FILE_NAME);
+                String fileContents = GenUtils.readFileContentsAsString(context, Constants.FileNames.BEACONS);
                 JSONObject rootObject = new JSONObject(fileContents);
                 commonBeaconUUID = rootObject.getString("UUID");
                 JSONArray rootArray = rootObject.getJSONArray("vendors");
@@ -415,32 +406,4 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         }
     }
 
-    public abstract class BTStateChangeReceiver extends BroadcastReceiver {
-
-        private long mTimeout;
-
-        public BTStateChangeReceiver(long timeout) {
-            super();
-            mTimeout = timeout;
-        }
-
-        @Override
-        public void onReceive(final Context context, Intent intent) {
-            if (intent != null && intent.getAction() != null && intent.getAction().equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
-                new Handler(Looper.myLooper()).postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        context.unregisterReceiver(BTStateChangeReceiver.this);
-                    }
-                }, mTimeout);
-                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
-                if (state == BluetoothAdapter.STATE_ON) {
-                    onBluetoothOK();
-                    context.unregisterReceiver(this);
-                }
-            }
-        }
-
-        public abstract void onBluetoothOK();
-    }
 }

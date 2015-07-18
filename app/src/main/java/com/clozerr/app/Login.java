@@ -442,7 +442,7 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
     }
 
     private void updateUI(boolean isSignedIn) {
-        mSignInButton.setEnabled(!isSignedIn);
+        mSignInButton.setClickable(!isSignedIn);
     }
 
     /*public void slideToImage(int position){

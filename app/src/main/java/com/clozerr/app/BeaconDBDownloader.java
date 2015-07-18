@@ -16,8 +16,6 @@ import org.json.JSONObject;
 
 public class BeaconDBDownloader extends BroadcastReceiver {
     private static final String TAG = "BDBDownloader";
-    //private static final String DOWNLOAD_URL = "http://api.clozerr.com/v2/vendor/beacons/all?access_token=";
-    public static final String BEACONS_FILE_NAME = "beacons.txt";
     public static final String ACTION_INITIATE_DOWNLOADER = "com.clozerr.app.ACTION_INITIATE_DOWNLOADER";
     private static boolean isDownloadDone = false;
 
@@ -40,7 +38,7 @@ public class BeaconDBDownloader extends BroadcastReceiver {
                         else {
                             try {
                                 String s = result.toString();
-                                GenUtils.writeDownloadedStringToFile(context, s, BEACONS_FILE_NAME);
+                                GenUtils.writeDownloadedStringToFile(context, s, Constants.FileNames.BEACONS);
                                 BeaconFinderService.commonBeaconUUID = new JSONObject(s).getString("UUID");
                                 PreferenceManager.getDefaultSharedPreferences(context).edit().
                                         putString(BeaconFinderService.KEY_BEACON_UUID, BeaconFinderService.commonBeaconUUID).apply();

@@ -53,14 +53,12 @@ import java.util.concurrent.TimeUnit;
 public class GeofenceManagerService extends Service {
 
     private static final String TAG = "GeofenceManagerService";
-    private static final String KEY_GEOFENCE_SERVICE_RUNNING = "com.clozerr.app.KEY_GEOFENCE_SERVICE_RUNNING";
-    private static final String GEOFENCE_PARAMS_FILE_NAME = "geofenceParams.txt";
+    //private static final String KEY_GEOFENCE_SERVICE_RUNNING = "com.clozerr.app.KEY_GEOFENCE_SERVICE_RUNNING";
     private static final float GEOFENCE_MINIMUM_RADIUS_METERS = 100.0F;
     private static final long GEOFENCE_EXPIRATION = TimeUnit.MILLISECONDS.convert(1L, TimeUnit.DAYS);
-    private static final int GEOFENCE_DWELL_TIME = (int)TimeUnit.MILLISECONDS.convert(5L, TimeUnit.SECONDS);
+    //private static final int GEOFENCE_DWELL_TIME = (int)TimeUnit.MILLISECONDS.convert(5L, TimeUnit.SECONDS);
         // of the int type as Geofencing API accepts only int delay
     private static final int NOTIFICATION_ID = 100;
-    private static final GenUtils.RunManager runManager = new GenUtils.RunManager(KEY_GEOFENCE_SERVICE_RUNNING);
 
     public static final HashMap<String, GeofenceParams> geofenceParamsHashMap = new HashMap<>();
     // Geofence types; all of them must start with "GEOFENCE_TYPE_" as the array holding them needs that
@@ -75,7 +73,7 @@ public class GeofenceManagerService extends Service {
     // HashMap storing details of all geofences to be tracked at any point of time.
     private static GeofencingRequest geofencingRequest = null;
     private static PendingIntent geofencePendingIntent = null;
-    //private static boolean running = false;
+    private static boolean running = false;
 
     static {
         for (Field field : GeofenceManagerService.class.getDeclaredFields())
@@ -121,7 +119,7 @@ public class GeofenceManagerService extends Service {
         return START_REDELIVER_INTENT;
     }
 
-    @Override
+    /*@Override
     public void onDestroy() {
         Log.e(TAG, "in onDestroy()");
         LocationServices.GeofencingApi.removeGeofences(
@@ -142,7 +140,7 @@ public class GeofenceManagerService extends Service {
         googleApiClient.disconnect();
         checkAndStopService(this);
         super.onDestroy();
-    }
+    }*/
 
     private synchronized void buildGoogleApiClient() {
         if (googleApiClient == null) {
@@ -246,7 +244,7 @@ public class GeofenceManagerService extends Service {
                             try {
                                 JSONArray root = new JSONArray(result.toString());
                                 GenUtils.writeDownloadedStringToFile(context,
-                                        root.toString(), GEOFENCE_PARAMS_FILE_NAME);
+                                        root.toString(), Constants.FileNames.GEOFENCE_PARAMS);
                                 for (int i = 0; i < root.length(); ++i) {
                                     JSONObject fenceObject = root.getJSONObject(i);
                                     geofenceParamsHashMap.put(fenceObject.getString("_id"),
@@ -288,25 +286,28 @@ public class GeofenceManagerService extends Service {
     }
 
     public static void checkAndStartService(final Context context) {
-        if (runManager.signalStart(context)) {
+        if (/*runManager.signalStart(context)*/!running) {
+            running = true;
             // download data about beacons, which will be part of this service
             // and will be running daily
             BeaconDBDownloadBaseReceiver.scheduleDownload(context);
-            // start service
+
             context.startService(new Intent(context, GeofenceManagerService.class));
         }
     }
 
     public static void checkAndStopService(final Context context) {
-        if (runManager.signalStop(context)) {
+        if (/*runManager.signalStop(context)*/running) {
+            running = false;
             BeaconDBDownloadBaseReceiver.stopDownloads(context);
+
             context.stopService(new Intent(context, GeofenceManagerService.class));
         }
     }
 
     public static void readGeofenceParamsFromFile(Context context) {
         try {
-            String fileContents = GenUtils.readFileContentsAsString(context, GEOFENCE_PARAMS_FILE_NAME);
+            String fileContents = GenUtils.readFileContentsAsString(context, Constants.FileNames.GEOFENCE_PARAMS);
             geofenceParamsHashMap.clear();
             JSONArray root = new JSONArray(fileContents);
             for (int i = 0; i < root.length(); ++i) {

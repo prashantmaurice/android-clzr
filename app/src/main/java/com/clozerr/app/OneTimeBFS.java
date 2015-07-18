@@ -1,6 +1,7 @@
 package com.clozerr.app;
 
 import android.annotation.TargetApi;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -133,20 +134,28 @@ public class OneTimeBFS extends BeaconFinderService {
         });*/
         setListener();
         turnOnBluetooth(getApplicationContext());
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+        new BTStateChangeReceiver() {
             @Override
-            public void run() {
-                beaconManager.connect(new ServiceReadyCallback() {
-                    @Override
-                    public void onServiceReady() {
-                        Log.e(TAG, "Started Scan");
-                        running = true;
-                        scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(commonBeaconUUID), beaconDBParams.mMajor, beaconDBParams.mMinor);
-                        beaconManager.startRangingAndDiscoverDevice(scanningRegion);
-                    }
-                });
+            public void onBTStateReached(Context context, int state) {
+                if (state == BluetoothAdapter.STATE_ON) {
+                    unregisterSelf(context);
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            beaconManager.connect(new ServiceReadyCallback() {
+                                @Override
+                                public void onServiceReady() {
+                                    Log.e(TAG, "Started Scan");
+                                    running = true;
+                                    scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(commonBeaconUUID), beaconDBParams.mMajor, beaconDBParams.mMinor);
+                                    beaconManager.startRangingAndDiscoverDevice(scanningRegion);
+                                }
+                            });
+                        }
+                    });
+                }
             }
-        }, BT_RECEIVER_TIMEOUT); // delay required as scanning will not work right upon enabling BT
+        }.registerSelf(this);
     }
 
     @Override

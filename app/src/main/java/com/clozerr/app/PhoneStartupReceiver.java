@@ -16,7 +16,6 @@ public class PhoneStartupReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.e(TAG, "boot done");
-        GenUtils.RunManager.initKeys(context);
         GeofenceManagerService.checkAndStartService(context);
     }
 }

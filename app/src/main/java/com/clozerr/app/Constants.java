@@ -16,6 +16,19 @@ public class Constants {
         public static final int GOOGLE_SIGN_IN_ACTIVITY = 9000;
     }
 
+    public static class FileNames {
+        public static final String BEACONS = "beacons.txt";
+        public static final String GEOFENCE_PARAMS = "geofenceParams.txt";
+    }
+
+    public static class Actions {
+
+    }
+
+    public static class SPKeys {                // Shared Preferences Keys
+
+    }
+
     public static class URLBuilders {
 
         private static final String DEFAULT_SCHEME = "http";

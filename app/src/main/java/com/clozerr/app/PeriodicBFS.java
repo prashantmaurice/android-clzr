@@ -6,6 +6,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -362,7 +363,7 @@ public class PeriodicBFS extends BeaconFinderService {
             //putToast(getApplicationContext(), "scanned", Toast.LENGTH_SHORT);
             /*if (beaconDatabase.contains(uuid.toUpperCase())) {*/
 
-            if (beacon.getRssi() >= THRESHOLD_RSSI) {
+            if (beacon.getRssi() >= DEFAULT_THRESHOLD_RSSI) {
                 VendorParams vendorParams = VendorParams.findVendorParamsInFile(this,
                         new Predicate<VendorParams>() {
                             @Override
@@ -465,22 +466,29 @@ public class PeriodicBFS extends BeaconFinderService {
         setListener();
         turnOnBluetooth(getApplicationContext());
         pushedNotification = false;
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+        new BTStateChangeReceiver(SCAN_PERIOD) {
             @Override
-            public void run() {
-                beaconManager.connect(new ServiceReadyCallback() {
-                    @Override
-                    public void onServiceReady() {
-                        //hasScanStarted = true;
-                        Log.e(TAG, "Started Scan");
-                        scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(commonBeaconUUID), null, null);
+            public void onBTStateReached(Context context, int state) {
+                if (state == BluetoothAdapter.STATE_ON) {
+                    unregisterSelf(context);
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            beaconManager.connect(new ServiceReadyCallback() {
+                                @Override
+                                public void onServiceReady() {
+                                    //hasScanStarted = true;
+                                    Log.e(TAG, "Started Scan");
+                                    scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(commonBeaconUUID), null, null);
                                     // scan for all possible major & minor values, so no rules
-                        beaconManager.startRangingAndDiscoverDevice(scanningRegion);
-                    }
-                });
+                                    beaconManager.startRangingAndDiscoverDevice(scanningRegion);
+                                }
+                            });
+                        }
+                    });
+                }
             }
-        }, BT_RECEIVER_TIMEOUT); // delay required as scanning will not work right upon enabling BT
-
+        }.registerSelf(this);
         /*beaconManager.connect(new ServiceReadyCallback() {
             @Override
             public void onServiceReady() {

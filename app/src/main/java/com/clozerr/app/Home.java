@@ -91,7 +91,6 @@ public class Home  extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        GenUtils.RunManager.initKeys(this);
         GeofenceManagerService.checkAndStartService(this);
         /*try
         {

@@ -13,6 +13,5 @@ public class PhoneShutdownReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.e(TAG, "shutting down");
-        GenUtils.RunManager.clearKeys(context);
     }
 }

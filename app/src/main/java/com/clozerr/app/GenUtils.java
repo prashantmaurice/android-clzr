@@ -2,20 +2,17 @@ package com.clozerr.app;
 
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
-import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashSet;
 
 /**
  * Created by aravind on 7/7/15.
@@ -70,55 +67,4 @@ public class GenUtils {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    public static class RunManager {
-        private static final String TAG = "RunManager";
-        private static final String KEY_PREFIX = TAG + "-";
-
-        public static final HashSet<String> keySet = new HashSet<>();
-
-        private String mKey;
-
-        public RunManager(String key) {
-            mKey = KEY_PREFIX + key;
-            keySet.add(mKey);
-        }
-
-        private static SharedPreferences getPreferences(Context context) {
-            return PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        }
-
-        public static void initKeys(Context context) {
-            keySet.clear();
-            for (String key : getPreferences(context).getAll().keySet())
-                if (key.startsWith(KEY_PREFIX))
-                    keySet.add(key);
-        }
-
-        public static void clearKeys(Context context) {
-            SharedPreferences.Editor editor = getPreferences(context).edit();
-            for (String key : keySet)
-                editor.remove(key);
-            editor.apply();
-        }
-
-        public boolean isRunning(Context context) {
-            return getPreferences(context).getBoolean(mKey, false);
-        }
-
-        public boolean signalStart(Context context) {
-            if (!isRunning(context)) {
-                getPreferences(context).edit().putBoolean(mKey, true).apply();
-                return true;
-            }
-            return false;
-        }
-
-        public boolean signalStop(Context context) {
-            if (isRunning(context)) {
-                getPreferences(context).edit().putBoolean(mKey, false).apply();
-                return true;
-            }
-            return false;
-        }
-    }
 }
