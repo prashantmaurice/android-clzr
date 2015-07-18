@@ -44,7 +44,7 @@ public class OneTimeBFS extends BeaconFinderService {
 
     /*@Override
     protected Region createRegion() {
-        return new Region(REGION_ID, getUuidWithoutHyphens(commonBeaconUUID), beaconDBParams.mMajor, beaconDBParams.mMinor);
+        return new Region(APP_PACKAGE_NAME, getUuidWithoutHyphens(commonBeaconUUID), beaconDBParams.mMajor, beaconDBParams.mMinor);
     }*/
 
     @Override
@@ -94,7 +94,7 @@ public class OneTimeBFS extends BeaconFinderService {
 
     /*@Override
     protected void runService() {
-        scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(commonBeaconUUID), beaconDBParams.mMajor, beaconDBParams.mMinor);
+        scanningRegion = new Region(APP_PACKAGE_NAME, getUuidWithoutHyphens(commonBeaconUUID), beaconDBParams.mMajor, beaconDBParams.mMinor);
         beaconManager.connect(new ServiceReadyCallback() {
             @Override
             public void onServiceReady() {
@@ -113,7 +113,7 @@ public class OneTimeBFS extends BeaconFinderService {
 
     /*@Override
     protected Region setScanningRegion() {
-        return new Region(REGION_ID, commonBeaconUUID, beaconDBParams.mMajor, beaconDBParams.mMinor);
+        return new Region(APP_PACKAGE_NAME, commonBeaconUUID, beaconDBParams.mMajor, beaconDBParams.mMinor);
     }*/
 
     @Override
@@ -147,7 +147,7 @@ public class OneTimeBFS extends BeaconFinderService {
                                 public void onServiceReady() {
                                     Log.e(TAG, "Started Scan");
                                     running = true;
-                                    scanningRegion = new Region(REGION_ID, getUuidWithoutHyphens(commonBeaconUUID), beaconDBParams.mMajor, beaconDBParams.mMinor);
+                                    scanningRegion = new Region(Constants.APP_PACKAGE_NAME, getUuidWithoutHyphens(commonBeaconUUID), beaconDBParams.mMajor, beaconDBParams.mMinor);
                                     beaconManager.startRangingAndDiscoverDevice(scanningRegion);
                                 }
                             });
@@ -179,7 +179,7 @@ public class OneTimeBFS extends BeaconFinderService {
             running = false;
             beaconManager.stopRanging(scanningRegion);
             turnOffBluetooth(context);
-            PreferenceManager.getDefaultSharedPreferences(context).edit().remove(KEY_APP_DISABLE_BT).apply();
+            PreferenceManager.getDefaultSharedPreferences(context).edit().remove(Constants.SPKeys.APP_DISABLE_BT).apply();
             PeriodicBFS.checkAndStartScan(context);
         }
     }

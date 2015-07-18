@@ -18,7 +18,10 @@ import java.io.IOException;
  * Created by aravind on 7/7/15.
  */
 public class GenUtils {
+
     private static final String TAG = "GenUtils";
+
+    private GenUtils() {}               // prevent initialization
 
     public static Uri.Builder getClearedUriBuilder(Uri.Builder builder) {
         return builder.clearQuery();
