@@ -42,9 +42,9 @@ public class PeriodicBFS extends BeaconFinderService {
     //private static final String ACTION_REMOVE_VENDOR = "RemoveVendor";
     //private static final String ACTION_FIRE_ALARM_SCAN = "com.clozerr.app.ACTION_FIRE_ALARM_SCAN";
 
-    private static final long ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.SECONDS);
-    private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(10L, TimeUnit.SECONDS);
-    private static final long SCAN_PAUSE_INTERVAL = TimeUnit.MILLISECONDS.convert(30L, TimeUnit.SECONDS);
+    private static final long ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(60L, TimeUnit.SECONDS);
+    private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(15L, TimeUnit.SECONDS);
+    private static final long SCAN_PAUSE_INTERVAL = TimeUnit.MILLISECONDS.convert(60L, TimeUnit.SECONDS);
     private static final long MAX_SCAN_RESTART_INTERVAL = ALARM_INTERVAL * 2 + SCAN_PAUSE_INTERVAL;
                                 // interval after which alarms have to be rescheduled no matter what
                                 // so it has to accommodate inexactness of alarm plus scan pausing
@@ -171,7 +171,7 @@ public class PeriodicBFS extends BeaconFinderService {
         //Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         return new NotificationCompat.Builder(context)
                 //.setLargeIcon(NOTIFICATION_LARGE_ICON)
-                .setSmallIcon(R.drawable.ic_notif_logo)
+                .setSmallIcon(R.drawable.ic_launcher)
                 .setPriority(Notification.PRIORITY_MAX)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setAutoCancel(true);
