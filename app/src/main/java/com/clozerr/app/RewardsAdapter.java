@@ -81,6 +81,7 @@ public class RewardsAdapter extends RecyclerView.Adapter<RewardsAdapter.ListItem
                     intent.putExtra("vendorid",VendorActivity.vendorId);
                     intent.putExtra("caption",currentItem.Caption);
                     intent.putExtra("description",currentItem.Description);
+                    c.startActivity(intent);
                 }
             });
         }
