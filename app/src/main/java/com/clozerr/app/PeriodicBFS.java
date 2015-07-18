@@ -540,7 +540,7 @@ public class PeriodicBFS extends BeaconFinderService {
     public static boolean isRunning() { return running; }
 
     public static void checkAndStartScan(Context context) {
-        if (!running && !OneTimeBFS.isRunning() && checkCompatibility(context) && checkPreferences(context)/* && areAnyVendorsNotifiable(context)*/) {
+        if (!running && !OneTimeBFS.isRunning() && checkCompatibility(context)/* && checkPreferences(context)*//* && areAnyVendorsNotifiable(context)*/) {
             running = true;
             //context.startService(new Intent(context, PeriodicBFS.class));
             //BeaconDBDownloadBaseReceiver.scheduleDownload(context);
@@ -654,6 +654,7 @@ public class PeriodicBFS extends BeaconFinderService {
     }*/
 
     public static class AlarmListener implements WakefulIntentService.AlarmListener {
+        private static final String TAG = "PBFSAlarmListener";
 
         @Override
         public void scheduleAlarms(AlarmManager alarmManager, PendingIntent pendingIntent, Context context) {
@@ -663,6 +664,7 @@ public class PeriodicBFS extends BeaconFinderService {
 
         @Override
         public void sendWakefulWork(Context context) {
+            Log.e(TAG, "sending wakeful work");
             commonBeaconUUID = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_BEACON_UUID, "");
             if (checkPreferences(context) && !commonBeaconUUID.isEmpty() && !isScanningPaused)
                 WakefulIntentService.sendWakefulWork(context, PeriodicBFS.class);

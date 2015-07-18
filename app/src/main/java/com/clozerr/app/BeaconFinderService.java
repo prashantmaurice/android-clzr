@@ -115,7 +115,8 @@ public abstract class BeaconFinderService extends WakefulIntentService {
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        onRangedBeacons((List<Beacon>) list);
+                        if (checkPreferences(getApplicationContext()))
+                            onRangedBeacons((List<Beacon>) list);
                     }
                 });
             }
@@ -229,7 +230,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         isScanningAllowed = sharedPreferences.getBoolean(context.getResources().getString(R.string.beacon_detection), true);
         sharedPreferences = context.getSharedPreferences("USER", 0);
         isUserLoggedIn = !sharedPreferences.getString("token", "").isEmpty();
-        return (!isUserLoggedIn || isScanningAllowed);
+        return (isUserLoggedIn && isScanningAllowed);
     }
 
     /*protected static void readBeaconDBFromFile(Context context) throws IOException, JSONException {

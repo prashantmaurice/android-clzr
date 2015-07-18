@@ -344,6 +344,7 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                     @Override
                     public void gotResult(String s) {
                         try {
+                            Log.e(TAG, "result - " + s);
                             JSONObject res = new JSONObject(s);
                             if (res.getBoolean("result")) {
                                 editor.putString("loginskip", "true");
@@ -377,18 +378,16 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
     @Override
     public void onClick(View v) {
         googleOrFb = 2;
-        if (!googleApiClient.isConnecting()) {
-// We only process button clicks when GoogleApiClient is not transitioning
-// between connected and not connected.
-            switch (v.getId()) {
-                case R.id.sign_in_button:
-                    // User clicked the sign-in button, so begin the sign-in process and automatically
-                    // attempt to resolve any errors that occur.
-                    mShouldResolve = true;
-                    googleApiClient.connect();
-                    break;
-            }
+        //if (!googleApiClient.isConnecting()) {
+        switch (v.getId()) {
+            case R.id.sign_in_button:
+                // User clicked the sign-in button, so begin the sign-in process and automatically
+                // attempt to resolve any errors that occur.
+                mShouldResolve = true;
+                googleApiClient.connect();
+                break;
         }
+        //}
     }
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
