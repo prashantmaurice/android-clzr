@@ -53,6 +53,7 @@ public class Constants {
         public static final String HOME_SCREEN = "Clozerr_Home_Screen";
         public static final String IN_STORE_INSTALL = "In_Store_Install";
         public static final String BEACON_DETECTION = "Beacon_Detection";
+        public static final String VENDOR_SCREEN = "Vendor Screen";
 
         public static final String SUFFIX_VENDOR_SCREEN = " Vendor Screen";
     }

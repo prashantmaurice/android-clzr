@@ -9,9 +9,7 @@ import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
@@ -33,11 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.TimeZone;
 
 
 public class VendorActivity extends ActionBarActivity {
@@ -251,28 +245,10 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putString("phoneNumber", phoneNumber);
                     //currentItem.getQuestions();
 
-                    TimeZone tz = TimeZone.getTimeZone("GMT+0530");
-                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
-                    df.setTimeZone(tz);
-                    String nowAsISO = df.format(new Date());
-                    analyticsurlvendor= Constants.URLBuilders.ANALYTICS
-                            .appendQueryParameter("metric","Vendor Screen")
-                            .appendQueryParameter("dimensions[device]", "Android API " + Build.VERSION.SDK_INT)
+                    analyticsurlvendor = GenUtils.getDefaultAnalyticsUriBuilder(getApplicationContext(), Constants.Metrics.VENDOR_SCREEN)
                             .appendQueryParameter("dimensions[vendor]", detailsBundle.getString("vendorId") )
-                            .appendQueryParameter("time", nowAsISO)
-                            .appendQueryParameter("access_token",TOKEN)
                             .build().toString();
-                    //Toast.makeText(getApplicationContext(),analyticsurlvendor,Toast.LENGTH_SHORT).show();
-
-                    //"?metric=Clozerr+Home+Screen&dimensions%5Bdevice%5D=Android+API+"+ Build.VERSION.SDK_INT+"&dimensions%5Bid%5D=,jau65asas76&time="+nowAsISO+"&access_token="+TOKEN;
-                    new AsyncGet(VendorActivity.this, analyticsurlvendor, new AsyncGet.AsyncResult() {
-                        @Override
-                        public void gotResult(String s) {
-                            Log.e(analyticsurlvendor, "");
-                            //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
-                            Constants.URLBuilders.ANALYTICS.clearQuery();
-                        }
-                    },false);
+                    GenUtils.putAnalytics(getApplicationContext(), TAG, analyticsurlvendor);
 
                     mCheckInButton.setOnClickListener(new View.OnClickListener() {
                         @Override
