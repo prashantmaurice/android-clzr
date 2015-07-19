@@ -35,10 +35,6 @@ import java.util.List;
 public abstract class BeaconFinderService extends WakefulIntentService {
     private static final String TAG = "BFS";
 
-    public static final String REGION_ID = "com.clozerr.app";
-    public static final String KEY_BLE = "com.clozerr.app.KEY_BLE";
-    public static final String KEY_BEACON_UUID = "com.clozerr.app.KEY_BEACON_UUID";
-    public static final String KEY_APP_DISABLE_BT = "com.clozerr.app.KEY_APP_DISABLE_BT";
     public static final int DEFAULT_THRESHOLD_RSSI = -100;
 
     protected static String commonBeaconUUID = "";
@@ -115,7 +111,8 @@ public abstract class BeaconFinderService extends WakefulIntentService {
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        onRangedBeacons((List<Beacon>) list);
+                        if (checkPreferences(getApplicationContext()))
+                            onRangedBeacons((List<Beacon>) list);
                     }
                 });
             }
@@ -186,7 +183,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
             else {
                 isBLESupported = true;
                 BeaconDBDownloadBaseReceiver.scheduleDownload(getApplicationContext());
-                commonBeaconUUID = sharedPreferences.getString(KEY_BEACON_UUID, "");
+                commonBeaconUUID = sharedPreferences.getString(BEACON_UUID, "");
                 return true;
             }
         }
@@ -195,7 +192,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
 
     protected static boolean checkCompatibility(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        if (!sharedPreferences.contains(KEY_BLE)) {
+        if (!sharedPreferences.contains(Constants.SPKeys.BLE)) {
             if (BluetoothAdapter.getDefaultAdapter() == null) {     // IntentService used, so
                                                                     // bluetoothAdapter may not have been initialized
                 putToast(context,
@@ -217,9 +214,9 @@ public abstract class BeaconFinderService extends WakefulIntentService {
             else {
                 isBLESupported = true;
                 /*BeaconDBDownloadBaseReceiver.scheduleDownload(getApplicationContext());
-                commonBeaconUUID = sharedPreferences.getString(KEY_BEACON_UUID, "");*/
+                commonBeaconUUID = sharedPreferences.getString(BEACON_UUID, "");*/
             }
-            sharedPreferences.edit().putBoolean(KEY_BLE, isBLESupported).apply();
+            sharedPreferences.edit().putBoolean(Constants.SPKeys.BLE, isBLESupported).apply();
         }
         return isBLESupported;
     }
@@ -229,7 +226,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         isScanningAllowed = sharedPreferences.getBoolean(context.getResources().getString(R.string.beacon_detection), true);
         sharedPreferences = context.getSharedPreferences("USER", 0);
         isUserLoggedIn = !sharedPreferences.getString("token", "").isEmpty();
-        return (!isUserLoggedIn || isScanningAllowed);
+        return (isUserLoggedIn && isScanningAllowed);
     }
 
     /*protected static void readBeaconDBFromFile(Context context) throws IOException, JSONException {
@@ -263,19 +260,19 @@ public abstract class BeaconFinderService extends WakefulIntentService {
     protected static void turnOnBluetooth(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         boolean shouldAppDeactivateBluetooth =
-                preferences.getBoolean(KEY_APP_DISABLE_BT, false) || !bluetoothAdapter.isEnabled();
+                preferences.getBoolean(Constants.SPKeys.APP_DISABLE_BT, false) || !bluetoothAdapter.isEnabled();
                                                 // check if it's this app that has to disable BT
                                                 // stored in (and read from) preferences to account for restart of
                                                 // process after OS/user kills app
         PreferenceManager.getDefaultSharedPreferences(context).edit()
-                .putBoolean(KEY_APP_DISABLE_BT, shouldAppDeactivateBluetooth).apply();
+                .putBoolean(Constants.SPKeys.APP_DISABLE_BT, shouldAppDeactivateBluetooth).apply();
         if (!bluetoothAdapter.isEnabled()) {                            // disabled, so enable BT
             bluetoothAdapter.enable();
         }
     }
 
     protected static void turnOffBluetooth(Context context) {
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(KEY_APP_DISABLE_BT, false))
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Constants.SPKeys.APP_DISABLE_BT, false))
                             // if app did not turn on BT, don't disable it as user might need it
             bluetoothAdapter.disable();
     }

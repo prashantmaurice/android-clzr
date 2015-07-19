@@ -292,7 +292,10 @@ public class Home  extends ActionBarActivity {
 
                 if(i==leftSliderData.length-1){ // this is basically the logout button
                     AlertDialog.Builder builder = new AlertDialog.Builder(Home.this);
-                    builder.setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
+                    builder.setTitle("Confirm log out")
+                            .setMessage("If you choose to log out, you will no longer receive Clozerr's notifications about your rewards in nearby places " +
+                                    "until your next log in.\nDo you still want to log out?")
+                            .setPositiveButton("Yes", dialogClickListener)
                             .setNegativeButton("No", dialogClickListener).show();
 
                 }

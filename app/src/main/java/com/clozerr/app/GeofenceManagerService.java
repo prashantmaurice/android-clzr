@@ -56,6 +56,8 @@ public class GeofenceManagerService extends Service {
     //private static final String KEY_GEOFENCE_SERVICE_RUNNING = "com.clozerr.app.KEY_GEOFENCE_SERVICE_RUNNING";
     private static final float GEOFENCE_MINIMUM_RADIUS_METERS = 100.0F;
     private static final long GEOFENCE_EXPIRATION = TimeUnit.MILLISECONDS.convert(1L, TimeUnit.DAYS);
+    private static final int GEOFENCE_URL_TIMEOUT = (int)TimeUnit.MILLISECONDS.convert(3L, TimeUnit.SECONDS);
+        // of the int type as Ion library accepts only int timeout
     //private static final int GEOFENCE_DWELL_TIME = (int)TimeUnit.MILLISECONDS.convert(5L, TimeUnit.SECONDS);
         // of the int type as Geofencing API accepts only int delay
     private static final int NOTIFICATION_ID = 100;
@@ -233,13 +235,12 @@ public class GeofenceManagerService extends Service {
     private static void loadURLAndAddGeofences(final Context context) {
         String geofenceUriString = getGeofenceUriString();
         Log.e(TAG, "fence url - " + geofenceUriString);
-        Ion.with(context).load(geofenceUriString).asJsonArray()
+        Ion.with(context).load(geofenceUriString).setTimeout(GEOFENCE_URL_TIMEOUT).asJsonArray()
                 .setCallback(new FutureCallback<JsonArray>() {
                     @Override
                     public void onCompleted(Exception e, JsonArray result) {
                         if (e != null) {
                             e.printStackTrace();
-                            loadURLAndAddGeofences(context);
                         } else {
                             try {
                                 JSONArray root = new JSONArray(result.toString());

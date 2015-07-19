@@ -7,7 +7,12 @@ import android.net.Uri;
  */
 public class Constants {
 
+    private static final String TAG = "Constants";
+
+    private Constants() {}          // prevent initialization
+
     public static final String SERVER_CLIENT_ID = "http://496568600186-o52fjump15ric3ct4rfoc9i73mnehu2f.apps.googleusercontent.com/";
+    public static final String APP_PACKAGE_NAME = Constants.class.getPackage().getName();
 
     public static class RequestCodes {
         public static final int DETAILS_INTENT = 1000;
@@ -25,8 +30,15 @@ public class Constants {
 
     }
 
-    public static class SPKeys {                // Shared Preferences Keys
+    /**
+     * Shared Preferences keys.
+     */
+    public static class SPKeys {
+        public static final String BLE = APP_PACKAGE_NAME + ".BLE";
+        public static final String BEACON_UUID = APP_PACKAGE_NAME + ".BEACON_UUID";
+        public static final String APP_DISABLE_BT = APP_PACKAGE_NAME + ".APP_DISABLE_BT";
 
+        public static final String PREFIX_REJECT_LIST = APP_PACKAGE_NAME + ".Rejects-";
     }
 
     public static class URLBuilders {

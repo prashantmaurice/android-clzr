@@ -41,7 +41,7 @@ public class BeaconDBDownloader extends BroadcastReceiver {
                                 GenUtils.writeDownloadedStringToFile(context, s, Constants.FileNames.BEACONS);
                                 BeaconFinderService.commonBeaconUUID = new JSONObject(s).getString("UUID");
                                 PreferenceManager.getDefaultSharedPreferences(context).edit().
-                                        putString(BeaconFinderService.KEY_BEACON_UUID, BeaconFinderService.commonBeaconUUID).apply();
+                                        putString(Constants.SPKeys.BEACON_UUID, BeaconFinderService.commonBeaconUUID).apply();
                                 Log.e(TAG, "downloaded");
                                 isDownloadDone = true;
                                 GenUtils.disableComponent(context, BeaconDBDownloader.class);
