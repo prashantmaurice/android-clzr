@@ -88,6 +88,7 @@ public class MyStampsFragment extends Fragment {
                                 extras,
                                 offerObject.getString("_id"),
                                 someObject.getInt("stamps")>=offerObject.getJSONObject("params").getInt("stamps")?true:false);
+                                //offerObject.getJSONObject("params").getBoolean("unlocked"));
                         rowItems.add(item);
                         flag = 1;
                         break;
