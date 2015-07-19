@@ -10,7 +10,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Get a Stamp for every Rs.300 you spend here"
+            android:text=""
             android:id="@+id/stampdesc"
             android:layout_margin="20dp"
             android:layout_alignParentTop="true"
