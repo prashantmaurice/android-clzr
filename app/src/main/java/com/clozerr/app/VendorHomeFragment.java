@@ -225,7 +225,8 @@ public class VendorHomeFragment extends Fragment {
         gallerylist.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         gallerylist.setItemAnimator(new DefaultItemAnimator());
         gallerylist.setHasFixedSize(true);
-        GalleryAdapter adapter = new GalleryAdapter(VendorActivity.detailsBundle.getStringArray("gallery"), getActivity());
+        String[] eStr = {""};
+        GalleryAdapter adapter = new GalleryAdapter(eStr, getActivity());
         gallerylist.setAdapter(adapter);
 
         return layout;
