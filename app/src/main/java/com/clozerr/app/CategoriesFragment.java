@@ -56,7 +56,7 @@ public class CategoriesFragment extends Fragment{
         SearchCard=layout.findViewById(R.id.card_view);
         SEARCH_CARD_INI_POS = ViewHelper.getTranslationY(SearchCard);
         mScrollable=getActivity().findViewById(R.id.drawerLayout);
-        mToolbar=(Toolbar)getActivity().findViewById(R.id.toolbar);
+        mToolbar=(Toolbar)getActivity().findViewById(R.id.toolbar_home);
         swipetab=getActivity().findViewById(R.id.tabs);
         final TextView searchHint = (TextView)layout.findViewById(R.id.searchHint);
         searchView.setOnSearchClickListener(new View.OnClickListener() {

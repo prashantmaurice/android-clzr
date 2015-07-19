@@ -36,6 +36,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SlidingDrawer;
@@ -46,6 +47,10 @@ import com.facebook.Session;
 import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.plus.Plus;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.text.DateFormat;
@@ -85,6 +90,7 @@ public class Home  extends ActionBarActivity {
     private NavDrawAdapter nav;
     private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Tell Friends about Clozerr", "My Pinned Offers", "Settings", "Log out"};
     private FrameLayout freebielayout;
+    private String giftboxstring;
     //private boolean nav_drawer_open = false;
 
 
@@ -124,6 +130,32 @@ public class Home  extends ActionBarActivity {
             setSupportActionBar(toolbar);
 
         }
+        ImageView giftbox = (ImageView)toolbar.findViewById(R.id.giftbox);
+        giftbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent giftboxintent = new Intent(Home.this, GiftBoxActivity.class);
+                giftboxintent.putExtra("giftboxstring",giftboxstring);
+                startActivity(giftboxintent);
+            }
+        });
+
+        String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
+        new AsyncGet(this, "http://api.clozerr.com/v2/vendor/offers/rewardspage?access_token=" +TOKEN, new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                try {
+                    giftboxstring=s;
+                    JSONArray rewards = new JSONArray(s);
+                    ArrayList<MyOffer> rowItems = new ArrayList<>();
+                    TextView notification=(TextView)toolbar.findViewById(R.id.notifcount);
+                    notification.setText(String.valueOf(rewards.length()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        },false);
+
         initDrawer();
         freebielayout=(FrameLayout)findViewById(R.id.homeframe);
         freebielayout.getForeground().setAlpha(0);
@@ -272,7 +304,7 @@ public class Home  extends ActionBarActivity {
     private void nitView() {
        // Toast.makeText(this, "in nitview", Toast.LENGTH_SHORT).show();
         leftDrawerList = (ListView) findViewById(R.id.nav_listView);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_home);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         //navigationDrawerAdapter=new ArrayAdapter<String>( Home.this, android.R.layout.simple_list_item_1, leftSliderData);
        // navigationDrawerAdapter=new ArrayAdapter<String>( Home.this, R.layout.navdrawlist,R.id.textView, leftSliderData);
@@ -317,7 +349,7 @@ public class Home  extends ActionBarActivity {
 
                 else if(i==4) {
                     Intent textShareIntent = new Intent(Intent.ACTION_SEND);
-                    textShareIntent.putExtra(Intent.EXTRA_TEXT, "Try out Clozerr, an app which lets you try out new restaurants near you and rewards you for your loyalty. https://play.google.com/store/apps/details?id=com.clozerr.app ");
+                    textShareIntent.putExtra(Intent.EXTRA_TEXT, "Try out Clozerr, an app which lets you try out new restaurants near you and rewards you for your loyalty. https://play.google.com/store/apps/details?id=com.clozerr.app&referrer=utm_source%3Dclozerr%26utm_medium%3Dappshare%26utm_term%3Dshared%252Bthrough%252Bclozerr");
                     textShareIntent.setType("text/plain");
                     startActivity(Intent.createChooser(textShareIntent, "Share with..."));
                 }
@@ -465,10 +497,10 @@ public class Home  extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.my, menu);
-        Drawable myIcon = getResources().getDrawable( R.drawable.giftbox );
-        ColorFilter filter = new LightingColorFilter( Color.WHITE, Color.WHITE );
-        myIcon.setColorFilter(filter);
-        menu.findItem(R.id.search).setIcon(myIcon);
+//        Drawable myIcon = getResources().getDrawable( R.drawable.giftbox );
+//        ColorFilter filter = new LightingColorFilter( Color.WHITE, Color.WHITE );
+//        myIcon.setColorFilter(filter);
+//        menu.findItem(R.id.search).setIcon(myIcon);
         return true;
     }
 
@@ -480,10 +512,10 @@ public class Home  extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.search) {
-            Intent giftboxintent = new Intent(this,GiftBoxActivity.class);
-            startActivity(giftboxintent);
-        }
+//        if (id == R.id.search) {
+//            Intent giftboxintent = new Intent(this,GiftBoxActivity.class);
+//            startActivity(giftboxintent);
+//        }
         if(id == android.R.id.home) {
                 drawerLayout.openDrawer(GravityCompat.START);  // OPEN DRAWER
                 return true;

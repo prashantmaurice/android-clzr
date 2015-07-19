@@ -58,7 +58,7 @@ public class MyClubsFragment extends Fragment {
         rowItems = new ArrayList<>();
         SEARCH_CARD_INI_POS = ViewHelper.getTranslationY(SearchCard);
         mScrollable = getActivity().findViewById(R.id.drawerLayout);
-        mToolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        mToolbar = (Toolbar) getActivity().findViewById(R.id.toolbar_home);
         swipetab = getActivity().findViewById(R.id.tabs);
         like = (ImageButton)getActivity().findViewById(R.id.like);
 

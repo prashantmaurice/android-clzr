@@ -230,6 +230,13 @@
             android:name=".PinnedOffersActivity"
             android:label="@string/title_activity_pinned_offers" >
         </activity>
+        <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
+        <receiver android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -39,7 +39,8 @@
                 android:layout_alignParentTop="true"
                 android:orientation="vertical">
 
-                <include layout="@layout/toolbar" />
+                <include layout="@layout/toolbar_home"
+                    android:id="@+id/toolbar_home"/>
 
                 <com.clozerr.app.SlidingTabLayout
                     android:id="@+id/tabs"

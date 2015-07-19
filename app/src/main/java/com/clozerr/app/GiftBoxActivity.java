@@ -39,39 +39,80 @@ public class GiftBoxActivity extends ActionBarActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             toolbar.setTitle("");
         }
-        String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
-        new AsyncGet(this, "http://api.clozerr.com/v2/vendor/offers/rewardspage?access_token=" +TOKEN, new AsyncGet.AsyncResult() {
-            @Override
-            public void gotResult(String s) {
-                try {
-                    JSONArray rewards = new JSONArray(s);
-                    ArrayList<MyOffer> rowItems = new ArrayList<>();
-                    for (int i = 0;i<rewards.length();i++)
-                    {
-                        JSONObject obj = rewards.getJSONObject(i);
-                        String caption = obj.getString("caption");
-                        String description = obj.getString("description");
-                        //int stamps = obj.getInt("stamps");
-                        String type = obj.getString("type");
-                        String vendor_id = obj.getJSONObject("vendor").getString("_id");
-                        String vendorName = obj.getJSONObject("vendor").getString("name");
-                        MyOffer item = new MyOffer(type,null,null,caption,description,0,false,true,null,obj.getString("_id"), vendor_id, vendorName,false);
-                        rowItems.add(item);
-                        //Toast.makeText(getApplicationContext(),String.valueOf(rowItems.size()),Toast.LENGTH_SHORT).show();
-                        //Log.i("row", String.valueOf(rowItems.size()));
-                    }
-                    //Toast.makeText(getApplicationContext(),String.valueOf(rowItems.size()),Toast.LENGTH_SHORT).show();
-                    if(rowItems.size()==0)
-                    {
-                        findViewById(R.id.alertgiftbox).setVisibility(View.VISIBLE);
-                    }
-                    mMainPageAdapter = new UnusedOffersAdapter(rowItems,c);
-                    mRecyclerView.setAdapter(mMainPageAdapter);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+
+        String newString;
+        if (savedInstanceState == null) {
+            Bundle extras = getIntent().getExtras();
+            if(extras == null) {
+                newString= null;
+            } else {
+                newString= extras.getString("giftboxstring");
             }
-        });
+        } else {
+            newString= (String) savedInstanceState.getSerializable("STRING_I_NEED");
+        }
+
+        if(newString!=null) {
+            try {
+                JSONArray rewards = new JSONArray(newString);
+                ArrayList<MyOffer> rowItems = new ArrayList<>();
+                for (int i = 0; i < rewards.length(); i++) {
+                    JSONObject obj = rewards.getJSONObject(i);
+                    String caption = obj.getString("caption");
+                    String description = obj.getString("description");
+                    //int stamps = obj.getInt("stamps");
+                    String type = obj.getString("type");
+                    String vendor_id = obj.getJSONObject("vendor").getString("_id");
+                    String vendorName = obj.getJSONObject("vendor").getString("name");
+                    MyOffer item = new MyOffer(type, null, null, caption, description, 0, false, true, null, obj.getString("_id"), vendor_id, vendorName, false);
+                    rowItems.add(item);
+                    //Toast.makeText(getApplicationContext(),String.valueOf(rowItems.size()),Toast.LENGTH_SHORT).show();
+                    //Log.i("row", String.valueOf(rowItems.size()));
+                }
+                //Toast.makeText(getApplicationContext(),String.valueOf(rowItems.size()),Toast.LENGTH_SHORT).show();
+                if (rowItems.size() == 0) {
+                    findViewById(R.id.alertgiftbox).setVisibility(View.VISIBLE);
+                }
+                mMainPageAdapter = new UnusedOffersAdapter(rowItems, c);
+                mRecyclerView.setAdapter(mMainPageAdapter);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        else {
+            String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
+            new AsyncGet(this, "http://api.clozerr.com/v2/vendor/offers/rewardspage?access_token=" + TOKEN, new AsyncGet.AsyncResult() {
+                @Override
+                public void gotResult(String s) {
+                    try {
+                        JSONArray rewards = new JSONArray(s);
+                        ArrayList<MyOffer> rowItems = new ArrayList<>();
+                        for (int i = 0; i < rewards.length(); i++) {
+                            JSONObject obj = rewards.getJSONObject(i);
+                            String caption = obj.getString("caption");
+                            String description = obj.getString("description");
+                            //int stamps = obj.getInt("stamps");
+                            String type = obj.getString("type");
+                            String vendor_id = obj.getJSONObject("vendor").getString("_id");
+                            String vendorName = obj.getJSONObject("vendor").getString("name");
+                            MyOffer item = new MyOffer(type, null, null, caption, description, 0, false, true, null, obj.getString("_id"), vendor_id, vendorName, false);
+                            rowItems.add(item);
+                            //Toast.makeText(getApplicationContext(),String.valueOf(rowItems.size()),Toast.LENGTH_SHORT).show();
+                            //Log.i("row", String.valueOf(rowItems.size()));
+                        }
+                        //Toast.makeText(getApplicationContext(),String.valueOf(rowItems.size()),Toast.LENGTH_SHORT).show();
+                        if (rowItems.size() == 0) {
+                            findViewById(R.id.alertgiftbox).setVisibility(View.VISIBLE);
+                        }
+                        mMainPageAdapter = new UnusedOffersAdapter(rowItems, c);
+                        mRecyclerView.setAdapter(mMainPageAdapter);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 
     @Override
