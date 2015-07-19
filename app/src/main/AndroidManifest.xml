@@ -124,11 +124,11 @@
             android:enabled="true"
             android:exported="false" >
         </service>
-        <service
+        <!--<service
             android:name=".OneTimeBFS"
             android:enabled="true"
             android:exported="false" >
-        </service>
+        </service>-->
         <service
             android:name="com.jaalee.sdk.service.BeaconService"
             android:exported="false" />
@@ -230,13 +230,9 @@
             android:name=".PinnedOffersActivity"
             android:label="@string/title_activity_pinned_offers" >
         </activity>
-        <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
-        <receiver android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER" />
-            </intent-filter>
-        </receiver>
+        <service android:name=".Home$InStoreInstallBFS"
+            android:enabled="true"
+            android:exported="true"/>
     </application>
 
 </manifest>

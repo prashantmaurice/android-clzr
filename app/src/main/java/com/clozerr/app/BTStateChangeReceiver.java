@@ -13,7 +13,7 @@ import android.os.Looper;
  */
 public abstract class BTStateChangeReceiver extends BroadcastReceiver {
     private static final String TAG = "BTSCR";
-    private static final long DEFAULT_TIMEOUT = -1;
+    public static final long DEFAULT_TIMEOUT = -1;
 
     private long mTimeout;
     private boolean mIsRegistered;

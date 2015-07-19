@@ -7,14 +7,11 @@ import android.app.Service;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.location.Location;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
@@ -39,12 +36,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -209,13 +202,13 @@ public class GeofenceManagerService extends Service {
         return geofencingRequest;
     }
 
-    private static Location getLastLocation() {
+    public static Location getLastLocation() {
         /*Location result;
         do {
             result = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         } while (result == null);
         return result;*/
-        if (googleApiClient.isConnected())
+        if (googleApiClient != null && googleApiClient.isConnected())
             return LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         else return null;
     }
@@ -287,18 +280,14 @@ public class GeofenceManagerService extends Service {
     }
 
     public static void checkAndStartService(final Context context) {
-        if (/*runManager.signalStart(context)*/!running) {
+        if (!running) {
             running = true;
-            // download data about beacons, which will be part of this service
-            // and will be running daily
-            BeaconDBDownloadBaseReceiver.scheduleDownload(context);
-
             context.startService(new Intent(context, GeofenceManagerService.class));
         }
     }
 
     public static void checkAndStopService(final Context context) {
-        if (/*runManager.signalStop(context)*/running) {
+        if (running) {
             running = false;
             BeaconDBDownloadBaseReceiver.stopDownloads(context);
 
@@ -463,24 +452,7 @@ public class GeofenceManagerService extends Service {
 
             readGeofenceParamsFromFile(this);
 
-            Location lastLocation = GeofenceManagerService.getLastLocation();
-            SharedPreferences sharedPreferences = getSharedPreferences("USER", 0);
-            String TOKEN = sharedPreferences.getString("token", "");
-            TimeZone tz = TimeZone.getTimeZone("GMT+0530");
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
-            df.setTimeZone(tz);
-            String nowAsISO = df.format(new Date());
-            final Uri.Builder analytics = GenUtils.getClearedUriBuilder(Constants.URLBuilders.ANALYTICS)
-                    .appendQueryParameter("metric","Geofence_Transition")
-                    .appendQueryParameter("dimensions[device]", "Android API " + Build.VERSION.SDK_INT)
-                    .appendQueryParameter("dimensions[id]", Settings.Secure.getString(this.getContentResolver(),
-                            Settings.Secure.ANDROID_ID))
-                    .appendQueryParameter("time", nowAsISO)
-                    .appendQueryParameter("access_token", TOKEN);
-            if (lastLocation != null)
-                analytics.appendQueryParameter("dimensions[latitude]", String.valueOf(lastLocation.getLatitude()))
-                    .appendQueryParameter("dimensions[longitude]", String.valueOf(lastLocation.getLongitude()));
-
+            final Uri.Builder analytics = GenUtils.getDefaultAnalyticsUriBuilder(this, Constants.Metrics.GEOFENCE_TRANSITION);
             for (Geofence triggeringGeofence : geofencingEvent.getTriggeringGeofences()) {
                 params = geofenceParamsHashMap.get(triggeringGeofence.getRequestId());
                 geofenceTypes = params.getIncludedTypes();
@@ -490,17 +462,7 @@ public class GeofenceManagerService extends Service {
                     case Geofence.GEOFENCE_TRANSITION_ENTER:
                         Log.e(TAG, "entered " + triggeringGeofence.getRequestId());
                         analytics.appendQueryParameter("dimensions[geofence]", "entered " + triggeringGeofence.getRequestId());
-                        final String urlEntry = analytics.build().toString();
-                        Ion.with(this).load(urlEntry).asString()
-                                .setCallback(new FutureCallback<String>() {
-                                    @Override
-                                    public void onCompleted(Exception e, String result) {
-                                        if (e != null)
-                                            e.printStackTrace();
-                                        else
-                                            Log.e(TAG, urlEntry);
-                                    }
-                                });
+                        GenUtils.putAnalytics(this, TAG, analytics.build().toString());
                         if (geofenceTypes.contains(GEOFENCE_TYPE_RANGE)) {
                             PeriodicBFS.checkAndStartScan(this);
                         }
@@ -514,17 +476,7 @@ public class GeofenceManagerService extends Service {
                     case Geofence.GEOFENCE_TRANSITION_EXIT:
                         Log.e(TAG, "exited " + triggeringGeofence.getRequestId());
                         analytics.appendQueryParameter("dimensions[geofence]", "exited " + triggeringGeofence.getRequestId());
-                        final String urlExit = analytics.build().toString();
-                        Ion.with(this).load(urlExit).asString()
-                                .setCallback(new FutureCallback<String>() {
-                                    @Override
-                                    public void onCompleted(Exception e, String result) {
-                                        if (e != null)
-                                            e.printStackTrace();
-                                        else
-                                            Log.e(TAG, urlExit);
-                                    }
-                                });
+                        GenUtils.putAnalytics(this, TAG, analytics.build().toString());
                         if (geofenceTypes.contains(GEOFENCE_TYPE_RANGE)) {
                             PeriodicBFS.checkAndStopScan(this);
                         }

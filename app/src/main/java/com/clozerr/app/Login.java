@@ -231,10 +231,10 @@ public class Login extends FragmentActivity implements
                                                 finish();
                                             } else {
                                                 //Toast.makeText(Login.this,session.getAccessToken(),Toast.LENGTH_SHORT).show();
-                                                Toast.makeText(Login.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(Login.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT).show();
                                             }
                                         } catch (JSONException e) {
-                                            Toast.makeText(Login.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(Login.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT).show();
                                             e.printStackTrace();
                                         }
                                     }
@@ -331,7 +331,7 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
             @Override
             public void onError() {
                 updateUI(false);
-                GenUtils.putToast(Login.this, "Something went wrong, please try again", Toast.LENGTH_SHORT);
+                GenUtils.putToast(Login.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT);
             }
 
             @Override
@@ -355,12 +355,12 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                                 finish();
                             } else {
                                 updateUI(false);
-                                GenUtils.putToast(Login.this, "Something went wrong, please try again", Toast.LENGTH_SHORT);
+                                GenUtils.putToast(Login.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT);
                                 Log.e(TAG, "error : " + res.get("err").toString());
                             }
                         } catch (Exception e) {
                             updateUI(false);
-                            GenUtils.putToast(Login.this, "Something went wrong, please try again", Toast.LENGTH_SHORT);
+                            GenUtils.putToast(Login.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT);
                             e.printStackTrace();
                         }
                     }
@@ -378,7 +378,6 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
     @Override
     public void onClick(View v) {
         googleOrFb = 2;
-        //if (!googleApiClient.isConnecting()) {
         switch (v.getId()) {
             case R.id.sign_in_button:
                 // User clicked the sign-in button, so begin the sign-in process and automatically
@@ -387,7 +386,6 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                 googleApiClient.connect();
                 break;
         }
-        //}
     }
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -442,6 +440,8 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
 
     private void updateUI(boolean isSignedIn) {
         mSignInButton.setClickable(!isSignedIn);
+        if (!isSignedIn && googleOrFb == 2 && googleApiClient.isConnected())
+            googleApiClient.disconnect();
     }
 
     /*public void slideToImage(int position){
