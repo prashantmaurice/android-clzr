@@ -16,6 +16,7 @@ public class PhoneStartupReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.e(TAG, "boot done");
+        BeaconDBDownloadBaseReceiver.scheduleDownload(context);
         GeofenceManagerService.checkAndStartService(context);
     }
 }

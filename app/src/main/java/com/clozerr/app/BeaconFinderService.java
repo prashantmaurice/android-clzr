@@ -11,7 +11,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.android.internal.util.Predicate;
@@ -45,11 +44,12 @@ public abstract class BeaconFinderService extends WakefulIntentService {
     protected static BluetoothAdapter bluetoothAdapter;
     protected static AlarmManager alarmManager = null;
     protected static BeaconManager beaconManager = null;
-    protected static Region scanningRegion = null;
 
     public BeaconFinderService() {
         super(TAG);
     }
+
+    public BeaconFinderService(String name) { super(name); }
 
     @Override
     public void onCreate() {
@@ -104,14 +104,14 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         }
     }*/
 
-    protected void setListener() {
+    protected void setListener(final boolean logInNecessary) {
         beaconManager.setRangingListener(new RangingListener() {
             @Override
             public void onBeaconsDiscovered(Region region, final List list) {
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        if (checkPreferences(getApplicationContext()))
+                        if (checkPreferences(getApplicationContext(), logInNecessary))
                             onRangedBeacons((List<Beacon>) list);
                     }
                 });
@@ -134,17 +134,6 @@ public abstract class BeaconFinderService extends WakefulIntentService {
     protected abstract void onManagerConnected();*/
     protected abstract void onRangedBeacons(final List<Beacon> beaconList);
     //protected abstract void runService();
-
-    // This function is just for putting toasts, but required as work is done on a background thread
-    // so if a toast is directly put, the app will crash (Toasts must be put in the UI thread)
-    protected static void putToast(final Context context, final CharSequence text, final int duration) {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(context, text, duration).show();
-            }
-        });
-    }
 
     protected static String getUuidWithoutHyphens(String uuidWithHyphens) {
         String resultUuid = "";
@@ -195,7 +184,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         if (!sharedPreferences.contains(Constants.SPKeys.BLE)) {
             if (BluetoothAdapter.getDefaultAdapter() == null) {     // IntentService used, so
                                                                     // bluetoothAdapter may not have been initialized
-                putToast(context,
+                GenUtils.putToast(context,
                         "Sorry, but your device doesn't support Bluetooth." +
                                 " Clozerr beacon-finding services won\'t work now.",
                         Toast.LENGTH_LONG);
@@ -204,7 +193,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
             }
             else if (!context.getPackageManager().
                     hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-                putToast(context,
+                GenUtils.putToast(context,
                         "Sorry, but your device doesn't support Bluetooth Low Energy." +
                                 " Clozerr beacon-finding services won\'t work now.",
                         Toast.LENGTH_LONG);
@@ -221,12 +210,16 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         return isBLESupported;
     }
 
-    protected static boolean checkPreferences(Context context) {
+    protected static boolean checkPreferences(Context context, boolean logInNecessary) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         isScanningAllowed = sharedPreferences.getBoolean(context.getResources().getString(R.string.beacon_detection), true);
+        commonBeaconUUID = sharedPreferences.getString(Constants.SPKeys.BEACON_UUID, "");
         sharedPreferences = context.getSharedPreferences("USER", 0);
         isUserLoggedIn = !sharedPreferences.getString("token", "").isEmpty();
-        return (isUserLoggedIn && isScanningAllowed);
+        if (logInNecessary)
+            return (isUserLoggedIn && isScanningAllowed && !commonBeaconUUID.isEmpty());
+        else
+            return (isScanningAllowed && !commonBeaconUUID.isEmpty());
     }
 
     /*protected static void readBeaconDBFromFile(Context context) throws IOException, JSONException {
@@ -277,9 +270,9 @@ public abstract class BeaconFinderService extends WakefulIntentService {
             bluetoothAdapter.disable();
     }
 
-    public static void disallowScanning(Context context) {
+    /*public static void disallowScanning(Context context) {
         isScanningAllowed = false;
-        PeriodicBFS.checkAndStopScan(context/*, true*/);
+        PeriodicBFS.checkAndStopScan(context*//*, true*//*);
         OneTimeBFS.checkAndStopScan(context);
         Log.e(TAG, "scans blocked");
     }
@@ -288,13 +281,13 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         isScanningAllowed = true;
         PeriodicBFS.checkAndStartScan(context);
         Log.e(TAG, "scans allowed");
-    }
+    }*/
 
     protected static class VendorParams {
-        public String mName;
+        public String name;
         //public String mUUID;
-        public BeaconDBParams mBeaconParams;
-        public String mVendorID;
+        public BeaconDBParams beaconParams;
+        public String id;
         /*public String mNextOfferID;
         public String mNextOfferCaption;
         public String mNextOfferDescription;*/
@@ -302,16 +295,16 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         //public boolean mHasOffers;
         //public String mPaymentType;
         //public String mLoyaltyType;
-        public int mThresholdRssi;
+        public int thresholdRssi;
 
         public VendorParams(/*Context context, */JSONObject object) throws JSONException {
-            mName = object.getString("name");
+            name = object.getString("name");
             /*mUUID = (object.getJSONArray("UUID").length() > 0) ?
                         object.getJSONArray("UUID").getString(0).toLowerCase() : "";*/
             if (object.has("beacons") && object.getJSONObject("beacons").has("major"))
-                mBeaconParams = new BeaconDBParams(object.getJSONObject("beacons"));
-            else mBeaconParams = null;
-            mVendorID = object.getString("_id");
+                beaconParams = new BeaconDBParams(object.getJSONObject("beacons"));
+            else beaconParams = null;
+            id = object.getString("_id");
             /*JSONObject nextOffer = (object.getJSONArray("offers_qualified").length()) > 0 ?
                                     object.getJSONArray("offers_qualified").getJSONObject(0) : null;
             mNextOfferID = (nextOffer == null) ? "" : nextOffer.getString("_id");
@@ -323,12 +316,12 @@ public abstract class BeaconFinderService extends WakefulIntentService {
                     "SX" : "S1";*/
             //mPaymentType = object.getString("paymentType");
             //mPaymentType = "counter";
-            mThresholdRssi = (object.has("thresh")) ? object.getInt("thresh") : DEFAULT_THRESHOLD_RSSI;
+            thresholdRssi = (object.has("thresh")) ? object.getInt("thresh") : DEFAULT_THRESHOLD_RSSI;
         }
 
         public Intent getDetailsIntent(Context context) {
             Intent detailIntent = new Intent(context, VendorActivity.class);
-            detailIntent.putExtra("vendor_id", mVendorID);
+            detailIntent.putExtra("vendor_id", id);
             /*detailIntent.putExtra("offer_id", mNextOfferID);
             detailIntent.putExtra("offer_caption", mNextOfferCaption);
             detailIntent.putExtra("offer_text", mNextOfferDescription);*/
@@ -376,30 +369,30 @@ public abstract class BeaconFinderService extends WakefulIntentService {
     }
 
     public static class BeaconDBParams {
-        public int mMajor;
-        public int mMinor;
+        public Integer major;
+        public Integer minor;
 
         public BeaconDBParams(JSONObject object) throws JSONException {
-            mMajor = object.getInt("major");
-            mMinor = object.getInt("minor");
+            major = object.getInt("major");
+            minor = object.getInt("minor");
         }
 
         public BeaconDBParams(Beacon beacon) {
-            mMajor = beacon.getMajor();
-            mMinor = beacon.getMinor();
+            major = beacon.getMajor();
+            minor = beacon.getMinor();
         }
 
-        public BeaconDBParams(int major, int minor) {
-            mMajor = major;
-            mMinor = minor;
+        public BeaconDBParams(Integer major, Integer minor) {
+            this.major = major;
+            this.minor = minor;
         }
 
         public boolean equals(BeaconDBParams other) {
-            return other != null && mMajor == other.mMajor && mMinor == other.mMinor;
+            return other != null && major.equals(other.major) && minor.equals(other.minor);
         }
 
         public String toString() {
-            return "major:" + mMajor + ";minor:" + mMinor;
+            return "major:" + major + ";minor:" + minor;
         }
     }
 

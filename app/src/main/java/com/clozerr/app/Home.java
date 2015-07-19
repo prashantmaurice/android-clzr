@@ -14,9 +14,8 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
+import android.preference.PreferenceManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -46,16 +45,16 @@ import com.facebook.Session;
 import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.plus.Plus;
+import com.google.gson.JsonObject;
+import com.jaalee.sdk.Beacon;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
 import java.net.URLEncoder;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.TimeZone;
 
 import static com.clozerr.app.R.drawable.rest1;
 import static com.clozerr.app.R.drawable.rest2;
@@ -64,6 +63,8 @@ import static com.clozerr.app.R.drawable.rest6;
 import static com.clozerr.app.R.drawable.rest7;
 
 public class Home  extends ActionBarActivity {
+
+    private static final String TAG = "Home";
 
     static final String SENDER_ID = "496568600186";  // project id from Google Console
     public static String TOKEN = "";
@@ -92,6 +93,10 @@ public class Home  extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (GenUtils.isFirstRun(this)) {
+            onFirstRun();
+            GenUtils.updateFirstRun(this);
+        }
         GeofenceManagerService.checkAndStartService(this);
         /*try
         {
@@ -127,32 +132,9 @@ public class Home  extends ActionBarActivity {
         initDrawer();
         freebielayout=(FrameLayout)findViewById(R.id.homeframe);
         freebielayout.getForeground().setAlpha(0);
-        //offerdialog();
-        SharedPreferences status2 = getSharedPreferences("USER", 0);
-        TOKEN = status2.getString("token", "");
-        TimeZone tz = TimeZone.getTimeZone("GMT+0530");
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
-        df.setTimeZone(tz);
-        String nowAsISO = df.format(new Date());
-        final String analyticsurl= GenUtils.getClearedUriBuilder(Constants.URLBuilders.ANALYTICS)
-                .appendQueryParameter("metric","Clozerr_Home_Screen")
-                .appendQueryParameter("dimensions[device]", "Android API " + Build.VERSION.SDK_INT)
-                .appendQueryParameter("dimensions[id]", Settings.Secure.getString(this.getContentResolver(),
-                        Settings.Secure.ANDROID_ID))
-                .appendQueryParameter("time", nowAsISO)
-                .appendQueryParameter("access_token", TOKEN)
-                .build().toString();
-        //Toast.makeText(getApplicationContext(),analyticsurl,Toast.LENGTH_SHORT).show();
-        //+"?metric=Clozerr+Home+Screen&dimensions%5Bdevice%5D=Android+API+"+ Build.VERSION.SDK_INT+"&dimensions%5Bid%5D=,jau65asas76&time="+nowAsISO+"&access_token="+TOKEN;
-        new AsyncGet(Home.this, analyticsurl, new AsyncGet.AsyncResult() {
-            @Override
-            public void gotResult(String s) {
-                Log.e("Home","analytics url - " + analyticsurl);
-                //Constants.URLBuilders.ANALYTICS.clearQuery();
-                //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
-                //Toast.makeText(getApplicationContext(),analyticsurl,Toast.LENGTH_SHORT).show();
-            }
-        },false);
+        final String analyticsurl= GenUtils.getDefaultAnalyticsUriBuilder(this, Constants.Metrics.HOME_SCREEN)
+                                    .build().toString();
+        GenUtils.putAnalytics(this, TAG, analyticsurl);
         TextView username = (TextView)findViewById(R.id.nav_text);
         if(USERNAME.length()!=0)
             username.setText(USERNAME);
@@ -194,6 +176,32 @@ public class Home  extends ActionBarActivity {
         mtabs.setViewPager(pager);
 
 
+    }
+
+    private void onFirstRun() {
+        checkInStoreInstall();
+        BeaconDBDownloadBaseReceiver.scheduleDownload(this);
+    }
+
+    private void checkInStoreInstall() {
+        final String downloadUUIDUrl = GenUtils.getClearedUriBuilder(Constants.URLBuilders.BEACON_DOWNLOAD)
+                .build().toString();
+        final Context applicationContext = getApplicationContext();
+        Ion.with(applicationContext).load(downloadUUIDUrl).asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null) {
+                            e.printStackTrace();
+                        } else {
+                            PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
+                                    .putString(Constants.SPKeys.BEACON_UUID, result.get("UUID").getAsString())
+                                    .commit();
+                            OneTimeBFS.startOneTimeService(applicationContext, InStoreInstallBFS.class,
+                                    null, false, Constants.Timeouts.IN_STORE_INSTALL_DETECTION);
+                        }
+                    }
+                });
     }
 
     @Override
@@ -681,5 +689,31 @@ public class Home  extends ActionBarActivity {
         AsyncGet.dismissDialog();
         super.onStop();
         GoogleAnalytics.getInstance(this).reportActivityStop(this);
+    }
+
+    /**
+     * Created by aravind on 19/7/15.
+     */
+    public static class InStoreInstallBFS extends OneTimeBFS {
+        private static final String TAG = "InStoreInstallBFS";
+
+        public InStoreInstallBFS() { super(); }
+
+        @Override
+        public void onRanged(List<Beacon> beacons) {
+            Beacon nearest = null;
+            for (Beacon beacon : beacons) {
+                if (nearest == null || nearest.getRssi() < beacon.getRssi())
+                    nearest = beacon;
+            }
+            if (nearest != null) {
+                final Context applicationContext = getApplicationContext();
+                final String analyticsURL = GenUtils.getDefaultAnalyticsUriBuilder(applicationContext, Constants.Metrics.IN_STORE_INSTALL)
+                        .appendQueryParameter("dimensions[beacon_major]", String.valueOf(nearest.getMajor()))
+                        .appendQueryParameter("dimensions[beacon_minor]", String.valueOf(nearest.getMinor()))
+                        .build().toString();
+                GenUtils.putAnalytics(applicationContext, TAG, analyticsURL);
+            }
+        }
     }
 }

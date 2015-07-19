@@ -2,6 +2,8 @@ package com.clozerr.app;
 
 import android.net.Uri;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by Adarsh on 7/2/2015.
  */
@@ -30,15 +32,29 @@ public class Constants {
 
     }
 
+    public static class Timeouts {
+        public static final long IN_STORE_INSTALL_DETECTION = TimeUnit.MILLISECONDS.convert(10L, TimeUnit.SECONDS);
+    }
+
     /**
      * Shared Preferences keys.
      */
     public static class SPKeys {
+        public static final String FIRST_RUN = APP_PACKAGE_NAME + ".FIRST_RUN";
         public static final String BLE = APP_PACKAGE_NAME + ".BLE";
         public static final String BEACON_UUID = APP_PACKAGE_NAME + ".BEACON_UUID";
         public static final String APP_DISABLE_BT = APP_PACKAGE_NAME + ".APP_DISABLE_BT";
 
         public static final String PREFIX_REJECT_LIST = APP_PACKAGE_NAME + ".Rejects-";
+    }
+
+    public static class Metrics {
+        public static final String GEOFENCE_TRANSITION = "Geofence_Transition";
+        public static final String HOME_SCREEN = "Clozerr_Home_Screen";
+        public static final String IN_STORE_INSTALL = "In_Store_Install";
+        public static final String BEACON_DETECTION = "Beacon_Detection";
+
+        public static final String SUFFIX_VENDOR_SCREEN = " Vendor Screen";
     }
 
     public static class URLBuilders {
