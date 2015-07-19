@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="debug"><source path="/home/aravind/octo-ninja/app/libraries/wakeful/build/intermediates/bundles/debug/assets"/></dataSet><dataSet config="main"><source path="/home/aravind/octo-ninja/app/libraries/wakeful/src/androidTest/assets"/></dataSet></merger>
+<merger version="3"><dataSet config="debug"><source path="/Users/saipraveenb/AndroidStudioProjects/octo-ninja/app/libraries/wakeful/build/intermediates/bundles/debug/assets"/></dataSet><dataSet config="main"><source path="/Users/saipraveenb/AndroidStudioProjects/octo-ninja/app/libraries/wakeful/src/androidTest/assets"/></dataSet></merger>

@@ -78,7 +78,12 @@ public class FreebiesFragment extends Fragment {
             JSONArray arr = obj.getJSONArray("rewards");
             for(int i=0;i<arr.length();i++){
                 JSONObject jsonObject = arr.getJSONObject(i);
-                RewardItem rewardItem = new RewardItem(jsonObject.getJSONObject("params").getString("type"),jsonObject.getString("caption"),jsonObject.getString("description"),jsonObject.getString("image"),jsonObject.getString("_id"));
+
+                // Make image optional.
+                String image = "";
+                if( jsonObject.has("image") )
+                       image = jsonObject.getString("image");
+                RewardItem rewardItem = new RewardItem(jsonObject.getJSONObject("params").getString("type"),jsonObject.getString("caption"),jsonObject.getString("description"),image,jsonObject.getString("_id"));
                 al.add(rewardItem);
             }
         } catch (JSONException e) {
