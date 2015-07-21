@@ -41,7 +41,7 @@ public class CardModel {
                 this.offerId = offers.getJSONObject(0).getString("_id");
                 this.offerDescription = offers.getJSONObject(0).getString("description");
             } catch (JSONException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
             this.stampString = stamps + " stamp(s)";
         }

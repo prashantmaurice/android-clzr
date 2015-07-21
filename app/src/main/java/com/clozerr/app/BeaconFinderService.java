@@ -12,7 +12,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
-
+import android.util.Log;
 import com.android.internal.util.Predicate;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.jaalee.sdk.Beacon;

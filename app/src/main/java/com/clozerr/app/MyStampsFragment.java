@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,6 +39,8 @@ public class MyStampsFragment extends Fragment {
                         mRecyclerView.setAdapter(myOffersAdapter);*/
         MyOffersRecyclerViewAdapter adapter = new MyOffersRecyclerViewAdapter(myOffers, getActivity());
         recyclerview.setAdapter(adapter);
+        final TextView textView = (TextView) layout.findViewById(R.id.stampdesc);
+        textView.setText(VendorActivity.detailsBundle.getString("policy"));
         //final String[] values = new String[] { "1","2","3","4","5","6","7","8","9","10" };
         //ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.stamp_layout, R.id.stampnumber, values);
         //recyclerview.setAdapter(new MyStampsRecyclerViewAdapter(values,getActivity()));
@@ -64,6 +67,7 @@ public class MyStampsFragment extends Fragment {
             //Log.e(TAG, "json passed - " + s);
             JSONObject someObject = new JSONObject(s);
             JSONArray array = someObject.getJSONArray("offers");
+            int maxStamps = getMaxStampCount( array );
             //Toast.makeText(getActivity(),s, Toast.LENGTH_LONG).show();
             MyOffer.SXOfferExtras extras = null;
             int i=0;
@@ -111,12 +115,27 @@ public class MyStampsFragment extends Fragment {
                     }
 
 
-                if(j==array.length()-1) break;
+                if(j==maxStamps-1) break;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return rowItems;
+    }
+
+    private int getMaxStampCount(JSONArray array) {
+        int max = 0;
+        for( int k = 0; k < array.length(); k++ ){
+            int num = 0;
+            try {
+                num = array.getJSONObject(k).getJSONObject("params").getInt("stamps");
+            }catch(org.json.JSONException ex){
+                ex.printStackTrace();
+            }
+            if( num > max )
+                max = num;
+        }
+        return max;
     }
 
     private void initViews() {

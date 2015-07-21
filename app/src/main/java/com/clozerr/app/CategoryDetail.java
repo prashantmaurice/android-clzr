@@ -35,6 +35,7 @@ import com.nineoldandroids.view.ViewHelper;
 
 import org.json.JSONArray;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -328,7 +329,7 @@ private ArrayList<CardModel> convertRow(String s) {
                     offers,
                     array.getJSONObject(i).getJSONArray("location").getDouble(0),
                     array.getJSONObject(i).getJSONArray("location").getDouble(1),
-                    array.getJSONObject(i).getString("image"),
+                    array.getJSONObject(i).getString("image") + URLEncoder.encode(array.getJSONObject(i).getString("resource_name"), "UTF-8"),
                     fid,array.getJSONObject(i).getString("_id"),0
             );
             rowItems.add(item);

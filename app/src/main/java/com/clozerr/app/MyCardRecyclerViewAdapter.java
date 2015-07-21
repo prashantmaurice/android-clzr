@@ -66,7 +66,8 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
                 .load(model.getImageId()).asBitmap().setCallback(new FutureCallback<Bitmap>() {
             @Override
             public void onCompleted(Exception e, Bitmap result) {
-                viewHolder.imageView.setImageBitmap(Bitmap.createScaledBitmap(result,1600,900,false));
+                if( result != null )
+                    viewHolder.imageView.setImageBitmap(Bitmap.createScaledBitmap(result,1600,900,false));
             }
         });
             }

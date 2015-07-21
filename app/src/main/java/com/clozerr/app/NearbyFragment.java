@@ -25,6 +25,8 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.net.URLEncoder;
+
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.nineoldandroids.animation.ValueAnimator;
 import com.nineoldandroids.view.ViewHelper;
@@ -455,7 +457,7 @@ public class NearbyFragment extends Fragment {
                         offers,
                         array.getJSONObject(i).getJSONArray("location").getDouble(0),
                         array.getJSONObject(i).getJSONArray("location").getDouble(1),
-                        array.getJSONObject(i).getString("image"),
+                        array.getJSONObject(i).getString("image") + URLEncoder.encode(array.getJSONObject(i).getString("resource_name"),"UTF-8"),
                         fid,array.getJSONObject(i).getString("_id"),0
                 );
                 rowItems.add(item);

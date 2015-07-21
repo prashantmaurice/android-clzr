@@ -31,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 
@@ -111,7 +112,8 @@ public class VendorActivity extends ActionBarActivity {
                     //Log.e("description", vendorDescription);
                     try
                     {
-                        logo = object.getString("logo");
+                        //logo = object.getString("logo");
+                        logo = object.getString("image") + URLEncoder.encode(object.getString("resource_name"), "UTF-8") + "_logo";
                         Log.i("logo",logo);
                     }
                     catch(Exception e)
@@ -156,7 +158,7 @@ public class VendorActivity extends ActionBarActivity {
                             object.getJSONArray("offers"),
                             latitude,
                             longitude,
-                            object.getString("image"),
+                            object.getString("image") + URLEncoder.encode(object.getString("resource_name"), "UTF-8"),
                             object.getString("fid"), object.getString("_id"),
                             0
                     );
@@ -243,6 +245,12 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putDouble("distance", currentItem.getDistance());
                     detailsBundle.putString("distanceString", currentItem.getDistanceString());
                     detailsBundle.putString("phoneNumber", phoneNumber);
+
+                    try {
+                        detailsBundle.putString("policy", object.getJSONObject("settings").getString("policy"));
+                    }catch(JSONException ex){
+                        detailsBundle.putString("policy", "");
+                    }
                     //currentItem.getQuestions();
 
                     analyticsurlvendor = GenUtils.getDefaultAnalyticsUriBuilder(getApplicationContext(), Constants.Metrics.VENDOR_SCREEN)

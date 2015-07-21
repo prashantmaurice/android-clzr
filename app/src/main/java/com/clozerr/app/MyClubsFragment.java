@@ -30,6 +30,7 @@ import com.nineoldandroids.view.ViewHelper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 
@@ -304,7 +305,7 @@ public class MyClubsFragment extends Fragment {
                         array.getJSONObject(i).getJSONArray("offers"),
                         array.getJSONObject(i).getJSONArray("location").getDouble(0),
                         array.getJSONObject(i).getJSONArray("location").getDouble(1),
-                        array.getJSONObject(i).getString("image"),
+                        array.getJSONObject(i).getString("image") + URLEncoder.encode(array.getJSONObject(i).getString("resource_name"), "UTF-8"),
                         array.getJSONObject(i).getString("fid"),
                         array.getJSONObject(i).getString("_id"),
                         //array.getJSONObject(i).getInt("stamps")
