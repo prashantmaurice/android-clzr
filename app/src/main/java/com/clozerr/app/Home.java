@@ -8,11 +8,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -47,13 +45,11 @@ import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.plus.Plus;
 import com.google.gson.JsonObject;
-import com.jaalee.sdk.Beacon;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -723,29 +719,4 @@ public class Home  extends ActionBarActivity {
         GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
-    /**
-     * Created by aravind on 19/7/15.
-     */
-    public static class InStoreInstallBFS extends OneTimeBFS {
-        private static final String TAG = "InStoreInstallBFS";
-
-        public InStoreInstallBFS() { super(); }
-
-        @Override
-        public void onRanged(List<Beacon> beacons) {
-            Beacon nearest = null;
-            for (Beacon beacon : beacons) {
-                if (nearest == null || nearest.getRssi() < beacon.getRssi())
-                    nearest = beacon;
-            }
-            if (nearest != null) {
-                final Context applicationContext = getApplicationContext();
-                final String analyticsURL = GenUtils.getDefaultAnalyticsUriBuilder(applicationContext, Constants.Metrics.IN_STORE_INSTALL)
-                        .appendQueryParameter("dimensions[beacon_major]", String.valueOf(nearest.getMajor()))
-                        .appendQueryParameter("dimensions[beacon_minor]", String.valueOf(nearest.getMinor()))
-                        .build().toString();
-                GenUtils.putAnalytics(applicationContext, TAG, analyticsURL);
-            }
-        }
-    }
 }

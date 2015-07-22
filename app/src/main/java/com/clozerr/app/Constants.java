@@ -29,7 +29,8 @@ public class Constants {
     }
 
     public static class Actions {
-
+        public static final String ACTION_INITIATE_DOWNLOADER = "com.clozerr.app.ACTION_INITIATE_DOWNLOADER";
+        public static final String ACTION_RESUME_SCAN = "com.clozerr.app.ACTION_RESUME_SCAN";
     }
 
     public static class Timeouts {

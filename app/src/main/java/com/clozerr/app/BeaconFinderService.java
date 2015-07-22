@@ -69,42 +69,6 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         return null;
     }
 
-    /*@Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent == null)
-            PeriodicBFS.checkAndStartScan(getApplicationContext());
-        else
-            findBeacons();
-        return START_STICKY;
-        *//*stopSelf();
-        return START_NOT_STICKY;*//*
-    }*/
-
-    /*@Override
-    public void onDestroy() {
-        turnOffBluetooth();
-        alarmManager = null;
-        super.onDestroy();
-    }*/
-
-    /*protected void findBeacons() {
-        //bgThreadHandler = new Handler(Looper.myLooper());
-        if (canServiceRun()) {
-            beaconManager.setRangingListener(new RangingListener() {
-                @Override
-                public void onBeaconsDiscovered(Region region, final List list) {
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            onRangedBeacons((List<Beacon>) list);
-                        }
-                    });
-                }
-            });
-            runService();
-        }
-    }*/
-
     protected void setListener(final boolean logInNecessary) {
         beaconManager.setRangingListener(new RangingListener() {
             @Override
@@ -121,21 +85,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         });
     }
 
-    /*protected void connectServiceAndStartRanging() {
-        beaconManager.connect(new ServiceReadyCallback() {
-            @Override
-            public void onServiceReady() {
-                onManagerConnected();
-                scanningRegion = setScanningRegion();
-                beaconManager.startRangingAndDiscoverDevice(scanningRegion);
-            }
-        });
-    }
-
-    protected abstract Region setScanningRegion();
-    protected abstract void onManagerConnected();*/
     protected abstract void onRangedBeacons(final List<Beacon> beaconList);
-    //protected abstract void runService();
 
     protected static String getUuidWithoutHyphens(String uuidWithHyphens) {
         String resultUuid = "";
@@ -143,43 +93,6 @@ public abstract class BeaconFinderService extends WakefulIntentService {
             if (c != '-') resultUuid += String.valueOf(c);
         return resultUuid;
     }
-
-    /*protected static boolean areUuidsEqual(String uuid1, String uuid2) {
-        return (getUuidWithoutHyphens(uuid1).equalsIgnoreCase(getUuidWithoutHyphens(uuid2)));
-    }*/
-
-    /*protected boolean canServiceRun() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        isScanningAllowed = sharedPreferences.getBoolean(getResources().getString(R.string.beacon_detection), true);
-        sharedPreferences = getSharedPreferences("USER", 0);
-        isUserLoggedIn = !sharedPreferences.getString("token", "").isEmpty();
-        if (isScanningAllowed && isUserLoggedIn) {
-            if (bluetoothAdapter == null) {
-                putToast(getApplicationContext(),
-                        "Sorry, but your device doesn't support Bluetooth." +
-                        " Clozerr beacon-finding services won\'t work now.",
-                        Toast.LENGTH_LONG);
-                isBLESupported = false;
-                return false;
-            }
-            else if (!getApplicationContext().getPackageManager().
-                        hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-                putToast(getApplicationContext(),
-                        "Sorry, but your device doesn't support Bluetooth Low Energy." +
-                        " Clozerr beacon-finding services won\'t work now.",
-                        Toast.LENGTH_LONG);
-                isBLESupported = false;
-                return false;
-            }
-            else {
-                isBLESupported = true;
-                BeaconDBDownloadBaseReceiver.scheduleDownload(getApplicationContext());
-                commonBeaconUUID = sharedPreferences.getString(BEACON_UUID, "");
-                return true;
-            }
-        }
-        else return false;
-    }*/
 
     protected static boolean checkCompatibility(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -204,8 +117,6 @@ public abstract class BeaconFinderService extends WakefulIntentService {
             }
             else {
                 isBLESupported = true;
-                /*BeaconDBDownloadBaseReceiver.scheduleDownload(getApplicationContext());
-                commonBeaconUUID = sharedPreferences.getString(BEACON_UUID, "");*/
             }
             sharedPreferences.edit().putBoolean(Constants.SPKeys.BLE, isBLESupported).apply();
         }
@@ -223,34 +134,6 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         else
             return (isScanningAllowed && !commonBeaconUUID.isEmpty());
     }
-
-    /*protected static void readBeaconDBFromFile(Context context) throws IOException, JSONException {
-        FileOutputStream dummyOutputStream = context.openFileOutput(BeaconDBDownloader.BEACONS, MODE_APPEND);
-                                            // for creating the file if not present
-        dummyOutputStream.close();
-        FileInputStream fileInputStream = context.openFileInput(BeaconDBDownloader.BEACONS);
-        byte[] dataBytes = new byte[fileInputStream.available()];
-        fileInputStream.read(dataBytes);
-        fileInputStream.close();
-        String data = new String(dataBytes);
-        if (!data.isEmpty()) {
-            JSONObject rootObject = new JSONObject(data);
-            commonBeaconUUID = rootObject.getString("UUID");
-            JSONArray rootArray = rootObject.getJSONArray("vendors");
-            beaconDatabase = new ArrayList<>();
-            for (int i = 0; i < rootArray.length(); ++i)
-                try {
-                *//*if (rootArray.getJSONObject(i).getJSONArray("UUID").length() > 0)
-                    beaconDatabase.add(rootArray.getJSONObject(i).getJSONArray("UUID").getString(0));*//*
-                    JSONObject beaconObject = rootArray.getJSONObject(i).has("beacons") ?
-                            rootArray.getJSONObject(i).getJSONObject("beacons") : null;
-                    if (beaconObject != null && beaconObject.has("major"))
-                        beaconDatabase.add(new BeaconDBParams(beaconObject));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-        }
-    }*/
 
     protected static void turnOnBluetooth(Context context) {
         Log.e(TAG, "Turning on bluetooth");
@@ -292,46 +175,22 @@ public abstract class BeaconFinderService extends WakefulIntentService {
 
     protected static class VendorParams {
         public String name;
-        //public String mUUID;
         public BeaconDBParams beaconParams;
         public String id;
-        /*public String mNextOfferID;
-        public String mNextOfferCaption;
-        public String mNextOfferDescription;*/
-        //public boolean mIsNotifiable;
-        //public boolean mHasOffers;
-        //public String mPaymentType;
-        //public String mLoyaltyType;
         public int thresholdRssi;
 
-        public VendorParams(/*Context context, */JSONObject object) throws JSONException {
+        public VendorParams(JSONObject object) throws JSONException {
             name = object.getString("name");
-            /*mUUID = (object.getJSONArray("UUID").length() > 0) ?
-                        object.getJSONArray("UUID").getString(0).toLowerCase() : "";*/
             if (object.has("beacons") && object.getJSONObject("beacons").has("major"))
                 beaconParams = new BeaconDBParams(object.getJSONObject("beacons"));
             else beaconParams = null;
             id = object.getString("_id");
-            /*JSONObject nextOffer = (object.getJSONArray("offers_qualified").length()) > 0 ?
-                                    object.getJSONArray("offers_qualified").getJSONObject(0) : null;
-            mNextOfferID = (nextOffer == null) ? "" : nextOffer.getString("_id");
-            mNextOfferCaption = (nextOffer == null) ? "" : nextOffer.getString("caption");
-            mNextOfferDescription = (nextOffer == null) ? "" : nextOffer.getString("description");*/
-            //mIsNotifiable = /*!mNextOfferID.isEmpty() && isVendorWithThisUUIDNotifiable(context, mUUID)*/true;
-            /*mHasOffers = object.getBoolean("hasOffers");
-            mLoyaltyType = (object.has("settings") && object.getJSONObject("settings").getBoolean("sxEnabled")) ?
-                    "SX" : "S1";*/
-            //mPaymentType = object.getString("paymentType");
-            //mPaymentType = "counter";
             thresholdRssi = (object.has("thresh")) ? object.getInt("thresh") : DEFAULT_THRESHOLD_RSSI;
         }
 
         public Intent getDetailsIntent(Context context) {
             Intent detailIntent = new Intent(context, VendorActivity.class);
             detailIntent.putExtra("vendor_id", id);
-            /*detailIntent.putExtra("offer_id", mNextOfferID);
-            detailIntent.putExtra("offer_caption", mNextOfferCaption);
-            detailIntent.putExtra("offer_text", mNextOfferDescription);*/
             return detailIntent;
         }
 
@@ -342,7 +201,6 @@ public abstract class BeaconFinderService extends WakefulIntentService {
                 JSONObject rootObject = new JSONObject(fileContents);
                 commonBeaconUUID = rootObject.getString("UUID");
                 JSONArray rootArray = rootObject.getJSONArray("vendors");
-                //Log.e(TAG, "root - " + rootArray.toString());
                 VendorParams vendorParams;
                 result = new ArrayList<>();
                 for (int i = 0; i < rootArray.length(); ++i) {
@@ -368,11 +226,6 @@ public abstract class BeaconFinderService extends WakefulIntentService {
                     return params;
             return null;
         }
-
-        /*public static boolean isVendorWithThisUUIDNotifiable(Context context, String uuid) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-            return !preferences.contains(uuid);
-        }*/
     }
 
     public static class BeaconDBParams {

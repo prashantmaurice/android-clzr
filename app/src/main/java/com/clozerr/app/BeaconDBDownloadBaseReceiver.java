@@ -22,7 +22,6 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
 
     private static long alarmInterval = MAXIMUM_ALARM_INTERVAL;
     private static AlarmManager alarmManager = null;
-    //private static WakeLockManager wakeLockManager = null;
     private static boolean firstDownloadPending = true;
 
     private Context mContext = null;
@@ -69,35 +68,17 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
     }
 
     private void initiateBDBDownloader(Context context) {
-        GenUtils.enableComponent(context, BeaconDBDownloader.class);
-        Intent initiateIntent = new Intent(context, BeaconDBDownloader.class);
-        initiateIntent.setAction(BeaconDBDownloader.ACTION_INITIATE_DOWNLOADER);
+        GenUtils.enableComponent(context, ConnectivityListener.class);
+        Intent initiateIntent = new Intent(context, ConnectivityListener.class);
+        initiateIntent.setAction(Constants.Actions.ACTION_INITIATE_DOWNLOADER);
         context.sendBroadcast(initiateIntent);
     }
-
-    /*private void disableBDBDownloader(Context context) {
-        ComponentName receiver = new ComponentName(context, BeaconDBDownloader.class);
-        context.getPackageManager().setComponentEnabledSetting(receiver,
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-    }*/
-
-    /*public static void acquireWakeLock(Context context) {
-        if (wakeLockManager == null)
-            wakeLockManager = new WakeLockManager();
-        wakeLockManager.acquireWakeLock(context, TAG);
-    }
-
-    public static void releaseWakeLock() { wakeLockManager.releaseWakeLock(); }*/
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
         if (intent.getAction() != null && intent.getAction().equals(ACTION_FIRE_ALARM_DOWNLOAD)) {
             mContext = context;
             mHandler = new Handler(Looper.myLooper());
-            //acquireWakeLock(context);
-            /*if (wakeLockManager == null)
-                wakeLockManager = new WakeLockManager();
-            wakeLockManager.acquireWakeLock(context, TAG);*/
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -107,9 +88,9 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (!BeaconDBDownloader.isDoneDownloading()) {
+                            if (!ConnectivityListener.isDoneDownloading()) {
                                 Log.e(TAG, "Timeout; disabling BDBDownloader");
-                                GenUtils.disableComponent(context, BeaconDBDownloader.class);
+                                GenUtils.disableComponent(context, ConnectivityListener.class);
                                 if (alarmInterval > MINIMUM_ALARM_INTERVAL) {
                                     alarmInterval /= REDUCTION_FACTOR;
                                     if (alarmInterval < MINIMUM_ALARM_INTERVAL)
@@ -126,8 +107,6 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
                                     setNewAlarm();
                                 }
                             }
-                            //releaseWakeLock();
-                            //wakeLockManager.releaseWakeLock();
                         }
                     }, CONNECTIVITY_SCAN_PERIOD);
                 }
