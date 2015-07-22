@@ -67,6 +67,30 @@ public class UnusedOffersActivity extends ActionBarActivity {
                 //l1.setAdapter(adapter);
             }
         });
+        findViewById(R.id.useit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startCheckinWithoutOffer();
+            }
+        });
+        /*findViewById(R.id.useit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+Home.TOKEN+"&vendor_id="+VendorActivity.vendorId+"&gcm_id="+ GCMRegistrar.getRegistrationId(getApplicationContext())+"offer_id="+VendorActivity.detailsBundle.getString("visitOfferId");
+                new AsyncGet(getApplicationContext(), url, new AsyncGet.AsyncResult() {
+                    @Override
+                    public void gotResult(String s) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(s);
+                            if(jsonObject.getString("vendor").equals(VendorActivity.vendorId))
+                                Toast.makeText(getApplicationContext(),"No offer unlocked. Marking checkin as a visit",Toast.LENGTH_SHORT).show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });*/
 /*        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -173,7 +197,7 @@ public class UnusedOffersActivity extends ActionBarActivity {
                     //description.add(offerObject.getString("description"));
                 //}
                 item = new MyOffer(offerObject.getString("type"),
-                        null,
+                        offerObject.getString("image"),
                         null,
                         offerObject.getString("caption"),
                         offerObject.getString("description"),
@@ -196,7 +220,7 @@ public class UnusedOffersActivity extends ActionBarActivity {
         {
             findViewById(R.id.alertoffer).setVisibility(View.VISIBLE);
             //Toast.makeText(getApplicationContext(),"No offer unlocked. Marking checkin as a visit",Toast.LENGTH_SHORT).show();
-            String url = "http://api.clozerr.com/v2/vendor/checkin?access_token="+Home.TOKEN+"&vendor_id="+VendorActivity.vendorId+"&gcm_id="+ GCMRegistrar.getRegistrationId(getApplicationContext());
+            /*String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+Home.TOKEN+"&vendor_id="+VendorActivity.vendorId+"&gcm_id="+ GCMRegistrar.getRegistrationId(getApplicationContext())+"offer_id="+VendorActivity.detailsBundle.getString("visitOfferId");
             new AsyncGet(getApplicationContext(), url, new AsyncGet.AsyncResult() {
                 @Override
                 public void gotResult(String s) {
@@ -208,9 +232,23 @@ public class UnusedOffersActivity extends ActionBarActivity {
                         e.printStackTrace();
                     }
                 }
-            });
+            });*/
+            startCheckinWithoutOffer();
         }
             return rowItems;
+    }
+
+    private void startCheckinWithoutOffer() {
+        Intent intent = new Intent(getApplicationContext(), FreebieDescription.class);
+        intent.putExtra("offerid", VendorActivity.detailsBundle.getString("visitOfferId"));
+        intent.putExtra("vendorid", VendorActivity.detailsBundle.getString("vendorId"));
+        intent.putExtra("vendorName", VendorActivity.detailsBundle.getString("vendorTitle"));
+        intent.putExtra("caption", "No Offer");
+        intent.putExtra("description", "No Offer available. Checkin to get stamps.");
+        intent.putExtra("button", "CHECK-IN");
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        getApplicationContext().startActivity(intent);
     }
 
     @Override

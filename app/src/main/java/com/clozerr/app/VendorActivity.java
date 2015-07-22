@@ -82,7 +82,7 @@ public class VendorActivity extends ActionBarActivity {
             public void gotResult(String s) {
                 try {
                     //Toast.makeText(getApplicationContext(), Constants.URLBuilders.ANALYTICSCOPY.toString(),Toast.LENGTH_SHORT).show();
-                    String address = "", phoneNumber = "", vendorDescription = "",fb = "",gplus = "",twitter = "",logo = "";
+                    String address = "", phoneNumber = "", vendorDescription = "",fb = "",gplus = "",twitter = "",logo = "", visitOfferId = "";
                     //BeaconFinderService.BeaconDBParams params = null;
                     double latitude = 0.0, longitude = 0.0;
                     JSONObject object = new JSONObject(s);
@@ -100,6 +100,7 @@ public class VendorActivity extends ActionBarActivity {
                         longitude = object.getJSONArray("location").getDouble(1);
                         if (longitude <= 0.0)
                             longitude = 0.0;
+                        visitOfferId = object.getString("visitOfferId");
                     } catch (Exception e) {
                         e.printStackTrace();
                         //Toast.makeText(CouponDetails.this, "Error - " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
@@ -204,6 +205,8 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putString("gplus",gplus);
                     detailsBundle.putString("twitter",twitter);
                     detailsBundle.putString("logo",logo);
+                    detailsBundle.putString("visitOfferId", visitOfferId);
+
 
                     //currentItem.getQuestions();
                     /*try {
@@ -245,7 +248,6 @@ public class VendorActivity extends ActionBarActivity {
                     detailsBundle.putDouble("distance", currentItem.getDistance());
                     detailsBundle.putString("distanceString", currentItem.getDistanceString());
                     detailsBundle.putString("phoneNumber", phoneNumber);
-
                     try {
                         detailsBundle.putString("policy", object.getJSONObject("settings").getString("policy"));
                     }catch(JSONException ex){

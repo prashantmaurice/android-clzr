@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 import android.util.Log;
 import com.android.internal.util.Predicate;
@@ -108,7 +109,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         beaconManager.setRangingListener(new RangingListener() {
             @Override
             public void onBeaconsDiscovered(Region region, final List list) {
-                Log.e(TAG,"Beacons discovered: " + list.size());
+                Log.e(TAG, "Beacons discovered: " + list.size());
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {

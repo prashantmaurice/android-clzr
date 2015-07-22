@@ -181,11 +181,11 @@ public class GeofenceManagerService extends Service {
                 geofenceList.add(new Geofence.Builder()
                                 .setRequestId(id)
                                 .setCircularRegion(
-                                        params.mCoordinates.latitude,
-                                        params.mCoordinates.longitude,
-                                        params.mRadius
+                                        params.coordinates.latitude,
+                                        params.coordinates.longitude,
+                                        params.radius
                                 )
-                                .setExpirationDuration(GEOFENCE_EXPIRATION)
+                                .setExpirationDuration(Geofence.NEVER_EXPIRE)
                                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
                                         Geofence.GEOFENCE_TRANSITION_EXIT)
 
@@ -309,77 +309,33 @@ public class GeofenceManagerService extends Service {
         }
     }
 
-    /*@Override
-    public void onConnected(Bundle bundle) {
-        Log.e(TAG, "in onConnected()");
-        loadURLAndAddGeofences(this);
-        *//*GeofenceParams house = geofenceParamsHashMap.get("House");
-        GeofenceParams ic = geofenceParamsHashMap.get("IITM IC");
-        float[] resultHome = new float[3], resultIc = new float[3];
-        Location.distanceBetween(
-                lastLocation.getLatitude(), lastLocation.getLongitude(),
-                house.mCoordinates.latitude, house.mCoordinates.longitude,
-                resultHome
-        );
-        Location.distanceBetween(
-                lastLocation.getLatitude(), lastLocation.getLongitude(),
-                ic.mCoordinates.latitude, ic.mCoordinates.longitude,
-                resultIc
-        );
-        Log.e(TAG, "distance from home (m): " + String.valueOf(resultHome[0]));
-        Log.e(TAG, "distance from IC (m): " + String.valueOf(resultIc[0]));*//*
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.e(TAG, "in onConnectionSuspended(" + i + ")");
-        //googleApiClient.connect();
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.e(TAG, "in onConnectionFailed(" + connectionResult.getErrorCode() + ")");
-        googleApiClient.connect();
-    }
-
-    @Override
-    public void onResult(Status status) {
-        Log.e(TAG, "in onResult(" + status.getStatusMessage() + ")");
-        if (status.isSuccess())
-            Log.e(TAG, "success");
-        else if (status.isCanceled())
-            Log.e(TAG, "canceled");
-        else if (status.isInterrupted())
-            Log.e(TAG, "interrupted");
-    }*/
-
     public static class GeofenceParams {
-        public LatLng mCoordinates;
-        public float mRadius;
-        public int mType;
-        public JSONObject mParams;
+        public LatLng coordinates;
+        public float radius;
+        public int type;
+        public JSONObject extras;
 
         public GeofenceParams() {}
 
         public GeofenceParams(JSONObject fenceObject) throws JSONException{
             float radius = (float) fenceObject.getDouble("radius");
-            mRadius = (radius > GEOFENCE_MINIMUM_RADIUS_METERS) ? radius : GEOFENCE_MINIMUM_RADIUS_METERS;
+            this.radius = (radius > GEOFENCE_MINIMUM_RADIUS_METERS) ? radius : GEOFENCE_MINIMUM_RADIUS_METERS;
 
             JSONArray locationArray = fenceObject.getJSONArray("location");
-            mCoordinates = new LatLng(locationArray.getDouble(0), locationArray.getDouble(1));
+            coordinates = new LatLng(locationArray.getDouble(0), locationArray.getDouble(1));
 
-            mType = fenceObject.getInt("type");
+            type = fenceObject.getInt("type");
 
-            mParams = fenceObject.has("params") ? fenceObject.getJSONObject("params") : null;
+            extras = fenceObject.has("params") ? fenceObject.getJSONObject("params") : null;
         }
 
         public GeofenceParams(LatLng coordinates, float radius, int type) {
-            mCoordinates = coordinates;
-            mRadius = radius;
-            mType = type;
+            this.coordinates = coordinates;
+            this.radius = radius;
+            this.type = type;
         }
 
-        public ArrayList<Integer> getIncludedTypes() { return getIncludedTypes(mType); }
+        public ArrayList<Integer> getIncludedTypes() { return getIncludedTypes(type); }
 
         public static ArrayList<Integer> getIncludedTypes(int type) {
             ArrayList<Integer> res = new ArrayList<>();
@@ -388,25 +344,6 @@ public class GeofenceManagerService extends Service {
                     res.add(i);
             return res;
         }
-
-        /*public String getTypeString() { return getTypeString(mType); }
-
-        public static String getTypeString(int type) {
-            String res = "";
-            if ((type & GEOFENCE_TYPE_RANGE) != 0)
-                res += "RANGE|";
-            if ((type & GEOFENCE_TYPE_RELOAD) != 0)
-                res += "RELOAD|";
-            if ((type & GEOFENCE_TYPE_PING) != 0)
-                res += "PING|";
-            if ((type & GEOFENCE_TYPE_PUSH) != 0)
-                res += "PUSH|";
-            if ((type & GEOFENCE_TYPE_ON_EXIT) != 0)
-                res += "ON_EXIT|";
-            if (res.charAt(res.length() - 1) == '|')
-                res = res.substring(0, res.length() - 1);
-            return res;
-        }*/
     }
 
     public static class GeofenceErrorMessages {
@@ -551,20 +488,20 @@ public class GeofenceManagerService extends Service {
         protected void setupNotification(Context context, GeofenceParams params) {
             Log.e(TAG, "setting up");
             try {
-                String type = params.mParams.has("type") ? params.mParams.getString("type") : "";
+                String type = params.extras.has("type") ? params.extras.getString("type") : "";
                 String message = "", title = "";
                 // make notifications here
                 switch (type) {
                     case "STANDARD":
-                        message = params.mParams.getString("message");
-                        title = params.mParams.getString("title");
+                        message = params.extras.getString("message");
+                        title = params.extras.getString("title");
                         notify(title, message);
                         break;
                     case "REVIEW":
-                        String checkin_id = params.mParams.getString("checkin_id");
-                        String vendor_id = params.mParams.getString("vendor_id");
-                        message = params.mParams.getString("message");
-                        title = params.mParams.getString("title");
+                        String checkin_id = params.extras.getString("checkin_id");
+                        String vendor_id = params.extras.getString("vendor_id");
+                        message = params.extras.getString("message");
+                        title = params.extras.getString("title");
                         notifyreview(title, message, checkin_id, vendor_id);
                         break;
                     default: break;

@@ -13,9 +13,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.koushikdutta.ion.Ion;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,6 +69,13 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
         else
             viewHolder.pin.setImageResource(R.drawable.pin100);
         Log.i("fave","leaving favs");
+        Ion.with((viewHolder.image))
+                //   .placeholder(R.drawable.call)
+                //   .error(R.drawable.bat)
+                //    .animateLoad(spinAnimation)
+                //    .animateIn(fadeInAnimation)
+                .load(current.getImageUrl());
+
 //        viewHolder.stampnumber.setOnTouchListener(new View.OnTouchListener() {
 //
 //            @Override
@@ -129,14 +139,18 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
         public MyOffer currentItem;
         public String vendorId;
         public String vendorName;
+        public ImageView image;
+        //public Button checkinButton;
         ImageView pin;
 
         public ListItemViewHolder(View itemView) {
             super(itemView);
             //txtvisitno = (TextView) itemView.findViewById(R.id.txtNum);
+            image = (ImageView) itemView.findViewById( R.id.freebieimage );
             caption = (TextView) itemView.findViewById(R.id.freebiename);
             description = (TextView) itemView.findViewById(R.id.freebiedescription);
             vendorId = vendorName = "";
+            //checkinButton = (Button) itemView.findViewById(R.id.useit);
 
             pin=(ImageView)itemView.findViewById(R.id.pinimage);
             pin.setOnClickListener(new View.OnClickListener() {

@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Button;
 
 import com.google.android.gcm.GCMRegistrar;
 
@@ -37,6 +38,7 @@ import java.util.Date;
 
 public class FreebieDescription extends ActionBarActivity {
     String offerid="";
+    String button="";
     String vendorid="",caption="",description="", name="";
     SharedPreferences status;
     String NotNow;
@@ -86,9 +88,20 @@ public class FreebieDescription extends ActionBarActivity {
         }catch (Exception e) {
 
         }
+
+        try {
+            button += intent.getStringExtra("button");
+        }catch (Exception e) {
+
+        }
+
+
         if(!caption.equals("")){
             ((TextView)findViewById(R.id.caption)).setText(caption);
             ((TextView)findViewById(R.id.title)).setText(caption);
+        }
+        if(!button.equals("")){
+            ((Button)findViewById(R.id.useit)).setText(caption);
         }
         if(!description.equals("")){
             ((TextView)findViewById(R.id.description)).setText(description);
