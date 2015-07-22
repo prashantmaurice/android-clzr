@@ -202,6 +202,7 @@ public class Home  extends ActionBarActivity {
             }
         });
         mtabs.setViewPager(pager);
+        offerdialog();
 
 
     }
@@ -530,50 +531,76 @@ public class Home  extends ActionBarActivity {
 
     public void offerdialog()
     {
-        freebielayout.getForeground().setAlpha(255);
-        LayoutInflater li = LayoutInflater.from(c);
-        View ltdofferView = li.inflate(R.layout.popupofferlayout, null);
+        new AsyncGet(c, "http://api.clozerr.com/v2/notifications/list/all?access_token=" + TOKEN, new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                // t1.setText(s);
+                Log.i("result", s);
+                try {
+                    JSONArray notifarray=new JSONArray(s);
+                    for(int i=0;i<notifarray.length();i++)
+                    {
+                        JSONObject notifobject = notifarray.getJSONObject(i);
+                        //Toast.makeText(getApplicationContext(),notifobject.toString(),Toast.LENGTH_LONG).show();
+                        freebielayout.getForeground().setAlpha(255);
+                        LayoutInflater li = LayoutInflater.from(c);
+                        View ltdofferView = li.inflate(R.layout.popupofferlayout, null);
 
-        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                c);
-        final Button okbutton = (Button) ltdofferView.findViewById(R.id.okbutton);
-        final ImageButton cancelbutton= (ImageButton) ltdofferView.findViewById(R.id.cancelbutton);
+                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                                c);
+                        final Button okbutton = (Button) ltdofferView.findViewById(R.id.okbutton);
+                        final ImageButton cancelbutton= (ImageButton) ltdofferView.findViewById(R.id.cancelbutton);
+                        final TextView caption = (TextView) ltdofferView.findViewById(R.id.offercaption);
+                        final TextView description = (TextView) ltdofferView.findViewById(R.id.offerdescription);
+                        alertDialogBuilder.setView(ltdofferView);
+                        alertDialogBuilder
+                                .setCancelable(true);
+                        // create alert dialog
+                        final AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+                        lp.copyFrom(alertDialog.getWindow().getAttributes());
+                        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+                        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                        lp.gravity= Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL;
+                        //alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        alertDialog.show();
+                        alertDialog.getWindow().setAttributes(lp);
+                        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        okbutton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                alertDialog.dismiss();
+                                freebielayout.getForeground().setAlpha(0);
+                            }
+                        });
+                        cancelbutton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                alertDialog.dismiss();
+                                freebielayout.getForeground().setAlpha(0);
+                            }
+                        });
+                        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialogInterface) {
+                                freebielayout.getForeground().setAlpha(0);
+                            }
+                        });
+                        caption.setText(notifobject.getJSONObject("data").getString("title"));
+                        description.setText(notifobject.getJSONObject("data").getString("description"));
+                    }
+                    if (s == null) {
+                        Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
 
-        alertDialogBuilder.setView(ltdofferView);
-        alertDialogBuilder
-                .setCancelable(true);
-        // create alert dialog
-        final AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        lp.copyFrom(alertDialog.getWindow().getAttributes());
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        lp.gravity= Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL;
-        //alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        alertDialog.show();
-        alertDialog.getWindow().setAttributes(lp);
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        okbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialog.dismiss();
-                freebielayout.getForeground().setAlpha(0);
-            }
-        });
-        cancelbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialog.dismiss();
-                freebielayout.getForeground().setAlpha(0);
-            }
-        });
-        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialogInterface) {
-                freebielayout.getForeground().setAlpha(0);
-            }
-        });
+        },false);
+
+
         //alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
 
