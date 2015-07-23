@@ -68,8 +68,8 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
     }
 
     private void initiateBDBDownloader(Context context) {
-        GenUtils.enableComponent(context, ConnectivityListener.class);
-        Intent initiateIntent = new Intent(context, ConnectivityListener.class);
+        GenUtils.enableComponent(context, BeaconDBDownloader.class);
+        Intent initiateIntent = new Intent(context, BeaconDBDownloader.class);
         initiateIntent.setAction(Constants.Actions.ACTION_INITIATE_DOWNLOADER);
         context.sendBroadcast(initiateIntent);
     }
@@ -88,9 +88,9 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (!ConnectivityListener.isDoneDownloading()) {
+                            if (!BeaconDBDownloader.isDoneDownloading()) {
                                 Log.e(TAG, "Timeout; disabling BDBDownloader");
-                                GenUtils.disableComponent(context, ConnectivityListener.class);
+                                GenUtils.disableComponent(context, BeaconDBDownloader.class);
                                 if (alarmInterval > MINIMUM_ALARM_INTERVAL) {
                                     alarmInterval /= REDUCTION_FACTOR;
                                     if (alarmInterval < MINIMUM_ALARM_INTERVAL)

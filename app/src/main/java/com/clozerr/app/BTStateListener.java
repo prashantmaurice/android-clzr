@@ -11,16 +11,16 @@ import android.os.Looper;
 /**
  * Created by aravind on 18/7/15.
  */
-public abstract class BTStateChangeReceiver extends BroadcastReceiver {
-    private static final String TAG = "BTSCR";
+public abstract class BTStateListener extends BroadcastReceiver {
+    private static final String TAG = "BTStateListener";
     public static final long DEFAULT_TIMEOUT = -1;
 
     private long mTimeout;
     private boolean mIsRegistered;
 
-    public BTStateChangeReceiver() { this(DEFAULT_TIMEOUT); }
+    public BTStateListener() { this(DEFAULT_TIMEOUT); }
 
-    public BTStateChangeReceiver(long timeout) {
+    public BTStateListener(long timeout) {
         super();
         mTimeout = timeout;
         mIsRegistered = false;

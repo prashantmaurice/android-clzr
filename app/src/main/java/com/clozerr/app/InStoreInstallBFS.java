@@ -10,7 +10,7 @@ import java.util.List;
  * Created by aravind on 19/7/15.
  */
 public class InStoreInstallBFS extends OneTimeBFS {
-    private static final String TAG = "InStoreInstallBFS";
+    private static final String TAG = "ISIBFS";
 
     public InStoreInstallBFS() { super(); }
 

@@ -14,11 +14,11 @@ import com.koushikdutta.ion.Ion;
 
 import org.json.JSONObject;
 
-public class ConnectivityListener extends BroadcastReceiver {
-    private static final String TAG = "ConnectivityListener";
+public class BeaconDBDownloader extends BroadcastReceiver {
+    private static final String TAG = "BeaconDBDownloader";
     private static boolean isDownloadDone = false;
 
-    public ConnectivityListener() {
+    public BeaconDBDownloader() {
         isDownloadDone = false;
     }
 
@@ -43,10 +43,10 @@ public class ConnectivityListener extends BroadcastReceiver {
                                         putString(Constants.SPKeys.BEACON_UUID, BeaconFinderService.commonBeaconUUID).apply();
                                 Log.e(TAG, "downloaded");
                                 isDownloadDone = true;
-                                GenUtils.disableComponent(context, ConnectivityListener.class);
+                                GenUtils.disableComponent(context, BeaconDBDownloader.class);
                             } catch (Exception ex) {
                                 ex.printStackTrace();
-                                Intent nextTrialIntent = new Intent(context, ConnectivityListener.class);
+                                Intent nextTrialIntent = new Intent(context, BeaconDBDownloader.class);
                                 nextTrialIntent.setAction(Constants.Actions.ACTION_INITIATE_DOWNLOADER);
                                 LocalBroadcastManager.getInstance(context).sendBroadcast(nextTrialIntent);
                             }

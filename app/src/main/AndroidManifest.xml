@@ -133,7 +133,7 @@
             android:exported="false" >
         </receiver>
         <receiver
-            android:name=".ConnectivityListener"
+            android:name=".BeaconDBDownloader"
             android:enabled="false"
             android:exported="true" >
             <intent-filter>

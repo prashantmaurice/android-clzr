@@ -133,7 +133,7 @@ public class PeriodicBFS extends BeaconFinderService {
         turnOnBluetooth(getApplicationContext());
         maxRssi = null;
         vendorToNotify = null;
-        new BTStateChangeReceiver(SCAN_PERIOD) {
+        new BTStateListener(SCAN_PERIOD) {
             @Override
             public void onBTStateReached(Context context, int state) {
                 if (state == BluetoothAdapter.STATE_ON) {
