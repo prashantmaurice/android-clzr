@@ -15,8 +15,7 @@ import com.koushikdutta.ion.Ion;
 import org.json.JSONObject;
 
 public class BeaconDBDownloader extends BroadcastReceiver {
-    private static final String TAG = "BDBDownloader";
-    public static final String ACTION_INITIATE_DOWNLOADER = "com.clozerr.app.ACTION_INITIATE_DOWNLOADER";
+    private static final String TAG = "BeaconDBDownloader";
     private static boolean isDownloadDone = false;
 
     public BeaconDBDownloader() {
@@ -48,7 +47,7 @@ public class BeaconDBDownloader extends BroadcastReceiver {
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                                 Intent nextTrialIntent = new Intent(context, BeaconDBDownloader.class);
-                                nextTrialIntent.setAction(ACTION_INITIATE_DOWNLOADER);
+                                nextTrialIntent.setAction(Constants.Actions.ACTION_INITIATE_DOWNLOADER);
                                 LocalBroadcastManager.getInstance(context).sendBroadcast(nextTrialIntent);
                             }
                         }
@@ -61,7 +60,7 @@ public class BeaconDBDownloader extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction() != null &&
-            (intent.getAction().equals(ACTION_INITIATE_DOWNLOADER) ||
+            (intent.getAction().equals(Constants.Actions.ACTION_INITIATE_DOWNLOADER) ||
                 (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)))
             ) {
             Log.e(TAG, "received");

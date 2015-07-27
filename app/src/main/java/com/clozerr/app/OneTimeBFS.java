@@ -37,7 +37,7 @@ public abstract class OneTimeBFS extends BeaconFinderService {
                                             intent.getIntExtra("beaconMinor", 0));
         if (mBeaconDBParams.major == 0) mBeaconDBParams.major = null;
         if (mBeaconDBParams.minor == 0) mBeaconDBParams.minor = null;
-        mTimeout = intent.getLongExtra("timeout", BTStateChangeReceiver.DEFAULT_TIMEOUT);
+        mTimeout = intent.getLongExtra("timeout", BTStateListener.DEFAULT_TIMEOUT);
         mLogInNecessary = intent.getBooleanExtra("login", true);
         if (!running)
             running = true;
@@ -72,7 +72,7 @@ public abstract class OneTimeBFS extends BeaconFinderService {
         if (checkCompatibility(applicationContext) && checkPreferences(applicationContext, mLogInNecessary)) {
             setListener(mLogInNecessary);
             turnOnBluetooth(applicationContext);
-            new BTStateChangeReceiver(mTimeout) {
+            new BTStateListener(mTimeout) {
                 @Override
                 public void onBTStateReached(Context context, int state) {
                     if (state == BluetoothAdapter.STATE_ON) {
@@ -109,7 +109,7 @@ public abstract class OneTimeBFS extends BeaconFinderService {
 
     public static void startOneTimeService(Context context, Class<? extends OneTimeBFS> serviceClass,
                                            BeaconDBParams beaconParams, boolean logInNecessary) {
-        startOneTimeService(context, serviceClass, beaconParams, logInNecessary, BTStateChangeReceiver.DEFAULT_TIMEOUT);
+        startOneTimeService(context, serviceClass, beaconParams, logInNecessary, BTStateListener.DEFAULT_TIMEOUT);
     }
 
     public static void startOneTimeService(Context context, Class<? extends OneTimeBFS> serviceClass,
