@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 public class GiftBoxActivity extends ActionBarActivity {
     private Toolbar toolbar;
-    private UnusedOffersAdapter mMainPageAdapter;
+    private GiftBoxRecyclerViewAdapter mMainPageAdapter;
     private RecyclerView mRecyclerView;
     Context c;
     @Override
@@ -76,7 +76,7 @@ public class GiftBoxActivity extends ActionBarActivity {
                 if (rowItems.size() == 0) {
                     findViewById(R.id.alertgiftbox).setVisibility(View.VISIBLE);
                 }
-                mMainPageAdapter = new UnusedOffersAdapter(rowItems, c);
+                mMainPageAdapter = new GiftBoxRecyclerViewAdapter(rowItems, c);
                 mRecyclerView.setAdapter(mMainPageAdapter);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -109,7 +109,7 @@ public class GiftBoxActivity extends ActionBarActivity {
                             if (rowItems.size() == 0) {
                                 findViewById(R.id.alertgiftbox).setVisibility(View.VISIBLE);
                             }
-                            mMainPageAdapter = new UnusedOffersAdapter(rowItems, c);
+                            mMainPageAdapter = new GiftBoxRecyclerViewAdapter(rowItems, c);
                             mRecyclerView.setAdapter(mMainPageAdapter);
                         } catch (JSONException e) {
                             e.printStackTrace();
