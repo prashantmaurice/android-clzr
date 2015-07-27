@@ -60,6 +60,7 @@ public class VendorActivity extends ActionBarActivity {
         Drawable myIcon = getResources().getDrawable( R.drawable.checkinbutton );
         ColorFilter filter = new LightingColorFilter( Color.WHITE, Color.WHITE );
         myIcon.setColorFilter(filter);
+        Rewards = "";
 
         callingIntent = getIntent();
         fromPeriodicBFS = callingIntent != null && callingIntent.getBooleanExtra("from_periodic_scan", false);
@@ -70,6 +71,8 @@ public class VendorActivity extends ActionBarActivity {
         mCheckInButton.setImageDrawable(myIcon);
 
         detailsBundle = new Bundle();
+
+
 
         final String vendor_id = callingIntent.getStringExtra("vendor_id");
         vendorId = vendor_id;
@@ -119,7 +122,7 @@ public class VendorActivity extends ActionBarActivity {
                     }
                     catch(Exception e)
                     {
-                        e.printStackTrace();
+                        //e.printStackTrace();
                     }
                     try
                     {
@@ -129,7 +132,7 @@ public class VendorActivity extends ActionBarActivity {
                     }
                     catch(Exception e)
                     {
-                        e.printStackTrace();
+                        //e.printStackTrace();
                     }
                     try
                     {
@@ -139,7 +142,7 @@ public class VendorActivity extends ActionBarActivity {
                     }
                     catch(Exception e)
                     {
-                        e.printStackTrace();
+                        //e.printStackTrace();
                     }
                     try
                     {
@@ -149,7 +152,7 @@ public class VendorActivity extends ActionBarActivity {
                     }
                     catch(Exception e)
                     {
-                        e.printStackTrace();
+                        ///e.printStackTrace();
                     }
                     address = object.getString("address");
                     final CardModel currentItem = new CardModel(

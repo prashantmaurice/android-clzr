@@ -12,11 +12,17 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketTimeoutException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by junaid on 2/11/14.
@@ -63,22 +69,18 @@ public class AsyncGet extends AsyncTask<String, String, String> {
         String content = "";
         HttpResponse httpResponse = null;
         HttpEntity httpEntity = null;
-        DefaultHttpClient hc = new DefaultHttpClient();
+
+        int timeout = 3000;
+        HttpParams httpParams = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(httpParams, timeout);
+        HttpConnectionParams.setSoTimeout(httpParams, timeout);
+
+        DefaultHttpClient hc = new DefaultHttpClient( httpParams );
         HttpGet hGet = new HttpGet(Url);
-//        ResponseHandler<String> rHand = new BasicResponseHandler();
-//        try {
-//            content = hc.execute(hGet,rHand);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            if (toDisplayProgress)
-//                handler.post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Toast.makeText(c, "Network error. Check your network connections and try again.",
-//                                Toast.LENGTH_LONG).show();
-//                    }
-//                });
-//        }
+
+
+
+
         try {
             httpResponse = hc.execute(hGet);
             httpEntity = httpResponse.getEntity();

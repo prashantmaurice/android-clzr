@@ -22,11 +22,11 @@ class MyPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         AsyncGet.dismissDialog();
         switch (position){
-            case 0:CategoriesFragment myFragment=new CategoriesFragment();
-                 return myFragment;
-            case 1:NearbyFragment nearbyFragment=new NearbyFragment();
+            //case 0:CategoriesFragment myFragment=new CategoriesFragment();
+            //     return myFragment;
+            case 0:NearbyFragment nearbyFragment=new NearbyFragment();
                  return nearbyFragment;
-            case 2:MyClubsFragment myClubsFragment = new MyClubsFragment();
+            case 1:MyClubsFragment myClubsFragment = new MyClubsFragment();
                 return myClubsFragment;
             default:return null;
         }

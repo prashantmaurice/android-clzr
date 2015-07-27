@@ -202,11 +202,11 @@ public class PeriodicBFS extends BeaconFinderService {
                 }
             });
             if (vendorParams != null) {*/
-            String title = "Welcome to " + vendorParams.name;
+            String title = vendorParams.notifTitle;
             Log.e(TAG, "vendor - " + vendorParams.name);
             String contentText = "", actionText = "";
             //if (vendorParams.mHasOffers) {
-                contentText = "Redeem your rewards!";
+                contentText = vendorParams.notifMessage;
                 actionText = "See rewards";
             //}
             /*else if (vendorParams.mLoyaltyType.equalsIgnoreCase("s1")) {

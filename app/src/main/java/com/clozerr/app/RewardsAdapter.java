@@ -45,8 +45,8 @@ public class RewardsAdapter extends RecyclerView.Adapter<RewardsAdapter.ListItem
     public void onBindViewHolder(final ListItemViewHolder viewHolder, int position) {
         viewHolder.currentItem = items.get(position);
         RewardItem model = items.get(position);
-        viewHolder.name.setText(model.Name);
-        viewHolder.caption.setText(model.Caption);
+        viewHolder.name.setText(model.Caption);
+        viewHolder.caption.setText(model.Description);
         Ion.with((viewHolder.imageView))
                 //   .placeholder(R.drawable.call)
                 //   .error(R.drawable.bat)

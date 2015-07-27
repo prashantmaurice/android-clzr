@@ -38,7 +38,7 @@ import java.util.Date;
 
 public class FreebieDescription extends ActionBarActivity {
     String offerid="";
-    String button="";
+    String button="USE IT";
     String vendorid="",caption="",description="", name="";
     SharedPreferences status;
     String NotNow;
@@ -90,7 +90,8 @@ public class FreebieDescription extends ActionBarActivity {
         }
 
         try {
-            button += intent.getStringExtra("button");
+            if( intent.hasExtra("button") )
+                button += intent.getStringExtra("button");
         }catch (Exception e) {
 
         }
@@ -101,7 +102,7 @@ public class FreebieDescription extends ActionBarActivity {
             ((TextView)findViewById(R.id.title)).setText(caption);
         }
         if(!button.equals("")){
-            ((Button)findViewById(R.id.useit)).setText(caption);
+            ((Button)findViewById(R.id.useit)).setText(button);
         }
         if(!description.equals("")){
             ((TextView)findViewById(R.id.description)).setText(description);
@@ -115,6 +116,7 @@ public class FreebieDescription extends ActionBarActivity {
             public void onClick(View v) {
                 String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+Home.TOKEN+"&offer_id="+offerid+"&vendor_id="+vendorid+"&gcm_id="+ GCMRegistrar.getRegistrationId(getApplicationContext());
                 Log.d("FreebieDescription", "checkin url - " + url);
+                VendorActivity.Rewards = "";
                 //Toast.makeText(getApplicationContext(),url,Toast.LENGTH_LONG).show();
                 new AsyncGet(getApplicationContext(), url, new AsyncGet.AsyncResult() {
                     @Override

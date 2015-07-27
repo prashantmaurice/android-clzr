@@ -295,6 +295,11 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         //public String mUUID;
         public BeaconDBParams beaconParams;
         public String id;
+
+        // Notification parameters.
+        public String notifTitle;
+        public String notifMessage;
+
         /*public String mNextOfferID;
         public String mNextOfferCaption;
         public String mNextOfferDescription;*/
@@ -306,6 +311,18 @@ public abstract class BeaconFinderService extends WakefulIntentService {
 
         public VendorParams(/*Context context, */JSONObject object) throws JSONException {
             name = object.getString("name");
+
+            JSONObject beacons = object.getJSONObject("beacons");
+            if( beacons.has("title") )
+                notifTitle = beacons.getString("title");
+            else
+                notifTitle = "Welcome to " + name;
+
+            if( beacons.has("message") )
+                notifMessage = beacons.getString("message");
+            else
+                notifMessage = "Checkout your rewards!";
+
             /*mUUID = (object.getJSONArray("UUID").length() > 0) ?
                         object.getJSONArray("UUID").getString(0).toLowerCase() : "";*/
             if (object.has("beacons") && object.getJSONObject("beacons").has("major"))

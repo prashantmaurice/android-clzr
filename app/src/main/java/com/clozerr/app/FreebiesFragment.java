@@ -35,11 +35,13 @@ public class FreebiesFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         listview.setLayoutManager(linearLayoutManager);
 // if List<String> isnt specific enough:
-        Log.e("FreebiesFragment","Haven't called the URL");
         if(VendorActivity.Rewards.equals("")) {
+            Log.e("FreebiesFragment","Haven't called the URL");
+
             final String rewardsurl = "http://api.clozerr.com/v2/vendor/offers/rewardspage/?vendor_id=" + VendorActivity.vendorId + "&access_token=" + VendorActivity.TOKEN;
             new AsyncGet(c, rewardsurl, new AsyncGet.AsyncResult() {
                 @Override
+
                 public void gotResult(String s) {
                     Log.d("rewardsurl", rewardsurl);
                     VendorActivity.Rewards = s;
