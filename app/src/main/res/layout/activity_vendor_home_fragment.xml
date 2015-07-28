@@ -256,7 +256,35 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
                         android:layout_marginTop="5dp"
-                        android:text="ABOUT"
+                        android:text="DESCRIPTION"
+                        android:textColor="#000000"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/descriptionView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:text="Description content"
+                        android:textColor="#70000000"
+                        android:textSize="14sp"
+                        android:textStyle="normal"
+                        android:paddingLeft="15dp"
+                        android:paddingRight="15dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="10dp"/>
+
+
+                    <View
+                        style="@style/DividerHorizontal"
+                        android:layout_height="1dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="5dp"
+                        android:text="GALLERY"
                         android:textColor="#000000"
                         android:textSize="14sp"
                         android:textStyle="bold" />
