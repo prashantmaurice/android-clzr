@@ -91,7 +91,7 @@ public class FreebieDescription extends ActionBarActivity {
 
         try {
             if( intent.hasExtra("button") )
-                button += intent.getStringExtra("button");
+                button = intent.getStringExtra("button");
         }catch (Exception e) {
 
         }

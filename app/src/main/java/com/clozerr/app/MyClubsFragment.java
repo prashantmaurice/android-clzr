@@ -305,7 +305,7 @@ public class MyClubsFragment extends Fragment {
                         array.getJSONObject(i).getJSONArray("offers"),
                         array.getJSONObject(i).getJSONArray("location").getDouble(0),
                         array.getJSONObject(i).getJSONArray("location").getDouble(1),
-                        array.getJSONObject(i).getString("image") + URLEncoder.encode(array.getJSONObject(i).getString("resource_name"), "UTF-8"),
+                        array.getJSONObject(i).getString("image_base") + URLEncoder.encode(array.getJSONObject(i).getString("resource_name"), "UTF-8"),
                         array.getJSONObject(i).getString("fid"),
                         array.getJSONObject(i).getString("_id"),
                         //array.getJSONObject(i).getInt("stamps")

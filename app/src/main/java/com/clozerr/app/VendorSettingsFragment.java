@@ -8,6 +8,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -18,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+import android.widget.ImageView;
 
 
 public class VendorSettingsFragment extends Fragment {
@@ -78,7 +82,12 @@ public class VendorSettingsFragment extends Fragment {
                     shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     Intent addIntent = new Intent();
                     addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, VendorActivity.vendorTitle);
-                    addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, Intent.ShortcutIconResource.fromContext(getActivity(), R.drawable.ic_launcher));
+
+                    ImageView image = VendorActivity.logoView;
+                    Bitmap bitmap = ((BitmapDrawable)image.getDrawable()).getBitmap();
+
+
+                    addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON, bitmap);
                     addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
                     addIntent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
                     getActivity().sendBroadcast(addIntent);

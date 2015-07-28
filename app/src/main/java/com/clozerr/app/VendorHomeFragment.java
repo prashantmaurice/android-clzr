@@ -39,11 +39,12 @@ public class VendorHomeFragment extends Fragment {
     private Context c;
     private FrameLayout layout;
 
-    private ImageView mVendorImageView,mVendorGalleryImageView;
+    private ImageView mVendorImageView,mVendorLogoView;
     private TextView mVendorTitleView;
     private TextView mVendorAddressView;
+    private TextView mVendorAboutView;
     private ImageButton mCallButton, mDirButton, favorites, whatsappshare,fb,gplus,twitter,share;
-    private RecyclerView gallerylist;
+    //private RecyclerView gallerylist;
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
@@ -52,8 +53,12 @@ public class VendorHomeFragment extends Fragment {
 
         Ion.with(mVendorImageView).load(VendorActivity.detailsBundle.getString("vendorImage")) ;
         if(!VendorActivity.detailsBundle.getString("logo").equalsIgnoreCase("undefined"))
-              new DownloadImageTask(mVendorGalleryImageView).execute(VendorActivity.detailsBundle.getString("logo"));
+              new DownloadImageTask(mVendorLogoView).execute(VendorActivity.detailsBundle.getString("logo"));
+
+        VendorActivity.logoView = mVendorLogoView;
+
         mVendorTitleView.setText(VendorActivity.detailsBundle.getString("vendorTitle"));
+        mVendorAboutView.setText(VendorActivity.detailsBundle.getString("description"));
         mVendorAddressView.setText(VendorActivity.detailsBundle.getString("address"));
         final SharedPreferences status = c.getSharedPreferences("USER",0);
         final String NotNow = status.getString("notNow","false");
@@ -222,12 +227,12 @@ public class VendorHomeFragment extends Fragment {
                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
             }
         });
-        gallerylist.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        /*gallerylist.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         gallerylist.setItemAnimator(new DefaultItemAnimator());
         gallerylist.setHasFixedSize(true);
         String[] eStr = {""};
         GalleryAdapter adapter = new GalleryAdapter(eStr, getActivity());
-        gallerylist.setAdapter(adapter);
+        gallerylist.setAdapter(adapter);*/
 
         return layout;
     }
@@ -246,9 +251,10 @@ public class VendorHomeFragment extends Fragment {
     private void initViews() {
         layout.getForeground().mutate().setAlpha(0);
         mVendorImageView = (ImageView) layout.findViewById(R.id.vendorImageView);
-        gallerylist = (RecyclerView) layout.findViewById(R.id.GalleryRecyclerView);
+        //gallerylist = (RecyclerView) layout.findViewById(R.id.GalleryRecyclerView);
         mVendorTitleView = (TextView) layout.findViewById(R.id.vendorTitleView);
         mVendorAddressView = (TextView) layout.findViewById(R.id.addressView);
+        mVendorAboutView = (TextView) layout.findViewById(R.id.aboutView);
         mCallButton = (ImageButton) layout.findViewById(R.id.callButton);
         mDirButton = (ImageButton) layout.findViewById(R.id.dirButton);
         favorites = (ImageButton) layout.findViewById(R.id.favorites);
@@ -257,7 +263,7 @@ public class VendorHomeFragment extends Fragment {
         gplus = (ImageButton) layout.findViewById(R.id.gplus);
         twitter = (ImageButton) layout.findViewById(R.id.twitter);
         share = (ImageButton) layout.findViewById(R.id.share);
-        mVendorGalleryImageView = (ImageView) layout.findViewById(R.id.logo);
+        mVendorLogoView = (ImageView) layout.findViewById(R.id.logo);
     }
 
     public void onClickWhatsApp() {

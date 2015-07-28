@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
@@ -49,6 +50,7 @@ public class VendorActivity extends ActionBarActivity {
     private String pinNumber;
     public static Bundle detailsBundle;
     public static String vendorId;
+    public static ImageView logoView;
     static String vendorTitle;
     static int i=1;
     public String analyticsurlvendor=null;
@@ -117,7 +119,7 @@ public class VendorActivity extends ActionBarActivity {
                     try
                     {
                         //logo = object.getString("logo");
-                        logo = object.getString("image") + URLEncoder.encode(object.getString("resource_name"), "UTF-8") + "_logo";
+                        logo = object.getString("image_base") + URLEncoder.encode(object.getString("resource_name"), "UTF-8") + "_logo";
                         Log.i("logo",logo);
                     }
                     catch(Exception e)
@@ -162,7 +164,7 @@ public class VendorActivity extends ActionBarActivity {
                             object.getJSONArray("offers"),
                             latitude,
                             longitude,
-                            object.getString("image") + URLEncoder.encode(object.getString("resource_name"), "UTF-8"),
+                            object.getString("image_base") + URLEncoder.encode(object.getString("resource_name"), "UTF-8"),
                             object.getString("fid"), object.getString("_id"),
                             0
                     );
