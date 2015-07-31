@@ -25,8 +25,8 @@ public class Settings {
     public final static boolean showDebugToasts = !(runMode== RunMode.PROD);
 
     //Other settings not related to Network
-    public final static String SDCARD_FOLDER = "TinyStep";
-    public final static String SDCARD_IMG_FOLDER = "TinyStep Images";
+    public final static String SDCARD_FOLDER = "Clozerr";
+    public final static String SDCARD_IMG_FOLDER = "Clozerr Images";
 
 }
 
