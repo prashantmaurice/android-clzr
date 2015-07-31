@@ -227,6 +227,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
                 String fileContents = GenUtils.readFileContentsAsString(context, Constants.FileNames.BEACONS);
                 JSONObject rootObject = new JSONObject(fileContents);
                 commonBeaconUUID = rootObject.getString("UUID");
+                //commonBeaconUUID = "00000000-0000-0000-0000-000000000000";
                 JSONArray rootArray = rootObject.getJSONArray("vendors");
                 VendorParams vendorParams;
                 result = new ArrayList<>();

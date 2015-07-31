@@ -309,7 +309,7 @@ public class MyClubsFragment extends Fragment {
                         array.getJSONObject(i).getString("fid"),
                         array.getJSONObject(i).getString("_id"),
                         //array.getJSONObject(i).getInt("stamps")
-                        0
+                        0,"", true
                 );
                 Log.e("stringfunction", "processed");
                 rowItems.add(item);

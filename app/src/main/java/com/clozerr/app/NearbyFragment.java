@@ -458,7 +458,7 @@ public class NearbyFragment extends Fragment {
                         array.getJSONObject(i).getJSONArray("location").getDouble(0),
                         array.getJSONObject(i).getJSONArray("location").getDouble(1),
                         array.getJSONObject(i).getString("image_base") + URLEncoder.encode(array.getJSONObject(i).getString("resource_name"),"UTF-8"),
-                        fid,array.getJSONObject(i).getString("_id"),0
+                        fid,array.getJSONObject(i).getString("_id"),0,array.getJSONObject(i).getString("caption"),array.getJSONObject(i).getBoolean("active")
                 );
                 rowItems.add(item);
             }
