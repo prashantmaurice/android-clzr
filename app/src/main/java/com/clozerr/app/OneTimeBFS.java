@@ -60,7 +60,7 @@ public abstract class OneTimeBFS extends BeaconFinderService {
             turnOffBluetooth(getApplicationContext());
             Log.e(TAG, "Stopped Scan");
             running = false;
-//            releaseLock();//TODO : Commented to
+//            releaseLock();//TODO : Commented to remove error ???? resolve this
         }
     }
 

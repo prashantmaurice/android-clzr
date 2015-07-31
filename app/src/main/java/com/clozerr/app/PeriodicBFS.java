@@ -187,7 +187,7 @@ public class PeriodicBFS extends BeaconFinderService {
             vendorToNotify = null;
             maxRssi = null;
         }
-//        releaseLock();
+//        releaseLock();//TODO : Commented to remove error ???? resolve this
     }
 
     @Override
@@ -206,7 +206,7 @@ public class PeriodicBFS extends BeaconFinderService {
         });
     }
 
-//    @Override
+//    @Override//TODO : Commented to remove error ???? resolve this
     protected boolean isListeningAfterWork() {
         return true;
     }
