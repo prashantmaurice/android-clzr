@@ -9,12 +9,14 @@ public class RewardItem {
     String Description;
     String Image;
     String RewardId;
-    public RewardItem(String Name,String Caption,String Description,String Image, String RewardId){
+    Boolean Unlocked;
+    public RewardItem(String Name,String Caption,String Description,String Image, String RewardId, Boolean Unlocked){
         this.Name = capitalise(splitCamelCase(Name));
         this.Caption = Caption;
         this.Description = Description;
         this.Image = Image;
         this.RewardId = RewardId;
+        this.Unlocked = Unlocked;
     }
     static String splitCamelCase(String s) {
         return s.replaceAll(

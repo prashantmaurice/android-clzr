@@ -166,7 +166,9 @@ public class VendorActivity extends ActionBarActivity {
                             longitude,
                             object.getString("image_base") + URLEncoder.encode(object.getString("resource_name"), "UTF-8"),
                             object.getString("fid"), object.getString("_id"),
-                            0
+                            0,
+                            "",
+                            true
                     );
                     ArrayList<String> questions = new ArrayList<String>();
                     JSONArray questionArray = object.getJSONArray("question");

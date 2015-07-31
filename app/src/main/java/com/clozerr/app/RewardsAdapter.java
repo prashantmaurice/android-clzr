@@ -2,11 +2,13 @@ package com.clozerr.app;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.koushikdutta.ion.Ion;
@@ -47,6 +49,10 @@ public class RewardsAdapter extends RecyclerView.Adapter<RewardsAdapter.ListItem
         RewardItem model = items.get(position);
         viewHolder.name.setText(model.Caption);
         viewHolder.caption.setText(model.Description);
+
+        if( !model.Unlocked )
+            viewHolder.layout.setBackgroundColor(Color.parseColor("#AAAAAA"));
+
         Ion.with((viewHolder.imageView))
                 //   .placeholder(R.drawable.call)
                 //   .error(R.drawable.bat)
@@ -66,6 +72,7 @@ public class RewardsAdapter extends RecyclerView.Adapter<RewardsAdapter.ListItem
         ImageView imageView;
         TextView name;
         TextView caption;
+        LinearLayout layout;
         public RewardItem currentItem;
 
         public ListItemViewHolder(final View itemView) {
@@ -73,15 +80,20 @@ public class RewardsAdapter extends RecyclerView.Adapter<RewardsAdapter.ListItem
             imageView = (ImageView) itemView.findViewById(R.id.freebieimage);
             name = (TextView)itemView.findViewById(R.id.freebiename);
             caption = (TextView)itemView.findViewById(R.id.freebiedescription);
+            layout = (LinearLayout)itemView.findViewById(R.id.freebielayout);
+
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
                     Intent intent = new Intent(c,FreebieDescription.class);
                     intent.putExtra("offerid",currentItem.RewardId);
                     intent.putExtra("vendorid",VendorActivity.vendorId);
                     intent.putExtra("caption",currentItem.Caption);
                     intent.putExtra("description",currentItem.Description);
-                    c.startActivity(intent);
+                    if( currentItem.Unlocked )
+                        c.startActivity(intent);
                 }
             });
         }

@@ -279,7 +279,7 @@
                     <View
                         style="@style/DividerHorizontal"
                         android:layout_height="1dp" />
-                    <TextView
+                    <!--<TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
@@ -305,7 +305,7 @@
                             android:text="Address content"
                             android:textColor="#70000000"
                             android:textSize="13sp" />
-                        <!--<android.support.v7.widget.RecyclerView
+                        <android.support.v7.widget.RecyclerView
                             android:id="@+id/GalleryRecyclerView"
                             android:layout_width="0dp"
                             android:clipChildren="true"
@@ -324,7 +324,7 @@
                             android:layout_height="55dp"
                             android:src="@drawable/addgallery"
                             android:layout_marginTop="5dp"/>-->
-                    </LinearLayout>
+                    <!--</LinearLayout>-->
 
                     <View
                         style="@style/DividerHorizontal"
