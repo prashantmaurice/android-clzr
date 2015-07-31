@@ -26,12 +26,14 @@ public class CardModel {
     private int stamps;
     private JSONArray offers;
     private String stampString;
-    public CardModel(String title, String phonenumber,  String vendorDescription, JSONArray offers,  double lat, double longi, String imageId, String fId, String vId,int stamps) {
+    private boolean active;
+
+    public CardModel(String title, String phonenumber,  String vendorDescription, JSONArray offers,  double lat, double longi, String imageId, String fId, String vId,int stamps, String caption, Boolean active) {
         this.imageId = imageId;
         this.title = title;
-        this.offers=offers;
-        this.stamps=stamps;
-        if (offers.length() == 0) {
+        this.offers = offers;
+        this.stamps = stamps;
+        /*if (offers.length() == 0) {
             this.caption = "No offers available";
             this.stampString = "All Offers Done";
         }
@@ -44,7 +46,9 @@ public class CardModel {
                 //e.printStackTrace();
             }
             this.stampString = stamps + " stamp(s)";
-        }
+        }*/
+        this.caption = caption;
+        this.active = active;
         Location location = new Location("Vendor " + vendorId + " location");
         location.setLatitude(lat);
         location.setLongitude(longi);
@@ -53,11 +57,13 @@ public class CardModel {
 
         userLocation.setLatitude(Home.lat);
         userLocation.setLongitude(Home.longi);
-        distance = userLocation.distanceTo(location) / 1000;
-        if (lat > 0.0 && longi > 0.0)
+        //distance = userLocation.distanceTo(location) / 1000;
+        this.distanceString = this.caption;
+        /*if (lat > 0.0 && longi > 0.0)
             this.distanceString = String.format("%.2f", distance) + " km";
         else
-            this.distanceString = "";
+            this.distanceString = "";*/
+
 
         this.franchiseId = fId;
         this.vendorId = vId;
@@ -130,4 +136,16 @@ public class CardModel {
         return i;
     }
     public int getStamps() {return stamps; }
+
+    public boolean getActive() {
+        return active;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }

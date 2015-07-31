@@ -278,8 +278,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         detailIntent.putExtra("offer_id", currentItem.getOfferId());
                         detailIntent.putExtra("offer_caption", currentItem.getCaption());
                         detailIntent.putExtra("offer_text", currentItem.getOfferDescription());
-
-                        c.startActivity(detailIntent);
+                        if( currentItem.isActive() )
+                            c.startActivity(detailIntent);
                     }
                     else  {
 

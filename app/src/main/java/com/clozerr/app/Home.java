@@ -227,8 +227,8 @@ public class Home  extends ActionBarActivity {
                             PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
                                     .putString(Constants.SPKeys.BEACON_UUID, result.get("UUID").getAsString())
                                     .commit();
-                            OneTimeBFS.startOneTimeService(applicationContext, InStoreInstallBFS.class,
-                                    null, false, Constants.Timeouts.IN_STORE_INSTALL_DETECTION);
+                            //OneTimeBFS.startOneTimeService(applicationContext, InStoreInstallBFS.class,
+                            //        null, false, Constants.Timeouts.IN_STORE_INSTALL_DETECTION);
                         }
                     }
                 });
@@ -532,10 +532,9 @@ public class Home  extends ActionBarActivity {
 
     public void offerdialog()
     {
-        new AsyncGet(c, "http://api.clozerr.com/v2/notifications/list/all?access_token=" + TOKEN, new AsyncGet.AsyncResult() {
+        new AsyncGet(c, "http://api.clozerr.com/v2/notifications/list/since?access_token=" + TOKEN, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
-                // t1.setText(s);
                 Log.i("result", s);
                 try {
                     JSONArray notifarray=new JSONArray(s);

@@ -193,6 +193,7 @@ public class GeofenceManagerService extends Service {
                                         //.setLoiteringDelay(GEOFENCE_DWELL_TIME)
                                 .build()
                 );
+
             }
             geofencingRequest = new GeofencingRequest.Builder()
                     .addGeofences(geofenceList)
