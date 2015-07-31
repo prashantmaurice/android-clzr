@@ -115,6 +115,7 @@ public final class GCMRegistrar {
         String packageName = context.getPackageName();
         String permissionName = packageName + ".permission.C2D_MESSAGE";
         // check permission
+        Log.d("DEBUG33","permissionName : "+permissionName);
         try {
             packageManager.getPermissionInfo(permissionName,
                     PackageManager.GET_PERMISSIONS);
