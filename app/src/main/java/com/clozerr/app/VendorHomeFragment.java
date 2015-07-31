@@ -103,7 +103,7 @@ public class VendorHomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (!VendorActivity.detailsBundle.getString("distanceString").isEmpty()) {
-                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                    Intent intent = new Intent(Intent.ACTION_VIEW,
                             Uri.parse("http://maps.google.com/maps?daddr=" + VendorActivity.detailsBundle.getDouble("latitude")
                                     + "," + VendorActivity.detailsBundle.getDouble("longitude")));
                     startActivity(intent);
@@ -229,11 +229,11 @@ public class VendorHomeFragment extends Fragment {
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                Intent sharingIntent = new Intent(Intent.ACTION_SEND);
                 sharingIntent.setType("text/plain");
                 String shareBody = "Check out this place I found on Clozerr: "+VendorActivity.detailsBundle.getString("vendorTitle")+" https://play.google.com/store/apps/details?id=com.clozerr.app";;
-                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Clozerr");
-                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Clozerr");
+                sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
             }
         });

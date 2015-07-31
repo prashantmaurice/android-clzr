@@ -253,11 +253,11 @@ public class FreebieDescription extends ActionBarActivity {
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                Intent sharingIntent = new Intent(Intent.ACTION_SEND);
                 sharingIntent.setType("text/plain");
                 String shareBody = "Check out the offer I got @ " +VendorActivity.detailsBundle.getString("vendorTitle")+" using Clozerr: "+description+" https://play.google.com/store/apps/details?id=com.clozerr.app";
-                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Clozerr");
-                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Clozerr");
+                sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
             }
         });

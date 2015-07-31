@@ -187,7 +187,7 @@ public class PeriodicBFS extends BeaconFinderService {
             vendorToNotify = null;
             maxRssi = null;
         }
-        releaseLock();
+//        releaseLock();
     }
 
     @Override
@@ -206,7 +206,7 @@ public class PeriodicBFS extends BeaconFinderService {
         });
     }
 
-    @Override
+//    @Override
     protected boolean isListeningAfterWork() {
         return true;
     }
@@ -222,7 +222,7 @@ public class PeriodicBFS extends BeaconFinderService {
     }
 
     public static void scheduleAlarms(Context context) {
-        WakefulIntentService.scheduleAlarms(new PeriodicBFS.AlarmListener(), context);
+        WakefulIntentService.scheduleAlarms(new AlarmListener(), context);
     }
 
     private static String getRejectListKey(VendorParams params) {

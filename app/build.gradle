@@ -1,22 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    signingConfigs {
-        debug {
-            storeFile file('../android.jks')
-            keyAlias 'clozerr_key'
-            keyPassword 'clozerr'
-            storePassword 'clozerr'
-        }
-    }
-    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
-    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
+
     defaultConfig {
-        applicationId "com.clozerr.app"
-        minSdkVersion 16
-        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
-        versionCode 5
-        versionName "2.2.1"
+        applicationId "com.clozerr.app.clozerr"
+        minSdkVersion 15
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
     }
     buildTypes {
         release {
@@ -25,25 +18,25 @@ android {
         }
     }
 }
-
 repositories {
-    mavenCentral()
+    maven {
+        url "https://repo.commonsware.com.s3.amazonaws.com"
+    }
 }
 
 dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.github.ksoichiro:android-observablescrollview:1.5.0'
     compile 'com.nineoldandroids:library:2.4.0'
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':app:libraries:facebook')
-    compile files('libraries/jaalee-beacon-android-sdk-master_2.5.3.jar')
-    compile 'com.android.support:appcompat-v7:22.2.0'
-    compile 'com.android.support:recyclerview-v7:22.2.0'
-    compile 'com.android.support:cardview-v7:22.2.0'
+    compile 'com.android.support:appcompat-v7:22.2.1'
+    compile 'com.facebook.android:facebook-android-sdk:3.19.0'
+    compile 'com.android.support:recyclerview-v7:22.2.1'
+    compile 'com.android.support:cardview-v7:22.2.1'
     compile 'de.hdodenhof:circleimageview:1.2.1'
     compile 'com.koushikdutta.ion:ion:2.+'
-    compile files('libraries/android-support-v13.jar')
+    compile 'com.commonsware.cwac:wakeful:1.0.2'
     compile 'com.google.android.gms:play-services:7.5.0'
-    compile 'com.android.support:design:22.2.0'
-    compile project(':app:libraries:wakeful')
+    compile 'com.android.support:design:22.2.1'
     compile 'me.dm7.barcodescanner:zxing:1.7.2'
 }

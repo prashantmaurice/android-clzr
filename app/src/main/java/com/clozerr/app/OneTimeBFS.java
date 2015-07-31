@@ -60,7 +60,7 @@ public abstract class OneTimeBFS extends BeaconFinderService {
             turnOffBluetooth(getApplicationContext());
             Log.e(TAG, "Stopped Scan");
             running = false;
-            releaseLock();
+//            releaseLock();//TODO : Commented to
         }
     }
 
@@ -104,7 +104,7 @@ public abstract class OneTimeBFS extends BeaconFinderService {
         } else terminate();
     }
 
-    @Override
+//    @Override
     protected boolean isListeningAfterWork() { return true; }
 
     public static void startOneTimeService(Context context, Class<? extends OneTimeBFS> serviceClass,

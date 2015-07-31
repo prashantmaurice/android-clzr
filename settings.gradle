@@ -1,1 +1,1 @@
-include ':app', ':app:libraries:facebook', ':app:libraries:wakeful', ':app:libraries'
+include ':app'
