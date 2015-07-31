@@ -7,10 +7,19 @@ import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.text.Html;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.Request;
@@ -29,6 +38,7 @@ import com.google.android.gms.plus.model.people.Person;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -45,13 +55,13 @@ public class Login extends FragmentActivity implements
     public static GoogleApiClient googleApiClient;
     private ImageButton mSignInButton;
     public static ProgressDialog pDialog;
-    //private static final int NUM_PAGES = 5;
+    private static final int SLIDES_COUNT = 5;
     /**
      * The pager widget, which handles animation and allows swiping horizontally to access previous
      * and next wizard steps.
      */
-    //private ViewPager mPager;
-    //int i=0;
+    private ViewPager mPager;
+    int i=0;
 
     // Is there a ConnectionResult resolution in progress?
     private boolean mIsResolving = false;
@@ -78,52 +88,91 @@ public class Login extends FragmentActivity implements
         mSignInButton = (ImageButton) findViewById(R.id.sign_in_button);
         mSignInButton.setOnClickListener(this);
         final Resources reso = this.getResources();
-        /*mPager = (ViewPager) findViewById(R.id.pager);
-        mPager.setPageTransformer(true, new ZoomOutPageTransformer());
-        *//*
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        // ViewPager and its adapters use support library fragments, so use getSupportFragmentManager.
+        DemoCollectionPagerAdapter mDemoCollectionPagerAdapter = new DemoCollectionPagerAdapter(getSupportFragmentManager());
+
+//        mPager.setPageTransformer(true, new ZoomOutPageTransformer());
+        /*
             The pager adapter, which provides the pages to the view pager widget.
-        *//*
-        PagerAdapter mPagerAdapter = new ScreenSlidePagerAdapter(getFragmentManager());
-        mPager.setAdapter(mPagerAdapter);
-        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+        */
+//        PagerAdapter mPagerAdapter = new ScreenSlidePagerAdapter(getFragmentManager());
+        mPager.setAdapter(mDemoCollectionPagerAdapter);
+        final View pagerDot_1 = findViewById(R.id.pagerDot_1);
+        final View pagerDot_2 = findViewById(R.id.pagerDot_2);
+        final View pagerDot_3 = findViewById(R.id.pagerDot_3);
+        final View pagerDot_4 = findViewById(R.id.pagerDot_4);
+        mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
             @Override
             public void onPageSelected(int position) {
-                ImageView slide1=(ImageView)findViewById(R.id.slide1);
-                ImageView slide2=(ImageView)findViewById(R.id.slide2);
-                ImageView slide3=(ImageView)findViewById(R.id.slide3);
-                ImageView slide4=(ImageView)findViewById(R.id.slide4);
-                ImageView slide5=(ImageView)findViewById(R.id.slide5);
-//slide1.setAlpha(0.0f);
-                slide1.setBackground(reso.getDrawable(R.drawable.image_slider));
-                slide2.setBackground(reso.getDrawable(R.drawable.image_slider));
-                slide3.setBackground(reso.getDrawable(R.drawable.image_slider));
-                slide4.setBackground(reso.getDrawable(R.drawable.image_slider));
-                slide5.setBackground(reso.getDrawable(R.drawable.image_slider));
-                i=position;
-                switch (position){
-                    case 0:
-                        slide1.setBackground(reso.getDrawable(R.drawable.image_slider_current));
-                        break;
+                pagerDot_1.setBackground(getResources().getDrawable(R.drawable.signup_dot));
+                pagerDot_2.setBackground(getResources().getDrawable(R.drawable.signup_dot));
+                pagerDot_3.setBackground(getResources().getDrawable(R.drawable.signup_dot));
+                pagerDot_4.setBackground(getResources().getDrawable(R.drawable.signup_dot));
+                switch (position + 1) {
                     case 1:
-                        slide2.setBackground(reso.getDrawable(R.drawable.image_slider_current));
+                        pagerDot_1.setBackground(getResources().getDrawable(R.drawable.signup_dot_active));
                         break;
                     case 2:
-                        slide3.setBackground(reso.getDrawable(R.drawable.image_slider_current));
+                        pagerDot_2.setBackground(getResources().getDrawable(R.drawable.signup_dot_active));
                         break;
                     case 3:
-                        slide4.setBackground(reso.getDrawable(R.drawable.image_slider_current));
+                        pagerDot_3.setBackground(getResources().getDrawable(R.drawable.signup_dot_active));
                         break;
                     case 4:
-                        slide5.setBackground(reso.getDrawable(R.drawable.image_slider_current));
+                        pagerDot_4.setBackground(getResources().getDrawable(R.drawable.signup_dot_active));
                         break;
                 }
-                invalidateOptionsMenu();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
             }
         });
-        if (savedInstanceState != null) {
-            mSignInProgress = savedInstanceState
-                    .getInt(SAVED_PROGRESS, STATE_DEFAULT);
-        }*/
+//        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+//            @Override
+//            public void onPageSelected(int position) {
+//                ImageView slide1=(ImageView)findViewById(R.id.slide1);
+//                ImageView slide2=(ImageView)findViewById(R.id.slide2);
+//                ImageView slide3=(ImageView)findViewById(R.id.slide3);
+//                ImageView slide4=(ImageView)findViewById(R.id.slide4);
+//                ImageView slide5=(ImageView)findViewById(R.id.slide5);
+////slide1.setAlpha(0.0f);
+//                slide1.setBackground(reso.getDrawable(R.drawable.image_slider));
+//                slide2.setBackground(reso.getDrawable(R.drawable.image_slider));
+//                slide3.setBackground(reso.getDrawable(R.drawable.image_slider));
+//                slide4.setBackground(reso.getDrawable(R.drawable.image_slider));
+//                slide5.setBackground(reso.getDrawable(R.drawable.image_slider));
+//                i=position;
+//                switch (position){
+//                    case 0:
+//                        slide1.setBackground(reso.getDrawable(R.drawable.image_slider_current));
+//                        break;
+//                    case 1:
+//                        slide2.setBackground(reso.getDrawable(R.drawable.image_slider_current));
+//                        break;
+//                    case 2:
+//                        slide3.setBackground(reso.getDrawable(R.drawable.image_slider_current));
+//                        break;
+//                    case 3:
+//                        slide4.setBackground(reso.getDrawable(R.drawable.image_slider_current));
+//                        break;
+//                    case 4:
+//                        slide5.setBackground(reso.getDrawable(R.drawable.image_slider_current));
+//                        break;
+//                }
+//                invalidateOptionsMenu();
+//            }
+//        });
+//        if (savedInstanceState != null) {
+//            mSignInProgress = savedInstanceState
+//                    .getInt(SAVED_PROGRESS, STATE_DEFAULT);
+//        }
         googleApiClient = buildGoogleApiClient();
         //int found=0;
         //slideToImage(2);
@@ -460,4 +509,62 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
             return NUM_PAGES;
         }
     }*/
+
+
+
+    ArrayList<String> slidesQuotes = new ArrayList<>(Arrays.asList("", "<span style='font-size=16px'>tap &#9825; and add<br>clubs to <b>my clubs</b></span>", "unlock rewards","<span style='font-size=16px'>tap <b>check in</b> and choose<br>reward to redeem</span>","<span style='font-size=16px'>tap <b>check in</b> and choose<br>reward to redeem</span>"));
+    ArrayList<Integer> slidesImages = new ArrayList<>(Arrays.asList(R.drawable.signup_slide_2,R.drawable.signup_slide_2,R.drawable.signup_slide_3,R.drawable.signup_slide_4,R.drawable.signup_slide_5));
+
+    //OUR MAIN SLIDE VIEW FRAGMENT ADAPTER */
+    public class DemoCollectionPagerAdapter extends FragmentPagerAdapter {
+        public DemoCollectionPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            if(i==0) return new IntroSlideFragment();
+
+            Fragment fragment = new SlideFragment();
+            Bundle args = new Bundle();
+            args.putString(SlideFragment.QUOTE, slidesQuotes.get(i));
+            args.putInt(SlideFragment.IMAGE, slidesImages.get(i));
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @Override
+        public int getCount() {
+            return SLIDES_COUNT;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return "OBJECT " + (position + 1);
+        }
+    }
+    //OUR MAIN SLIDE VIEW FRAGMENTS
+    public static class SlideFragment extends Fragment {
+        public static final String QUOTE = "object";
+        public static final String IMAGE = "image";
+        @Override
+        public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_signup_slide, container, false);
+            Bundle args = getArguments();
+            TextView myTextView = ((TextView) rootView.findViewById(R.id.textView));
+            ImageView imageView = (ImageView) rootView.findViewById(R.id.imageView);
+            myTextView.setText(Html.fromHtml(args.getString(QUOTE)));
+            imageView.setImageResource(args.getInt(IMAGE));
+
+            return rootView;
+        }
+    }
+    public static class IntroSlideFragment extends Fragment {
+        @Override
+        public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
+            return inflater.inflate(R.layout.fragment_signup_slide_first, container, false);
+        }
+    }
+
+
 }

@@ -3,13 +3,107 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/white">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#E5E5E5">
+        <android.support.v4.view.ViewPager
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#E5E5E5" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/tv_subQuote"
+            android:layout_centerHorizontal="true"
+            android:gravity="center_horizontal">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:background="@drawable/signup_dot_active"
+                android:id="@+id/pagerDot_1"
+                android:layout_margin="5dp"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:background="@drawable/signup_dot"
+                android:id="@+id/pagerDot_2"
+                android:layout_margin="5dp"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:background="@drawable/signup_dot"
+                android:id="@+id/pagerDot_3"
+                android:layout_margin="5dp"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:background="@drawable/signup_dot"
+                android:id="@+id/pagerDot_4"
+                android:layout_margin="5dp"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:background="@drawable/signup_dot"
+                android:id="@+id/pagerDot_5"
+                android:layout_margin="5dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/fb"
+                android:onClick="facebook"
+                android:background="#00000000"
+                android:scaleType="fitCenter"
+                android:id="@+id/authButton"
+                android:layout_weight="1"
+                android:layout_marginLeft="40dp"
+                android:layout_marginRight="40dp" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/gplus"
+                android:id="@+id/sign_in_button"
+                android:background="#00000000"
+                android:scaleType="fitCenter"
+                android:layout_weight="1"
+                android:layout_marginLeft="40dp"
+                android:layout_marginRight="40dp" />
+        </LinearLayout>
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="320dp">
+            android:layout_height="320dp"
+            android:visibility="visible">
             <!--<android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/pager"
                 android:layout_width="match_parent"
@@ -69,27 +163,7 @@
                 android:scaleType="fitCenter"
                 android:layout_margin="32dp"/>
         </RelativeLayout>
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="25dp"
-            android:layout_marginLeft="25dp"
-            android:src="@drawable/fb"
-            android:onClick="facebook"
-            android:layout_marginTop="40dp"
-            android:background="#00000000"
-            android:scaleType="fitCenter"
-            android:id="@+id/authButton"/>
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="25dp"
-            android:layout_marginLeft="25dp"
-            android:src="@drawable/gplus"
-            android:id="@+id/sign_in_button"
-            android:background="#00000000"
-            android:scaleType="fitCenter"/>
     </LinearLayout>
 
     <Button
@@ -106,5 +180,7 @@
         android:layout_alignParentBottom="true"
 
 
-        android:id="@+id/ibutton" />
+        android:id="@+id/ibutton"
+        android:visibility="gone" />
+
 </RelativeLayout>
