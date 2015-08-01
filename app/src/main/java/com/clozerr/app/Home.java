@@ -40,6 +40,8 @@ import android.widget.SlidingDrawer;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.LoginScreens.LoginActivity;
+import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.clozerr.app.Models.UserMain;
 import com.facebook.Session;
 import com.google.android.gcm.GCMRegistrar;
@@ -76,8 +78,8 @@ public class Home  extends ActionBarActivity {
     public static String USER_PIC_URL = "";
     public static Context c;
     Button button;
-    static double lat;
-    static double longi;
+    public static double lat;
+    public static double longi;
 
     private Toolbar toolbar;
     private ViewPager pager;
@@ -287,7 +289,7 @@ public class Home  extends ActionBarActivity {
             USERID = MainApplication.getInstance().data.userMain.facebookId;
             USERNAME = MainApplication.getInstance().data.userMain.fb_name;
             USER_PIC_URL = "https://graph.facebook.com/" + USERID + "/picture?type=large&width=200&height=200";
-            Login.googleOrFb = 1;
+            LoginActivity.googleOrFb = 1;
         }
         else if (!MainApplication.getInstance().data.userMain.gplus_id.isEmpty())
         {
@@ -295,12 +297,12 @@ public class Home  extends ActionBarActivity {
             USERNAME = MainApplication.getInstance().data.userMain.gplus_name;
             USER_PIC_URL = MainApplication.getInstance().data.userMain.gplus_pic;
             USER_PIC_URL = resetImageSize( USER_PIC_URL );
-            Login.googleOrFb = 2;
+            LoginActivity.googleOrFb = 2;
         }
 //        Log.i("all saved prefs", use.getAll().toString());
         UserMain userMain = MainApplication.getInstance().data.userMain;
         if(!userMain.loginSkip){
-            startActivity(new Intent(this, Login.class));
+            startActivity(new Intent(this, LoginActivity.class));
             finish();
             return 0;
         }
@@ -368,15 +370,15 @@ public class Home  extends ActionBarActivity {
 
                 else if(i==2) {
                     Uri uri = null;
-                    if (Login.googleOrFb == 1)
+                    if (LoginActivity.googleOrFb == 1)
                     {
                         uri = Uri.parse("https://www.facebook.com/clozerrdeals");
                     }
-                    else if (Login.googleOrFb == 2)
+                    else if (LoginActivity.googleOrFb == 2)
                     {
                         uri = Uri.parse("https://plus.google.com/112342093373744098489/about");
                     }
-                    if (uri == null) Log.e("navdraw", "null" + Login.googleOrFb);
+                    if (uri == null) Log.e("navdraw", "null" + LoginActivity.googleOrFb);
                     Intent intent = new Intent(Intent.ACTION_VIEW,uri);
                     /*// Create and start the chooser
                     Intent chooser = Intent.createChooser(intent, "Open with");*/
@@ -409,14 +411,14 @@ public class Home  extends ActionBarActivity {
                     editor.clear();
                     editor.apply();
                     USER_PIC_URL = USERNAME = USERID = TOKEN = "";
-                    if (Login.googleOrFb == 2 && Login.googleApiClient != null)
+                    if (LoginActivity.googleOrFb == 2 && LoginActivity.googleApiClient != null)
                     {
-                        if (Login.googleApiClient.isConnected()) {
-                            Plus.AccountApi.clearDefaultAccount(Login.googleApiClient);
-                            Login.googleApiClient.disconnect();
+                        if (LoginActivity.googleApiClient.isConnected()) {
+                            Plus.AccountApi.clearDefaultAccount(LoginActivity.googleApiClient);
+                            LoginActivity.googleApiClient.disconnect();
                         }
                     }
-                    else if (Login.googleOrFb == 1)
+                    else if (LoginActivity.googleOrFb == 1)
                     {
                         Session session = Session.getActiveSession();
                         if (session != null) {
@@ -430,7 +432,7 @@ public class Home  extends ActionBarActivity {
                         }
                     }
                     //BeaconFinderService.disallowScanning(Home.this);
-                    startActivity(new Intent(Home.this, Login.class));
+                    startActivity(new Intent(Home.this, LoginActivity.class));
                     finish();
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:

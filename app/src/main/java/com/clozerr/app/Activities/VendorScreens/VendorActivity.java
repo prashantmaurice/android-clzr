@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.VendorScreens;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -25,6 +25,16 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
+import com.clozerr.app.Analytics;
+import com.clozerr.app.AsyncGet;
+import com.clozerr.app.CardModel;
+import com.clozerr.app.Constants;
+import com.clozerr.app.GenUtils;
+import com.clozerr.app.MainApplication;
+import com.clozerr.app.PeriodicBFS;
+import com.clozerr.app.R;
+import com.clozerr.app.SlidingTabLayout;
+import com.clozerr.app.UnusedOffersActivity;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
@@ -46,15 +56,15 @@ public class VendorActivity extends ActionBarActivity {
     private SlidingTabLayout mtabs;
     private Intent callingIntent;
     private FloatingActionButton mCheckInButton;
-    static String Rewards="";
+    public static String Rewards="";
     private String pinNumber;
     public static Bundle detailsBundle;
     public static String vendorId;
     public static ImageView logoView;
     static String vendorTitle;
-    static int i=1;
+    public static int i=1;
     public String analyticsurlvendor=null;
-    static String TOKEN="";
+    public static String TOKEN="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

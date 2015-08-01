@@ -10,13 +10,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gcm.GCMRegistrar;
+import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;

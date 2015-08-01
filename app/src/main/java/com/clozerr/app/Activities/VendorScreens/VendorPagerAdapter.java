@@ -1,9 +1,14 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.VendorScreens;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+
+import com.clozerr.app.AsyncGet;
+import com.clozerr.app.FreebiesFragment;
+import com.clozerr.app.MyStampsFragment;
+import com.clozerr.app.R;
 
 /**
  * Created by Adarsh on 20/5/15.

@@ -36,7 +36,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".Login"
+            android:name=".Activities.LoginScreens.LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:screenOrientation="portrait" >
@@ -152,7 +152,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".VendorActivity"
+            android:name=".Activities.VendorScreens.VendorActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <intent-filter>

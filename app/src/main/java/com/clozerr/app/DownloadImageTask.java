@@ -12,7 +12,7 @@ import java.net.HttpURLConnection;
 /**
  * Created by jun on 1/12/14.
  */
-class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     ImageView bmImage;
 
     public DownloadImageTask(ImageView bmImage) {

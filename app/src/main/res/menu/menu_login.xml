@@ -1,4 +1,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" tools:context="com.clozerr.app.Login">
+    xmlns:tools="http://schemas.android.com/tools" tools:context="com.clozerr.app.Activities.LoginScreens.LoginActivity">
 
 </menu>

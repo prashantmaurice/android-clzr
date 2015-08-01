@@ -27,6 +27,8 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.LoginScreens.LoginActivity;
+import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.facebook.Session;
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.google.android.gms.plus.Plus;
@@ -509,15 +511,15 @@ private ArrayList<CardModel> convertRow(String s) {
 
                 else if(i==2) {
                     Uri uri = null;
-                    if (Login.googleOrFb == 1)
+                    if (LoginActivity.googleOrFb == 1)
                     {
                         uri = Uri.parse("https://www.facebook.com/clozerrdeals");
                     }
-                    else if (Login.googleOrFb == 2)
+                    else if (LoginActivity.googleOrFb == 2)
                     {
                         uri = Uri.parse("https://plus.google.com/112342093373744098489/about");
                     }
-                    if (uri == null) Log.e("navdraw", "null" + Login.googleOrFb);
+                    if (uri == null) Log.e("navdraw", "null" + LoginActivity.googleOrFb);
                     Intent intent = new Intent(Intent.ACTION_VIEW,uri);
                     /*// Create and start the chooser
                     Intent chooser = Intent.createChooser(intent, "Open with");*/
@@ -549,14 +551,14 @@ private ArrayList<CardModel> convertRow(String s) {
                     editor.clear();
                     editor.apply();
                     Home.USER_PIC_URL = Home.USERNAME = Home.USERID = TOKEN = "";
-                    if (Login.googleOrFb == 2 && Login.googleApiClient != null)
+                    if (LoginActivity.googleOrFb == 2 && LoginActivity.googleApiClient != null)
                     {
-                        if (Login.googleApiClient.isConnected()) {
-                            Plus.AccountApi.clearDefaultAccount(Login.googleApiClient);
-                            Login.googleApiClient.disconnect();
+                        if (LoginActivity.googleApiClient.isConnected()) {
+                            Plus.AccountApi.clearDefaultAccount(LoginActivity.googleApiClient);
+                            LoginActivity.googleApiClient.disconnect();
                         }
                     }
-                    else if (Login.googleOrFb == 1)
+                    else if (LoginActivity.googleOrFb == 1)
                     {
                         Session session = Session.getActiveSession();
                         if (session != null) {
@@ -570,7 +572,7 @@ private ArrayList<CardModel> convertRow(String s) {
                         }
                     }
                     //BeaconFinderService.disallowScanning(Home.this);
-                    startActivity(new Intent(CategoryDetail.this, Login.class));
+                    startActivity(new Intent(CategoryDetail.this, LoginActivity.class));
                     finish();
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:

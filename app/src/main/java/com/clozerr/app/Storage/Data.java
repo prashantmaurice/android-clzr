@@ -2,6 +2,7 @@ package com.clozerr.app.Storage;
 
 import android.content.Context;
 
+import com.clozerr.app.Models.CacheMain;
 import com.clozerr.app.Models.UserMain;
 
 /**
@@ -17,8 +18,10 @@ import com.clozerr.app.Models.UserMain;
 public class Data {
     private static Data instance;
     public UserMain userMain;
+    public CacheMain cacheMain;
 
     private Data(Context context) {
+        cacheMain = CacheMain.getInstance(context);
         userMain = UserMain.getInstance(context);
     }
 
@@ -47,6 +50,7 @@ public class Data {
 //    }
 
     public void saveCompleteDataLocally(){
+        cacheMain.saveCacheDataLocally();
         userMain.saveUserDataLocally();
     }
 

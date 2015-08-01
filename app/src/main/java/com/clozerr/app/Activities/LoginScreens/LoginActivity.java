@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.LoginScreens;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -21,7 +21,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.AsyncGet;
+import com.clozerr.app.AsyncTokenGet;
+import com.clozerr.app.Constants;
+import com.clozerr.app.GenUtils;
+import com.clozerr.app.Home;
+import com.clozerr.app.MainApplication;
 import com.clozerr.app.Models.UserMain;
+import com.clozerr.app.R;
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
@@ -42,7 +49,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-public class Login extends FragmentActivity implements
+public class LoginActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         View.OnClickListener {
     private static final String TAG = "clozerr";
@@ -51,7 +58,7 @@ public class Login extends FragmentActivity implements
     private static final String KEY_SHOULD_RESOLVE = "should_resolve";
     public static String userName;
     public static String dispPicUrl;
-    static int googleOrFb=3;
+    public static int googleOrFb=3;
     public static GoogleApiClient googleApiClient;
     private ImageButton mSignInButton;
     public static ProgressDialog pDialog;
@@ -216,7 +223,7 @@ public class Login extends FragmentActivity implements
                     List<String> permissions = session.getPermissions();
                     if (!isSubsetOf(PERMISSIONS, permissions)) {
                         Session.NewPermissionsRequest newPermissionsRequest = new Session.NewPermissionsRequest(
-                                Login.this, PERMISSIONS);
+                                LoginActivity.this, PERMISSIONS);
                         session.requestNewReadPermissions(newPermissionsRequest);
                         return;
                     }
@@ -233,7 +240,7 @@ public class Login extends FragmentActivity implements
 //                                editor.putString("fb_name", user.getName());
 //                                editor.putString("fb_id", user.getId());
 //                                editor.apply();
-                                new AsyncGet(Login.this, "http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken(), new AsyncGet.AsyncResult() {
+                                new AsyncGet(LoginActivity.this, "http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken(), new AsyncGet.AsyncResult() {
                                     @Override
                                     public void gotResult(String s) {
                                         /*Log.i("urltest","http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken());
@@ -253,14 +260,14 @@ public class Login extends FragmentActivity implements
 //                                                editor.putString("token", res.getString("token"));
 //                                                editor.putString("user",res.getString("user"));
 //                                                editor.apply();
-                                                startActivity(new Intent(Login.this, Home.class));
+                                                startActivity(new Intent(LoginActivity.this, Home.class));
                                                 finish();
                                             } else {
                                                 //Toast.makeText(Login.this,session.getAccessToken(),Toast.LENGTH_SHORT).show();
-                                                Toast.makeText(Login.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(LoginActivity.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT).show();
                                             }
                                         } catch (JSONException e) {
-                                            Toast.makeText(Login.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(LoginActivity.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT).show();
                                             e.printStackTrace();
                                         }
                                     }
@@ -370,7 +377,7 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
             @Override
             public void onError() {
                 updateUI(false);
-                GenUtils.putToast(Login.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT);
+                GenUtils.putToast(LoginActivity.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT);
             }
 
             @Override
@@ -379,7 +386,7 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                                                 .appendQueryParameter("token", s)
                                                 .build().toString();
                 Log.e(TAG, "token generating url - " + clozerrAuthURL);
-                new AsyncGet(Login.this, clozerrAuthURL, new AsyncGet.AsyncResult() {
+                new AsyncGet(LoginActivity.this, clozerrAuthURL, new AsyncGet.AsyncResult() {
                     @Override
                     public void gotResult(String s) {
                         try {
@@ -399,16 +406,16 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
 //                                editor.putString("token", res.getString("token"));
 //                                editor.putString("user",res.getString("user"));
 //                                editor.apply();
-                                startActivity(new Intent(Login.this, Home.class));
+                                startActivity(new Intent(LoginActivity.this, Home.class));
                                 finish();
                             } else {
                                 updateUI(false);
-                                GenUtils.putToast(Login.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT);
+                                GenUtils.putToast(LoginActivity.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT);
                                 Log.e(TAG, "error : " + res.get("err").toString());
                             }
                         } catch (Exception e) {
                             updateUI(false);
-                            GenUtils.putToast(Login.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT);
+                            GenUtils.putToast(LoginActivity.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT);
                             e.printStackTrace();
                         }
                     }

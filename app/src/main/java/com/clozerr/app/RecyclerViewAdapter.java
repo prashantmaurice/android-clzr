@@ -24,6 +24,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.LoginScreens.LoginActivity;
+import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.facebook.Session;
 import com.koushikdutta.ion.Ion;
 
@@ -343,7 +345,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                             session.closeAndClearTokenInformation();
                         }
 
-                        c.startActivity(new Intent(c, Login.class));
+                        c.startActivity(new Intent(c, LoginActivity.class));
 
                         if(c instanceof Activity)
                             ((Activity)c).finish();

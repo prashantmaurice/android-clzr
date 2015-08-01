@@ -22,6 +22,7 @@ public class SharedPrefs {
 
     //ALL DATA STORED
     public JSONObject userData = new JSONObject();
+    public JSONObject cacheData = new JSONObject();
 
     private SharedPrefs(Context context) {
         this.mContext = context;
@@ -36,10 +37,19 @@ public class SharedPrefs {
 
     //USER DATA
     public void saveUserData() {
-        Logg.d(TAG, "saved all UserData in Prefs");
+        Logg.d(TAG, "saveUserData in Prefs");
         Logg.d("SAVE PREFS userData :=====", userData.toString());
         SharedPreferences.Editor editor = prefs_trackers.edit();
         editor.putString(Str.userData, userData.toString());
+        editor.apply();
+    }
+
+    //CACHE DATA
+    public void saveCacheData() {
+        Logg.d(TAG, "saveCacheData in Prefs");
+        Logg.d("SAVE PREFS cacheData :=====", cacheData.toString());
+        SharedPreferences.Editor editor = prefs_trackers.edit();
+        editor.putString(Str.cacheData, cacheData.toString());
         editor.apply();
     }
 
@@ -59,6 +69,7 @@ public class SharedPrefs {
         });
         try {
             userData = new JSONObject(getString(PrefsTypes.TRACKERS, Str.userData,"{}"));
+            cacheData = new JSONObject(getString(PrefsTypes.TRACKERS, Str.cacheData,"{}"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -91,6 +102,7 @@ public class SharedPrefs {
     //Holder for all strings used
     public static class Str{
         static String userData = "userData";
+        static String cacheData = "cacheData";
     }
 
 

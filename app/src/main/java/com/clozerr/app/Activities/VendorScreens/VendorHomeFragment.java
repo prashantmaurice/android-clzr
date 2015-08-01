@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.VendorScreens;
 
 /**
  * Created by Adarsh on 20-05-2015.
@@ -23,6 +23,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.AsyncGet;
+import com.clozerr.app.DownloadImageTask;
+import com.clozerr.app.MainApplication;
+import com.clozerr.app.R;
 import com.koushikdutta.ion.Ion;
 
 import org.json.JSONArray;
@@ -302,8 +306,7 @@ public class VendorHomeFragment extends Fragment {
             startActivity(Intent.createChooser(waIntent, "Share with"));
 
         } catch (PackageManager.NameNotFoundException e) {
-            Toast.makeText(getActivity(), "WhatsApp not Installed", Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(getActivity(), "WhatsApp not Installed", Toast.LENGTH_SHORT).show();
         }
 
     }

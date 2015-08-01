@@ -15,6 +15,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.clozerr.app.Activities.VendorScreens.VendorActivity;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -163,11 +165,15 @@ public class LocationService extends Service {
                             catch (Exception e){
                                 continue;
                             }
-                            SharedPreferences example = getSharedPreferences("USER", 0);
-                            SharedPreferences.Editor editor = example.edit();
-                            editor.putString("latitude", location.getLatitude()+"");
-                            editor.putString("longitude", location.getLongitude()+"");
-                            editor.apply();
+//                            SharedPreferences example = getSharedPreferences("USER", 0);
+//                            SharedPreferences.Editor editor = example.edit();
+//                            editor.putString("latitude", location.getLatitude()+"");
+//                            editor.putString("longitude", location.getLongitude() + "");
+//                            editor.apply();
+                            MainApplication.getInstance().data.userMain.latitude = location.getLatitude()+"";
+                            MainApplication.getInstance().data.userMain.longitude =location.getLongitude()+"";
+                            MainApplication.getInstance().data.userMain.saveUserDataLocally();
+
                             Intent intent = new Intent(LocationService.this, VendorActivity.class);
                             intent.putExtra("vendor_id", jsonObject.getString("_id"));
                             /*JSONArray jsonArray=jsonObject.getJSONArray("offers");

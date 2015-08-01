@@ -15,6 +15,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.android.internal.util.Predicate;
+import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.BeaconManager;

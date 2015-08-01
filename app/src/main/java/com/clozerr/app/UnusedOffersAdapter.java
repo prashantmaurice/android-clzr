@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.koushikdutta.ion.Ion;
 
 import org.json.JSONArray;

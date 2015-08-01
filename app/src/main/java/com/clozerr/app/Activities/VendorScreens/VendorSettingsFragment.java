@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.VendorScreens;
 
 /**
  * Created by Aravind.S on 20-05-2015.
@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -22,6 +21,10 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 import android.widget.ImageView;
+
+import com.clozerr.app.Home;
+import com.clozerr.app.MainApplication;
+import com.clozerr.app.R;
 
 
 public class VendorSettingsFragment extends Fragment {
@@ -73,11 +76,15 @@ public class VendorSettingsFragment extends Fragment {
                 { //code for what you want it to do return true;
                     Intent shortcutIntent = new Intent(getActivity(), VendorActivity.class);
                     shortcutIntent.putExtra("vendor_id",VendorActivity.vendorId);
-                    SharedPreferences example = getActivity().getSharedPreferences("USER", 0);
-                    SharedPreferences.Editor editor = example.edit();
-                    editor.putString("latitude", Home.lat+"");
-                    editor.putString("longitude", Home.longi+"");
-                    editor.apply();
+//                    SharedPreferences example = getActivity().getSharedPreferences("USER", 0);
+//                    SharedPreferences.Editor editor = example.edit();
+//                    editor.putString("latitude", Home.lat+"");
+//                    editor.putString("longitude", Home.longi+"");
+//                    editor.apply();
+                    MainApplication.getInstance().data.userMain.latitude = Home.lat+"";
+                    MainApplication.getInstance().data.userMain.longitude = Home.longi+"";
+                    MainApplication.getInstance().data.userMain.saveUserDataLocally();
+
                     shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     Intent addIntent = new Intent();

@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.LoginScreens.LoginActivity;
 import com.facebook.Session;
 
 import java.util.ArrayList;
@@ -175,7 +176,7 @@ public class ReviewQuestionsAdapter extends RecyclerView.Adapter<ReviewQuestions
                             session.closeAndClearTokenInformation();
                         }
 
-                        c.startActivity(new Intent(c, Login.class));
+                        c.startActivity(new Intent(c, LoginActivity.class));
 
                         if(c instanceof Activity)
                             ((Activity)c).finish();

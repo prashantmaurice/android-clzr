@@ -32,6 +32,9 @@ public class UserMain {
     public String gplus_id;
     public String gplus_pic;
 
+    public String latitude;
+    public String longitude;
+
     public boolean loginSkip = false;
     public boolean notNow = false; //todo : why needing this?
     public boolean isMale = false;
@@ -62,6 +65,8 @@ public class UserMain {
             gplus_pic = (sPrefs.userData.has("gplus_pic"))?sPrefs.userData.getString("gplus_pic"):"";
             home_cards = (sPrefs.userData.has("home_cards"))?sPrefs.userData.getString("home_cards"):"";
             categories_cards = (sPrefs.userData.has("categories_cards"))?sPrefs.userData.getString("categories_cards"):"";
+            latitude = (sPrefs.userData.has("latitude"))?sPrefs.userData.getString("latitude"):"";
+            longitude = (sPrefs.userData.has("longitude"))?sPrefs.userData.getString("longitude"):"";
 
             fb_name = (sPrefs.userData.has("fb_name"))?sPrefs.userData.getString("fb_name"):"";
             user = (sPrefs.userData.has("user"))?sPrefs.userData.getString("user"):"";
@@ -88,6 +93,8 @@ public class UserMain {
             sPrefs.userData.put("home_cards", home_cards);
             sPrefs.userData.put("categories_cards", categories_cards);
 
+            sPrefs.userData.put("latitude", latitude);
+            sPrefs.userData.put("longitude", longitude);
             sPrefs.userData.put("loginSkip", loginSkip);
             sPrefs.userData.put("imageUrl", imageUrl);
             sPrefs.userData.put("coverPic", coverPic);

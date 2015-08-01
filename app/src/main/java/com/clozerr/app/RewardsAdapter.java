@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.koushikdutta.ion.Ion;
 
 import java.util.List;
@@ -89,7 +90,7 @@ public class RewardsAdapter extends RecyclerView.Adapter<RewardsAdapter.ListItem
 
                     Intent intent = new Intent(c,FreebieDescription.class);
                     intent.putExtra("offerid",currentItem.RewardId);
-                    intent.putExtra("vendorid",VendorActivity.vendorId);
+                    intent.putExtra("vendorid", VendorActivity.vendorId);
                     intent.putExtra("caption",currentItem.Caption);
                     intent.putExtra("description",currentItem.Description);
                     if( currentItem.Unlocked )

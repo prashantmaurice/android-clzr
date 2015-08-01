@@ -25,6 +25,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.google.android.gcm.GCMRegistrar;
 
 import org.json.JSONArray;
