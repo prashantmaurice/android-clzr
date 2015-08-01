@@ -7,7 +7,9 @@ import com.clozerr.app.Storage.SharedPrefs;
 import org.json.JSONException;
 
 /**
- * This contains all the User data excluding kids,
+ * This contains all the Cache that needs to be stored in app and which does not need to be fetched from server
+ *
+ * TODO : add cache timeout limit to all variables
  */
 public class CacheMain {
     private Context mContext;

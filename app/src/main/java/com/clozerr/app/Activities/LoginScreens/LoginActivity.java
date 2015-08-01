@@ -63,12 +63,7 @@ public class LoginActivity extends FragmentActivity implements
     private ImageButton mSignInButton;
     public static ProgressDialog pDialog;
     private static final int SLIDES_COUNT = 5;
-    /**
-     * The pager widget, which handles animation and allows swiping horizontally to access previous
-     * and next wizard steps.
-     */
     private ViewPager mPager;
-    int i=0;
 
     // Is there a ConnectionResult resolution in progress?
     private boolean mIsResolving = false;
@@ -78,7 +73,7 @@ public class LoginActivity extends FragmentActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-// domain = getString(R.string.domain);
+        // domain = getString(R.string.domain);
 
         if (savedInstanceState != null) {
             mIsResolving = savedInstanceState.getBoolean(KEY_IS_RESOLVING);
@@ -87,10 +82,10 @@ public class LoginActivity extends FragmentActivity implements
 
         pDialog = new ProgressDialog(this);
         pDialog.setMessage("Loading...");
-//pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        //pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         pDialog.setCancelable(false);
-//super.setIntegerProperty("splashscreen", R.drawable.splash);
-// this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //super.setIntegerProperty("splashscreen", R.drawable.splash);
+        // this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_loginfb);
         mSignInButton = (ImageButton) findViewById(R.id.sign_in_button);
         mSignInButton.setOnClickListener(this);
@@ -101,10 +96,6 @@ public class LoginActivity extends FragmentActivity implements
         DemoCollectionPagerAdapter mDemoCollectionPagerAdapter = new DemoCollectionPagerAdapter(getSupportFragmentManager());
 
 //        mPager.setPageTransformer(true, new ZoomOutPageTransformer());
-        /*
-            The pager adapter, which provides the pages to the view pager widget.
-        */
-//        PagerAdapter mPagerAdapter = new ScreenSlidePagerAdapter(getFragmentManager());
         mPager.setAdapter(mDemoCollectionPagerAdapter);
         final View pagerDot_1 = findViewById(R.id.pagerDot_1);
         final View pagerDot_2 = findViewById(R.id.pagerDot_2);
@@ -236,10 +227,7 @@ public class LoginActivity extends FragmentActivity implements
                                 userMain.fb_name = user.getName();
                                 userMain.facebookId = user.getId();
                                 userMain.saveUserDataLocally();
-//                                final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-//                                editor.putString("fb_name", user.getName());
-//                                editor.putString("fb_id", user.getId());
-//                                editor.apply();
+
                                 new AsyncGet(LoginActivity.this, "http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken(), new AsyncGet.AsyncResult() {
                                     @Override
                                     public void gotResult(String s) {
@@ -254,12 +242,6 @@ public class LoginActivity extends FragmentActivity implements
                                                 userMain.user = res.getString("user");
                                                 userMain.saveUserDataLocally();
 
-
-
-//                                                editor.putString("loginskip", "true");
-//                                                editor.putString("token", res.getString("token"));
-//                                                editor.putString("user",res.getString("user"));
-//                                                editor.apply();
                                                 startActivity(new Intent(LoginActivity.this, Home.class));
                                                 finish();
                                             } else {
@@ -285,12 +267,6 @@ public class LoginActivity extends FragmentActivity implements
         userMain.notNow = true;
         userMain.saveUserDataLocally();
 
-
-//        SharedPreferences example = getSharedPreferences("USER", 0);
-//        SharedPreferences.Editor editor = example.edit();
-//        editor.putString("loginskip", "true");
-//        editor.putString("notNow","true");
-//        editor.apply();
         startActivity(new Intent(this, Home.class));
         finish();
     }
@@ -303,46 +279,6 @@ public class LoginActivity extends FragmentActivity implements
         }
         return true;
     }
-    /*public void slide(View v) {
-        //final Resources reso = this.getResources();
-        switch (v.getId()) {
-            case R.id.slide1:
-                mPager.setCurrentItem(0);
-                i=0;
-*//*slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
-slide2.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
-slide3.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
-slide4.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));*//*
-                break;
-            case R.id.slide2:
-                mPager.setCurrentItem(1);
-                i=1;
-*//* slide2.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
-slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
-slide3.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
-slide4.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));*//*
-                break;
-            case R.id.slide3:
-                mPager.setCurrentItem(2);
-                i=2;
-*//*slide3.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
-slide2.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
-slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
-slide4.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));*//*
-                break;
-            case R.id.slide4:
-                mPager.setCurrentItem(3);
-                i=3;
-*//* slide4.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider_current));
-slide2.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
-slide3.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));
-slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider));*//*
-                break;
-            case R.id.slide5:
-                mPager.setCurrentItem(4);
-                i=4;
-        }
-    }*/
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -364,13 +300,6 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
         userMain.gplus_name = userName;
         userMain.gplus_pic = dispPicUrl;
         userMain.saveUserDataLocally();
-
-
-//        final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-//        editor.putString("gplus_name", userName);
-//        editor.putString("gplus_id", currentUser.getId());
-//        editor.putString("gplus_pic", dispPicUrl);
-//        editor.apply();
 
 
         new AsyncTokenGet(this, new AsyncTokenGet.AsyncTokenResult() {
@@ -499,23 +428,6 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
             googleApiClient.disconnect();
     }
 
-    /*public void slideToImage(int position){
-        mPager.setCurrentItem(position);
-    }
-    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-        public ScreenSlidePagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-        @Override
-        public Fragment getItem(int position) {
-            return ScreenSlidePageFragment.create(position);
-        }
-        @Override
-        public int getCount() {
-            return NUM_PAGES;
-        }
-    }*/
-
 
 
     ArrayList<String> slidesQuotes = new ArrayList<>(Arrays.asList("", "<span style='font-size=16px'>tap &#9825; and add<br>clubs to <b>my clubs</b></span>", "unlock rewards","<span style='font-size=16px'>tap <b>check in</b> and choose<br>reward to redeem</span>","<span style='font-size=16px'>tap <b>check in</b> and choose<br>reward to redeem</span>"));
@@ -549,6 +461,7 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
             return "OBJECT " + (position + 1);
         }
     }
+
     //OUR MAIN SLIDE VIEW FRAGMENTS
     public static class SlideFragment extends Fragment {
         public static final String QUOTE = "object";
