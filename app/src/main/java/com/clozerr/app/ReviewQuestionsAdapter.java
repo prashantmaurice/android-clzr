@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -149,10 +148,13 @@ public class ReviewQuestionsAdapter extends RecyclerView.Adapter<ReviewQuestions
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
-                        SharedPreferences example = c.getSharedPreferences("USER", 0);
-                        SharedPreferences.Editor editor = example.edit();
-                        editor.putString("notNow", "false");
-                        editor.apply();
+//                        SharedPreferences example = c.getSharedPreferences("USER", 0);
+//                        SharedPreferences.Editor editor = example.edit();
+//                        editor.putString("notNow", "false");
+//                        editor.apply();
+
+                        MainApplication.getInstance().data.userMain.changeNotNow(false);
+
                         //Yes button clicked
                            /* Intent mStartActivity = new Intent(c,Login.class);
                             int mPendingIntentId = 123456;

@@ -2,7 +2,6 @@ package com.clozerr.app;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -87,18 +86,22 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
         public CardModel currentItem;
         ImageButton like;
 
-        SharedPreferences status;
-        String NotNow;
+//        SharedPreferences status;
+        boolean NotNow;
         ArrayList<String> fav;
         JSONArray favourites;
 
         public void updateFavs(){
-            status = c.getSharedPreferences("USER",0);
-            NotNow = status.getString("notNow","false");
+//            status = c.getSharedPreferences("USER",0);
+            NotNow = MainApplication.getInstance().data.userMain.notNow;
+//            NotNow = status.getString("notNow","false");
             fav = new ArrayList<String>();
-            if(NotNow.equals("false")) {
+//            if(NotNow.equals("false")) {
+            if(!NotNow) {
                 try {
-                    JSONObject userobj = new JSONObject(status.getString("user", "null"));
+//                    JSONObject userobj = new JSONObject(status.getString("user", "null"));
+                    String jsonTxt = (MainApplication.getInstance().data.userMain.user.isEmpty())?"null":MainApplication.getInstance().data.userMain.user;
+                    JSONObject userobj = new JSONObject(jsonTxt);
                     favourites = userobj.getJSONArray("favourites");
                     Log.i("favourites", favourites.toString());
                     if (favourites != null) {
@@ -130,8 +133,9 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
                 public void onClick(View view) {
                     //Log.i("tag",like.getTag().toString());
                     //Toast.makeText(c,"clicked",Toast.LENGTH_SHORT).show();
-                    SharedPreferences status = c.getSharedPreferences("USER", 0);
-                    String TOKEN = status.getString("token", "");
+//                    SharedPreferences status = c.getSharedPreferences("USER", 0);
+//                    String TOKEN = status.getString("token", "");
+                    String TOKEN = MainApplication.getInstance().data.userMain.token;
                     //Log.i("name",getResources().getResourceName(R.id.favorites));
                     if(fav.indexOf(currentItem.getVendorId())==-1)
                     {
@@ -147,9 +151,10 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
                                         like.setImageResource(R.drawable.like);
                                     } else {
                                         fav.add(currentItem.getVendorId());
-                                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                                        editor.putString("user", s);
-                                        editor.apply();
+//                                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+//                                        editor.putString("user", s);
+//                                        editor.apply();
+                                        MainApplication.getInstance().data.userMain.changeUser(s);
                                         Toast.makeText(c, "Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
                                     }
                                 /*} catch (JSONException e) {
@@ -181,9 +186,10 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
                                         like.setImageResource(R.drawable.favorited);
                                     } else {
                                         fav.remove(fav.indexOf(currentItem.getVendorId()));
-                                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                                        editor.putString("user", s);
-                                        editor.apply();
+//                                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+//                                        editor.putString("user", s);
+//                                        editor.apply();
+                                        MainApplication.getInstance().data.userMain.changeUser(s);
                                         Toast.makeText(c, "Unfavorited and removed from My Clubs.", Toast.LENGTH_LONG).show();
                                     }
                                     // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
@@ -205,9 +211,10 @@ public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecycl
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    SharedPreferences status = c.getSharedPreferences("USER", 0);
-                    String NotNow = status.getString("notNow", "false");
-                    if (VendorActivity.i == 0 && NotNow.equals("false"))
+//                    SharedPreferences status = c.getSharedPreferences("USER", 0);
+//                    String NotNow = status.getString("notNow", "false");
+                    NotNow = MainApplication.getInstance().data.userMain.notNow;
+                    if (VendorActivity.i == 0 && !NotNow)
                     {
                         Intent detailIntent = new Intent(c, VendorActivity.class);
                         detailIntent.putExtra("vendor_id", currentItem.getVendorId());

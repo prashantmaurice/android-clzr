@@ -17,13 +17,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Button;
 
 import com.google.android.gcm.GCMRegistrar;
 
@@ -41,7 +41,7 @@ public class FreebieDescription extends ActionBarActivity {
     String button="USE IT";
     String vendorid="",caption="",description="", name="";
     SharedPreferences status;
-    String NotNow;
+    boolean NotNow;
     ArrayList<String> pinned;
     ImageButton pin;
     ImageButton whatsappshare;
@@ -197,9 +197,10 @@ public class FreebieDescription extends ActionBarActivity {
                         public void gotResult(String s) {
                             try {
                                 JSONObject obj = new JSONObject(s);
-                                final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-                                editor.putString("user",s);
-                                editor.apply();
+//                                final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
+//                                editor.putString("user", s);
+//                                editor.apply();
+                                MainApplication.getInstance().data.userMain.changeUser(s);
                                 //Toast.makeText(getActivity(),s,Toast.LENGTH_SHORT).show();
                                 pin.setImageResource(R.drawable.pinfilled);
                                 Toast.makeText(getApplicationContext(), "Added to pinned offers", Toast.LENGTH_SHORT).show();
@@ -223,9 +224,10 @@ public class FreebieDescription extends ActionBarActivity {
                         public void gotResult(String s) {
                             try {
                                 JSONObject obj = new JSONObject(s);
-                                final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-                                editor.putString("user",s);
-                                editor.apply();
+//                                final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
+//                                editor.putString("user",s);
+//                                editor.apply();
+                                MainApplication.getInstance().data.userMain.changeUser(s);
                                 //Toast.makeText(getActivity(),s,Toast.LENGTH_SHORT).show();
                                 pin.setImageResource(R.drawable.pin100);
                                 Toast.makeText(getApplicationContext(), "Removed from pinned offers", Toast.LENGTH_SHORT).show();
@@ -255,7 +257,7 @@ public class FreebieDescription extends ActionBarActivity {
             public void onClick(View view) {
                 Intent sharingIntent = new Intent(Intent.ACTION_SEND);
                 sharingIntent.setType("text/plain");
-                String shareBody = "Check out the offer I got @ " +VendorActivity.detailsBundle.getString("vendorTitle")+" using Clozerr: "+description+" https://play.google.com/store/apps/details?id=com.clozerr.app";
+                String shareBody = "Check out the offer I got @ " + VendorActivity.detailsBundle.getString("vendorTitle") + " using Clozerr: " + description + " https://play.google.com/store/apps/details?id=com.clozerr.app";
                 sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Clozerr");
                 sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
@@ -264,12 +266,16 @@ public class FreebieDescription extends ActionBarActivity {
     }
     public void updatePind(){
         status = getSharedPreferences("USER", 0);
-        NotNow = status.getString("notNow","false");
+        NotNow = MainApplication.getInstance().data.userMain.notNow;
+//        NotNow = status.getString("notNow", "false");
         pinned = new ArrayList<String>();
         JSONArray pind ;
-        if(NotNow.equals("false")) {
+//        if(NotNow.equals("false")) {
+        if(!NotNow) {
             try {
-                JSONObject userobj = new JSONObject(status.getString("user", "null"));
+//                JSONObject userobj = new JSONObject(status.getString("user", "null"));
+                String jsonTxt = (MainApplication.getInstance().data.userMain.user.isEmpty())?"null":MainApplication.getInstance().data.userMain.user;
+                JSONObject userobj = new JSONObject(jsonTxt);
                 pind = userobj.getJSONArray("pinned");
                 Log.i("pinned", pind.toString());
                 if (pind != null) {

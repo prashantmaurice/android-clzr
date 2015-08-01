@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.clozerr.app.Models.UserMain;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
@@ -23,7 +24,8 @@ public class BeaconDBDownloader extends BroadcastReceiver {
     }
 
     private static void downloadBeaconDB(final Context context) {
-        String token = context.getSharedPreferences("USER", 0).getString("token", "");
+        UserMain userMain = MainApplication.getInstance().data.userMain;
+        String token = userMain.token;
         final String url = GenUtils.getClearedUriBuilder(Constants.URLBuilders.BEACON_DOWNLOAD)
                             .appendQueryParameter("access_token", token)
                             .build().toString();

@@ -13,7 +13,7 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
-import android.util.Log;
+
 import com.android.internal.util.Predicate;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.jaalee.sdk.Beacon;
@@ -127,8 +127,9 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         isScanningAllowed = sharedPreferences.getBoolean(context.getResources().getString(R.string.beacon_detection), true);
         commonBeaconUUID = sharedPreferences.getString(Constants.SPKeys.BEACON_UUID, "");
-        sharedPreferences = context.getSharedPreferences("USER", 0);
-        isUserLoggedIn = !sharedPreferences.getString("token", "").isEmpty();
+//        sharedPreferences = context.getSharedPreferences("USER", 0);
+//        isUserLoggedIn = !sharedPreferences.getString("token", "").isEmpty();
+        isUserLoggedIn = !MainApplication.getInstance().data.userMain.token.isEmpty();
         if (logInNecessary)
             return (isUserLoggedIn && isScanningAllowed && !commonBeaconUUID.isEmpty());
         else

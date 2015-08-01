@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -43,8 +42,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private List<CardModel> items;
     static Context c;
-    SharedPreferences status;
-    String NotNow;
+//    SharedPreferences status;
+    boolean NotNow;
     ArrayList<String> fav;
     JSONArray favourites;
 
@@ -135,12 +134,21 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return items.size();
     }
     public void updateFavs(){
-        status = c.getSharedPreferences("USER",0);
-        NotNow = status.getString("notNow","false");
+//        status = c.getSharedPreferences("USER", 0);
+//        NotNow = status.getString("notNow", "false");
+
+        NotNow = MainApplication.getInstance().data.userMain.notNow;
+//            NotNow = status.getString("notNow","false");
         fav = new ArrayList<String>();
-        if(NotNow.equals("false")) {
+//            if(NotNow.equals("false")) {
+
+
+        fav = new ArrayList<String>();
+//        if(NotNow.equals("false")) {
+        if(!NotNow) {
             try {
-                JSONObject userobj = new JSONObject(status.getString("user", "null"));
+                String jsonTxt = (MainApplication.getInstance().data.userMain.user.isEmpty())?"null":MainApplication.getInstance().data.userMain.user;
+                JSONObject userobj = new JSONObject(jsonTxt);
                 favourites = userobj.getJSONArray("favourites");
                 Log.i("favourites",favourites.toString());
                 if (favourites != null) {
@@ -187,16 +195,21 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             linearLayout.setLayoutParams(params);*/
             VendorActivity.Rewards = "";
             //txtrating=(TextView) itemView.findViewById(R.id.txtrating);
-            final SharedPreferences status = c.getSharedPreferences("USER",0);
-            final String NotNow = status.getString("notNow","false");
+//            final SharedPreferences status = c.getSharedPreferences("USER", 0);
+//            final boolean NotNow = status.getString("notNow", "false");
+
+            final boolean NotNow = MainApplication.getInstance().data.userMain.notNow;
+
+
             final ArrayList<String> fav = new ArrayList<String>();
             like.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     //Log.i("tag",like.getTag().toString());
                     //Toast.makeText(c,"clicked",Toast.LENGTH_SHORT).show();
-                    SharedPreferences status = c.getSharedPreferences("USER", 0);
-                    String TOKEN = status.getString("token", "");
+//                    SharedPreferences status = c.getSharedPreferences("USER", 0);
+//                    String TOKEN = status.getString("token", "");
+                    String TOKEN = MainApplication.getInstance().data.userMain.token;
                     //Log.i("name",getResources().getResourceName(R.id.favorites));
                     if(fav.indexOf(currentItem.getVendorId())==-1)
                     {
@@ -212,9 +225,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                         like.setImageResource(R.drawable.like);
                                     } else {
                                         fav.add(currentItem.getVendorId());
-                                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                                        editor.putString("user", s);
-                                        editor.apply();
+//                                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+//                                        editor.putString("user", s);
+//                                        editor.apply();
+                                        MainApplication.getInstance().data.userMain.changeUser(s);
                                         Toast.makeText(c, "Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
                                     }
                                 /*} catch (JSONException e) {
@@ -246,9 +260,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                         like.setImageResource(R.drawable.favorited);
                                     } else {
                                         fav.remove(fav.indexOf(currentItem.getVendorId()));
-                                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                                        editor.putString("user", s);
-                                        editor.apply();
+//                                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+//                                        editor.putString("user", s);
+//                                        editor.apply();
+
+                                        MainApplication.getInstance().data.userMain.changeUser(s);
                                         Toast.makeText(c, "Unfavorited and removed from My Clubs.", Toast.LENGTH_LONG).show();
                                     }
                                 /*} catch (JSONException e) {
@@ -271,7 +287,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (VendorActivity.i == 0 && NotNow.equals("false"))
+                    if (VendorActivity.i == 0 && !NotNow)
                     {
                         Intent detailIntent = new Intent(c, VendorActivity.class);
                         detailIntent.putExtra("vendor_id", currentItem.getVendorId());
@@ -302,10 +318,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
-                        SharedPreferences example = c.getSharedPreferences("USER", 0);
-                        SharedPreferences.Editor editor = example.edit();
-                        editor.putString("notNow", "false");
-                        editor.apply();
+//                        SharedPreferences example = c.getSharedPreferences("USER", 0);
+//                        SharedPreferences.Editor editor = example.edit();
+//                        editor.putString("notNow", "false");
+//                        editor.apply();
+                        MainApplication.getInstance().data.userMain.changeNotNow(false);
                         //Yes button clicked
                            /* Intent mStartActivity = new Intent(c,Login.class);
                             int mPendingIntentId = 123456;

@@ -6,14 +6,12 @@ package com.clozerr.app;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,8 +29,8 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
     private ArrayList<MyOffer> values;
     static Context c;
     Resources reso;
-    public SharedPreferences status;
-    public String NotNow;
+//    public SharedPreferences status;
+    public boolean NotNow;
     public static ArrayList<String> pinned;
 
     UnusedOffersAdapter(ArrayList<MyOffer> offers, Context c) {
@@ -106,13 +104,19 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
     }
 
     public void updatePind(){
-        status = c.getSharedPreferences("USER",0);
-        NotNow = status.getString("notNow","false");
+//        status = c.getSharedPreferences("USER",0);
+
+        NotNow = MainApplication.getInstance().data.userMain.notNow;
+
+//        NotNow = status.getString("notNow","false");
         pinned = new ArrayList<String>();
         JSONArray pind ;
-        if(NotNow.equals("false")) {
+        if(!NotNow) {
+//        if(NotNow.equals("false")) {
             try {
-                JSONObject userobj = new JSONObject(status.getString("user", "null"));
+//                JSONObject userobj = new JSONObject(status.getString("user", "null"));
+                String jsonTxt = (MainApplication.getInstance().data.userMain.user.isEmpty())?"null":MainApplication.getInstance().data.userMain.user;
+                JSONObject userobj = new JSONObject(jsonTxt);
                 pind = userobj.getJSONArray("pinned");
                 Log.i("pinned", pind.toString());
                 if (pind != null) {
@@ -164,9 +168,10 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
                         public void gotResult(String s) {
                             try {
                                 JSONObject obj = new JSONObject(s);
-                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                                editor.putString("user",s);
-                                editor.apply();
+//                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+//                                editor.putString("user",s);
+//                                editor.apply();
+                                MainApplication.getInstance().data.userMain.changeUser(s);
                                 //Toast.makeText(getActivity(),s,Toast.LENGTH_SHORT).show();
                                 pin.setImageResource(R.drawable.pinfilled);
                                 Toast.makeText(c, "Added to pinned offers", Toast.LENGTH_SHORT).show();
@@ -190,9 +195,10 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
                             public void gotResult(String s) {
                                 try {
                                     JSONObject obj = new JSONObject(s);
-                                    final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                                    editor.putString("user",s);
-                                    editor.apply();
+//                                    final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+//                                    editor.putString("user",s);
+//                                    editor.apply();
+                                    MainApplication.getInstance().data.userMain.changeUser(s);
                                     //Toast.makeText(getActivity(),s,Toast.LENGTH_SHORT).show();
                                     pin.setImageResource(R.drawable.pin100);
                                     Toast.makeText(c, "Removed from pinned offers", Toast.LENGTH_SHORT).show();

@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Models.UserMain;
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
@@ -134,41 +134,6 @@ public class Login extends FragmentActivity implements
             public void onPageScrollStateChanged(int state) {
             }
         });
-//        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-//            @Override
-//            public void onPageSelected(int position) {
-//                ImageView slide1=(ImageView)findViewById(R.id.slide1);
-//                ImageView slide2=(ImageView)findViewById(R.id.slide2);
-//                ImageView slide3=(ImageView)findViewById(R.id.slide3);
-//                ImageView slide4=(ImageView)findViewById(R.id.slide4);
-//                ImageView slide5=(ImageView)findViewById(R.id.slide5);
-////slide1.setAlpha(0.0f);
-//                slide1.setBackground(reso.getDrawable(R.drawable.image_slider));
-//                slide2.setBackground(reso.getDrawable(R.drawable.image_slider));
-//                slide3.setBackground(reso.getDrawable(R.drawable.image_slider));
-//                slide4.setBackground(reso.getDrawable(R.drawable.image_slider));
-//                slide5.setBackground(reso.getDrawable(R.drawable.image_slider));
-//                i=position;
-//                switch (position){
-//                    case 0:
-//                        slide1.setBackground(reso.getDrawable(R.drawable.image_slider_current));
-//                        break;
-//                    case 1:
-//                        slide2.setBackground(reso.getDrawable(R.drawable.image_slider_current));
-//                        break;
-//                    case 2:
-//                        slide3.setBackground(reso.getDrawable(R.drawable.image_slider_current));
-//                        break;
-//                    case 3:
-//                        slide4.setBackground(reso.getDrawable(R.drawable.image_slider_current));
-//                        break;
-//                    case 4:
-//                        slide5.setBackground(reso.getDrawable(R.drawable.image_slider_current));
-//                        break;
-//                }
-//                invalidateOptionsMenu();
-//            }
-//        });
 //        if (savedInstanceState != null) {
 //            mSignInProgress = savedInstanceState
 //                    .getInt(SAVED_PROGRESS, STATE_DEFAULT);
@@ -260,10 +225,14 @@ public class Login extends FragmentActivity implements
                         public void onCompleted(GraphUser user, Response response) {
                             if (user != null) {
                                 Log.i("user", user.getName());
-                                final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-                                editor.putString("fb_name", user.getName());
-                                editor.putString("fb_id", user.getId());
-                                editor.apply();
+                                UserMain userMain = MainApplication.getInstance().data.userMain;
+                                userMain.fb_name = user.getName();
+                                userMain.facebookId = user.getId();
+                                userMain.saveUserDataLocally();
+//                                final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
+//                                editor.putString("fb_name", user.getName());
+//                                editor.putString("fb_id", user.getId());
+//                                editor.apply();
                                 new AsyncGet(Login.this, "http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken(), new AsyncGet.AsyncResult() {
                                     @Override
                                     public void gotResult(String s) {
@@ -272,10 +241,18 @@ public class Login extends FragmentActivity implements
                                         try {
                                             JSONObject res = new JSONObject(s);
                                             if (res.getBoolean("result")) {
-                                                editor.putString("loginskip", "true");
-                                                editor.putString("token", res.getString("token"));
-                                                editor.putString("user",res.getString("user"));
-                                                editor.apply();
+                                                UserMain userMain = MainApplication.getInstance().data.userMain;
+                                                userMain.loginSkip = true;
+                                                userMain.token = res.getString("token");
+                                                userMain.user = res.getString("user");
+                                                userMain.saveUserDataLocally();
+
+
+
+//                                                editor.putString("loginskip", "true");
+//                                                editor.putString("token", res.getString("token"));
+//                                                editor.putString("user",res.getString("user"));
+//                                                editor.apply();
                                                 startActivity(new Intent(Login.this, Home.class));
                                                 finish();
                                             } else {
@@ -296,11 +273,17 @@ public class Login extends FragmentActivity implements
         });
     }
     public void skiplogin(View v) {
-        SharedPreferences example = getSharedPreferences("USER", 0);
-        SharedPreferences.Editor editor = example.edit();
-        editor.putString("loginskip", "true");
-        editor.putString("notNow","true");
-        editor.apply();
+        UserMain userMain = MainApplication.getInstance().data.userMain;
+        userMain.loginSkip = true;
+        userMain.notNow = true;
+        userMain.saveUserDataLocally();
+
+
+//        SharedPreferences example = getSharedPreferences("USER", 0);
+//        SharedPreferences.Editor editor = example.edit();
+//        editor.putString("loginskip", "true");
+//        editor.putString("notNow","true");
+//        editor.apply();
         startActivity(new Intent(this, Home.class));
         finish();
     }
@@ -369,11 +352,18 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
         userName = currentUser.getDisplayName();
         dispPicUrl = currentUser.getImage().getUrl();
 
-        final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-        editor.putString("gplus_name", userName);
-        editor.putString("gplus_id", currentUser.getId());
-        editor.putString("gplus_pic", dispPicUrl);
-        editor.apply();
+        UserMain userMain = MainApplication.getInstance().data.userMain;
+        userMain.gplus_id = currentUser.getId();
+        userMain.gplus_name = userName;
+        userMain.gplus_pic = dispPicUrl;
+        userMain.saveUserDataLocally();
+
+
+//        final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
+//        editor.putString("gplus_name", userName);
+//        editor.putString("gplus_id", currentUser.getId());
+//        editor.putString("gplus_pic", dispPicUrl);
+//        editor.apply();
 
 
         new AsyncTokenGet(this, new AsyncTokenGet.AsyncTokenResult() {
@@ -396,10 +386,19 @@ slide1.setBackground((GradientDrawable)reso.getDrawable(R.drawable.image_slider)
                             Log.e(TAG, "result - " + s);
                             JSONObject res = new JSONObject(s);
                             if (res.getBoolean("result")) {
-                                editor.putString("loginskip", "true");
-                                editor.putString("token", res.getString("token"));
-                                editor.putString("user",res.getString("user"));
-                                editor.apply();
+
+                                UserMain userMain = MainApplication.getInstance().data.userMain;
+                                userMain.loginSkip = true;
+                                userMain.token = res.getString("token");
+                                userMain.user = res.getString("user");
+                                userMain.saveUserDataLocally();
+
+
+
+//                                editor.putString("loginskip", "true");
+//                                editor.putString("token", res.getString("token"));
+//                                editor.putString("user",res.getString("user"));
+//                                editor.apply();
                                 startActivity(new Intent(Login.this, Home.class));
                                 finish();
                             } else {

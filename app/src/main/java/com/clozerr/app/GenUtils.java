@@ -2,7 +2,6 @@ package com.clozerr.app;
 
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -48,8 +47,9 @@ public class GenUtils {
     }
 
     public static Uri.Builder getDefaultAnalyticsUriBuilder(Context context, String metric) {
-        SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences("USER", 0);
-        String TOKEN = sharedPreferences.getString("token", "");
+//        SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences("USER", 0);
+//        String TOKEN = sharedPreferences.getString("token", "");
+        String TOKEN = MainApplication.getInstance().data.userMain.token;
         String nowAsISO = getCurrentTimeAsISOString();
 
         Uri.Builder result = getClearedUriBuilder(Constants.URLBuilders.ANALYTICS)

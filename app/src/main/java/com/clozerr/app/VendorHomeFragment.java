@@ -7,14 +7,11 @@ package com.clozerr.app;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -61,13 +58,20 @@ public class VendorHomeFragment extends Fragment {
         //mVendorAboutView.setText(VendorActivity.detailsBundle.getString("description"));
         mVendorAddressView.setText(VendorActivity.detailsBundle.getString("address"));
         mVendorDescriptionView.setText(VendorActivity.detailsBundle.getString("description"));
-        final SharedPreferences status = c.getSharedPreferences("USER",0);
-        final String NotNow = status.getString("notNow","false");
+//        final SharedPreferences status = c.getSharedPreferences("USER",0);
+//        final String NotNow = status.getString("notNow","false");
+
+        final boolean NotNow = MainApplication.getInstance().data.userMain.notNow;
+
+
         final ArrayList<String> fav = new ArrayList<String>();
         JSONArray favourites ;
-        if(NotNow.equals("false")) {
+        if(!NotNow) {
+//        if(NotNow.equals("false")) {
             try {
-                JSONObject userobj = new JSONObject(status.getString("user", "null"));
+//                JSONObject userobj = new JSONObject(status.getString("user", "null"));
+                String jsonTxt = (MainApplication.getInstance().data.userMain.user.isEmpty())?"null":MainApplication.getInstance().data.userMain.user;
+                JSONObject userobj = new JSONObject(jsonTxt);
                 favourites = userobj.getJSONArray("favourites");
                 Log.i("favourites", favourites.toString());
                 int len = favourites.length();
@@ -128,8 +132,9 @@ public class VendorHomeFragment extends Fragment {
         favorites.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferences status = getActivity().getSharedPreferences("USER", 0);
-                String TOKEN = status.getString("token", "");
+//                SharedPreferences status = getActivity().getSharedPreferences("USER", 0);
+//                String TOKEN = status.getString("token", "");
+                String TOKEN = MainApplication.getInstance().data.userMain.token;
                 Log.i("name", getResources().getResourceName(R.id.favorites));
                 if (fav.indexOf(VendorActivity.detailsBundle.getString("vendorId")) == -1) {
                     Log.e("VendorHomeFragment", "favs url - " + "http://api.clozerr.com/v2/user/add/favourites?vendor_id=" + VendorActivity.vendorId + "&access_token=" + TOKEN);
@@ -144,9 +149,10 @@ public class VendorHomeFragment extends Fragment {
                                 favorites.setImageResource(R.drawable.unfavorited);
                             } else {
                                 fav.add(VendorActivity.detailsBundle.getString("vendorId"));
-                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                                editor.putString("user", s);
-                                editor.apply();
+//                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+//                                editor.putString("user", s);
+//                                editor.apply();
+                                MainApplication.getInstance().data.userMain.changeUser(s);
                                 Toast.makeText(getActivity(), "Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
                             }
                             // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
@@ -174,9 +180,10 @@ public class VendorHomeFragment extends Fragment {
                                 favorites.setImageResource(R.drawable.favorited);
                             } else {
                                 fav.remove(VendorActivity.detailsBundle.getString("vendorId"));
-                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                                editor.putString("user", s);
-                                editor.apply();
+//                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+//                                editor.putString("user", s);
+//                                editor.apply();
+                                MainApplication.getInstance().data.userMain.changeUser(s);
                                 Toast.makeText(getActivity(), "Unfavorited and removed from My Clubs.", Toast.LENGTH_LONG).show();
                             }
                             // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();

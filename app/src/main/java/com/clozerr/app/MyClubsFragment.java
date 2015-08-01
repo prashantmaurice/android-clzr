@@ -2,7 +2,6 @@ package com.clozerr.app;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -172,8 +171,9 @@ public class MyClubsFragment extends Fragment {
         Log.e("app", "in slidingmycards; set recycler");
 
 
-        SharedPreferences status = c.getSharedPreferences("USER", 0);
-        String TOKEN = status.getString("token", "");
+//        SharedPreferences status = c.getSharedPreferences("USER", 0);
+//        String TOKEN = status.getString("token", "");
+        String TOKEN = MainApplication.getInstance().data.userMain.token;
 
         /*String urlVisited = "http://api.clozerr.com/vendor/get/visitedV2?access_token=" + TOKEN;
         Log.e("urlslide", urlVisited);

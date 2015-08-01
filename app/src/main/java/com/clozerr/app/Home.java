@@ -40,6 +40,7 @@ import android.widget.SlidingDrawer;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Models.UserMain;
 import com.facebook.Session;
 import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -142,7 +143,8 @@ public class Home  extends ActionBarActivity {
             }
         });
 
-        String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
+        String TOKEN = MainApplication.getInstance().data.userMain.token;
+//        String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
         new AsyncGet(this, "http://api.clozerr.com/v2/vendor/offers/rewardspage?access_token=" +TOKEN, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
@@ -181,8 +183,9 @@ public class Home  extends ActionBarActivity {
         if (regId.equals("")) {
             GCMRegistrar.register(this, SENDER_ID);
         }else{
-            SharedPreferences status = getSharedPreferences("USER", 0);
-            TOKEN = status.getString("token", "");
+//            SharedPreferences status = getSharedPreferences("USER", 0);
+            TOKEN = MainApplication.getInstance().data.userMain.token;
+//            TOKEN = status.getString("token", "");
             new AsyncGet(Home.this, "http://api.clozerr.com/auth/update/gcm?gcm_id=" + regId + "&access_token=" + TOKEN, new AsyncGet.AsyncResult() {
                 @Override
                 public void gotResult(String s) {
@@ -275,26 +278,28 @@ public class Home  extends ActionBarActivity {
         return url.split("\\?")[0] + "?sz=200";
     }
     public int logincheck(){
-        SharedPreferences status = getSharedPreferences("USER", 0);
-        TOKEN = status.getString("token", "");
-        if (status.contains("fb_id"))
+//        SharedPreferences status = getSharedPreferences("USER", 0);
+        TOKEN = MainApplication.getInstance().data.userMain.token;
+//        TOKEN = status.getString("token", "");
+//        if (status.contains("fb_id"))
+        if (!MainApplication.getInstance().data.userMain.facebookId.isEmpty())
         {
-            USERID = status.getString("fb_id", "");
-            USERNAME = status.getString("fb_name", "");
+            USERID = MainApplication.getInstance().data.userMain.facebookId;
+            USERNAME = MainApplication.getInstance().data.userMain.fb_name;
             USER_PIC_URL = "https://graph.facebook.com/" + USERID + "/picture?type=large&width=200&height=200";
             Login.googleOrFb = 1;
         }
-        else if (status.contains("gplus_id"))
+        else if (!MainApplication.getInstance().data.userMain.gplus_id.isEmpty())
         {
-            USERID = status.getString("gplus_id", "");
-            USERNAME = status.getString("gplus_name", "");
-            USER_PIC_URL = status.getString("gplus_pic", "");
+            USERID = MainApplication.getInstance().data.userMain.gplus_id;
+            USERNAME = MainApplication.getInstance().data.userMain.gplus_name;
+            USER_PIC_URL = MainApplication.getInstance().data.userMain.gplus_pic;
             USER_PIC_URL = resetImageSize( USER_PIC_URL );
             Login.googleOrFb = 2;
         }
-        Log.i("all saved prefs", status.getAll().toString());
-        String loginskipped = status.getString("loginskip", "false");
-        if(!loginskipped.equals("true")){
+//        Log.i("all saved prefs", use.getAll().toString());
+        UserMain userMain = MainApplication.getInstance().data.userMain;
+        if(!userMain.loginSkip){
             startActivity(new Intent(this, Login.class));
             finish();
             return 0;

@@ -79,7 +79,8 @@ public class VendorActivity extends ActionBarActivity {
         final String vendor_id = callingIntent.getStringExtra("vendor_id");
         vendorId = vendor_id;
 
-        TOKEN = getSharedPreferences("USER", 0).getString("token", "");
+//        TOKEN = getSharedPreferences("USER", 0).getString("token", "");
+        TOKEN = MainApplication.getInstance().data.userMain.token;
         final String urlVendor = "http://api.clozerr.com/v2/vendor/get/details?vendor_id=" + vendor_id;
         Log.e(TAG, "vendor url - " + urlVendor);
         new AsyncGet(this, urlVendor, new AsyncGet.AsyncResult() {

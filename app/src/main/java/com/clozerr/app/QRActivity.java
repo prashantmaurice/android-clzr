@@ -107,7 +107,8 @@ public class QRActivity extends ActionBarActivity implements ZXingScannerView.Re
     public void handleResult(Result rawResult) {
         /*Log.e(TAG, "result - " + rawResult.getText());
         Log.e(TAG, "format - " + rawResult.getBarcodeFormat().toString());*/
-        String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
+//        String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
+        String TOKEN = MainApplication.getInstance().data.userMain.token;
         String gcmId = GCMRegistrar.getRegistrationId(getApplicationContext());
         final String validateURL = GenUtils.getClearedUriBuilder(Constants.URLBuilders.QRCODE_VALIDATE)
                                             .appendQueryParameter("access_token", TOKEN)

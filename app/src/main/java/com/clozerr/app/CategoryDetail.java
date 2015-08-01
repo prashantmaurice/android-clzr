@@ -169,7 +169,8 @@ public class CategoryDetail extends ActionBarActivity{
 
         SharedPreferences status = getSharedPreferences("USER", 0);
         final String cards = status.getString(categorybundle.getString("categoryname")+"category_cards", "");
-        TOKEN = status.getString("token", "");
+//        TOKEN = status.getString("token", "");
+        TOKEN = MainApplication.getInstance().data.userMain.token;
         if(!cards.equals("")){
             Log.e("Cached Card", cards);
             mMainCardsList = convertRow(cards);

@@ -4,9 +4,6 @@ import android.content.Context;
 
 import com.clozerr.app.Models.UserMain;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 /**
  *  Instance of Data object contains all access to the complete date model underneath.
  *  Just pull the Data instance in your screen and make modifications to exposed objects
@@ -32,13 +29,13 @@ public class Data {
     }
 
     //Refill function to generate all previous data
-    public void refillCompleteData(JSONObject response){
-        try {
-            userMain.decodeFromServer(response.getJSONObject("user"));
-            userMain.saveUserDataLocally();
-
-        } catch (JSONException e) {e.printStackTrace();}
-    };
+//    public void refillCompleteData(JSONObject response){
+//        try {
+//            userMain.decodeFromServer(response.getJSONObject("user"));
+//            userMain.saveUserDataLocally();
+//
+//        } catch (JSONException e) {e.printStackTrace();}
+//    };
 
 //    public void pullDataFromServer(final String email, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) throws JSONException {
 //        String url = Router.User.getWIthEmailComplete(email);

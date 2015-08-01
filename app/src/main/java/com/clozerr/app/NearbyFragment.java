@@ -2,7 +2,6 @@ package com.clozerr.app;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
@@ -25,14 +24,13 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.net.URLEncoder;
-
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.nineoldandroids.animation.ValueAnimator;
 import com.nineoldandroids.view.ViewHelper;
 
 import org.json.JSONArray;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 /**
@@ -157,9 +155,11 @@ public class NearbyFragment extends Fragment {
 
                                         mRecyclerView.setOnScrollListener(mOnScrollListener);
                                     }
-                                    final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                                    editor.putString("home_cards", s);
-                                    editor.apply();
+//                                    final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+//                                    editor.putString("home_cards", s);
+//                                    editor.apply();
+                                    MainApplication.getInstance().data.userMain.changeHomeCards(s);
+
                                     Log.e("app", "editing done");
                                 } else {
                                     Log.d("app", "no cards to show");
@@ -262,9 +262,10 @@ public class NearbyFragment extends Fragment {
         Home.longi = 80.2;
 
 
-        SharedPreferences status = c.getSharedPreferences("USER", 0);
-        final String cards = status.getString("home_cards", "");
-        if(!cards.equals("")){
+//        SharedPreferences status = c.getSharedPreferences("USER", 0);
+//        final String cards = status.getString("home_cards", "");
+        final String cards = MainApplication.getInstance().data.userMain.home_cards;
+        if(!cards.isEmpty()){
             Log.e("Cached Card", cards);
             mMainCardsList = convertRow(cards);
             mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
@@ -288,9 +289,10 @@ public class NearbyFragment extends Fragment {
                         mMainCardsList = CardList;
                         mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
                         mRecyclerView.setAdapter(mMainPageAdapter);
-                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                        editor.putString("home_cards", s);
-                        editor.apply();
+//                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+//                        editor.putString("home_cards", s);
+//                        editor.apply();
+                        MainApplication.getInstance().data.userMain.changeHomeCards(s);
                         Log.e("app", "editing done");
                     }
                     else {
@@ -314,8 +316,9 @@ public class NearbyFragment extends Fragment {
                 }catch (Exception e){
                     e.printStackTrace();
                 }
-                SharedPreferences status = c.getSharedPreferences("USER", 0);
-                TOKEN = status.getString("token", "");
+//                SharedPreferences status = c.getSharedPreferences("USER", 0);
+//                TOKEN = status.getString("token", "");
+                TOKEN = MainApplication.getInstance().data.userMain.token;
                 String url;
                 mOffset = 0;
                 if(!TOKEN.equals(""))
@@ -335,9 +338,10 @@ public class NearbyFragment extends Fragment {
 
                             mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
                             mRecyclerView.setAdapter(mMainPageAdapter);
-                            final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                            editor.putString("home_cards", s);
-                            editor.apply();
+//                            final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+//                            editor.putString("home_cards", s);
+//                            editor.apply();
+                            MainApplication.getInstance().data.userMain.changeHomeCards(s);
                         }
                         else {
                             mCardsLeft = false;
@@ -401,9 +405,10 @@ public class NearbyFragment extends Fragment {
                     ArrayList<CardModel> CardList = convertRow(s);
                     if (CardList.size() != 0) {
                         mMainCardsList.addAll(convertRow(s));
-                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                        editor.putString("home_cards", s);
-                        editor.apply();
+//                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+//                        editor.putString("home_cards", s);
+//                        editor.apply();
+                        MainApplication.getInstance().data.userMain.changeHomeCards(s);
                         Log.e("app", "editing done");
                         mMainPageAdapter.notifyDataSetChanged();
                         //Toast.makeText(getApplicationContext(), "More items ready", Toast.LENGTH_SHORT).show();
