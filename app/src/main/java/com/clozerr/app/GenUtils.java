@@ -132,4 +132,7 @@ public class GenUtils {
         PreferenceManager.getDefaultSharedPreferences(context).edit()
                 .putBoolean(Constants.SPKeys.FIRST_RUN, false).apply();
     }
+    public static void showDebugToast(Context context, String text){
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+    }
 }

@@ -43,7 +43,6 @@ import android.widget.Toast;
 import com.clozerr.app.Activities.LoginScreens.LoginActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.clozerr.app.Models.UserMain;
-import com.facebook.Session;
 import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.plus.Plus;
@@ -420,16 +419,16 @@ public class Home  extends ActionBarActivity {
                     }
                     else if (LoginActivity.googleOrFb == 1)
                     {
-                        Session session = Session.getActiveSession();
-                        if (session != null) {
-                            if (!session.isClosed()) {
-                                session.closeAndClearTokenInformation();
-                            }
-                        } else {
-                            session = new Session(Home.this);
-                            Session.setActiveSession(session);
-                            session.closeAndClearTokenInformation();
-                        }
+//                        Session session = Session.getActiveSession();
+//                        if (session != null) {
+//                            if (!session.isClosed()) {
+//                                session.closeAndClearTokenInformation();
+//                            }
+//                        } else {
+//                            session = new Session(Home.this);
+//                            Session.setActiveSession(session);
+//                            session.closeAndClearTokenInformation();
+//                        }
                     }
                     //BeaconFinderService.disallowScanning(Home.this);
                     startActivity(new Intent(Home.this, LoginActivity.class));

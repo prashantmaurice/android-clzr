@@ -62,4 +62,5 @@
 
     <!-- Google Play Services error for Toast -->
     <string name="play_services_error_fmt">Google Play Services Error: %i, please try signing in again</string>
+    <string name="facebook_app_id">977845575588603</string>
 </resources>

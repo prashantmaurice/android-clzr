@@ -29,7 +29,7 @@ import android.widget.Toast;
 
 import com.clozerr.app.Activities.LoginScreens.LoginActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
-import com.facebook.Session;
+//import com.facebook.Session;
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.google.android.gms.plus.Plus;
 import com.nineoldandroids.animation.ValueAnimator;
@@ -560,16 +560,16 @@ private ArrayList<CardModel> convertRow(String s) {
                     }
                     else if (LoginActivity.googleOrFb == 1)
                     {
-                        Session session = Session.getActiveSession();
-                        if (session != null) {
-                            if (!session.isClosed()) {
-                                session.closeAndClearTokenInformation();
-                            }
-                        } else {
-                            session = new Session(CategoryDetail.this);
-                            Session.setActiveSession(session);
-                            session.closeAndClearTokenInformation();
-                        }
+//                        Session session = Session.getActiveSession();
+//                        if (session != null) {
+//                            if (!session.isClosed()) {
+//                                session.closeAndClearTokenInformation();
+//                            }
+//                        } else {
+//                            session = new Session(CategoryDetail.this);
+//                            Session.setActiveSession(session);
+//                            session.closeAndClearTokenInformation();
+//                        }
                     }
                     //BeaconFinderService.disallowScanning(Home.this);
                     startActivity(new Intent(CategoryDetail.this, LoginActivity.class));

@@ -3,6 +3,7 @@ package com.clozerr.app;
 import android.app.Application;
 import android.content.SharedPreferences;
 
+import com.clozerr.app.Handlers.TokenHandler;
 import com.clozerr.app.Storage.Data;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Logger;
@@ -21,6 +22,7 @@ public class MainApplication extends Application {
     private static MainApplication sInstance;
     SharedPreferences sharedPreferences;
     public Data data;
+    public TokenHandler tokenHandler;
     boolean mBound = false;
 
     public enum TrackerName {
@@ -43,6 +45,7 @@ public class MainApplication extends Application {
 
         sharedPreferences = getSharedPreferences("Tinystep", MODE_PRIVATE);//will be deprecated soon
         data = Data.getInstance(this);//this gets all the data from preferances and Db
+        tokenHandler = TokenHandler.getInstance(this);
     }
 
     public synchronized static MainApplication getInstance() {
