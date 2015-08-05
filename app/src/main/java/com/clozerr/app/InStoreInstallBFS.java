@@ -2,6 +2,7 @@ package com.clozerr.app;
 
 import android.content.Context;
 
+import com.clozerr.app.Utils.Constants;
 import com.jaalee.sdk.Beacon;
 
 import java.util.List;

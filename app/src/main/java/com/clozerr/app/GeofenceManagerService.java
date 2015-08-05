@@ -19,6 +19,7 @@ import android.util.Log;
 
 import com.clozerr.app.Activities.HomeScreens.HomeActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
+import com.clozerr.app.Utils.Constants;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;

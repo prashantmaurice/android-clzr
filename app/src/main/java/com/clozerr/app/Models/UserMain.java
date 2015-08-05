@@ -29,8 +29,6 @@ public class UserMain {
     public String imageUrl;
     public String gcmId;
     public String phone;
-    public String token;//this is clozerr service token
-    public String socialtoken;//this is token of facebook/google
     public String address;
     public String coverPic;
 
@@ -78,7 +76,6 @@ public class UserMain {
             fb_name = (sPrefs.userData.has("fb_name"))?sPrefs.userData.getString("fb_name"):"";
             user = (sPrefs.userData.has("user"))?sPrefs.userData.getString("user"):"";
             name = (sPrefs.userData.has("name"))?sPrefs.userData.getString("name"):"";
-            token = (sPrefs.userData.has("token"))?sPrefs.userData.getString("token"):"";
             phone = (sPrefs.userData.has("phone"))?sPrefs.userData.getString("phone"):"";
             email = (sPrefs.userData.has("email"))?sPrefs.userData.getString("email"):"";
             gcmId = (sPrefs.userData.has("gcmId"))?sPrefs.userData.getString("gcmId"):"";
@@ -110,7 +107,6 @@ public class UserMain {
             sPrefs.userData.put("userId", userId);
             sPrefs.userData.put("email", email);
             sPrefs.userData.put("phone", phone);
-            sPrefs.userData.put("token", token);
             sPrefs.userData.put("name", name);
             sPrefs.userData.put("user", user);
             sPrefs.userData.put("gcmId", gcmId);
@@ -192,13 +188,6 @@ public class UserMain {
 //        MainApplication.getInstance().getRequestQueue().add(jsonObjectRequest);
 //    }
 
-    /** SOME PUBLIC GET FUNCTIONS */
-    public boolean hasToken(){
-        return (!token.isEmpty());
-    }
-    public boolean updateToken(){
-        return (!token.isEmpty());
-    }
 
     /** SOME PUBLIC PUT FUNCTIONS */
     public void changeUser(String userString){

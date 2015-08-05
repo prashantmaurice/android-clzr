@@ -319,7 +319,7 @@ public class NearbyFragment extends Fragment {
                 }
 //                SharedPreferences status = c.getSharedPreferences("USER", 0);
 //                TOKEN = status.getString("token", "");
-                TOKEN = MainApplication.getInstance().data.userMain.token;
+                TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
                 String url;
                 mOffset = 0;
                 if(!TOKEN.equals(""))

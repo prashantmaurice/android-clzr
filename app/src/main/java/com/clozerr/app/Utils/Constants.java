@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Utils;
 
 import android.net.Uri;
 

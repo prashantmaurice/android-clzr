@@ -9,6 +9,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.clozerr.app.Utils.Constants;
+
 import java.util.concurrent.TimeUnit;
 
 public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {

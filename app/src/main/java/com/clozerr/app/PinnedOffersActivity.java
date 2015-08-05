@@ -44,7 +44,7 @@ public class PinnedOffersActivity extends ActionBarActivity {
 
         c= this;
 //        String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
-        String TOKEN = MainApplication.getInstance().data.userMain.token;
+        String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
         new AsyncGet(this, "http://api.clozerr.com/v2/user/pinned/list?access_token=" +TOKEN, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {

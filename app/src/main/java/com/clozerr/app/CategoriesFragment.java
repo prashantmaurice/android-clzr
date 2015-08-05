@@ -152,7 +152,7 @@ public class CategoriesFragment extends Fragment{
         });
 //        SharedPreferences status = c.getSharedPreferences("USER", 0);
 //        String TOKEN = status.getString("token", "");
-        String TOKEN = MainApplication.getInstance().data.userMain.token;
+        String TOKEN =  MainApplication.getInstance().tokenHandler.clozerrtoken;
         final String cards = MainApplication.getInstance().data.userMain.categories_cards;
 //        final String cards = status.getString("categories_cards", "");
         if(!cards.isEmpty()){

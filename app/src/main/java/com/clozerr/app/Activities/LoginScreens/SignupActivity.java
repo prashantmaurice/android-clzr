@@ -237,13 +237,14 @@ public class SignupActivity extends FragmentActivity {
     }
     private void updateLoginTokens(){
         try {
+
             if (userMain.authProvider.equals(UserMain.AUTH_GOOGLE)) {
-                userMain.token = GoogleAuthUtil.getToken(this,userMain.email, "oauth2:" + Scopes.PLUS_LOGIN);
-                userMain.saveUserDataLocally();
+                tokenHandler.clozerrtoken = GoogleAuthUtil.getToken(this,userMain.email, "oauth2:" + Scopes.PLUS_LOGIN);
+                tokenHandler.saveTokenDataLocally();
             }else{
                 AccessToken token = AccessToken.getCurrentAccessToken();
-                userMain.token = token.getToken();
-                userMain.saveUserDataLocally();
+                tokenHandler.clozerrtoken = token.getToken();
+                tokenHandler.saveTokenDataLocally();
             }
         }catch (RuntimeException | GoogleAuthException | IOException e) {e.printStackTrace();}
     }

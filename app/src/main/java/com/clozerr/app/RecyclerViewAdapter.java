@@ -210,7 +210,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     //Toast.makeText(c,"clicked",Toast.LENGTH_SHORT).show();
 //                    SharedPreferences status = c.getSharedPreferences("USER", 0);
 //                    String TOKEN = status.getString("token", "");
-                    String TOKEN = MainApplication.getInstance().data.userMain.token;
+                    String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
                     //Log.i("name",getResources().getResourceName(R.id.favorites));
                     if(fav.indexOf(currentItem.getVendorId())==-1)
                     {

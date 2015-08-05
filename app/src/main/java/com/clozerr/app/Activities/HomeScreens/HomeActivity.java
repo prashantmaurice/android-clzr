@@ -12,6 +12,7 @@ import android.graphics.LightingColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.GravityCompat;
@@ -46,7 +47,7 @@ import com.clozerr.app.Activities.LoginScreens.SignupActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.BeaconDBDownloadBaseReceiver;
-import com.clozerr.app.Constants;
+import com.clozerr.app.Utils.Constants;
 import com.clozerr.app.DownloadImageTask;
 import com.clozerr.app.FAQ;
 import com.clozerr.app.GenUtils;
@@ -61,8 +62,11 @@ import com.clozerr.app.PinnedOffersActivity;
 import com.clozerr.app.R;
 import com.clozerr.app.SettingsActivity;
 import com.clozerr.app.SlidingTabLayout;
-import com.google.android.gcm.GCMRegistrar;
+import com.clozerr.app.Storage.Data;
+import com.clozerr.app.Utils.Router;
 import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
 import com.google.android.gms.plus.Plus;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
@@ -72,6 +76,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -126,7 +131,6 @@ public class HomeActivity extends ActionBarActivity {
         if(!tokenHandler.isLoggedIn()&&!tokenHandler.hasSkippedLogin()){
             //first time user
             startActivityForResult(new Intent(this, SignupActivity.class),11000);
-//            finish();
         }
 
 //        if (logincheck()==0)
@@ -156,7 +160,7 @@ public class HomeActivity extends ActionBarActivity {
             }
         });
 
-        String TOKEN = MainApplication.getInstance().data.userMain.token;
+        String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
 //        String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
         new AsyncGet(this, "http://api.clozerr.com/v2/vendor/offers/rewardspage?access_token=" +TOKEN, new AsyncGet.AsyncResult() {
             @Override
@@ -190,22 +194,25 @@ public class HomeActivity extends ActionBarActivity {
 
         //slidingMyCards();
 
-        GCMRegistrar.checkDevice(this);
-        GCMRegistrar.checkManifest(this);
-        final String regId = GCMRegistrar.getRegistrationId(this);
-        if (regId.equals("")) {
-            GCMRegistrar.register(this, SENDER_ID);
-        }else{
+//        GCMRegistrar.checkDevice(this);
+//        GCMRegistrar.checkManifest(this);
+//        final String regId = GCMRegistrar.getRegistrationId(this);
+//        if (regId.equals("")) {
+//            GCMRegistrar.register(this, SENDER_ID);
+//        }else{
 //            SharedPreferences status = getSharedPreferences("USER", 0);
-            TOKEN = MainApplication.getInstance().data.userMain.token;
+//            TOKEN = MainApplication.getInstance().data.userMain.token;
 //            TOKEN = status.getString("token", "");
-            new AsyncGet(HomeActivity.this, "http://api.clozerr.com/auth/update/gcm?gcm_id=" + regId + "&access_token=" + TOKEN, new AsyncGet.AsyncResult() {
-                @Override
-                public void gotResult(String s) {
-                    Log.e("gcm_update_result",s);
-                }
-            });
-        }
+//            new AsyncGet(HomeActivity.this, "http://api.clozerr.com/auth/update/gcm?gcm_id=" + regId + "&access_token=" + TOKEN, new AsyncGet.AsyncResult() {
+//                @Override
+//                public void gotResult(String s) {
+//                    Log.e("gcm_update_result",s);
+//                }
+//            });
+//        }
+        updateGCMIDinServer();
+
+
         pager=(ViewPager)findViewById(R.id.pager);
         pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager(),HomeActivity.this));
         pager.setOffscreenPageLimit(0);
@@ -222,6 +229,50 @@ public class HomeActivity extends ActionBarActivity {
         offerdialog();
 
 
+    }
+
+    private void updateGCMIDinServer(){
+        final AsyncTask asyncTask = new AsyncTask() {
+
+            @Override
+            protected Object doInBackground(Object[] params) {
+                Log.i("AsyncTask", "Inside async task, trying to generate GCM id");
+                InstanceID instanceID = InstanceID.getInstance(HomeActivity.this);
+                String gcmId = "";
+                try {
+                    gcmId = instanceID.getToken(getString(R.string.GcmProjectId),
+                            GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+
+
+                    if(gcmId==null){
+                        Log.e("ERROR","GCM gcmId returned as null");
+                        return null;
+                    }
+                    Log.i("AsyncTask", "GCM id is " + gcmId);
+
+                    Data data = MainApplication.getInstance().data;
+                    data.userMain.gcmId = gcmId;
+                    data.userMain.saveUserDataLocally();
+                    new AsyncGet(HomeActivity.this, Router.User.gcmIdUpdate(gcmId).build().toString(), new AsyncGet.AsyncResult() {
+                        @Override
+                        public void gotResult(String s) {
+                            Log.e("gcm_update_result",s);
+                        }
+                    });
+
+                } catch (IOException e) {
+                    Log.e("AsyncTask", "Failed to generate GCM id");
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Object o) {
+                super.onPostExecute(o);
+            }
+        };
+        asyncTask.execute(this);
     }
 
     private void onFirstRun() {
@@ -292,7 +343,7 @@ public class HomeActivity extends ActionBarActivity {
     }
     public int logincheck(){
 //        SharedPreferences status = getSharedPreferences("USER", 0);
-        TOKEN = MainApplication.getInstance().data.userMain.token;
+        TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
 //        TOKEN = status.getString("token", "");
 //        if (status.contains("fb_id"))
         if (!MainApplication.getInstance().data.userMain.facebookId.isEmpty())

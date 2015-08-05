@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.AsyncTokenGet;
-import com.clozerr.app.Constants;
+import com.clozerr.app.Utils.Constants;
 import com.clozerr.app.GenUtils;
 import com.clozerr.app.Activities.HomeScreens.HomeActivity;
 import com.clozerr.app.MainApplication;
@@ -267,7 +267,7 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.C
 
                                 UserMain userMain = MainApplication.getInstance().data.userMain;
                                 userMain.loginSkip = true;
-                                userMain.token = res.getString("token");
+//                                userMain.token = res.getString("token");
                                 userMain.user = res.getString("user");
                                 userMain.saveUserDataLocally();
 
