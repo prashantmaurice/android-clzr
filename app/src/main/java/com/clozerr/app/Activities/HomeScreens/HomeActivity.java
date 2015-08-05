@@ -94,7 +94,6 @@ public class HomeActivity extends ActionBarActivity {
     private static final String TAG = "Home";
 
     public static final String SENDER_ID = "496568600186";  // project id from Google Console
-    public static String TOKEN = "";
     public static String USERNAME = "";
     public static String USERID = "";
     public static String USER_PIC_URL = "";
@@ -253,7 +252,7 @@ public class HomeActivity extends ActionBarActivity {
                     Data data = MainApplication.getInstance().data;
                     data.userMain.gcmId = gcmId;
                     data.userMain.saveUserDataLocally();
-                    new AsyncGet(HomeActivity.this, Router.User.gcmIdUpdate(gcmId).build().toString(), new AsyncGet.AsyncResult() {
+                    new AsyncGet(HomeActivity.this, Router.User.gcmIdUpdate(gcmId), new AsyncGet.AsyncResult() {
                         @Override
                         public void gotResult(String s) {
                             Log.e("gcm_update_result",s);
@@ -343,7 +342,7 @@ public class HomeActivity extends ActionBarActivity {
     }
     public int logincheck(){
 //        SharedPreferences status = getSharedPreferences("USER", 0);
-        TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
+        String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
 //        TOKEN = status.getString("token", "");
 //        if (status.contains("fb_id"))
         if (!MainApplication.getInstance().data.userMain.facebookId.isEmpty())
@@ -472,6 +471,7 @@ public class HomeActivity extends ActionBarActivity {
                     SharedPreferences.Editor editor = example.edit();
                     editor.clear();
                     editor.apply();
+                    String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
                     USER_PIC_URL = USERNAME = USERID = TOKEN = "";
                     if (LoginActivity.googleOrFb == 2 && LoginActivity.googleApiClient != null)
                     {
@@ -599,9 +599,9 @@ public class HomeActivity extends ActionBarActivity {
     }
 
 
-    public void offerdialog()
-    {
-        new AsyncGet(c, "http://api.clozerr.com/v2/notifications/list/since?access_token=" + TOKEN, new AsyncGet.AsyncResult() {
+    public void offerdialog(){
+
+        new AsyncGet(c, Router.Homescreen.offerdialog(), new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
                 Log.i("result", s);
@@ -753,6 +753,7 @@ public class HomeActivity extends ActionBarActivity {
                 }
                 else
                 try {
+                    String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
                     new AsyncGet(c, "http://api.clozerr.com/vendor/request?access_token=" + TOKEN + "&name=" + URLEncoder.encode(s1, "UTF-8") + "&remarks=" + URLEncoder.encode(s2, "UTF-8"), new AsyncGet.AsyncResult() {
                         @Override
                         public void gotResult(String s) {

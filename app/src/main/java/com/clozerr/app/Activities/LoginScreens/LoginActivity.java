@@ -42,6 +42,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
+/**
+ *  @deprecated : This activity is deprecated and is only present for reference purposes
+ */
 public class LoginActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
     private static final String TAG = "clozerr";
     // Keys for persisting instance variables in savedInstanceState

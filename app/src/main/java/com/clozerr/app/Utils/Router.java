@@ -23,15 +23,21 @@ public class Router {
     };
 
     public static class Homescreen{
-        private static String base = Settings.BASE_URL+"user";
-        public static String base(){return base; }
+        public static String offerdialog(){
+            return getNewDefaultBuilder().path("v2/notifications/list/since")
+                    .appendQueryParameter("access_token",getClozerrToken()).build().toString();
+        }
+
+
+
+
     }
 
     public static class User{
-        public static Uri.Builder gcmIdUpdate(String gcmId){
-            return getNewDefaultBuilder().path("v2/analytics/hit")
+        public static String gcmIdUpdate(String gcmId){
+            return getNewDefaultBuilder().path("auth/update/gcm")
                     .appendQueryParameter("gcm_id", gcmId)
-                    .appendQueryParameter("access_token",getClozerrToken());
+                    .appendQueryParameter("access_token",getClozerrToken()).build().toString();
         }
     }
 
