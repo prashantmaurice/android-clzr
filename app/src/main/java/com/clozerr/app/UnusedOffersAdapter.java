@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.HomeScreens.HomeActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.koushikdutta.ion.Ion;
 
@@ -161,7 +162,7 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
             pin.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String urlPinning = "http://api.clozerr.com/v2/user/add/pinned?access_token=" + Home.TOKEN +"&offer_id="+currentItem.getOfferid();
+                    String urlPinning = "http://api.clozerr.com/v2/user/add/pinned?access_token=" + HomeActivity.TOKEN +"&offer_id="+currentItem.getOfferid();
                     if(pinned.indexOf(currentItem.getOfferid())==-1)
                     {
                     new AsyncGet(c, urlPinning, new AsyncGet.AsyncResult() {
@@ -191,7 +192,7 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
                     }
                     else
                     {
-                        new AsyncGet(c, "http://api.clozerr.com/v2/user/remove/pinned?access_token=" + Home.TOKEN +"&offer_id="+currentItem.getOfferid(), new AsyncGet.AsyncResult() {
+                        new AsyncGet(c, "http://api.clozerr.com/v2/user/remove/pinned?access_token=" + HomeActivity.TOKEN +"&offer_id="+currentItem.getOfferid(), new AsyncGet.AsyncResult() {
                             @Override
                             public void gotResult(String s) {
                                 try {

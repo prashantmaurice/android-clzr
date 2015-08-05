@@ -27,6 +27,7 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.HomeScreens.HomeActivity;
 import com.clozerr.app.Activities.LoginScreens.LoginActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 //import com.facebook.Session;
@@ -70,14 +71,14 @@ public class CategoryDetail extends ActionBarActivity{
         categorybundle=getIntent().getExtras();
         nitView();
         TextView username = (TextView)findViewById(R.id.nav_text);
-        if(Home.USERNAME.length()!=0)
-            username.setText(Home.USERNAME);
+        if(HomeActivity.USERNAME.length()!=0)
+            username.setText(HomeActivity.USERNAME);
         swipetab = findViewById(R.id.tab);
-        Log.e("pic", Home.USER_PIC_URL);
+        Log.e("pic", HomeActivity.USER_PIC_URL);
         SearchCard = findViewById(R.id.card_view);
         SEARCH_CARD_INI_POS = ViewHelper.getTranslationY(SearchCard);
         new DownloadImageTask((de.hdodenhof.circleimageview.CircleImageView)findViewById(R.id.nav_image))
-                .execute(Home.USER_PIC_URL);
+                .execute(HomeActivity.USER_PIC_URL);
         final ObservableRecyclerView mRecyclerView = (ObservableRecyclerView) findViewById(R.id.list);
         searchView = (SearchView)findViewById(R.id.searchView);
         mScrollable=findViewById(R.id.drawerLayout);
@@ -160,8 +161,8 @@ public class CategoryDetail extends ActionBarActivity{
 
 
         //startService(new Intent(this, LocationService.class));
-        Home.lat = 13;
-        Home.longi = 80.2;
+        HomeActivity.lat = 13;
+        HomeActivity.longi = 80.2;
         findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -181,7 +182,7 @@ public class CategoryDetail extends ActionBarActivity{
         } else {
             mOffset = 0;
             String url = "http://api.clozerr.com/v2/vendor/search/near?category=" + categorybundle.getString("categoryname").replace(" ", "%20") +
-                    "&latitude=" + Home.lat + "&longitude=" + Home.longi + ((TOKEN.isEmpty()) ? "" : ("&access_token=" + TOKEN));
+                    "&latitude=" + HomeActivity.lat + "&longitude=" + HomeActivity.longi + ((TOKEN.isEmpty()) ? "" : ("&access_token=" + TOKEN));
             Log.e("url", url);
             new AsyncGet(this, url, new AsyncGet.AsyncResult() {
                 @Override
@@ -215,10 +216,10 @@ public class CategoryDetail extends ActionBarActivity{
             public void gotLocation (Location location) {
                 Log.e("location stuff","Location Callback called.");
                 try{
-                    Home.lat=location.getLatitude();
-                    Home.longi=location.getLongitude();
-                    Log.e("lat", Home.lat + "");
-                    Log.e("long", Home.longi + "");
+                    HomeActivity.lat=location.getLatitude();
+                    HomeActivity.longi=location.getLongitude();
+                    Log.e("lat", HomeActivity.lat + "");
+                    Log.e("long", HomeActivity.longi + "");
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -226,7 +227,7 @@ public class CategoryDetail extends ActionBarActivity{
                 String url;
                 mOffset = 0;
                 url = "http://api.clozerr.com/v2/vendor/search/near?category="+categorybundle.getString("categoryname").replace(" ","%20") +
-                        "&latitude=" + Home.lat + "&longitude=" + Home.longi + ((TOKEN.isEmpty()) ? "" : ("&access_token=" + TOKEN));
+                        "&latitude=" + HomeActivity.lat + "&longitude=" + HomeActivity.longi + ((TOKEN.isEmpty()) ? "" : ("&access_token=" + TOKEN));
                 Log.e("url", url);
                 // TODO support pagination
                 new AsyncGet(CategoryDetail.this, url, new AsyncGet.AsyncResult() {
@@ -550,7 +551,7 @@ private ArrayList<CardModel> convertRow(String s) {
                     SharedPreferences.Editor editor = example.edit();
                     editor.clear();
                     editor.apply();
-                    Home.USER_PIC_URL = Home.USERNAME = Home.USERID = TOKEN = "";
+                    HomeActivity.USER_PIC_URL = HomeActivity.USERNAME = HomeActivity.USERID = TOKEN = "";
                     if (LoginActivity.googleOrFb == 2 && LoginActivity.googleApiClient != null)
                     {
                         if (LoginActivity.googleApiClient.isConnected()) {

@@ -2,6 +2,8 @@ package com.clozerr.app;
 
 import android.location.Location;
 
+import com.clozerr.app.Activities.HomeScreens.HomeActivity;
+
 /**
  * Created by jun on 29/11/14.
  */
@@ -26,8 +28,8 @@ public class MyCardModel {
         this.location.setLongitude(longi);
 
         Location userLocation = new Location("User location");
-        userLocation.setLatitude(Double.valueOf(Home.lat));
-        userLocation.setLongitude(Double.valueOf(Home.longi));
+        userLocation.setLatitude(Double.valueOf(HomeActivity.lat));
+        userLocation.setLongitude(Double.valueOf(HomeActivity.longi));
         this.distance=userLocation.distanceTo(this.location)+" km";
 
         this.franchiseId = fId;

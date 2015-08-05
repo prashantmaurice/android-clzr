@@ -24,7 +24,7 @@ import com.clozerr.app.AsyncGet;
 import com.clozerr.app.AsyncTokenGet;
 import com.clozerr.app.Constants;
 import com.clozerr.app.GenUtils;
-import com.clozerr.app.Home;
+import com.clozerr.app.Activities.HomeScreens.HomeActivity;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.Models.UserMain;
 import com.clozerr.app.R;
@@ -209,7 +209,7 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.C
         userMain.notNow = true;
         userMain.saveUserDataLocally();
 
-        startActivity(new Intent(this, Home.class));
+        startActivity(new Intent(this, HomeActivity.class));
         finish();
     }
     private boolean isSubsetOf(Collection<String> subset,
@@ -277,7 +277,7 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.C
 //                                editor.putString("token", res.getString("token"));
 //                                editor.putString("user",res.getString("user"));
 //                                editor.apply();
-                                startActivity(new Intent(LoginActivity.this, Home.class));
+                                startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                                 finish();
                             } else {
                                 updateUI(false);

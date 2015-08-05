@@ -2,15 +2,24 @@ package com.clozerr.app.Handlers;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.clozerr.app.GenUtils;
+import com.clozerr.app.MainApplication;
 import com.clozerr.app.Models.UserMain;
 import com.clozerr.app.Storage.SharedPrefs;
+import com.clozerr.app.Utils.Logg;
 import com.facebook.AccessToken;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.Scopes;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -60,8 +69,8 @@ public class TokenHandler {
 
     private TokenHandler(Context context) {
         mContext = context;
-        pullUserDataFromLocal();
-        if(isLoggedIn()){
+        pullTokenDataFromLocal();
+        if(hasSocialToken()){
             updateLoginTokens();
         }
     }
@@ -74,20 +83,22 @@ public class TokenHandler {
 
 
     //LOCAL STORAGE ENCODERS
-    public void pullUserDataFromLocal() {
+    public void pullTokenDataFromLocal() {
         sPrefs = SharedPrefs.getInstance(mContext);
         try {
             authProvider = (sPrefs.userData.has("authProvider"))?sPrefs.loginData.getString("authProvider"):AUTH_NONE;
             socialtoken = (sPrefs.userData.has("socialtoken"))?sPrefs.loginData.getString("socialtoken"):"";
+            loginSkip = (sPrefs.loginData.has("loginSkip"))?sPrefs.loginData.getBoolean("loginSkip"):false;
             token = (sPrefs.userData.has("token"))?sPrefs.loginData.getString("token"):"";
             email = (sPrefs.userData.has("email"))?sPrefs.loginData.getString("email"):"";
 
         } catch (JSONException e) {e.printStackTrace();}
     }
-    public void saveUserDataLocally() {
+    public void saveTokenDataLocally() {
         try {
             sPrefs.loginData.put("authProvider", authProvider);
             sPrefs.loginData.put("socialtoken", socialtoken);
+            sPrefs.loginData.put("loginSkip", loginSkip);
             sPrefs.loginData.put("token", token);
             sPrefs.loginData.put("email", email);
         } catch (JSONException e) {e.printStackTrace();}
@@ -102,6 +113,9 @@ public class TokenHandler {
     public boolean isLoggedIn() {
         return (!token.isEmpty());
     }
+    public boolean hasSkippedLogin(){
+        return loginSkip;
+    }
     public boolean hasSocialToken(){
         return (!socialtoken.isEmpty());
     }
@@ -115,8 +129,41 @@ public class TokenHandler {
         email = "";
         socialtoken = "";
         authProvider = AUTH_NONE;
-        saveUserDataLocally();
+        saveTokenDataLocally();
     }
+
+    public void addLoginToken(String token, String authProviderStr){
+        socialtoken = token;
+        authProvider = authProviderStr;
+        saveTokenDataLocally();
+    }
+
+    public void getClozerrToken(final ClozerrTokenListener listener){
+        String authGuy = (authProvider.equals(AUTH_GOOGLE))?"google":"facebook";
+        String url = "http://api.clozerr.com/auth/login/"+authGuy+"?token=" + socialtoken;
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new JSONObject(), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    Logg.m("MAIN", "Response : Email check = " + response.toString());
+                    if(response.getString("status").equalsIgnoreCase("success")) {
+                        listener.onClozerTokenUpdated();
+                    }else{
+                        GenUtils.showDebugToast(mContext.getApplicationContext(), "error in fetching clozerr token");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("ERROR", "Error in getting all user data" + error.getLocalizedMessage());
+            }
+        });
+        MainApplication.getInstance().getRequestQueue().add(jsonObjectRequest);
+    }
+
     private void updateLoginTokens(){
         AsyncTask task = new AsyncTask() {
             @Override
@@ -124,11 +171,11 @@ public class TokenHandler {
                 try {
                     if (authProvider.equals(UserMain.AUTH_GOOGLE)) {
                         token = GoogleAuthUtil.getToken(mContext, email, "oauth2:" + Scopes.PLUS_LOGIN);
-                        saveUserDataLocally();
+                        saveTokenDataLocally();
                     }else{
                         AccessToken tokenFb = AccessToken.getCurrentAccessToken();
                         token = tokenFb.getToken();
-                        saveUserDataLocally();
+                        saveTokenDataLocally();
                     }
                 }catch (RuntimeException | GoogleAuthException | IOException e) {e.printStackTrace();}
                 return null;
@@ -136,8 +183,10 @@ public class TokenHandler {
         };
         task.execute((Void) null);
 
+    }
 
-
+    public interface ClozerrTokenListener{
+        void onClozerTokenUpdated();
     }
 
 }

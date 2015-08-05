@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.HomeScreens;
 
 
 import android.app.AlertDialog;
@@ -40,9 +40,27 @@ import android.widget.SlidingDrawer;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.AboutUs;
 import com.clozerr.app.Activities.LoginScreens.LoginActivity;
+import com.clozerr.app.Activities.LoginScreens.SignupActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
+import com.clozerr.app.AsyncGet;
+import com.clozerr.app.BeaconDBDownloadBaseReceiver;
+import com.clozerr.app.Constants;
+import com.clozerr.app.DownloadImageTask;
+import com.clozerr.app.FAQ;
+import com.clozerr.app.GenUtils;
+import com.clozerr.app.GeofenceManagerService;
+import com.clozerr.app.GiftBoxActivity;
+import com.clozerr.app.Handlers.TokenHandler;
+import com.clozerr.app.MainApplication;
 import com.clozerr.app.Models.UserMain;
+import com.clozerr.app.MyOffer;
+import com.clozerr.app.NavDrawAdapter;
+import com.clozerr.app.PinnedOffersActivity;
+import com.clozerr.app.R;
+import com.clozerr.app.SettingsActivity;
+import com.clozerr.app.SlidingTabLayout;
 import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.plus.Plus;
@@ -66,11 +84,11 @@ import static com.clozerr.app.R.drawable.rest4;
 import static com.clozerr.app.R.drawable.rest6;
 import static com.clozerr.app.R.drawable.rest7;
 
-public class Home  extends ActionBarActivity {
+public class HomeActivity extends ActionBarActivity {
 
     private static final String TAG = "Home";
 
-    static final String SENDER_ID = "496568600186";  // project id from Google Console
+    public static final String SENDER_ID = "496568600186";  // project id from Google Console
     public static String TOKEN = "";
     public static String USERNAME = "";
     public static String USERID = "";
@@ -103,25 +121,19 @@ public class Home  extends ActionBarActivity {
             GenUtils.updateFirstRun(this);
         }
         GeofenceManagerService.checkAndStartService(this);
-        /*try
-        {
-            Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
 
-            t.setScreenName("home");
-
-            t.send(new HitBuilders.AppViewBuilder().build());
+        TokenHandler tokenHandler = MainApplication.getInstance().tokenHandler;
+        if(!tokenHandler.isLoggedIn()&&!tokenHandler.hasSkippedLogin()){
+            //first time user
+            startActivity(new Intent(this, SignupActivity.class));
+            finish();
         }
-        catch(Exception  e)
-        {
-            Toast.makeText(getApplicationContext(), "Error"+e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-        */
 
         if (logincheck()==0)
             return;
 
            // Enable if strict location is required
-        c = Home.this;
+        c = HomeActivity.this;
         setContentView(R.layout.activity_my);
         nitView();
         if (toolbar != null) {
@@ -138,7 +150,7 @@ public class Home  extends ActionBarActivity {
         giftbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent giftboxintent = new Intent(Home.this, GiftBoxActivity.class);
+                Intent giftboxintent = new Intent(HomeActivity.this, GiftBoxActivity.class);
                 giftboxintent.putExtra("giftboxstring",giftboxstring);
                 startActivity(giftboxintent);
             }
@@ -187,7 +199,7 @@ public class Home  extends ActionBarActivity {
 //            SharedPreferences status = getSharedPreferences("USER", 0);
             TOKEN = MainApplication.getInstance().data.userMain.token;
 //            TOKEN = status.getString("token", "");
-            new AsyncGet(Home.this, "http://api.clozerr.com/auth/update/gcm?gcm_id=" + regId + "&access_token=" + TOKEN, new AsyncGet.AsyncResult() {
+            new AsyncGet(HomeActivity.this, "http://api.clozerr.com/auth/update/gcm?gcm_id=" + regId + "&access_token=" + TOKEN, new AsyncGet.AsyncResult() {
                 @Override
                 public void gotResult(String s) {
                     Log.e("gcm_update_result",s);
@@ -195,7 +207,7 @@ public class Home  extends ActionBarActivity {
             });
         }
         pager=(ViewPager)findViewById(R.id.pager);
-        pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager(),Home.this));
+        pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager(),HomeActivity.this));
         pager.setOffscreenPageLimit(0);
         mtabs=(SlidingTabLayout)findViewById(R.id.tabs);
         mtabs.setDistributeEvenly(true);
@@ -335,7 +347,7 @@ public class Home  extends ActionBarActivity {
                 // Toast.makeText(Home.this, i+"", Toast.LENGTH_SHORT).show();
 
                 if(i==leftSliderData.length-1){ // this is basically the logout button
-                    AlertDialog.Builder builder = new AlertDialog.Builder(Home.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
                     builder.setTitle("Confirm log out")
                             .setMessage("If you choose to log out, you will no longer receive Clozerr's notifications about your rewards in nearby places " +
                                     "until your next log in.\nDo you still want to log out?")
@@ -345,18 +357,18 @@ public class Home  extends ActionBarActivity {
                 }
                 //"ABOUT US","FAQ'S","LIKE/FOLLOW CLOZERR","RATE CLOZERR", "LOGOUT"
                 if(i==1){
-                    startActivity(new Intent(Home.this,FAQ.class));
+                    startActivity(new Intent(HomeActivity.this,FAQ.class));
                 }
                 else if(i==0){
-                    startActivity(new Intent(Home.this,AboutUs.class));
+                    startActivity(new Intent(HomeActivity.this,AboutUs.class));
                 }
 
                 else if(i==5){
-                    startActivity(new Intent(Home.this,PinnedOffersActivity.class));
+                    startActivity(new Intent(HomeActivity.this,PinnedOffersActivity.class));
                 }
 
                 else if(i==6){
-                    startActivity(new Intent(Home.this,SettingsActivity.class));
+                    startActivity(new Intent(HomeActivity.this,SettingsActivity.class));
                 }
 
                 else if(i==4) {
@@ -404,7 +416,7 @@ public class Home  extends ActionBarActivity {
             switch (which){
                 case DialogInterface.BUTTON_POSITIVE:
                     //Yes button clicked
-                    Toast.makeText(Home.this, "Logging out", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(HomeActivity.this, "Logging out", Toast.LENGTH_SHORT).show();
                     SharedPreferences example = getSharedPreferences("USER", 0);
                     SharedPreferences.Editor editor = example.edit();
                     editor.clear();
@@ -431,7 +443,7 @@ public class Home  extends ActionBarActivity {
 //                        }
                     }
                     //BeaconFinderService.disallowScanning(Home.this);
-                    startActivity(new Intent(Home.this, LoginActivity.class));
+                    startActivity(new Intent(HomeActivity.this, LoginActivity.class));
                     finish();
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
@@ -685,7 +697,7 @@ public class Home  extends ActionBarActivity {
                 final String s2=remark.getText().toString();
 
                 if (s1.equals("")) {
-                    Toast.makeText(Home.this, "Please enter a restaurant name.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(HomeActivity.this, "Please enter a restaurant name.", Toast.LENGTH_LONG).show();
                     name.setBackgroundColor(Color.RED);
                 }
                 else

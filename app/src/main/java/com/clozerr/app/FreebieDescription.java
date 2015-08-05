@@ -25,6 +25,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.HomeScreens.HomeActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.google.android.gcm.GCMRegistrar;
 
@@ -115,7 +116,7 @@ public class FreebieDescription extends ActionBarActivity {
         findViewById(R.id.useit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+Home.TOKEN+"&offer_id="+offerid+"&vendor_id="+vendorid+"&gcm_id="+ GCMRegistrar.getRegistrationId(getApplicationContext());
+                String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+ HomeActivity.TOKEN+"&offer_id="+offerid+"&vendor_id="+vendorid+"&gcm_id="+ GCMRegistrar.getRegistrationId(getApplicationContext());
                 Log.d("FreebieDescription", "checkin url - " + url);
                 VendorActivity.Rewards = "";
                 //Toast.makeText(getApplicationContext(),url,Toast.LENGTH_LONG).show();
@@ -190,7 +191,7 @@ public class FreebieDescription extends ActionBarActivity {
         findViewById(R.id.pin).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String urlPinning = "http://api.clozerr.com/v2/user/add/pinned?access_token=" + Home.TOKEN +"&offer_id="+offerid;
+                String urlPinning = "http://api.clozerr.com/v2/user/add/pinned?access_token=" + HomeActivity.TOKEN +"&offer_id="+offerid;
                 if(pinned.indexOf(offerid)==-1)
                 {
                     new AsyncGet(getApplicationContext(), urlPinning, new AsyncGet.AsyncResult() {
@@ -220,7 +221,7 @@ public class FreebieDescription extends ActionBarActivity {
                 }
                 else
                 {
-                    new AsyncGet(getApplicationContext(), "http://api.clozerr.com/v2/user/remove/pinned?access_token=" + Home.TOKEN +"&offer_id="+offerid, new AsyncGet.AsyncResult() {
+                    new AsyncGet(getApplicationContext(), "http://api.clozerr.com/v2/user/remove/pinned?access_token=" + HomeActivity.TOKEN +"&offer_id="+offerid, new AsyncGet.AsyncResult() {
                         @Override
                         public void gotResult(String s) {
                             try {

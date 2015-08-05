@@ -1,14 +1,17 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.HomeScreens;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-/**
- * Created by srivatsan on 12/5/15.
- */
-class MyPagerAdapter extends FragmentPagerAdapter {
+import com.clozerr.app.AsyncGet;
+import com.clozerr.app.MyClubsFragment;
+import com.clozerr.app.NearbyFragment;
+import com.clozerr.app.R;
+
+
+public class MyPagerAdapter extends FragmentPagerAdapter {
     Context c;
     String[] tabheadings;
     public MyPagerAdapter(FragmentManager fm,Context c) {

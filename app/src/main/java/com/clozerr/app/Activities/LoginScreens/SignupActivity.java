@@ -19,9 +19,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.clozerr.app.Activities.HomeScreens.HomeActivity;
 import com.clozerr.app.GenUtils;
 import com.clozerr.app.Handlers.TokenHandler;
-import com.clozerr.app.Home;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.Models.UserMain;
 import com.clozerr.app.R;
@@ -140,6 +140,11 @@ public class SignupActivity extends FragmentActivity {
         }
     }
 
+    private void gotoMainApp(){
+//        Intent intent = new Intent(SignupActivity.this, HomeActivity.class);
+//        startActivity(intent);
+    }
+
     /** Helper functions */
     private void addFacebookLoginCallbacks(){
         FacebookSdk.sdkInitialize(this.getApplicationContext());
@@ -148,8 +153,13 @@ public class SignupActivity extends FragmentActivity {
             @Override
             public void onSuccess(final LoginResult loginResult) {
                 Logg.m("MAIN", "Facebook Login Success : AccessToken=" + loginResult.getAccessToken().getToken());
-                tokenHandler.socialtoken = loginResult.getAccessToken().getToken();
-                tokenHandler.authProvider = UserMain.AUTH_FACEBOOK;
+                tokenHandler.addLoginToken(loginResult.getAccessToken().getToken(), UserMain.AUTH_FACEBOOK);
+                tokenHandler.getClozerrToken(new TokenHandler.ClozerrTokenListener() {
+                    @Override
+                    public void onClozerTokenUpdated() {
+                        gotoMainApp();
+                    }
+                });
             }
 
             @Override
@@ -170,17 +180,29 @@ public class SignupActivity extends FragmentActivity {
                     public void onConnected(Bundle bundle) {
                         mSignInClicked = false;
                         GenUtils.showDebugToast(SignupActivity.this, "User is connected to google account!");
-                        String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
-                        String scope = "oauth2:" + Scopes.PLUS_LOGIN;
-                        try {
-                            String token = GoogleAuthUtil.getToken(SignupActivity.this.getApplicationContext(), email, scope);
-                            tokenHandler.socialtoken = token;
-                            tokenHandler.authProvider = UserMain.AUTH_GOOGLE;
+                        final String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
+                        final String scope = "oauth2:" + Scopes.PLUS_LOGIN;
+                        AsyncTask task = new AsyncTask() {
+                            @Override
+                            protected Object doInBackground(Object... params) {
+                                try {
+                                    String token = GoogleAuthUtil.getToken(SignupActivity.this.getApplicationContext(), email, scope);
+                                    tokenHandler.addLoginToken(token, UserMain.AUTH_GOOGLE);
+                                    tokenHandler.getClozerrToken(new TokenHandler.ClozerrTokenListener() {
+                                        @Override
+                                        public void onClozerTokenUpdated() {
+                                            gotoMainApp();
+                                        }
+                                    });
 
-                        } catch (IOException | GoogleAuthException e) {
-                            GenUtils.showDebugToast(SignupActivity.this,"no token available with google");//should never come here
-                            e.printStackTrace();
-                        }
+                                } catch (IOException | GoogleAuthException e) {
+                                    GenUtils.showDebugToast(SignupActivity.this, "no token available with google");//should never come here
+                                    e.printStackTrace();
+                                }
+                                return null;
+                            }
+                        };
+                        task.execute((Void) null);
                     }
 
                     @Override
@@ -462,7 +484,7 @@ public class SignupActivity extends FragmentActivity {
 //
 //    }
     private void logInToMainApp(){
-        Intent intent1 = new Intent(SignupActivity.this, Home.class);
+        Intent intent1 = new Intent(SignupActivity.this, HomeActivity.class);
         startActivity(intent1);
         finish();
     }

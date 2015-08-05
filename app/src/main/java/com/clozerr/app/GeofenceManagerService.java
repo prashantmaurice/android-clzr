@@ -17,6 +17,7 @@ import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.clozerr.app.Activities.HomeScreens.HomeActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -465,14 +466,14 @@ public class GeofenceManagerService extends Service {
                             .setContentTitle( title )
                             .setContentText( content )
                             .setDefaults(NotificationCompat.DEFAULT_ALL);
-            Intent resultIntent = new Intent(this, Home.class);
+            Intent resultIntent = new Intent(this, HomeActivity.class);
             // The stack builder object will contain an artificial back stack for the
             // started Activity.
             // This ensures that navigating backward from the Activity leads out of
             // your application to the Home screen.
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
             // Adds the back stack for the Intent (but not the Intent itself)
-            stackBuilder.addParentStack(Home.class);
+            stackBuilder.addParentStack(HomeActivity.class);
             // Adds the Intent that starts the Activity to the top of the stack
             stackBuilder.addNextIntent(resultIntent);
             PendingIntent resultPendingIntent =
@@ -536,7 +537,7 @@ public class GeofenceManagerService extends Service {
             // your application to the Home screen.
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
             // Adds the back stack for the Intent (but not the Intent itself)
-            stackBuilder.addParentStack(Home.class);
+            stackBuilder.addParentStack(HomeActivity.class);
             // Adds the Intent that starts the Activity to the top of the stack
             stackBuilder.addNextIntent(resultIntent);
             PendingIntent resultPendingIntent =

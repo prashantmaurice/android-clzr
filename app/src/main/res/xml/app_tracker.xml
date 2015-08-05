@@ -4,7 +4,7 @@
         tools:ignore="TypographyDashes">
     <integer name="ga_sessionTimeout">300</integer>
     <bool name="ga_autoActivityTracking">false</bool>
-    <!--<screenName name="com.clozerr.app.Home">
+    <!--<screenName name="com.clozerr.appa.Home">
         home
     </screenName>
     <screenName name="com.clozerr.app.CouponDetails">

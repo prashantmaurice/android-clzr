@@ -54,7 +54,7 @@
             android:label="Service for Location" />
 
         <activity
-            android:name=".Home"
+            android:name=".Activities.HomeScreens.HomeActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <!--<intent-filter>-->
@@ -78,7 +78,7 @@
             android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Home" />
+                android:value=".Activities.HomeScreens.HomeActivity" />
         </activity>
         <activity
             android:name=".AboutUs"
@@ -86,7 +86,7 @@
             android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Home" />
+                android:value=".Activities.HomeScreens.HomeActivity" />
         </activity>
 
         <receiver
@@ -124,7 +124,7 @@
             android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Home" />
+                android:value=".Activities.HomeScreens.HomeActivity" />
         </activity>
 
         <service

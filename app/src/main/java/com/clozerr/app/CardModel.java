@@ -2,8 +2,9 @@ package com.clozerr.app;
 
 import android.location.Location;
 
+import com.clozerr.app.Activities.HomeScreens.HomeActivity;
+
 import org.json.JSONArray;
-import org.json.JSONException;
 
 /**
  * Created by jun on 29/11/14.
@@ -55,8 +56,8 @@ public class CardModel {
 
         Location userLocation = new Location("User location");
 
-        userLocation.setLatitude(Home.lat);
-        userLocation.setLongitude(Home.longi);
+        userLocation.setLatitude(HomeActivity.lat);
+        userLocation.setLongitude(HomeActivity.longi);
         //distance = userLocation.distanceTo(location) / 1000;
         this.distanceString = this.caption;
         /*if (lat > 0.0 && longi > 0.0)
