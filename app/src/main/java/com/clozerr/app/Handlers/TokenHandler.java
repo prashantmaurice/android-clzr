@@ -46,7 +46,7 @@ public class TokenHandler {
     public String imageUrl;
     public String gcmId;
     public String phone;
-    public String token;//this is clozerr service token
+    public String clozerrtoken;//this is clozerr service token
     public String socialtoken;//this is token of facebook/google
     public String address;
     public String coverPic;
@@ -89,7 +89,7 @@ public class TokenHandler {
             authProvider = (sPrefs.userData.has("authProvider"))?sPrefs.loginData.getString("authProvider"):AUTH_NONE;
             socialtoken = (sPrefs.userData.has("socialtoken"))?sPrefs.loginData.getString("socialtoken"):"";
             loginSkip = (sPrefs.loginData.has("loginSkip"))?sPrefs.loginData.getBoolean("loginSkip"):false;
-            token = (sPrefs.userData.has("token"))?sPrefs.loginData.getString("token"):"";
+            clozerrtoken = (sPrefs.userData.has("clozerrtoken"))?sPrefs.loginData.getString("clozerrtoken"):"";
             email = (sPrefs.userData.has("email"))?sPrefs.loginData.getString("email"):"";
 
         } catch (JSONException e) {e.printStackTrace();}
@@ -97,9 +97,9 @@ public class TokenHandler {
     public void saveTokenDataLocally() {
         try {
             sPrefs.loginData.put("authProvider", authProvider);
+            sPrefs.loginData.put("clozerrtoken", clozerrtoken);
             sPrefs.loginData.put("socialtoken", socialtoken);
             sPrefs.loginData.put("loginSkip", loginSkip);
-            sPrefs.loginData.put("token", token);
             sPrefs.loginData.put("email", email);
         } catch (JSONException e) {e.printStackTrace();}
         sPrefs.saveLoginData();
@@ -108,10 +108,10 @@ public class TokenHandler {
 
     /** SOME PUBLIC GET FUNCTIONS */
     public boolean hasToken(){
-        return (!token.isEmpty());
+        return (!clozerrtoken.isEmpty());
     }
     public boolean isLoggedIn() {
-        return (!token.isEmpty());
+        return (!clozerrtoken.isEmpty());
     }
     public boolean hasSkippedLogin(){
         return loginSkip;
@@ -120,19 +120,19 @@ public class TokenHandler {
         return (!socialtoken.isEmpty());
     }
     public boolean updateToken(){
-        return (!token.isEmpty());
+        return (!clozerrtoken.isEmpty());
     }
 
     /** SOME PUBLIC PUT FUNCTIONS */
     public void logout() {
-        token = "";
+        clozerrtoken = "";
         email = "";
         socialtoken = "";
         authProvider = AUTH_NONE;
         saveTokenDataLocally();
     }
 
-    public void addLoginToken(String token, String authProviderStr){
+    public void addSocialToken(String token, String authProviderStr){
         socialtoken = token;
         authProvider = authProviderStr;
         saveTokenDataLocally();
@@ -149,15 +149,20 @@ public class TokenHandler {
                     if(response.getString("status").equalsIgnoreCase("success")) {
                         listener.onClozerTokenUpdated();
                     }else{
-                        GenUtils.showDebugToast(mContext.getApplicationContext(), "error in fetching clozerr token");
+                        GenUtils.showDebugToast(mContext.getApplicationContext(), "error in parsing clozerr token");
                     }
                 } catch (JSONException e) {
+                    GenUtils.showDebugToast(mContext.getApplicationContext(), "error in fetching clozerr token");
                     e.printStackTrace();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                GenUtils.showDebugToast(mContext.getApplicationContext(), "server did not return clozerr token");
+
+                loginSkip = true;
+                listener.onClozerTokenUpdated();
                 Log.d("ERROR", "Error in getting all user data" + error.getLocalizedMessage());
             }
         });
@@ -170,11 +175,11 @@ public class TokenHandler {
             protected Object doInBackground(Object... params) {
                 try {
                     if (authProvider.equals(UserMain.AUTH_GOOGLE)) {
-                        token = GoogleAuthUtil.getToken(mContext, email, "oauth2:" + Scopes.PLUS_LOGIN);
+                        clozerrtoken = GoogleAuthUtil.getToken(mContext, email, "oauth2:" + Scopes.PLUS_LOGIN);
                         saveTokenDataLocally();
                     }else{
                         AccessToken tokenFb = AccessToken.getCurrentAccessToken();
-                        token = tokenFb.getToken();
+                        clozerrtoken = tokenFb.getToken();
                         saveTokenDataLocally();
                     }
                 }catch (RuntimeException | GoogleAuthException | IOException e) {e.printStackTrace();}

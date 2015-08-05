@@ -141,6 +141,7 @@ public class SignupActivity extends FragmentActivity {
     }
 
     private void gotoMainApp(){
+        finish();
 //        Intent intent = new Intent(SignupActivity.this, HomeActivity.class);
 //        startActivity(intent);
     }
@@ -153,7 +154,7 @@ public class SignupActivity extends FragmentActivity {
             @Override
             public void onSuccess(final LoginResult loginResult) {
                 Logg.m("MAIN", "Facebook Login Success : AccessToken=" + loginResult.getAccessToken().getToken());
-                tokenHandler.addLoginToken(loginResult.getAccessToken().getToken(), UserMain.AUTH_FACEBOOK);
+                tokenHandler.addSocialToken(loginResult.getAccessToken().getToken(), UserMain.AUTH_FACEBOOK);
                 tokenHandler.getClozerrToken(new TokenHandler.ClozerrTokenListener() {
                     @Override
                     public void onClozerTokenUpdated() {
@@ -178,6 +179,7 @@ public class SignupActivity extends FragmentActivity {
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override
                     public void onConnected(Bundle bundle) {
+                        Logg.e("MIAN","onConnected");
                         mSignInClicked = false;
                         GenUtils.showDebugToast(SignupActivity.this, "User is connected to google account!");
                         final String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
@@ -187,7 +189,7 @@ public class SignupActivity extends FragmentActivity {
                             protected Object doInBackground(Object... params) {
                                 try {
                                     String token = GoogleAuthUtil.getToken(SignupActivity.this.getApplicationContext(), email, scope);
-                                    tokenHandler.addLoginToken(token, UserMain.AUTH_GOOGLE);
+                                    tokenHandler.addSocialToken(token, UserMain.AUTH_GOOGLE);
                                     tokenHandler.getClozerrToken(new TokenHandler.ClozerrTokenListener() {
                                         @Override
                                         public void onClozerTokenUpdated() {
@@ -207,12 +209,14 @@ public class SignupActivity extends FragmentActivity {
 
                     @Override
                     public void onConnectionSuspended(int i) {
+                        Logg.e("MIAN","onConnectionSuspended");
                         mGoogleApiClient.connect();
                     }
                 })
                 .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(ConnectionResult connectionResult) {
+                        Logg.e("MIAN","onConnectionFailed");
                         if (!connectionResult.hasResolution()) {
                             Logg.e("ERROR","Google login : "+connectionResult.toString());
                             GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), SignupActivity.this, 0).show();
@@ -258,10 +262,17 @@ public class SignupActivity extends FragmentActivity {
             }
         }
     }
+
+    @Override
     protected void onStart() {
         super.onStart();
-        if(mGoogleApiClient!=null) mGoogleApiClient.connect();
+        if(mGoogleApiClient!=null){
+            Logg.e("MIAN", "mGoogleApiClient.connect()");
+            mGoogleApiClient.connect();
+        }
     }
+
+    @Override
     protected void onStop() {
         super.onStop();
         if ((mGoogleApiClient!=null) && mGoogleApiClient.isConnected()) mGoogleApiClient.disconnect();
@@ -525,6 +536,7 @@ public class SignupActivity extends FragmentActivity {
         final View pagerDot_2 = findViewById(R.id.pagerDot_2);
         final View pagerDot_3 = findViewById(R.id.pagerDot_3);
         final View pagerDot_4 = findViewById(R.id.pagerDot_4);
+        final View pagerDot_5 = findViewById(R.id.pagerDot_5);
         mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -536,6 +548,7 @@ public class SignupActivity extends FragmentActivity {
                 pagerDot_2.setBackground(getResources().getDrawable(R.drawable.signup_dot));
                 pagerDot_3.setBackground(getResources().getDrawable(R.drawable.signup_dot));
                 pagerDot_4.setBackground(getResources().getDrawable(R.drawable.signup_dot));
+                pagerDot_5.setBackground(getResources().getDrawable(R.drawable.signup_dot));
                 switch (position + 1) {
                     case 1:
                         pagerDot_1.setBackground(getResources().getDrawable(R.drawable.signup_dot_active));
@@ -548,6 +561,9 @@ public class SignupActivity extends FragmentActivity {
                         break;
                     case 4:
                         pagerDot_4.setBackground(getResources().getDrawable(R.drawable.signup_dot_active));
+                        break;
+                    case 5:
+                        pagerDot_5.setBackground(getResources().getDrawable(R.drawable.signup_dot_active));
                         break;
                 }
             }

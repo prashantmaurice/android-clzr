@@ -125,12 +125,12 @@ public class HomeActivity extends ActionBarActivity {
         TokenHandler tokenHandler = MainApplication.getInstance().tokenHandler;
         if(!tokenHandler.isLoggedIn()&&!tokenHandler.hasSkippedLogin()){
             //first time user
-            startActivity(new Intent(this, SignupActivity.class));
-            finish();
+            startActivityForResult(new Intent(this, SignupActivity.class),11000);
+//            finish();
         }
 
-        if (logincheck()==0)
-            return;
+//        if (logincheck()==0)
+//            return;
 
            // Enable if strict location is required
         c = HomeActivity.this;
