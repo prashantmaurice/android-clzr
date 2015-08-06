@@ -31,7 +31,8 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right">
+        android:layout_gravity="right"
+        android:visibility="visible">
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -51,6 +52,7 @@
             android:layout_marginRight="7dp"
             android:layout_marginTop="1dp"
             android:layout_alignRight="@+id/giftbox"
-            android:layout_alignEnd="@+id/giftbox" />
+            android:layout_alignEnd="@+id/giftbox"
+            android:visibility="visible" />
     </RelativeLayout>
 </android.support.v7.widget.Toolbar>

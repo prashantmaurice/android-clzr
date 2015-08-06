@@ -1,5 +1,8 @@
 package com.clozerr.app;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MyOffer {
     /*private int stamps;
     private String caption;
@@ -120,5 +123,16 @@ public class MyOffer {
             this.mTotalStamps = totalStamps;
             this.mBillAmount = billAmount;
         }
+    }
+
+    public static MyOffer parseFromServer(JSONObject obj) throws JSONException {
+        String caption = obj.has("caption")?obj.getString("caption"):"";
+        String description = obj.getString("description");
+        String type = obj.getString("type");
+        String vendor_id = obj.getJSONObject("vendor").getString("_id");
+        String vendorName = obj.getJSONObject("vendor").getString("name");
+        String image = "";
+        if(obj.has("image")) obj.getString("image");
+        return new MyOffer(type, image, null, caption, description, 0, false, true, null, obj.getString("_id"), vendor_id, vendorName, false);
     }
 }

@@ -56,7 +56,6 @@ import com.clozerr.app.Handlers.TokenHandler;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.Models.NavObject;
 import com.clozerr.app.Models.UserMain;
-import com.clozerr.app.MyOffer;
 import com.clozerr.app.NavDrawAdapter;
 import com.clozerr.app.PinnedOffersActivity;
 import com.clozerr.app.R;
@@ -64,6 +63,7 @@ import com.clozerr.app.SettingsActivity;
 import com.clozerr.app.SlidingTabLayout;
 import com.clozerr.app.Storage.Data;
 import com.clozerr.app.Utils.Constants;
+import com.clozerr.app.Utils.Logg;
 import com.clozerr.app.Utils.Router;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -79,7 +79,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Random;
 
 import static com.clozerr.app.R.drawable.rest1;
@@ -90,13 +89,13 @@ import static com.clozerr.app.R.drawable.rest7;
 
 public class HomeActivity extends ActionBarActivity {
 
-    private static final String TAG = "Home";
+    private static final String TAG = "HomeActivity";
 
-    public static final String SENDER_ID = "496568600186";  // project id from Google Console
-    public static String USERNAME = "";
-    public static String USERID = "";
-    public static String USER_PIC_URL = "";
-    public static Context mContext;
+    public final String SENDER_ID = Constants.GOOGLE_PROJECTID;
+    public String USERNAME = "";
+    public String USERID = "";
+    public String USER_PIC_URL = "";
+    public Context mContext;
     Button button;
     public static double lat;
     public static double longi;
@@ -107,12 +106,10 @@ public class HomeActivity extends ActionBarActivity {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private ListView leftDrawerList;
-    //private ArrayAdapter<String> navigationDrawerAdapter;
     private NavDrawAdapter navAdapter;
     private FrameLayout freebielayout;
-    private String giftboxstring;
+    private String giftBoxJsonString;
     ImageView giftbox;
-    //private boolean nav_drawer_open = false;
 
 
 
@@ -153,21 +150,20 @@ public class HomeActivity extends ActionBarActivity {
             @Override
             public void onClick(View view) {
                 Intent giftboxintent = new Intent(HomeActivity.this, GiftBoxActivity.class);
-                giftboxintent.putExtra("giftboxstring",giftboxstring);
+                giftboxintent.putExtra(GiftBoxActivity.GIFTBOXDATA, giftBoxJsonString);
                 startActivity(giftboxintent);
             }
         });
 
-        String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
-//        String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
-        new AsyncGet(this, "http://api.clozerr.com/v2/vendor/offers/rewardspage?access_token=" +TOKEN, new AsyncGet.AsyncResult() {
+        Router.Homescreen.getVendorsGifts();
+        new AsyncGet(this, Router.Homescreen.getVendorsGifts(), new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
+                Logg.i("URL",Router.Homescreen.getVendorsGifts()+ " : "+s);
                 try {
-                    giftboxstring=s;
+                    giftBoxJsonString = s;
                     JSONArray rewards = new JSONArray(s);
-                    ArrayList<MyOffer> rowItems = new ArrayList<>();
-                    TextView notification=(TextView)toolbar.findViewById(R.id.notifcount);
+                    TextView notification = (TextView) toolbar.findViewById(R.id.notifcount);
                     notification.setText(String.valueOf(rewards.length()));
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -390,7 +386,7 @@ public class HomeActivity extends ActionBarActivity {
 
                 switch(clickedObject.listId){
                     case ABOUTUS:
-                        startActivityForResult(new Intent(HomeActivity.this,AboutUs.class),0);
+                        startActivityForResult(new Intent(HomeActivity.this, AboutUs.class), 0);
                         break;
 
                     case FAQ:

@@ -9,14 +9,15 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by Adarsh on 7/2/2015.
+ *  This contains all the configuration constants defined throughout the app
  */
 public class Constants {
 
     private static final String TAG = "Constants";
 
-    private Constants() {}          // prevent initialization
+    private Constants() {}
 
+    public static final String GOOGLE_PROJECTID = "496568600186";// project id from Google Console
     public static final String SERVER_CLIENT_ID = "http://496568600186-o52fjump15ric3ct4rfoc9i73mnehu2f.apps.googleusercontent.com/";
     public static final String APP_PACKAGE_NAME = Constants.class.getPackage().getName();
 
@@ -94,6 +95,8 @@ public class Constants {
         public static final Uri.Builder QRCODE_VALIDATE = getNewDefaultBuilder().path("v2/offers/checkin/qrcodevalidate");
     }
 
+
+    //NAVIGATION DRAWER RELATED STUFF....
     public enum NavListId {
         ABOUTUS,
         FAQ,

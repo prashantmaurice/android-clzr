@@ -11,17 +11,17 @@ import android.util.Log;
 
 import com.clozerr.app.Activities.HomeScreens.HomeActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
+import com.clozerr.app.Utils.Constants;
 import com.google.android.gcm.GCMBaseIntentService;
 
 import org.json.JSONObject;
 
-import static com.clozerr.app.Activities.HomeScreens.HomeActivity.SENDER_ID;
 
 
 public class GCMIntentService extends GCMBaseIntentService {
 
     public GCMIntentService() {
-        super(SENDER_ID);
+        super(Constants.GOOGLE_PROJECTID);
     }
 
     private static final String TAG = "GCMIntentService";

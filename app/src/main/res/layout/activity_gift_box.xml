@@ -49,6 +49,6 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="#777777"
-        android:visibility="invisible"
+        android:visibility="gone"
         android:id="@+id/alertgiftbox"/>
 </RelativeLayout>

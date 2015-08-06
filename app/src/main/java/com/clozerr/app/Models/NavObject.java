@@ -12,10 +12,4 @@ public class NavObject {
         this.iconResId = iconResId;
         this.listId = listId;
     }
-
-
-    public void equals(NavObject range){
-
-    }
-
 }

@@ -28,6 +28,11 @@ public class Router {
                     .appendQueryParameter("access_token",getClozerrToken()).build().toString();
         }
 
+        public static String getVendorsGifts() {
+            //http://api.clozerr.com/v2/vendor/offers/rewardspage?access_token=
+            return getNewDefaultBuilder().path("v2/vendor/offers/rewardspage")
+                    .appendQueryParameter("access_token",getClozerrToken()).build().toString();
+        }
     }
 
     public static class User{

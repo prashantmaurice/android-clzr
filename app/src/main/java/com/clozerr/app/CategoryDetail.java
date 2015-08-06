@@ -41,6 +41,8 @@ import org.json.JSONArray;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 //import com.facebook.Session;
 
 
@@ -64,21 +66,30 @@ public class CategoryDetail extends ActionBarActivity{
     View mScrollable;
     private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Tell Friends about Clozerr", "My Pinned Offers", "Settings", "Log out"};
 
+    String USERNAME;
+    String USER_PIC_URL;
+
+    //view variables
+    TextView username;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category_detail);
         categorybundle=getIntent().getExtras();
+
+        USERNAME = MainApplication.getInstance().data.userMain.name;
+        USER_PIC_URL = MainApplication.getInstance().data.userMain.gplus_pic;
+
         nitView();
-        TextView username = (TextView)findViewById(R.id.nav_text);
-        if(HomeActivity.USERNAME.length()!=0)
-            username.setText(HomeActivity.USERNAME);
+
+
+        if(USERNAME.length()!=0) username.setText(USERNAME);
         swipetab = findViewById(R.id.tab);
-        Log.e("pic", HomeActivity.USER_PIC_URL);
+        Log.e("pic", USER_PIC_URL);
         SearchCard = findViewById(R.id.card_view);
         SEARCH_CARD_INI_POS = ViewHelper.getTranslationY(SearchCard);
-        new DownloadImageTask((de.hdodenhof.circleimageview.CircleImageView)findViewById(R.id.nav_image))
-                .execute(HomeActivity.USER_PIC_URL);
+        new DownloadImageTask((CircleImageView) findViewById(R.id.nav_image)).execute(USER_PIC_URL);
         final ObservableRecyclerView mRecyclerView = (ObservableRecyclerView) findViewById(R.id.list);
         searchView = (SearchView)findViewById(R.id.searchView);
         mScrollable=findViewById(R.id.drawerLayout);
@@ -464,6 +475,7 @@ private ArrayList<CardModel> convertRow(String s) {
         ListView leftDrawerList = (ListView) findViewById(R.id.nav_listView);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        username = (TextView)findViewById(R.id.nav_text);
 
         NavDrawAdapter nav = new NavDrawAdapter(this, Constants.getNavList());
         leftDrawerList.setAdapter(nav);
@@ -543,7 +555,8 @@ private ArrayList<CardModel> convertRow(String s) {
                     SharedPreferences.Editor editor = example.edit();
                     editor.clear();
                     editor.apply();
-                    HomeActivity.USER_PIC_URL = HomeActivity.USERNAME = HomeActivity.USERID = TOKEN = "";
+                    //WTF is this????
+//                    HomeActivity.USER_PIC_URL = HomeActivity.USERNAME = HomeActivity.USERID = TOKEN = "";
                     if (LoginActivity.googleOrFb == 2 && LoginActivity.googleApiClient != null)
                     {
                         if (LoginActivity.googleApiClient.isConnected()) {
