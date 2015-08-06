@@ -3,6 +3,9 @@ package com.clozerr.app;
 import android.app.Application;
 import android.content.SharedPreferences;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
+import com.clozerr.app.Handlers.TokenHandler;
 import com.clozerr.app.Storage.Data;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Logger;
@@ -21,8 +24,9 @@ public class MainApplication extends Application {
     private static MainApplication sInstance;
     SharedPreferences sharedPreferences;
     public Data data;
+    public TokenHandler tokenHandler;
     boolean mBound = false;
-
+    RequestQueue queue;
     public enum TrackerName {
         APP_TRACKER,
         GLOBAL_TRACKER,
@@ -41,8 +45,10 @@ public class MainApplication extends Application {
         super.onCreate();
         sInstance = this;
 
-        sharedPreferences = getSharedPreferences("Tinystep", MODE_PRIVATE);//will be deprecated soon
+        sharedPreferences = getSharedPreferences("Clozerr", MODE_PRIVATE);//will be deprecated soon
         data = Data.getInstance(this);//this gets all the data from preferances and Db
+        queue = Volley.newRequestQueue(this);
+        tokenHandler = TokenHandler.getInstance(this);
     }
 
     public synchronized static MainApplication getInstance() {
@@ -51,6 +57,10 @@ public class MainApplication extends Application {
 
     public SharedPreferences getSharedPreferences() {
         return sharedPreferences;
+    }
+
+    public RequestQueue getRequestQueue() {
+        return queue;
     }
 
     synchronized Tracker getTracker(TrackerName trackerId) {

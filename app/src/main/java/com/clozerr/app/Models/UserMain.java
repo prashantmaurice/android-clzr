@@ -15,16 +15,20 @@ public class UserMain {
     private SharedPrefs sPrefs;
     public String name;
 
+    public static String AUTH_FACEBOOK = "facebook";
+    public static String AUTH_GOOGLE = "google";
+    public static String AUTH_NONE = "none";
+
     public String fb_name;
     public String facebookId;
+    public String authProvider = AUTH_NONE;
 
     public String userId;
     public String user;
-    public String email;
+    public String email;//this needs to be stored so that google token update can work seamlessly
     public String imageUrl;
     public String gcmId;
     public String phone;
-    public String token;
     public String address;
     public String coverPic;
 
@@ -68,10 +72,10 @@ public class UserMain {
             latitude = (sPrefs.userData.has("latitude"))?sPrefs.userData.getString("latitude"):"";
             longitude = (sPrefs.userData.has("longitude"))?sPrefs.userData.getString("longitude"):"";
 
+            authProvider = (sPrefs.userData.has("authProvider"))?sPrefs.userData.getString("authProvider"):AUTH_NONE;
             fb_name = (sPrefs.userData.has("fb_name"))?sPrefs.userData.getString("fb_name"):"";
             user = (sPrefs.userData.has("user"))?sPrefs.userData.getString("user"):"";
             name = (sPrefs.userData.has("name"))?sPrefs.userData.getString("name"):"";
-            token = (sPrefs.userData.has("token"))?sPrefs.userData.getString("token"):"";
             phone = (sPrefs.userData.has("phone"))?sPrefs.userData.getString("phone"):"";
             email = (sPrefs.userData.has("email"))?sPrefs.userData.getString("email"):"";
             gcmId = (sPrefs.userData.has("gcmId"))?sPrefs.userData.getString("gcmId"):"";
@@ -89,6 +93,7 @@ public class UserMain {
     public void saveUserDataLocally() {
         try {
             sPrefs.userData.put("fb_name", fb_name);
+            sPrefs.userData.put("authProvider", authProvider);
             sPrefs.userData.put("facebookId", facebookId);
             sPrefs.userData.put("home_cards", home_cards);
             sPrefs.userData.put("categories_cards", categories_cards);
@@ -102,7 +107,6 @@ public class UserMain {
             sPrefs.userData.put("userId", userId);
             sPrefs.userData.put("email", email);
             sPrefs.userData.put("phone", phone);
-            sPrefs.userData.put("token", token);
             sPrefs.userData.put("name", name);
             sPrefs.userData.put("user", user);
             sPrefs.userData.put("gcmId", gcmId);
@@ -185,7 +189,7 @@ public class UserMain {
 //    }
 
 
-    /** SOME PUBLIC FUNCTIONS */
+    /** SOME PUBLIC PUT FUNCTIONS */
     public void changeUser(String userString){
         user = userString;
         saveUserDataLocally();

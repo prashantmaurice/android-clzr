@@ -24,6 +24,7 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.HomeScreens.HomeActivity;
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.nineoldandroids.animation.ValueAnimator;
 import com.nineoldandroids.view.ViewHelper;
@@ -129,11 +130,11 @@ public class NearbyFragment extends Fragment {
                         String url;
                         showToolbar();
                         if (!query.equals("")) {
-                            url = "http://api.clozerr.com/v2/vendor/search/near?access_token=" + TOKEN + "&name=" + query.replace(" ", "%20") + "&latitude=" + Home.lat + "&longitude=" + Home.longi;
+                            url = "http://api.clozerr.com/v2/vendor/search/near?access_token=" + TOKEN + "&name=" + query.replace(" ", "%20") + "&latitude=" + HomeActivity.lat + "&longitude=" + HomeActivity.longi;
                         } else {
                             mCardsLeft = true;
                             mOffset = 0;
-                            url = "http://api.clozerr.com/v2/vendor/search/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
+                            url = "http://api.clozerr.com/v2/vendor/search/near?latitude=" + HomeActivity.lat + "&longitude=" + HomeActivity.longi + "&access_token=" + TOKEN
                                     + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
                             Log.d("urlsearch", url);
                         }
@@ -258,8 +259,8 @@ public class NearbyFragment extends Fragment {
 
 
         //startService(new Intent(this, LocationService.class));
-        Home.lat = 13;
-        Home.longi = 80.2;
+        HomeActivity.lat = 13;
+        HomeActivity.longi = 80.2;
 
 
 //        SharedPreferences status = c.getSharedPreferences("USER", 0);
@@ -273,7 +274,7 @@ public class NearbyFragment extends Fragment {
 //            addMargin();
         } else {
             mOffset = 0;
-            String url = "http://api.clozerr.com/v2/vendor/search/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
+            String url = "http://api.clozerr.com/v2/vendor/search/near?latitude=" + HomeActivity.lat + "&longitude=" + HomeActivity.longi + "&access_token=" + TOKEN
                     + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
             Log.e("url", url);
             new AsyncGet(c, url, new AsyncGet.AsyncResult() {
@@ -309,23 +310,23 @@ public class NearbyFragment extends Fragment {
             public void gotLocation (Location location) {
                 Log.e("location stuff","Location Callback called.");
                 try{
-                    Home.lat=location.getLatitude();
-                    Home.longi=location.getLongitude();
-                    Log.e("lat", Home.lat + "");
-                    Log.e("long", Home.longi + "");
+                    HomeActivity.lat=location.getLatitude();
+                    HomeActivity.longi=location.getLongitude();
+                    Log.e("lat", HomeActivity.lat + "");
+                    Log.e("long", HomeActivity.longi + "");
                 }catch (Exception e){
                     e.printStackTrace();
                 }
 //                SharedPreferences status = c.getSharedPreferences("USER", 0);
 //                TOKEN = status.getString("token", "");
-                TOKEN = MainApplication.getInstance().data.userMain.token;
+                TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
                 String url;
                 mOffset = 0;
                 if(!TOKEN.equals(""))
-                    url = "http://api.clozerr.com/v2/vendor/search/near?latitude="+Home.lat+"&longitude="+Home.longi+"&access_token="+TOKEN
+                    url = "http://api.clozerr.com/v2/vendor/search/near?latitude="+ HomeActivity.lat+"&longitude="+ HomeActivity.longi+"&access_token="+TOKEN
                             + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
                 else
-                    url = "http://api.clozerr.com/v2/vendor/search/near?latitude="+Home.lat+"&longitude="+Home.longi
+                    url = "http://api.clozerr.com/v2/vendor/search/near?latitude="+ HomeActivity.lat+"&longitude="+ HomeActivity.longi
                             + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
                 Log.e("url", url);
 
@@ -389,10 +390,10 @@ public class NearbyFragment extends Fragment {
             mOffset += (mOffset == 0) ? INITIAL_LOAD_LIMIT : ITEMS_PER_PAGE;
             String url = "";
             if (!TOKEN.equals(""))
-                url = "http://api.clozerr.com/v2/vendor/search/near?latitude=" + Home.lat + "&longitude=" + Home.longi + "&access_token=" + TOKEN
+                url = "http://api.clozerr.com/v2/vendor/search/near?latitude=" + HomeActivity.lat + "&longitude=" + HomeActivity.longi + "&access_token=" + TOKEN
                         + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
             else
-                url = "http://api.clozerr.com/v2/vendor/search/near?latitude=" + Home.lat + "&longitude=" + Home.longi
+                url = "http://api.clozerr.com/v2/vendor/search/near?latitude=" + HomeActivity.lat + "&longitude=" + HomeActivity.longi
                         + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
             Log.e("url", url);
             new AsyncGet(c, url, new AsyncGet.AsyncResult() {

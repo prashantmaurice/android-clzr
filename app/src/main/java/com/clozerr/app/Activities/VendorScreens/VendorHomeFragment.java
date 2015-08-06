@@ -138,7 +138,7 @@ public class VendorHomeFragment extends Fragment {
             public void onClick(View view) {
 //                SharedPreferences status = getActivity().getSharedPreferences("USER", 0);
 //                String TOKEN = status.getString("token", "");
-                String TOKEN = MainApplication.getInstance().data.userMain.token;
+                String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
                 Log.i("name", getResources().getResourceName(R.id.favorites));
                 if (fav.indexOf(VendorActivity.detailsBundle.getString("vendorId")) == -1) {
                     Log.e("VendorHomeFragment", "favs url - " + "http://api.clozerr.com/v2/user/add/favourites?vendor_id=" + VendorActivity.vendorId + "&access_token=" + TOKEN);

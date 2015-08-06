@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -23,17 +22,12 @@ import android.widget.Toast;
 
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.AsyncTokenGet;
-import com.clozerr.app.Constants;
+import com.clozerr.app.Utils.Constants;
 import com.clozerr.app.GenUtils;
-import com.clozerr.app.Home;
+import com.clozerr.app.Activities.HomeScreens.HomeActivity;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.Models.UserMain;
 import com.clozerr.app.R;
-import com.facebook.Request;
-import com.facebook.Response;
-import com.facebook.Session;
-import com.facebook.SessionState;
-import com.facebook.model.GraphUser;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
@@ -42,25 +36,26 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-public class LoginActivity extends FragmentActivity implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        View.OnClickListener {
+
+/**
+ *  @deprecated : This activity is deprecated and is only present for reference purposes
+ */
+public class LoginActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
     private static final String TAG = "clozerr";
     // Keys for persisting instance variables in savedInstanceState
     private static final String KEY_IS_RESOLVING = "is_resolving";
     private static final String KEY_SHOULD_RESOLVE = "should_resolve";
     public static String userName;
     public static String dispPicUrl;
-    public static int googleOrFb=3;
     public static GoogleApiClient googleApiClient;
-    private ImageButton mSignInButton;
+    public static int googleOrFb;
+    private ImageButton btn_login_facebook, btn_login_google;
     public static ProgressDialog pDialog;
     private static final int SLIDES_COUNT = 5;
     private ViewPager mPager;
@@ -73,91 +68,46 @@ public class LoginActivity extends FragmentActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // domain = getString(R.string.domain);
 
         if (savedInstanceState != null) {
             mIsResolving = savedInstanceState.getBoolean(KEY_IS_RESOLVING);
             mShouldResolve = savedInstanceState.getBoolean(KEY_SHOULD_RESOLVE);
         }
 
-        pDialog = new ProgressDialog(this);
-        pDialog.setMessage("Loading...");
-        //pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        pDialog.setCancelable(false);
-        //super.setIntegerProperty("splashscreen", R.drawable.splash);
-        // this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_loginfb);
-        mSignInButton = (ImageButton) findViewById(R.id.sign_in_button);
-        mSignInButton.setOnClickListener(this);
-        final Resources reso = this.getResources();
+        setContentView(R.layout.activity_loginpage);
         mPager = (ViewPager) findViewById(R.id.pager);
-        mPager.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        // ViewPager and its adapters use support library fragments, so use getSupportFragmentManager.
-        DemoCollectionPagerAdapter mDemoCollectionPagerAdapter = new DemoCollectionPagerAdapter(getSupportFragmentManager());
-
-//        mPager.setPageTransformer(true, new ZoomOutPageTransformer());
-        mPager.setAdapter(mDemoCollectionPagerAdapter);
-        final View pagerDot_1 = findViewById(R.id.pagerDot_1);
-        final View pagerDot_2 = findViewById(R.id.pagerDot_2);
-        final View pagerDot_3 = findViewById(R.id.pagerDot_3);
-        final View pagerDot_4 = findViewById(R.id.pagerDot_4);
-        mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        btn_login_facebook = (ImageButton) findViewById(R.id.btn_login_facebook);
+        btn_login_google = (ImageButton) findViewById(R.id.btn_login_google);
+        btn_login_facebook.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
+            public void onClick(View v) {
 
-            @Override
-            public void onPageSelected(int position) {
-                pagerDot_1.setBackground(getResources().getDrawable(R.drawable.signup_dot));
-                pagerDot_2.setBackground(getResources().getDrawable(R.drawable.signup_dot));
-                pagerDot_3.setBackground(getResources().getDrawable(R.drawable.signup_dot));
-                pagerDot_4.setBackground(getResources().getDrawable(R.drawable.signup_dot));
-                switch (position + 1) {
-                    case 1:
-                        pagerDot_1.setBackground(getResources().getDrawable(R.drawable.signup_dot_active));
-                        break;
-                    case 2:
-                        pagerDot_2.setBackground(getResources().getDrawable(R.drawable.signup_dot_active));
-                        break;
-                    case 3:
-                        pagerDot_3.setBackground(getResources().getDrawable(R.drawable.signup_dot_active));
-                        break;
-                    case 4:
-                        pagerDot_4.setBackground(getResources().getDrawable(R.drawable.signup_dot_active));
-                        break;
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
             }
         });
+
+        btn_login_google.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mShouldResolve = true;
+                googleApiClient.connect();
+            }
+        });
+
+        //Add intro slides UI
+        initializeSliderUI();
+
 //        if (savedInstanceState != null) {
 //            mSignInProgress = savedInstanceState
 //                    .getInt(SAVED_PROGRESS, STATE_DEFAULT);
 //        }
         googleApiClient = buildGoogleApiClient();
-        //int found=0;
-        //slideToImage(2);
-        //change();
     }
-    /*public void change(){
-        new CountDownTimer(5000, 5000) {
-            public void onTick(long millisUntilFinished) {
-                slideToImage(i);
-            }
-            public void onFinish() {
-                ++i;
-                if(i==5)
-                    i=0;
-                change();
-            }
-        }.start();
-    }*/
+
+
     public GoogleApiClient buildGoogleApiClient() {
-// When we build the GoogleApiClient we specify where connected and
-// connection failed callbacks should be returned, which Google APIs our
-// app uses and which OAuth 2.0 scopes our app requests.
+        // When we build the GoogleApiClient we specify where connected and
+        // connection failed callbacks should be returned, which Google APIs our
+        // app uses and which OAuth 2.0 scopes our app requests.
         return new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -170,8 +120,6 @@ public class LoginActivity extends FragmentActivity implements
     @Override
     public void onStart() {
         super.onStart();
-// EasyTracker.getInstance().activityStart(this);
-// The rest of your onStart() code.
         //googleApiClient.connect();
     }
     @Override
@@ -184,8 +132,6 @@ public class LoginActivity extends FragmentActivity implements
         AsyncGet.dismissDialog();
         AsyncTokenGet.dismissDialog();
         super.onStop();
-//EasyTracker.getInstance().activityStop(this);
-// The rest of your onStop() code.
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -201,66 +147,66 @@ public class LoginActivity extends FragmentActivity implements
             mIsResolving = false;
             googleApiClient.connect();
         }
-        else
-            Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+//        else
+//            Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
     }
     private static final List<String> PERMISSIONS = Arrays.asList(
             "email");
     public void facebook(View v) {
-        googleOrFb=1;
-        Session.openActiveSession(this, true, new Session.StatusCallback() {
-            @Override
-            public void call(final Session session, SessionState state, Exception exception) {
-                if (session.isOpened()) {
-                    List<String> permissions = session.getPermissions();
-                    if (!isSubsetOf(PERMISSIONS, permissions)) {
-                        Session.NewPermissionsRequest newPermissionsRequest = new Session.NewPermissionsRequest(
-                                LoginActivity.this, PERMISSIONS);
-                        session.requestNewReadPermissions(newPermissionsRequest);
-                        return;
-                    }
-                    Request.newMeRequest(session, new Request.GraphUserCallback() {
-                        @Override
-                        public void onCompleted(GraphUser user, Response response) {
-                            if (user != null) {
-                                Log.i("user", user.getName());
-                                UserMain userMain = MainApplication.getInstance().data.userMain;
-                                userMain.fb_name = user.getName();
-                                userMain.facebookId = user.getId();
-                                userMain.saveUserDataLocally();
-
-                                new AsyncGet(LoginActivity.this, "http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken(), new AsyncGet.AsyncResult() {
-                                    @Override
-                                    public void gotResult(String s) {
-                                        /*Log.i("urltest","http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken());
-                                        Log.i("token result", s);*/
-                                        try {
-                                            JSONObject res = new JSONObject(s);
-                                            if (res.getBoolean("result")) {
-                                                UserMain userMain = MainApplication.getInstance().data.userMain;
-                                                userMain.loginSkip = true;
-                                                userMain.token = res.getString("token");
-                                                userMain.user = res.getString("user");
-                                                userMain.saveUserDataLocally();
-
-                                                startActivity(new Intent(LoginActivity.this, Home.class));
-                                                finish();
-                                            } else {
-                                                //Toast.makeText(Login.this,session.getAccessToken(),Toast.LENGTH_SHORT).show();
-                                                Toast.makeText(LoginActivity.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT).show();
-                                            }
-                                        } catch (JSONException e) {
-                                            Toast.makeText(LoginActivity.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT).show();
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    }).executeAsync();
-                }
-            }
-        });
+//        googleOrFb=1;
+//        Session.openActiveSession(this, true, new Session.StatusCallback() {
+//            @Override
+//            public void call(final Session session, SessionState state, Exception exception) {
+//                if (session.isOpened()) {
+//                    List<String> permissions = session.getPermissions();
+//                    if (!isSubsetOf(PERMISSIONS, permissions)) {
+//                        Session.NewPermissionsRequest newPermissionsRequest = new Session.NewPermissionsRequest(
+//                                LoginActivity.this, PERMISSIONS);
+//                        session.requestNewReadPermissions(newPermissionsRequest);
+//                        return;
+//                    }
+//                    Request.newMeRequest(session, new Request.GraphUserCallback() {
+//                        @Override
+//                        public void onCompleted(GraphUser user, Response response) {
+//                            if (user != null) {
+//                                Log.i("user", user.getName());
+//                                UserMain userMain = MainApplication.getInstance().data.userMain;
+//                                userMain.fb_name = user.getName();
+//                                userMain.facebookId = user.getId();
+//                                userMain.saveUserDataLocally();
+//
+//                                new AsyncGet(LoginActivity.this, "http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken(), new AsyncGet.AsyncResult() {
+//                                    @Override
+//                                    public void gotResult(String s) {
+//                                        /*Log.i("urltest","http://api.clozerr.com/auth/login/facebook?token=" + session.getAccessToken());
+//                                        Log.i("token result", s);*/
+//                                        try {
+//                                            JSONObject res = new JSONObject(s);
+//                                            if (res.getBoolean("result")) {
+//                                                UserMain userMain = MainApplication.getInstance().data.userMain;
+//                                                userMain.loginSkip = true;
+//                                                userMain.token = res.getString("token");
+//                                                userMain.user = res.getString("user");
+//                                                userMain.saveUserDataLocally();
+//
+//                                                startActivity(new Intent(LoginActivity.this, Home.class));
+//                                                finish();
+//                                            } else {
+//                                                //Toast.makeText(Login.this,session.getAccessToken(),Toast.LENGTH_SHORT).show();
+//                                                Toast.makeText(LoginActivity.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT).show();
+//                                            }
+//                                        } catch (JSONException e) {
+//                                            Toast.makeText(LoginActivity.this, "Something went wrong, please try again after some time", Toast.LENGTH_SHORT).show();
+//                                            e.printStackTrace();
+//                                        }
+//                                    }
+//                                });
+//                            }
+//                        }
+//                    }).executeAsync();
+//                }
+//            }
+//        });
     }
     public void skiplogin(View v) {
         UserMain userMain = MainApplication.getInstance().data.userMain;
@@ -268,7 +214,7 @@ public class LoginActivity extends FragmentActivity implements
         userMain.notNow = true;
         userMain.saveUserDataLocally();
 
-        startActivity(new Intent(this, Home.class));
+        startActivity(new Intent(this, HomeActivity.class));
         finish();
     }
     private boolean isSubsetOf(Collection<String> subset,
@@ -290,7 +236,7 @@ public class LoginActivity extends FragmentActivity implements
     public void onConnected(Bundle connectionHint) {
         Log.i(TAG, "onConnected");
         /*// Update the user interface to reflect that the user is signed in.
-        // mSignInButton.setEnabled(false);*/
+        // m1SignInButton.setEnabled(false);*/
 
         final Person currentUser = Plus.PeopleApi.getCurrentPerson(googleApiClient);
         userName = currentUser.getDisplayName();
@@ -326,7 +272,7 @@ public class LoginActivity extends FragmentActivity implements
 
                                 UserMain userMain = MainApplication.getInstance().data.userMain;
                                 userMain.loginSkip = true;
-                                userMain.token = res.getString("token");
+//                                userMain.token = res.getString("token");
                                 userMain.user = res.getString("user");
                                 userMain.saveUserDataLocally();
 
@@ -336,7 +282,7 @@ public class LoginActivity extends FragmentActivity implements
 //                                editor.putString("token", res.getString("token"));
 //                                editor.putString("user",res.getString("user"));
 //                                editor.apply();
-                                startActivity(new Intent(LoginActivity.this, Home.class));
+                                startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                                 finish();
                             } else {
                                 updateUI(false);
@@ -360,18 +306,18 @@ public class LoginActivity extends FragmentActivity implements
         // be hidden or disabled until onConnected is called again.
         Log.w(TAG, "onConnectionSuspended:" + i);
     }
-    @Override
-    public void onClick(View v) {
-        googleOrFb = 2;
-        switch (v.getId()) {
-            case R.id.sign_in_button:
-                // User clicked the sign-in button, so begin the sign-in process and automatically
-                // attempt to resolve any errors that occur.
-                mShouldResolve = true;
-                googleApiClient.connect();
-                break;
-        }
-    }
+//    @Override
+//    public void onClick(View v) {
+//        googleOrFb = 2;
+//        switch (v.getId()) {
+//            case R.id.btn_login_google:
+//                // User clicked the sign-in button, so begin the sign-in process and automatically
+//                // attempt to resolve any errors that occur.
+//                mShouldResolve = true;
+//                googleApiClient.connect();
+//                break;
+//        }
+//    }
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         // Could not connect to Google Play Services.  The user needs to select an account,
@@ -424,11 +370,52 @@ public class LoginActivity extends FragmentActivity implements
     }
 
     private void updateUI(boolean isSignedIn) {
-        mSignInButton.setClickable(!isSignedIn);
+        btn_login_facebook.setClickable(!isSignedIn);
         if (!isSignedIn && googleOrFb == 2 && googleApiClient.isConnected())
             googleApiClient.disconnect();
     }
 
+
+    private void initializeSliderUI(){
+        mPager.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        DemoCollectionPagerAdapter mDemoCollectionPagerAdapter = new DemoCollectionPagerAdapter(getSupportFragmentManager());
+        mPager.setAdapter(mDemoCollectionPagerAdapter);
+        final View pagerDot_1 = findViewById(R.id.pagerDot_1);
+        final View pagerDot_2 = findViewById(R.id.pagerDot_2);
+        final View pagerDot_3 = findViewById(R.id.pagerDot_3);
+        final View pagerDot_4 = findViewById(R.id.pagerDot_4);
+        mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                pagerDot_1.setBackground(getResources().getDrawable(R.drawable.signup_dot));
+                pagerDot_2.setBackground(getResources().getDrawable(R.drawable.signup_dot));
+                pagerDot_3.setBackground(getResources().getDrawable(R.drawable.signup_dot));
+                pagerDot_4.setBackground(getResources().getDrawable(R.drawable.signup_dot));
+                switch (position + 1) {
+                    case 1:
+                        pagerDot_1.setBackground(getResources().getDrawable(R.drawable.signup_dot_active));
+                        break;
+                    case 2:
+                        pagerDot_2.setBackground(getResources().getDrawable(R.drawable.signup_dot_active));
+                        break;
+                    case 3:
+                        pagerDot_3.setBackground(getResources().getDrawable(R.drawable.signup_dot_active));
+                        break;
+                    case 4:
+                        pagerDot_4.setBackground(getResources().getDrawable(R.drawable.signup_dot_active));
+                        break;
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+    }
 
 
     ArrayList<String> slidesQuotes = new ArrayList<>(Arrays.asList("", "<span style='font-size=16px'>tap &#9825; and add<br>clubs to <b>my clubs</b></span>", "unlock rewards","<span style='font-size=16px'>tap <b>check in</b> and choose<br>reward to redeem</span>","<span style='font-size=16px'>tap <b>check in</b> and choose<br>reward to redeem</span>"));

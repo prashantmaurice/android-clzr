@@ -15,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.clozerr.app.Activities.HomeScreens.HomeActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 
 import org.json.JSONArray;
@@ -191,7 +192,7 @@ public class LocationService extends Service {
                                     Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             PendingIntent pIntent = PendingIntent.getActivity(LocationService.this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-                            Intent intent1 = new Intent(LocationService.this, Home.class);
+                            Intent intent1 = new Intent(LocationService.this, HomeActivity.class);
                             PendingIntent pIntent1 = PendingIntent.getActivity(LocationService.this, 0, intent1, 0);
                             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                             if(sharedPref.getBoolean("nbd_detect", true)) {

@@ -28,7 +28,7 @@ import android.widget.Toast;
 import com.clozerr.app.Analytics;
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.CardModel;
-import com.clozerr.app.Constants;
+import com.clozerr.app.Utils.Constants;
 import com.clozerr.app.GenUtils;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.PeriodicBFS;
@@ -90,7 +90,7 @@ public class VendorActivity extends ActionBarActivity {
         vendorId = vendor_id;
 
 //        TOKEN = getSharedPreferences("USER", 0).getString("token", "");
-        TOKEN = MainApplication.getInstance().data.userMain.token;
+        TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
         final String urlVendor = "http://api.clozerr.com/v2/vendor/get/details?vendor_id=" + vendor_id;
         Log.e(TAG, "vendor url - " + urlVendor);
         new AsyncGet(this, urlVendor, new AsyncGet.AsyncResult() {

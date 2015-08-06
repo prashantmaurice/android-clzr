@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Utils;
 
 import android.net.Uri;
 
@@ -63,6 +63,9 @@ public class Constants {
 
         private static final String DEFAULT_SCHEME = "http";
         private static final String DEFAULT_AUTHORITY = "api.clozerr.com";
+
+        private static final String DEFAULT_AUTHORITY_LOCAL = "localhost:3000";
+
         
         private static Uri.Builder getNewDefaultBuilder() {
             return new Uri.Builder().scheme(DEFAULT_SCHEME).authority(DEFAULT_AUTHORITY);

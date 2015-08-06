@@ -15,6 +15,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.clozerr.app.Utils.Constants;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
@@ -49,7 +50,7 @@ public class GenUtils {
     public static Uri.Builder getDefaultAnalyticsUriBuilder(Context context, String metric) {
 //        SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences("USER", 0);
 //        String TOKEN = sharedPreferences.getString("token", "");
-        String TOKEN = MainApplication.getInstance().data.userMain.token;
+        String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
         String nowAsISO = getCurrentTimeAsISOString();
 
         Uri.Builder result = getClearedUriBuilder(Constants.URLBuilders.ANALYTICS)
@@ -131,5 +132,8 @@ public class GenUtils {
     public static void updateFirstRun(Context context) {
         PreferenceManager.getDefaultSharedPreferences(context).edit()
                 .putBoolean(Constants.SPKeys.FIRST_RUN, false).apply();
+    }
+    public static void showDebugToast(Context context, String text){
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
 }

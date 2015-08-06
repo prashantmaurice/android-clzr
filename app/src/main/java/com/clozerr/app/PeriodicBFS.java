@@ -19,6 +19,8 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
 import com.android.internal.util.Predicate;
+import com.clozerr.app.Activities.HomeScreens.HomeActivity;
+import com.clozerr.app.Utils.Constants;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.Region;
@@ -101,7 +103,7 @@ public class PeriodicBFS extends BeaconFinderService {
             Intent detailIntent = vendorParams.getDetailsIntent(context);
             detailIntent.putExtra("from_periodic_scan", true);
             TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(context)
-                                        .addParentStack(Home.class)
+                                        .addParentStack(HomeActivity.class)
                                         .addNextIntent(detailIntent);
             PendingIntent detailPendingIntent = taskStackBuilder.getPendingIntent(Constants.RequestCodes.DETAILS_INTENT, 0);
 

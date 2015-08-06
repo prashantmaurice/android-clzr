@@ -44,7 +44,8 @@ public class UnusedOffersActivity extends ActionBarActivity {
         //ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.freebies_item_layout, R.id.freebiename, values);
         UnusedOffersAdapter adapter = new UnusedOffersAdapter(values,this);
         mRecyclerView.setAdapter(adapter);
-        String urlPinning = "http://api.clozerr.com/v2/user/add/pinned?access_token=" + Home.TOKEN;
+        String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
+        String urlPinning = "http://api.clozerr.com/v2/user/add/pinned?access_token=" + TOKEN;
         new AsyncGet(getApplicationContext(), urlPinning, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {

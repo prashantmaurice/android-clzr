@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.clozerr.app.Utils.Constants;
 import com.google.android.gcm.GCMRegistrar;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
@@ -108,7 +109,7 @@ public class QRActivity extends ActionBarActivity implements ZXingScannerView.Re
         /*Log.e(TAG, "result - " + rawResult.getText());
         Log.e(TAG, "format - " + rawResult.getBarcodeFormat().toString());*/
 //        String TOKEN = getSharedPreferences("USER", 0).getString("token", "");
-        String TOKEN = MainApplication.getInstance().data.userMain.token;
+        String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
         String gcmId = GCMRegistrar.getRegistrationId(getApplicationContext());
         final String validateURL = GenUtils.getClearedUriBuilder(Constants.URLBuilders.QRCODE_VALIDATE)
                                             .appendQueryParameter("access_token", TOKEN)

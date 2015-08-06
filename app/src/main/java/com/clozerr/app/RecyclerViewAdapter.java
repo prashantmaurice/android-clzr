@@ -26,7 +26,6 @@ import android.widget.Toast;
 
 import com.clozerr.app.Activities.LoginScreens.LoginActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
-import com.facebook.Session;
 import com.koushikdutta.ion.Ion;
 
 import org.json.JSONArray;
@@ -211,7 +210,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     //Toast.makeText(c,"clicked",Toast.LENGTH_SHORT).show();
 //                    SharedPreferences status = c.getSharedPreferences("USER", 0);
 //                    String TOKEN = status.getString("token", "");
-                    String TOKEN = MainApplication.getInstance().data.userMain.token;
+                    String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
                     //Log.i("name",getResources().getResourceName(R.id.favorites));
                     if(fav.indexOf(currentItem.getVendorId())==-1)
                     {
@@ -334,16 +333,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                             System.exit(0);*/
                         // Toast.makeText(c, "Logging out", Toast.LENGTH_SHORT).show();
 
-                        Session session = Session.getActiveSession();
-                        if (session != null) {
-                            if (!session.isClosed()) {
-                                session.closeAndClearTokenInformation();
-                            }
-                        } else {
-                            session = new Session(c);
-                            Session.setActiveSession(session);
-                            session.closeAndClearTokenInformation();
-                        }
+//                        Session session = Session.getActiveSession();
+//                        if (session != null) {
+//                            if (!session.isClosed()) {
+//                                session.closeAndClearTokenInformation();
+//                            }
+//                        } else {
+//                            session = new Session(c);
+//                            Session.setActiveSession(session);
+//                            session.closeAndClearTokenInformation();
+//                        }
 
                         c.startActivity(new Intent(c, LoginActivity.class));
 

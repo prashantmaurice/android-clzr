@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.clozerr.app.Utils.Constants;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.Region;

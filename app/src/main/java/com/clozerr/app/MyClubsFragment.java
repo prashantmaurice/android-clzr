@@ -173,7 +173,7 @@ public class MyClubsFragment extends Fragment {
 
 //        SharedPreferences status = c.getSharedPreferences("USER", 0);
 //        String TOKEN = status.getString("token", "");
-        String TOKEN = MainApplication.getInstance().data.userMain.token;
+        String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
 
         /*String urlVisited = "http://api.clozerr.com/vendor/get/visitedV2?access_token=" + TOKEN;
         Log.e("urlslide", urlVisited);
