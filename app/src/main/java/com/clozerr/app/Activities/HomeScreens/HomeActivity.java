@@ -47,7 +47,6 @@ import com.clozerr.app.Activities.LoginScreens.SignupActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.BeaconDBDownloadBaseReceiver;
-import com.clozerr.app.Utils.Constants;
 import com.clozerr.app.DownloadImageTask;
 import com.clozerr.app.FAQ;
 import com.clozerr.app.GenUtils;
@@ -55,6 +54,7 @@ import com.clozerr.app.GeofenceManagerService;
 import com.clozerr.app.GiftBoxActivity;
 import com.clozerr.app.Handlers.TokenHandler;
 import com.clozerr.app.MainApplication;
+import com.clozerr.app.Models.NavObject;
 import com.clozerr.app.Models.UserMain;
 import com.clozerr.app.MyOffer;
 import com.clozerr.app.NavDrawAdapter;
@@ -63,6 +63,7 @@ import com.clozerr.app.R;
 import com.clozerr.app.SettingsActivity;
 import com.clozerr.app.SlidingTabLayout;
 import com.clozerr.app.Storage.Data;
+import com.clozerr.app.Utils.Constants;
 import com.clozerr.app.Utils.Router;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -79,8 +80,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 import static com.clozerr.app.R.drawable.rest1;
@@ -97,7 +96,7 @@ public class HomeActivity extends ActionBarActivity {
     public static String USERNAME = "";
     public static String USERID = "";
     public static String USER_PIC_URL = "";
-    public static Context c;
+    public static Context mContext;
     Button button;
     public static double lat;
     public static double longi;
@@ -109,10 +108,10 @@ public class HomeActivity extends ActionBarActivity {
     private ActionBarDrawerToggle drawerToggle;
     private ListView leftDrawerList;
     //private ArrayAdapter<String> navigationDrawerAdapter;
-    private NavDrawAdapter nav;
-    private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Tell Friends about Clozerr", "My Pinned Offers", "Settings", "Log out"};
+    private NavDrawAdapter navAdapter;
     private FrameLayout freebielayout;
     private String giftboxstring;
+    ImageView giftbox;
     //private boolean nav_drawer_open = false;
 
 
@@ -120,6 +119,7 @@ public class HomeActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = this;
         if (GenUtils.isFirstRun(this)) {
             onFirstRun();
             GenUtils.updateFirstRun(this);
@@ -136,9 +136,8 @@ public class HomeActivity extends ActionBarActivity {
 //            return;
 
            // Enable if strict location is required
-        c = HomeActivity.this;
         setContentView(R.layout.activity_my);
-        nitView();
+        setupUI();
         if (toolbar != null) {
             //toolbar.setTitle(getString(R.string.app_name));
 
@@ -149,7 +148,7 @@ public class HomeActivity extends ActionBarActivity {
             setSupportActionBar(toolbar);
 
         }
-        ImageView giftbox = (ImageView)toolbar.findViewById(R.id.giftbox);
+
         giftbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -375,89 +374,80 @@ public class HomeActivity extends ActionBarActivity {
 
 
     }
-    private void nitView() {
-       // Toast.makeText(this, "in nitview", Toast.LENGTH_SHORT).show();
+    private void setupUI() {
         leftDrawerList = (ListView) findViewById(R.id.nav_listView);
-        toolbar = (Toolbar) findViewById(R.id.toolbar_home);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        //navigationDrawerAdapter=new ArrayAdapter<String>( Home.this, android.R.layout.simple_list_item_1, leftSliderData);
-       // navigationDrawerAdapter=new ArrayAdapter<String>( Home.this, R.layout.navdrawlist,R.id.textView, leftSliderData);
-       // Log.i("omy",leftSliderData[0]);
-        List<String> l = Arrays.asList(leftSliderData);
+        button = (Button) findViewById(R.id.button);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_home);
+        giftbox = (ImageView) toolbar.findViewById(R.id.giftbox);
 
-// if List<String> isnt specific enough:
-        ArrayList<String> al = new ArrayList<>(l);
-       // ArrayList<String> arr ;
-       // arr= (ArrayList<String>) Arrays.asList(leftSliderData);
-        nav=new NavDrawAdapter(this,al);
-        leftDrawerList.setAdapter(nav);
+        navAdapter = new NavDrawAdapter(this,Constants.getNavList());
+        leftDrawerList.setAdapter(navAdapter);
         leftDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                // Toast.makeText(Home.this, i+"", Toast.LENGTH_SHORT).show();
+                NavObject clickedObject = Constants.getNavList().get(i);
 
-                if(i==leftSliderData.length-1){ // this is basically the logout button
-                    AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
-                    builder.setTitle("Confirm log out")
-                            .setMessage("If you choose to log out, you will no longer receive Clozerr's notifications about your rewards in nearby places " +
-                                    "until your next log in.\nDo you still want to log out?")
-                            .setPositiveButton("Yes", dialogClickListener)
-                            .setNegativeButton("No", dialogClickListener).show();
+                switch(clickedObject.listId){
+                    case ABOUTUS:
+                        startActivityForResult(new Intent(HomeActivity.this,AboutUs.class),0);
+                        break;
 
-                }
-                //"ABOUT US","FAQ'S","LIKE/FOLLOW CLOZERR","RATE CLOZERR", "LOGOUT"
-                if(i==1){
-                    startActivity(new Intent(HomeActivity.this,FAQ.class));
-                }
-                else if(i==0){
-                    startActivity(new Intent(HomeActivity.this,AboutUs.class));
-                }
+                    case FAQ:
+                        startActivity(new Intent(HomeActivity.this,FAQ.class));
+                        break;
 
-                else if(i==5){
-                    startActivity(new Intent(HomeActivity.this,PinnedOffersActivity.class));
-                }
+                    case PINNED_OFFERS:
+                        startActivity(new Intent(HomeActivity.this,PinnedOffersActivity.class));
+                        break;
 
-                else if(i==6){
-                    startActivity(new Intent(HomeActivity.this,SettingsActivity.class));
-                }
+                    case SETTINGS:
+                        startActivity(new Intent(HomeActivity.this,SettingsActivity.class));
+                        break;
 
-                else if(i==4) {
-                    Intent textShareIntent = new Intent(Intent.ACTION_SEND);
-                    textShareIntent.putExtra(Intent.EXTRA_TEXT, "Try out Clozerr, an app which lets you try out new restaurants near you and rewards you for your loyalty. https://play.google.com/store/apps/details?id=com.clozerr.app&referrer=utm_source%3Dclozerr%26utm_medium%3Dappshare%26utm_term%3Dshared%252Bthrough%252Bclozerr");
-                    textShareIntent.setType("text/plain");
-                    startActivity(Intent.createChooser(textShareIntent, "Share with..."));
-                }
+                    case LIKE_CLOZERR:
+                        Uri uri;
+                        if(MainApplication.getInstance().tokenHandler.loggedByFb()){
+                            uri = Uri.parse("https://www.facebook.com/clozerrdeals");
+                        }else if(MainApplication.getInstance().tokenHandler.loggedByGoogle()){
+                            uri = Uri.parse("https://plus.google.com/112342093373744098489/about");
+                        }else{
+                            uri = Uri.parse("https://www.facebook.com/clozerrdeals");
+                        }
+                        Intent intent = new Intent(Intent.ACTION_VIEW,uri);
+                        startActivity(intent);
+                        break;
 
+                    case RATE_CLOZERR:
+                        final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                        try {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                        } catch (android.content.ActivityNotFoundException anfe) {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                        }
+                        break;
 
-                else if(i==2) {
-                    Uri uri = null;
-                    if (LoginActivity.googleOrFb == 1)
-                    {
-                        uri = Uri.parse("https://www.facebook.com/clozerrdeals");
-                    }
-                    else if (LoginActivity.googleOrFb == 2)
-                    {
-                        uri = Uri.parse("https://plus.google.com/112342093373744098489/about");
-                    }
-                    if (uri == null) Log.e("navdraw", "null" + LoginActivity.googleOrFb);
-                    Intent intent = new Intent(Intent.ACTION_VIEW,uri);
-                    /*// Create and start the chooser
-                    Intent chooser = Intent.createChooser(intent, "Open with");*/
-                    startActivity(intent/*chooser*/);
+                    case TELL_FRIEND:
+                        Intent textShareIntent = new Intent(Intent.ACTION_SEND);
+                        textShareIntent.putExtra(Intent.EXTRA_TEXT, "Try out Clozerr, an app which lets you try out new restaurants near you and rewards you for your loyalty. https://play.google.com/store/apps/details?id=com.clozerr.app&referrer=utm_source%3Dclozerr%26utm_medium%3Dappshare%26utm_term%3Dshared%252Bthrough%252Bclozerr");
+                        textShareIntent.setType("text/plain");
+                        startActivity(Intent.createChooser(textShareIntent, "Share with..."));
+                        break;
+
+                    case LOGOUT:
+                        AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
+                        builder.setTitle("Confirm log out")
+                                .setMessage("If you choose to log out, you will no longer receive Clozerr's notifications about your rewards in nearby places " +
+                                        "until your next log in.\nDo you still want to log out?")
+                                .setPositiveButton("Yes", dialogClickListener)
+                                .setNegativeButton("No", dialogClickListener).show();
+                        break;
                 }
-                else if(i==3) {
-                    final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
-                    try {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-                    } catch (android.content.ActivityNotFoundException anfe) {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-                    }
-                }
-                }
+            }
 
         });
         VendorActivity.i=0;
-        button=(Button)findViewById(R.id.button);
+
        // Toast.makeText(this, "end nitview", Toast.LENGTH_SHORT).show();
     }
     DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -601,7 +591,7 @@ public class HomeActivity extends ActionBarActivity {
 
     public void offerdialog(){
 
-        new AsyncGet(c, Router.Homescreen.offerdialog(), new AsyncGet.AsyncResult() {
+        new AsyncGet(mContext, Router.Homescreen.offerdialog(), new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
                 Log.i("result", s);
@@ -612,11 +602,10 @@ public class HomeActivity extends ActionBarActivity {
                         JSONObject notifobject = notifarray.getJSONObject(i);
                         //Toast.makeText(getApplicationContext(),notifobject.toString(),Toast.LENGTH_LONG).show();
                         freebielayout.getForeground().setAlpha(255);
-                        LayoutInflater li = LayoutInflater.from(c);
+                        LayoutInflater li = LayoutInflater.from(mContext);
                         View ltdofferView = li.inflate(R.layout.popupofferlayout, null);
 
-                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                                c);
+                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
                         final Button okbutton = (Button) ltdofferView.findViewById(R.id.okbutton);
                         final ImageButton cancelbutton= (ImageButton) ltdofferView.findViewById(R.id.cancelbutton);
                         final TextView caption = (TextView) ltdofferView.findViewById(R.id.offercaption);
@@ -679,11 +668,10 @@ public class HomeActivity extends ActionBarActivity {
 
     public void prompt(View v)
     { // get prompts.xml view
-        LayoutInflater li = LayoutInflater.from(c);
+        LayoutInflater li = LayoutInflater.from(mContext);
         View promptsView = li.inflate(R.layout.prompts, null);
 
-        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                c);
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
 
         // set prompts.xml to alertdialog builder
         alertDialogBuilder.setView(promptsView);
@@ -754,12 +742,12 @@ public class HomeActivity extends ActionBarActivity {
                 else
                 try {
                     String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
-                    new AsyncGet(c, "http://api.clozerr.com/vendor/request?access_token=" + TOKEN + "&name=" + URLEncoder.encode(s1, "UTF-8") + "&remarks=" + URLEncoder.encode(s2, "UTF-8"), new AsyncGet.AsyncResult() {
+                    new AsyncGet(mContext, "http://api.clozerr.com/vendor/request?access_token=" + TOKEN + "&name=" + URLEncoder.encode(s1, "UTF-8") + "&remarks=" + URLEncoder.encode(s2, "UTF-8"), new AsyncGet.AsyncResult() {
                         @Override
                         public void gotResult(String s) {
                             // t1.setText(s);
                             Log.i("result", s);
-                            Toast.makeText(c, "Thank you. The restaurant will be added soon.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(mContext, "Thank you. The restaurant will be added soon.", Toast.LENGTH_LONG).show();
                             //RecyclerViewAdapter adapter = new RecyclerViewAdapter(convertRow(s), Home.this);
                             //mRecyclerView.setAdapter(adapter);
 

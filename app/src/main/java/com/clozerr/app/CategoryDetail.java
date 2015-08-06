@@ -30,7 +30,7 @@ import android.widget.Toast;
 import com.clozerr.app.Activities.HomeScreens.HomeActivity;
 import com.clozerr.app.Activities.LoginScreens.LoginActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
-//import com.facebook.Session;
+import com.clozerr.app.Utils.Constants;
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.google.android.gms.plus.Plus;
 import com.nineoldandroids.animation.ValueAnimator;
@@ -40,8 +40,8 @@ import org.json.JSONArray;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
+//import com.facebook.Session;
 
 
 public class CategoryDetail extends ActionBarActivity{
@@ -464,16 +464,8 @@ private ArrayList<CardModel> convertRow(String s) {
         ListView leftDrawerList = (ListView) findViewById(R.id.nav_listView);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        //navigationDrawerAdapter=new ArrayAdapter<String>( Home.this, android.R.layout.simple_list_item_1, leftSliderData);
-        // navigationDrawerAdapter=new ArrayAdapter<String>( Home.this, R.layout.navdrawlist,R.id.textView, leftSliderData);
-        // Log.i("omy",leftSliderData[0]);
-        List<String> l = Arrays.asList(leftSliderData);
 
-// if List<String> isnt specific enough:
-        ArrayList<String> al = new ArrayList<>(l);
-        // ArrayList<String> arr ;
-        // arr= (ArrayList<String>) Arrays.asList(leftSliderData);
-        NavDrawAdapter nav = new NavDrawAdapter(this, al);
+        NavDrawAdapter nav = new NavDrawAdapter(this, Constants.getNavList());
         leftDrawerList.setAdapter(nav);
         leftDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

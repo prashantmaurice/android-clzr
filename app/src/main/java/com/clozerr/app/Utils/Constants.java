@@ -2,6 +2,10 @@ package com.clozerr.app.Utils;
 
 import android.net.Uri;
 
+import com.clozerr.app.Models.NavObject;
+import com.clozerr.app.R;
+
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -88,5 +92,28 @@ public class Constants {
         public static final Uri.Builder ADSOMETHINGHERE = getNewDefaultBuilder().path("v2/user/add/favourites");
         public static final Uri.Builder GEOFENCE_LIST_NEAR = getNewDefaultBuilder().path("v2/geofence/list/near");
         public static final Uri.Builder QRCODE_VALIDATE = getNewDefaultBuilder().path("v2/offers/checkin/qrcodevalidate");
+    }
+
+    public enum NavListId {
+        ABOUTUS,
+        FAQ,
+        LIKE_CLOZERR,
+        RATE_CLOZERR,
+        TELL_FRIEND,
+        PINNED_OFFERS,
+        SETTINGS,
+        LOGOUT
+    }
+    public static ArrayList<NavObject> getNavList() {
+        return new ArrayList<NavObject>() {{
+            add(new NavObject("About Us", R.drawable.aboutclozerr, NavListId.ABOUTUS));
+            add(new NavObject("FAQ's", R.drawable.aboutus, NavListId.FAQ));
+            add(new NavObject("Like/Follow Clozerr", R.drawable.facebooklike, NavListId.LIKE_CLOZERR));
+            add(new NavObject("Rate Clozerr", R.drawable.rate, NavListId.RATE_CLOZERR));
+            add(new NavObject("Tell Friends about Clozerr", R.drawable.share, NavListId.TELL_FRIEND));
+            add(new NavObject("My Pinned Offers", R.drawable.pinfilled, NavListId.PINNED_OFFERS));
+            add(new NavObject("Settings", R.drawable.settings, NavListId.SETTINGS));
+            add(new NavObject("Log out", R.drawable.logout, NavListId.LOGOUT));
+        }};
     }
 }

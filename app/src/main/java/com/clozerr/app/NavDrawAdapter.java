@@ -10,18 +10,20 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.clozerr.app.Models.NavObject;
+
 import java.util.ArrayList;
 
 /**
- * Created by raakesh on 18/1/15.
+ * This handles the entire NavDrawer view generations
  */
-public class NavDrawAdapter extends ArrayAdapter<String> {
-    public ArrayList<String> text;
+public class NavDrawAdapter extends ArrayAdapter<NavObject> {
+    public ArrayList<NavObject> text;
     public LayoutInflater navinflater;
     private Context context;
     int i;
 
-    public NavDrawAdapter(Context context, ArrayList<String> texts) {
+    public NavDrawAdapter(Context context, ArrayList<NavObject> texts) {
         super(context, R.layout.navdrawlist, texts);
         text = texts;
         this.context = context;
@@ -29,8 +31,6 @@ public class NavDrawAdapter extends ArrayAdapter<String> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        int navlist[];
-        navlist = new int[]{R.drawable.aboutclozerr, R.drawable.aboutus, R.drawable.facebooklike, R.drawable.rate, R.drawable.share, R.drawable.pinfilled, R.drawable.settings, R.drawable.logout};
         if (convertView == null) {
             // This a new view we inflate the new layout
             navinflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -46,8 +46,8 @@ public class NavDrawAdapter extends ArrayAdapter<String> {
             ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
             // MyOffer off = offerList.get(position);
             //Log.i("shit",Integer.toString(position));
-            icon.setImageResource(navlist[position]);
-            txtNum.setText(text.get(position));
+            icon.setImageResource(text.get(position).iconResId);
+            txtNum.setText(text.get(position).title);
             return convertView;
         }
         return null;

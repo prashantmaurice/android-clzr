@@ -122,6 +122,12 @@ public class TokenHandler {
     public boolean updateToken(){
         return (!clozerrtoken.isEmpty());
     }
+    public boolean loggedByFb(){
+        return (!authProvider.equals(AUTH_FACEBOOK));
+    }
+    public boolean loggedByGoogle(){
+        return (!authProvider.equals(AUTH_FACEBOOK));
+    }
 
     /** SOME PUBLIC PUT FUNCTIONS */
     public void logout() {
