@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
+
         config {
             keyAlias 'clozerr_key'
             keyPassword 'clozerr'
@@ -11,12 +12,13 @@ android {
     }
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
+
     defaultConfig {
         applicationId "com.clozerr.app"
         minSdkVersion 16
-        targetSdkVersion 22
-        versionCode 5
-        versionName "2.2.1"
+        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+        versionCode 7
+        versionName "2.3.1"
     }
     buildTypes {
         release {
