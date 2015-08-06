@@ -28,9 +28,6 @@ public class Router {
                     .appendQueryParameter("access_token",getClozerrToken()).build().toString();
         }
 
-
-
-
     }
 
     public static class User{

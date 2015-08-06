@@ -141,12 +141,16 @@ public class TokenHandler {
     public void getClozerrToken(final ClozerrTokenListener listener){
         String authGuy = (authProvider.equals(AUTH_GOOGLE))?"google":"facebook";
         String url = "http://api.clozerr.com/auth/login/"+authGuy+"?token=" + socialtoken;
+        Logg.d("url",url);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new JSONObject(), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     Logg.m("MAIN", "Response : Email check = " + response.toString());
-                    if(response.getString("status").equalsIgnoreCase("success")) {
+                    if(response.getBoolean("result")) {
+                        String token = response.getString("token");
+                        MainApplication.getInstance().tokenHandler.clozerrtoken = token;
+                        MainApplication.getInstance().tokenHandler.saveTokenDataLocally();
                         listener.onClozerTokenUpdated();
                     }else{
                         GenUtils.showDebugToast(mContext.getApplicationContext(), "error in parsing clozerr token");
