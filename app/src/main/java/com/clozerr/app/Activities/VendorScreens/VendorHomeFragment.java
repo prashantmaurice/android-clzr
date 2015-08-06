@@ -110,15 +110,15 @@ public class VendorHomeFragment extends Fragment {
         mDirButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!VendorActivity.detailsBundle.getString("distanceString").isEmpty()) {
+                //if (VendorActivity.detailsBundle.getDouble("latitude") && !VendorActivity.detailsBundle.getString("longitude").isEmpty() ) {
                     Intent intent = new Intent(Intent.ACTION_VIEW,
                             Uri.parse("http://maps.google.com/maps?daddr=" + VendorActivity.detailsBundle.getDouble("latitude")
                                     + "," + VendorActivity.detailsBundle.getDouble("longitude")));
                     startActivity(intent);
-                }
-                else
-                    Toast.makeText(getActivity(), "Sorry, the location details have not been provided by the vendor.",
-                            Toast.LENGTH_SHORT).show();
+                //}
+                //else
+                //    Toast.makeText(getActivity(), "Sorry, the location details have not been provided by the vendor.",
+                //            Toast.LENGTH_SHORT).show();
             }
         });
         /*mRateButton.setOnClickListener(new View.OnClickListener() {

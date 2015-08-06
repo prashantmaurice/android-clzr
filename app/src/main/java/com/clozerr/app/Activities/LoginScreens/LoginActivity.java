@@ -164,6 +164,7 @@ public class LoginActivity extends FragmentActivity implements
                 .addApi(Plus.API)
                 .addScope(new Scope(Scopes.PLUS_LOGIN))
                 .addScope(new Scope(Scopes.PROFILE))
+                .addScope(new Scope("https://www.googleapis.com/auth/plus.profile.emails.read"))
                 .build();
     }
     @Override

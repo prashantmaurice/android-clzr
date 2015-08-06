@@ -62,7 +62,7 @@ public class Constants {
     public static class URLBuilders {
 
         private static final String DEFAULT_SCHEME = "http";
-        private static final String DEFAULT_AUTHORITY = "localhost:3000";
+        private static final String DEFAULT_AUTHORITY = "api.clozerr.com";
         
         private static Uri.Builder getNewDefaultBuilder() {
             return new Uri.Builder().scheme(DEFAULT_SCHEME).authority(DEFAULT_AUTHORITY);

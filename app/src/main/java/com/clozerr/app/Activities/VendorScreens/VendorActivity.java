@@ -363,7 +363,8 @@ public class VendorActivity extends ActionBarActivity {
 
                     t.send(new HitBuilders.AppViewBuilder().build());
                 } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), "Error" + e.getMessage(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), "Error" + e.getMessage(), Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
                 }
                 //l1.setAdapter(adapter);
                 if (s == null) {
