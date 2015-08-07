@@ -1,5 +1,6 @@
 package com.clozerr.app.Utils;
 
+import android.location.Location;
 import android.net.Uri;
 
 import com.clozerr.app.MainApplication;
@@ -33,6 +34,26 @@ public class Router {
             return getNewDefaultBuilder().path("v2/vendor/offers/rewardspage")
                     .appendQueryParameter("access_token",getClozerrToken()).build().toString();
         }
+
+        public static String getNearbyRestaurents(Location location, int offset, int limit) {
+            return getNearbyRestaurents(location, offset, limit, null);
+        }
+        public static String getNearbyRestaurents(Location location, int offset, int limit, String query) {
+            return getNearbyRestaurents(location,offset,limit,query,null);
+        }
+        public static String getNearbyRestaurents(Location location, int offset, int limit, String query, String category) {
+            //"http://api.clozerr.com/v2/vendor/search/near?latitude=" + HomeActivity.lat + "&longitude=" + HomeActivity.longi + "&access_token=" + TOKEN"&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;ttp://api.clozerr.com/v2/vendor/offers/rewardspage?access_token=
+            Uri.Builder builder = getNewDefaultBuilder().path("v2/vendor/search/near")
+                    .appendQueryParameter("latitude", "" + location.getLatitude())
+                    .appendQueryParameter("longitude", "" + location.getLongitude())
+                    .appendQueryParameter("offset", "" + offset)
+                    .appendQueryParameter("access_token", getClozerrToken());
+            if(limit>=0) builder.appendQueryParameter("limit", "" + limit);
+            if(query!=null) builder.appendQueryParameter("name", query);
+            if(category!=null) builder.appendQueryParameter("category", category);
+            return builder.build().toString();
+        }
+
     }
 
     public static class User{

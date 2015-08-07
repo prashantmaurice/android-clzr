@@ -7,17 +7,16 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.MyClubsFragment;
-import com.clozerr.app.NearbyFragment;
 import com.clozerr.app.R;
 
 
-public class MyPagerAdapter extends FragmentPagerAdapter {
-    Context c;
+public class HomeActivityPagerAdapter extends FragmentPagerAdapter {
+    Context mContext;
     String[] tabheadings;
-    public MyPagerAdapter(FragmentManager fm,Context c) {
+    public HomeActivityPagerAdapter(FragmentManager fm, Context c) {
         super(fm);
-        this.c=c;
-        tabheadings=c.getResources().getStringArray(R.array.tabheadings);
+        this.mContext = c;
+        tabheadings = mContext.getResources().getStringArray(R.array.tabheadings);
         
     }
 
@@ -27,9 +26,11 @@ public class MyPagerAdapter extends FragmentPagerAdapter {
         switch (position){
             //case 0:CategoriesFragment myFragment=new CategoriesFragment();
             //     return myFragment;
-            case 0:NearbyFragment nearbyFragment=new NearbyFragment();
-                 return nearbyFragment;
-            case 1:MyClubsFragment myClubsFragment = new MyClubsFragment();
+            case 0:
+                NearbyFragment nearbyFragment = new NearbyFragment();
+                return nearbyFragment;
+            case 1:
+                MyClubsFragment myClubsFragment = new MyClubsFragment();
                 return myClubsFragment;
             default:return null;
         }

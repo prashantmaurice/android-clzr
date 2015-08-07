@@ -2,6 +2,7 @@ package com.clozerr.app;
 
 import android.app.Application;
 import android.content.SharedPreferences;
+import android.location.Location;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
@@ -25,6 +26,7 @@ public class MainApplication extends Application {
     SharedPreferences sharedPreferences;
     public Data data;
     public TokenHandler tokenHandler;
+    public Location location = new Location("Location");
     boolean mBound = false;
     RequestQueue queue;
     public enum TrackerName {
@@ -36,14 +38,14 @@ public class MainApplication extends Application {
     HashMap<TrackerName, Tracker> mTrackers = new HashMap<TrackerName, Tracker>();
 
 
-
-
-
-
     @Override
     public void onCreate() {
         super.onCreate();
         sInstance = this;
+
+        //set default location
+        location.setLatitude(13);
+        location.setLongitude(80.2);
 
         sharedPreferences = getSharedPreferences("Clozerr", MODE_PRIVATE);//will be deprecated soon
         data = Data.getInstance(this);//this gets all the data from preferances and Db

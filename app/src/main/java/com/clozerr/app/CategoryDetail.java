@@ -27,10 +27,11 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.clozerr.app.Activities.HomeScreens.HomeActivity;
+import com.clozerr.app.Activities.HomeScreens.NearbyFragmentAdapter;
 import com.clozerr.app.Activities.LoginScreens.LoginActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.clozerr.app.Utils.Constants;
+import com.clozerr.app.Utils.Router;
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.google.android.gms.plus.Plus;
 import com.nineoldandroids.animation.ValueAnimator;
@@ -50,7 +51,7 @@ public class CategoryDetail extends ActionBarActivity{
 
     public static String TOKEN = "";
     Toolbar mToolbar;
-    private RecyclerViewAdapter mMainPageAdapter;
+    private NearbyFragmentAdapter mMainPageAdapter;
     private ArrayList<CardModel> mMainCardsList;
     private RecyclerView.LayoutManager mLayoutManager;
     private EndlessRecyclerOnScrollListener mOnScrollListener;
@@ -172,8 +173,8 @@ public class CategoryDetail extends ActionBarActivity{
 
 
         //startService(new Intent(this, LocationService.class));
-        HomeActivity.lat = 13;
-        HomeActivity.longi = 80.2;
+//        HomeActivity.lat = 13;
+//        HomeActivity.longi = 80.2;
         findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -188,12 +189,13 @@ public class CategoryDetail extends ActionBarActivity{
         if(!cards.equals("")){
             Log.e("Cached Card", cards);
             mMainCardsList = convertRow(cards);
-            mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, this);
+            mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, this);
             mRecyclerView.setAdapter(mMainPageAdapter);
         } else {
             mOffset = 0;
-            String url = "http://api.clozerr.com/v2/vendor/search/near?category=" + categorybundle.getString("categoryname").replace(" ", "%20") +
-                    "&latitude=" + HomeActivity.lat + "&longitude=" + HomeActivity.longi + ((TOKEN.isEmpty()) ? "" : ("&access_token=" + TOKEN));
+//            String url = "http://api.clozerr.com/v2/vendor/search/near?category=" + categorybundle.getString("categoryname").replace(" ", "%20") +
+//                    "&latitude=" + MainApplication.getInstance().location.getLatitude() + "&longitude=" + MainApplication.getInstance().location.getLongitude()+ ((TOKEN.isEmpty()) ? "" : ("&access_token=" + TOKEN));
+            String url = Router.Homescreen.getNearbyRestaurents(MainApplication.getInstance().location, mOffset, -1, null,categorybundle.getString("categoryname"));
             Log.e("url", url);
             new AsyncGet(this, url, new AsyncGet.AsyncResult() {
                 @Override
@@ -206,7 +208,7 @@ public class CategoryDetail extends ActionBarActivity{
                     ArrayList<CardModel> CardList = convertRow(s);
                     if (CardList.size() != 0) {
                         mMainCardsList = CardList;
-                        mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, CategoryDetail.this);
+                        mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, CategoryDetail.this);
                         mRecyclerView.setAdapter(mMainPageAdapter);
                         final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                         editor.putString(categorybundle.getString("categoryname")+"category_cards", s);
@@ -227,18 +229,19 @@ public class CategoryDetail extends ActionBarActivity{
             public void gotLocation (Location location) {
                 Log.e("location stuff","Location Callback called.");
                 try{
-                    HomeActivity.lat=location.getLatitude();
-                    HomeActivity.longi=location.getLongitude();
-                    Log.e("lat", HomeActivity.lat + "");
-                    Log.e("long", HomeActivity.longi + "");
+                    MainApplication.getInstance().location.setLatitude(location.getLatitude());
+                    MainApplication.getInstance().location.setLongitude(location.getLongitude());
+                    Log.e("lat", MainApplication.getInstance().location.getLatitude() + "");
+                    Log.e("long", MainApplication.getInstance().location.getLongitude() + "");
                 }catch (Exception e){
                     e.printStackTrace();
                 }
 
                 String url;
                 mOffset = 0;
-                url = "http://api.clozerr.com/v2/vendor/search/near?category="+categorybundle.getString("categoryname").replace(" ","%20") +
-                        "&latitude=" + HomeActivity.lat + "&longitude=" + HomeActivity.longi + ((TOKEN.isEmpty()) ? "" : ("&access_token=" + TOKEN));
+//                url = "http://api.clozerr.com/v2/vendor/search/near?category="+categorybundle.getString("categoryname").replace(" ","%20") +
+//                        "&latitude=" + MainApplication.getInstance().location.getLatitude() + "&longitude=" + MainApplication.getInstance().location.getLongitude() + ((TOKEN.isEmpty()) ? "" : ("&access_token=" + TOKEN));
+                url = Router.Homescreen.getNearbyRestaurents(MainApplication.getInstance().location, mOffset, -1, null,categorybundle.getString("categoryname"));
                 Log.e("url", url);
                 // TODO support pagination
                 new AsyncGet(CategoryDetail.this, url, new AsyncGet.AsyncResult() {
@@ -248,7 +251,7 @@ public class CategoryDetail extends ActionBarActivity{
                             ArrayList<CardModel> CardList = convertRow(s);
                             if (CardList.size() != 0) {
                                 mMainCardsList = CardList;
-                                mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, CategoryDetail.this);
+                                mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, CategoryDetail.this);
                                 mRecyclerView.setAdapter(mMainPageAdapter);
 
                                 final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();

@@ -208,7 +208,7 @@ public class HomeActivity extends ActionBarActivity {
 
 
         pager=(ViewPager)findViewById(R.id.pager);
-        pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager(),HomeActivity.this));
+        pager.setAdapter(new HomeActivityPagerAdapter(getSupportFragmentManager(),HomeActivity.this));
         pager.setOffscreenPageLimit(0);
         mtabs=(SlidingTabLayout)findViewById(R.id.tabs);
         mtabs.setDistributeEvenly(true);

@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.HomeScreens;
 
 import android.app.Activity;
 import android.content.Context;
@@ -24,7 +24,15 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.clozerr.app.Activities.HomeScreens.HomeActivity;
+import com.clozerr.app.AsyncGet;
+import com.clozerr.app.CardModel;
+import com.clozerr.app.EndlessRecyclerOnScrollListener;
+import com.clozerr.app.MainApplication;
+import com.clozerr.app.MyLocation;
+import com.clozerr.app.R;
+import com.clozerr.app.SpaceItemDecoration;
+import com.clozerr.app.Utils.Logg;
+import com.clozerr.app.Utils.Router;
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.nineoldandroids.animation.ValueAnimator;
 import com.nineoldandroids.view.ViewHelper;
@@ -35,23 +43,17 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 
 /**
- * Created by srivatsan on 12/5/15.
+ *  This is used in HomeScreen activity
  */
 public class NearbyFragment extends Fragment {
-    /*public static MyFragment getInstance(int Position){
-        MyFragment myFragment=new MyFragment();
-        Bundle args=new Bundle();
-        args.getInt("position",Position);
-        myFragment.setArguments(args);
-        return myFragment;
-    }*/
+    
     static int scolled = 0;
     Context c;
     public static String TOKEN = "";
     static Toolbar mToolbar;
     ObservableRecyclerView mRecyclerView;
     static View swipetab;
-    private RecyclerViewAdapter mMainPageAdapter;
+    private NearbyFragmentAdapter mMainPageAdapter;
     private ArrayList<CardModel> mMainCardsList;
     private RecyclerView.LayoutManager mLayoutManager;
     private EndlessRecyclerOnScrollListener mOnScrollListener;
@@ -64,6 +66,13 @@ public class NearbyFragment extends Fragment {
     CountDownTimer countDownTimer;
     static View SearchCard;
     static float SEARCH_CARD_INI_POS = 0;
+    
+
+    
+    public static NearbyFragment getInstance(){
+        NearbyFragment myFragment=new NearbyFragment();
+        return myFragment;
+    }
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         View layout=inflater.inflate(R.layout.activity_nearby_fragment,container,false);
@@ -110,7 +119,6 @@ public class NearbyFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-
                 return false;
             }
 
@@ -130,12 +138,11 @@ public class NearbyFragment extends Fragment {
                         String url;
                         showToolbar();
                         if (!query.equals("")) {
-                            url = "http://api.clozerr.com/v2/vendor/search/near?access_token=" + TOKEN + "&name=" + query.replace(" ", "%20") + "&latitude=" + HomeActivity.lat + "&longitude=" + HomeActivity.longi;
+                            url = Router.Homescreen.getNearbyRestaurents(MainApplication.getInstance().location,mOffset,ITEMS_PER_PAGE,query);
                         } else {
                             mCardsLeft = true;
                             mOffset = 0;
-                            url = "http://api.clozerr.com/v2/vendor/search/near?latitude=" + HomeActivity.lat + "&longitude=" + HomeActivity.longi + "&access_token=" + TOKEN
-                                    + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
+                            url = Router.Homescreen.getNearbyRestaurents(MainApplication.getInstance().location,mOffset,ITEMS_PER_PAGE,null);
                             Log.d("urlsearch", url);
                         }
 
@@ -150,7 +157,7 @@ public class NearbyFragment extends Fragment {
                                 if (CardList.size() != 0) {
 
                                     mMainCardsList = CardList;
-                                    mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
+                                    mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, c);
                                     mRecyclerView.setAdapter(mMainPageAdapter);
                                     if (query.equals("")) {
 
@@ -259,8 +266,8 @@ public class NearbyFragment extends Fragment {
 
 
         //startService(new Intent(this, LocationService.class));
-        HomeActivity.lat = 13;
-        HomeActivity.longi = 80.2;
+//        lat = 13;
+//        longg = 80.2;
 
 
 //        SharedPreferences status = c.getSharedPreferences("USER", 0);
@@ -269,13 +276,12 @@ public class NearbyFragment extends Fragment {
         if(!cards.isEmpty()){
             Log.e("Cached Card", cards);
             mMainCardsList = convertRow(cards);
-            mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
+            mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, c);
             mRecyclerView.setAdapter(mMainPageAdapter);
 //            addMargin();
         } else {
             mOffset = 0;
-            String url = "http://api.clozerr.com/v2/vendor/search/near?latitude=" + HomeActivity.lat + "&longitude=" + HomeActivity.longi + "&access_token=" + TOKEN
-                    + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
+            String url = Router.Homescreen.getNearbyRestaurents(MainApplication.getInstance().location,mOffset,ITEMS_PER_PAGE, null);
             Log.e("url", url);
             new AsyncGet(c, url, new AsyncGet.AsyncResult() {
                 @Override
@@ -288,7 +294,7 @@ public class NearbyFragment extends Fragment {
                     ArrayList<CardModel> CardList = convertRow(s);
                     if (CardList.size() != 0) {
                         mMainCardsList = CardList;
-                        mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
+                        mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, c);
                         mRecyclerView.setAdapter(mMainPageAdapter);
 //                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
 //                        editor.putString("home_cards", s);
@@ -310,10 +316,9 @@ public class NearbyFragment extends Fragment {
             public void gotLocation (Location location) {
                 Log.e("location stuff","Location Callback called.");
                 try{
-                    HomeActivity.lat=location.getLatitude();
-                    HomeActivity.longi=location.getLongitude();
-                    Log.e("lat", HomeActivity.lat + "");
-                    Log.e("long", HomeActivity.longi + "");
+                    MainApplication.getInstance().location.setLatitude(location.getLatitude());
+                    MainApplication.getInstance().location.setLongitude(location.getLongitude());
+                    Log.e("latlong", location.toString());
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -322,12 +327,7 @@ public class NearbyFragment extends Fragment {
                 TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
                 String url;
                 mOffset = 0;
-                if(!TOKEN.equals(""))
-                    url = "http://api.clozerr.com/v2/vendor/search/near?latitude="+ HomeActivity.lat+"&longitude="+ HomeActivity.longi+"&access_token="+TOKEN
-                            + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
-                else
-                    url = "http://api.clozerr.com/v2/vendor/search/near?latitude="+ HomeActivity.lat+"&longitude="+ HomeActivity.longi
-                            + "&offset=" + mOffset + "&limit=" + INITIAL_LOAD_LIMIT;
+                url = Router.Homescreen.getNearbyRestaurents(MainApplication.getInstance().location,mOffset,ITEMS_PER_PAGE, null);
                 Log.e("url", url);
 
                 new AsyncGet(c, url, new AsyncGet.AsyncResult() {
@@ -337,7 +337,7 @@ public class NearbyFragment extends Fragment {
                         if(CardList.size()!=0){
                             mMainCardsList = CardList;
 
-                            mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, c);
+                            mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, c);
                             mRecyclerView.setAdapter(mMainPageAdapter);
 //                            final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
 //                            editor.putString("home_cards", s);
@@ -388,18 +388,14 @@ public class NearbyFragment extends Fragment {
         Log.e("load", "in loadMoreItems()");
         if (mCardsLeft) {
             mOffset += (mOffset == 0) ? INITIAL_LOAD_LIMIT : ITEMS_PER_PAGE;
-            String url = "";
-            if (!TOKEN.equals(""))
-                url = "http://api.clozerr.com/v2/vendor/search/near?latitude=" + HomeActivity.lat + "&longitude=" + HomeActivity.longi + "&access_token=" + TOKEN
-                        + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
-            else
-                url = "http://api.clozerr.com/v2/vendor/search/near?latitude=" + HomeActivity.lat + "&longitude=" + HomeActivity.longi
-                        + "&offset=" + mOffset + "&limit=" + ITEMS_PER_PAGE;
+            String url = Router.Homescreen.getNearbyRestaurents(MainApplication.getInstance().location,mOffset,ITEMS_PER_PAGE);
             Log.e("url", url);
+            final String finalUrl = url;
             new AsyncGet(c, url, new AsyncGet.AsyncResult() {
                 @Override
                 public void gotResult(String s) {
                     Log.e("result", s);
+                    Logg.i("URL", finalUrl + " : " + s);
                     if (s == null) {
                         Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
                     }

@@ -2,8 +2,6 @@ package com.clozerr.app;
 
 import android.location.Location;
 
-import com.clozerr.app.Activities.HomeScreens.HomeActivity;
-
 import org.json.JSONArray;
 
 /**
@@ -56,8 +54,8 @@ public class CardModel {
 
         Location userLocation = new Location("User location");
 
-        userLocation.setLatitude(HomeActivity.lat);
-        userLocation.setLongitude(HomeActivity.longi);
+        userLocation.setLatitude(MainApplication.getInstance().location.getLatitude());
+        userLocation.setLongitude(MainApplication.getInstance().location.getLongitude());
         //distance = userLocation.distanceTo(location) / 1000;
         this.distanceString = this.caption;
         /*if (lat > 0.0 && longi > 0.0)

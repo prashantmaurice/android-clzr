@@ -34,6 +34,8 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+        import com.clozerr.app.Activities.HomeScreens.NearbyFragment;
+
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to
  * the user's scroll progress.
@@ -314,7 +316,8 @@ public class SlidingTabLayout extends HorizontalScrollView {
                 case 0:CategoriesFragment.showToolbar();
                     CategoriesFragment.showSearchbarToInitial();
                     break;
-                case 1:NearbyFragment.showToolbar();
+                case 1:
+                    NearbyFragment.showToolbar();
                     NearbyFragment.showSearchbarToInitial();
                     break;
                 case 2:MyClubsFragment.showToolbar();

@@ -17,6 +17,7 @@ import android.util.Log;
 
 import com.clozerr.app.Activities.HomeScreens.HomeActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
+import com.clozerr.app.Utils.Router;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -135,8 +136,11 @@ public class LocationService extends Service {
         @Override
         public void onLocationChanged(final Location location) {
             Log.d("change","location");
-            Log.d("accuracy",""+location.getAccuracy());
-            String url ="http://api.clozerr.com/v2/vendor/search/near?latitude=" + location.getLatitude() + "&longitude=" + location.getLongitude() + "&limit=" + MIN_NEAR_VENDOR;
+            Log.d("accuracy", "" + location.getAccuracy());
+            MainApplication.getInstance().location.setLatitude(location.getLatitude());
+            MainApplication.getInstance().location.setLongitude(location.getLongitude());
+            String url = Router.Homescreen.getNearbyRestaurents(location, 0, MIN_NEAR_VENDOR, null);
+//            String url ="http://api.clozerr.com/v2/vendor/search/near?latitude=" + location.getLatitude() + "&longitude=" + location.getLongitude() + "&limit=" + MIN_NEAR_VENDOR;
             new AsyncGet(LocationService.this, url , new AsyncGet.AsyncResult() {
                 @Override
                 public void gotResult(String s) {
