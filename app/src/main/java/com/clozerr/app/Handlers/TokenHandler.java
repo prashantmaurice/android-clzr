@@ -93,13 +93,13 @@ public class TokenHandler {
     public void pullTokenDataFromLocal() {
         sPrefs = SharedPrefs.getInstance(mContext);
         try {
-            authProvider = (sPrefs.userData.has("authProvider"))?sPrefs.loginData.getString("authProvider"):AUTH_NONE;
-            socialtoken = (sPrefs.userData.has("socialtoken"))?sPrefs.loginData.getString("socialtoken"):"";
-            clozerrtoken = (sPrefs.userData.has("clozerrtoken"))?sPrefs.loginData.getString("clozerrtoken"):"";
+            authProvider = (sPrefs.loginData.has("authProvider"))?sPrefs.loginData.getString("authProvider"):AUTH_NONE;
+            socialtoken = (sPrefs.loginData.has("socialtoken"))?sPrefs.loginData.getString("socialtoken"):"";
+            clozerrtoken = (sPrefs.loginData.has("clozerrtoken"))?sPrefs.loginData.getString("clozerrtoken"):"";
             loginSkip = (sPrefs.loginData.has("loginSkip"))?sPrefs.loginData.getBoolean("loginSkip"):false;
-            username = (sPrefs.userData.has("username"))?sPrefs.loginData.getString("username"):"";
-            picurl = (sPrefs.userData.has("picurl"))?sPrefs.loginData.getString("picurl"):"";
-            email = (sPrefs.userData.has("email"))?sPrefs.loginData.getString("email"):"";
+            username = (sPrefs.loginData.has("username"))?sPrefs.loginData.getString("username"):"";
+            picurl = (sPrefs.loginData.has("picurl"))?sPrefs.loginData.getString("picurl"):"";
+            email = (sPrefs.loginData.has("email"))?sPrefs.loginData.getString("email"):"";
         } catch (JSONException e) {e.printStackTrace();}
     }
     public void saveTokenDataLocally() {
