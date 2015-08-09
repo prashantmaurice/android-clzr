@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#eaeaea"
     tools:context=".NearbyFragment">
     <RelativeLayout
         android:layout_width="match_parent"
@@ -11,13 +10,11 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#eaeaea">
+            android:layout_height="match_parent">
             <com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/list"
                 android:layout_alignParentTop="true"
-                android:background="#eaeaea"
                 android:layout_marginBottom="0dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
