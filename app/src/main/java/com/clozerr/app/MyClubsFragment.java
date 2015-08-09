@@ -54,7 +54,7 @@ public class MyClubsFragment extends Fragment {
         layout = inflater.inflate(R.layout.activity_my_clubs_fragment, container, false);
         mRecyclerView = (ObservableRecyclerView) layout.findViewById(R.id.sliding_list);
         searchView = (SearchView) layout.findViewById(R.id.searchView);
-        SearchCard = layout.findViewById(R.id.card_view);
+        SearchCard = layout.findViewById(R.id.searchview);
         rowItems = new ArrayList<>();
         SEARCH_CARD_INI_POS = ViewHelper.getTranslationY(SearchCard);
         mScrollable = getActivity().findViewById(R.id.drawerLayout);

@@ -78,7 +78,7 @@ public class NearbyFragment extends Fragment {
         View layout=inflater.inflate(R.layout.activity_nearby_fragment,container,false);
         mRecyclerView = (ObservableRecyclerView) layout.findViewById(R.id.list);
         searchView = (SearchView)layout.findViewById(R.id.searchView);
-        SearchCard = layout.findViewById(R.id.card_view);
+        SearchCard = layout.findViewById(R.id.searchview);
         locationimage=(ImageView)layout.findViewById(R.id.locationunavailable);
         SEARCH_CARD_INI_POS = ViewHelper.getTranslationY(SearchCard);
         mScrollable=getActivity().findViewById(R.id.drawerLayout);
