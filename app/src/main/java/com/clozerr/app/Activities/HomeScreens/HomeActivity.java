@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
-import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -56,6 +55,7 @@ import com.clozerr.app.Handlers.TokenHandler;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.Models.NavObject;
 import com.clozerr.app.Models.UserMain;
+import com.clozerr.app.Models.UserMainLive;
 import com.clozerr.app.NavDrawAdapter;
 import com.clozerr.app.PinnedOffersActivity;
 import com.clozerr.app.R;
@@ -91,7 +91,6 @@ public class HomeActivity extends ActionBarActivity {
 
     private static final String TAG = "HomeActivity";
 
-    public final String SENDER_ID = Constants.GOOGLE_PROJECTID;
     public String USERNAME = "";
     public String USERID = "";
     public String USER_PIC_URL = "";
@@ -109,21 +108,35 @@ public class HomeActivity extends ActionBarActivity {
     private NavDrawAdapter navAdapter;
     private FrameLayout freebielayout;
     private String giftBoxJsonString;
+    UserMainLive userMainLive;
     ImageView giftbox;
+    TextView nav_username;
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        updateUI();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = this;
+
+        //Check for first run
         if (GenUtils.isFirstRun(this)) {
             onFirstRun();
             GenUtils.updateFirstRun(this);
         }
+
+        //Upstart services
         GeofenceManagerService.checkAndStartService(this);
 
+
+        //Check whether this user is
         TokenHandler tokenHandler = MainApplication.getInstance().tokenHandler;
+        Logg.d("tokenHandler",tokenHandler.clozerrtoken);
         if(!tokenHandler.isLoggedIn()&&!tokenHandler.hasSkippedLogin()){
             //first time user
             startActivityForResult(new Intent(this, SignupActivity.class),11000);
@@ -139,9 +152,9 @@ public class HomeActivity extends ActionBarActivity {
             //toolbar.setTitle(getString(R.string.app_name));
 
             toolbar.setTitle("");
-            ((TextView) toolbar.findViewById(R.id.appTitleView)).setTypeface(Typeface.createFromAsset(
-                    getAssets(), "fonts/comfortaa.ttf"
-            ));
+//            ((TextView) toolbar.findViewById(R.id.appTitleView)).setTypeface(Typeface.createFromAsset(
+//                    getAssets(), "fonts/comfortaa.ttf"
+//            ));
             setSupportActionBar(toolbar);
 
         }
@@ -155,7 +168,6 @@ public class HomeActivity extends ActionBarActivity {
             }
         });
 
-        Router.Homescreen.getVendorsGifts();
         new AsyncGet(this, Router.Homescreen.getVendorsGifts(), new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
@@ -171,20 +183,27 @@ public class HomeActivity extends ActionBarActivity {
             }
         },false);
 
+
+
+
+
         initDrawer();
         freebielayout=(FrameLayout)findViewById(R.id.homeframe);
         freebielayout.getForeground().setAlpha(0);
         final String analyticsurl= GenUtils.getDefaultAnalyticsUriBuilder(this, Constants.Metrics.HOME_SCREEN)
                                     .build().toString();
         GenUtils.putAnalytics(this, TAG, analyticsurl);
-        TextView username = (TextView)findViewById(R.id.nav_text);
-        if(USERNAME.length()!=0)
-            username.setText(USERNAME);
 
-        Log.e("pic", USER_PIC_URL);
 
-        new DownloadImageTask((de.hdodenhof.circleimageview.CircleImageView)findViewById(R.id.nav_image))
-                .execute(USER_PIC_URL);
+        nav_username = (TextView)findViewById(R.id.nav_text);
+
+
+
+        nav_username.setText("TEST");
+        updateUI();
+
+
+        new DownloadImageTask((de.hdodenhof.circleimageview.CircleImageView)findViewById(R.id.nav_image)).execute(USER_PIC_URL);
 
         //slidingMyCards();
 
@@ -223,6 +242,30 @@ public class HomeActivity extends ActionBarActivity {
         offerdialog();
 
 
+        //Load initial user data before doing anything
+//        new AsyncGet(this, Router.Homescreen.getUserDataComplete(), new AsyncGet.AsyncResult() {
+//            @Override
+//            public void gotResult(String s) {
+//                Logg.i("URL",Router.Homescreen.getUserDataComplete()+ " : "+s);
+//                try {
+//                    JSONObject userData = new JSONObject(s);
+//                    MainApplication.getInstance().userMainLive = UserMainLive.decodeFromServer(userData);
+//                    updateUI();
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        },false);
+
+
+    }
+
+    private void updateUI(){
+        MainApplication.getInstance().tokenHandler.print();
+        if(MainApplication.getInstance().tokenHandler.isLoggedIn()){
+            nav_username.setText(MainApplication.getInstance().tokenHandler.username);
+            new DownloadImageTask((de.hdodenhof.circleimageview.CircleImageView)findViewById(R.id.nav_image)).execute(MainApplication.getInstance().tokenHandler.picurl);
+        }
     }
 
     private void updateGCMIDinServer(){

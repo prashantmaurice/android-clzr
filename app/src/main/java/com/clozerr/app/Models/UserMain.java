@@ -52,6 +52,8 @@ public class UserMain {
         mContext = context;
         pullUserDataFromLocal();
     }
+
+
     public static UserMain getInstance(Context context) {
         if(instance == null) {
             instance = new UserMain(context);

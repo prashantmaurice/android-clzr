@@ -33,7 +33,6 @@ import com.clozerr.app.R;
 import com.koushikdutta.ion.Ion;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -153,15 +152,15 @@ public class NearbyFragmentAdapter extends RecyclerView.Adapter<NearbyFragmentAd
         if(!NotNow) {
             try {
                 String jsonTxt = (MainApplication.getInstance().data.userMain.user.isEmpty())?"null":MainApplication.getInstance().data.userMain.user;
-                JSONObject userobj = new JSONObject(jsonTxt);
-                favourites = userobj.getJSONArray("favourites");
-                Log.i("favourites",favourites.toString());
-                if (favourites != null) {
-                    int len = favourites.length();
-                    for (int i = 0; i < len; i++) {
-                        fav.add(favourites.get(i).toString());
-                    }
-                }
+//                JSONObject userobj = new JSONObject(jsonTxt);
+//                favourites = userobj.getJSONArray("favourites");
+//                Log.i("favourites",favourites.toString());
+//                if (favourites != null) {
+//                    int len = favourites.length();
+//                    for (int i = 0; i < len; i++) {
+//                        fav.add(favourites.get(i).toString());
+//                    }
+//                }
 
             }
             catch(Exception e)

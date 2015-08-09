@@ -46,8 +46,15 @@ public class TokenHandler {
     public String imageUrl;
     public String gcmId;
     public String phone;
+
+    //actual tracked variables
     public String clozerrtoken;//this is clozerr service token
     public String socialtoken;//this is token of facebook/google
+    public String username;
+    public String picurl;
+
+
+
     public String address;
     public String coverPic;
 
@@ -88,10 +95,11 @@ public class TokenHandler {
         try {
             authProvider = (sPrefs.userData.has("authProvider"))?sPrefs.loginData.getString("authProvider"):AUTH_NONE;
             socialtoken = (sPrefs.userData.has("socialtoken"))?sPrefs.loginData.getString("socialtoken"):"";
-            loginSkip = (sPrefs.loginData.has("loginSkip"))?sPrefs.loginData.getBoolean("loginSkip"):false;
             clozerrtoken = (sPrefs.userData.has("clozerrtoken"))?sPrefs.loginData.getString("clozerrtoken"):"";
+            loginSkip = (sPrefs.loginData.has("loginSkip"))?sPrefs.loginData.getBoolean("loginSkip"):false;
+            username = (sPrefs.userData.has("username"))?sPrefs.loginData.getString("username"):"";
+            picurl = (sPrefs.userData.has("picurl"))?sPrefs.loginData.getString("picurl"):"";
             email = (sPrefs.userData.has("email"))?sPrefs.loginData.getString("email"):"";
-
         } catch (JSONException e) {e.printStackTrace();}
     }
     public void saveTokenDataLocally() {
@@ -100,6 +108,8 @@ public class TokenHandler {
             sPrefs.loginData.put("clozerrtoken", clozerrtoken);
             sPrefs.loginData.put("socialtoken", socialtoken);
             sPrefs.loginData.put("loginSkip", loginSkip);
+            sPrefs.loginData.put("username", username);
+            sPrefs.loginData.put("picurl", picurl);
             sPrefs.loginData.put("email", email);
         } catch (JSONException e) {e.printStackTrace();}
         sPrefs.saveLoginData();
@@ -155,7 +165,10 @@ public class TokenHandler {
                     Logg.m("MAIN", "Response : Email check = " + response.toString());
                     if(response.getBoolean("result")) {
                         String token = response.getString("token");
+                        JSONObject profile = response.getJSONObject("user").getJSONObject("profile");
                         MainApplication.getInstance().tokenHandler.clozerrtoken = token;
+                        MainApplication.getInstance().tokenHandler.username = profile.getString("name");
+                        MainApplication.getInstance().tokenHandler.picurl = profile.getString("picture");
                         MainApplication.getInstance().tokenHandler.saveTokenDataLocally();
                         listener.onClozerTokenUpdated();
                     }else{
@@ -202,6 +215,18 @@ public class TokenHandler {
 
     public interface ClozerrTokenListener{
         void onClozerTokenUpdated();
+    }
+
+    public void print(){
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("username",""+MainApplication.getInstance().tokenHandler.username);
+            obj.put("picurl",""+MainApplication.getInstance().tokenHandler.picurl);
+            obj.put("clozerrtoken",""+MainApplication.getInstance().tokenHandler.clozerrtoken);
+            obj.put("socialtoken",""+MainApplication.getInstance().tokenHandler.socialtoken);
+            obj.put("isLoggedIn",""+MainApplication.getInstance().tokenHandler.isLoggedIn());
+            Log.d("TOKENHANDLER STATE",""+obj.toString(4));
+        } catch (JSONException e) {e.printStackTrace();}
     }
 
 }

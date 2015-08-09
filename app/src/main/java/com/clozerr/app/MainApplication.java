@@ -7,6 +7,7 @@ import android.location.Location;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.clozerr.app.Handlers.TokenHandler;
+import com.clozerr.app.Models.UserMainLive;
 import com.clozerr.app.Storage.Data;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Logger;
@@ -25,6 +26,7 @@ public class MainApplication extends Application {
     private static MainApplication sInstance;
     SharedPreferences sharedPreferences;
     public Data data;
+    public UserMainLive userMainLive;
     public TokenHandler tokenHandler;
     public Location location = new Location("Location");
     boolean mBound = false;

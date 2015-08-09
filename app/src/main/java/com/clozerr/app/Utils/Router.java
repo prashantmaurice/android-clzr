@@ -29,6 +29,12 @@ public class Router {
                     .appendQueryParameter("access_token",getClozerrToken()).build().toString();
         }
 
+        public static String getUserDataComplete() {
+            //http://api.clozerr.com/v2/user/details/get?access_token=8738307ee2b3851ae25025b830de2f73
+            return getNewDefaultBuilder().path("v2/user/details/get")
+                    .appendQueryParameter("access_token",getClozerrToken()).build().toString();
+        }
+
         public static String getVendorsGifts() {
             //http://api.clozerr.com/v2/vendor/offers/rewardspage?access_token=
             return getNewDefaultBuilder().path("v2/vendor/offers/rewardspage")

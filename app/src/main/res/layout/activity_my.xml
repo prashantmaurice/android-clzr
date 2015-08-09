@@ -12,61 +12,59 @@
         android:layout_height="match_parent"
         android:background="#eaeaea">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/homeframe"
-        android:foreground="#55000000">
-
-
-
-        <RelativeLayout
-            android:id="@+id/layout"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:id="@+id/homeframe"
+            android:foreground="#55000000">
 
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/pager"
+            <RelativeLayout
+                android:id="@+id/layout"
                 android:layout_width="match_parent"
-                android:layout_height="fill_parent"
-                android:layout_alignParentTop="true"
-                android:background="#eaeaea" />
+                android:layout_height="match_parent">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:orientation="vertical">
 
-                <include layout="@layout/toolbar_home"
-                    android:id="@+id/toolbar_home"/>
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_alignParentTop="true"
+                    android:background="#eaeaea" />
 
-                <com.clozerr.app.SlidingTabLayout
-                    android:id="@+id/tabs"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/colorPrimary"
-                    android:elevation="5dp" />
-            </LinearLayout>
-        </RelativeLayout>
+                    android:layout_alignParentTop="true"
+                    android:orientation="vertical">
 
-        <!-- navigation drawer -->
-        <!--<RelativeLayout-->
-        <!--android:layout_gravity="left|start"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:background="#fff"-->
-        <!--android:layout_height="match_parent">-->
+                    <include layout="@layout/toolbar_home"
+                        android:id="@+id/toolbar_home"/>
 
-        <!--<ListView-->
-        <!--android:id="@+id/left_drawer"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:divider="#eee"-->
-        <!--android:background="#fff"-->
-        <!--android:dividerHeight="1dp" />-->
-        <!--</RelativeLayout>-->
-    </FrameLayout>
+                    <com.clozerr.app.SlidingTabLayout
+                        android:id="@+id/tabs"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/colorPrimary"
+                        android:elevation="5dp" />
+                </LinearLayout>
+            </RelativeLayout>
+
+            <!-- navigation drawer -->
+            <!--<RelativeLayout-->
+            <!--android:layout_gravity="left|start"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:background="#fff"-->
+            <!--android:layout_height="match_parent">-->
+
+            <!--<ListView-->
+            <!--android:id="@+id/left_drawer"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:divider="#eee"-->
+            <!--android:background="#fff"-->
+            <!--android:dividerHeight="1dp" />-->
+            <!--</RelativeLayout>-->
+        </FrameLayout>
         <include layout="@layout/navdrawer_content" />
 
     </android.support.v4.widget.DrawerLayout>
