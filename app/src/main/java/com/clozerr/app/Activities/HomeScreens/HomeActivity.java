@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
 import android.graphics.drawable.ColorDrawable;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.internal.view.ContextThemeWrapper;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
@@ -148,6 +150,17 @@ public class HomeActivity extends ActionBarActivity {
            // Enable if strict location is required
         setContentView(R.layout.activity_my);
         setupUI();
+
+
+        //check for location
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER) && !manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            buildAlertMessageNoGps();
+        }
+
+
+
         if (toolbar != null) {
             //toolbar.setTitle(getString(R.string.app_name));
 
@@ -341,7 +354,7 @@ public class HomeActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         //stopService(new Intent(this, LocationService.class));
-        Log.d("HOME","start");
+        Log.d("HOME","onResume");
         super.onResume();
         //PeriodicBFS.checkAndStartScan(getApplicationContext());
     }
@@ -581,7 +594,7 @@ public class HomeActivity extends ActionBarActivity {
         }catch(Exception e){
             Log.i("GCM Error", "device not registered yet");
         }*/
-        Log.d("HOME","destroy");
+        Log.d("HOME", "onPause");
         //startService(new Intent(this, LocationService.class));
         super.onPause();
     }
@@ -834,13 +847,32 @@ public class HomeActivity extends ActionBarActivity {
     @Override
     protected void onStart(){
         super.onStart();
+        Log.d("HOME", "onStart");
         GoogleAnalytics.getInstance(this).reportActivityStart(this);
     }
     @Override
     protected void onStop(){
         AsyncGet.dismissDialog();
+        Log.d("HOME", "onStop");
         super.onStop();
         GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
+    private void buildAlertMessageNoGps() {
+        final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(new ContextThemeWrapper(HomeActivity.this, R.style.profileDialog));
+        builder.setMessage("Your location seems to be disabled, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final android.support.v7.app.AlertDialog alert = builder.create();
+        alert.show();
+    }
 }

@@ -31,7 +31,6 @@ import com.clozerr.app.MainApplication;
 import com.clozerr.app.MyLocation;
 import com.clozerr.app.R;
 import com.clozerr.app.SpaceItemDecoration;
-import com.clozerr.app.Utils.Logg;
 import com.clozerr.app.Utils.Router;
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.nineoldandroids.animation.ValueAnimator;
@@ -49,20 +48,19 @@ public class NearbyFragment extends Fragment {
     
     static int scolled = 0;
     Context c;
-    public static String TOKEN = "";
     static Toolbar mToolbar;
     ObservableRecyclerView mRecyclerView;
     static View swipetab;
     private NearbyFragmentAdapter mMainPageAdapter;
-    private ArrayList<CardModel> mMainCardsList;
+    private ArrayList<CardModel> mMainCardsList = new ArrayList<>();
     private RecyclerView.LayoutManager mLayoutManager;
     private EndlessRecyclerOnScrollListener mOnScrollListener;
-    private int mOffset;
     private ImageView locationimage;
     private boolean mCardsLeft = true;
     private final int ITEMS_PER_PAGE = 7, INITIAL_LOAD_LIMIT = 8;
     View mScrollable;
     SearchView searchView;
+    String searchQuery;     //Stores current query String
     CountDownTimer countDownTimer;
     static View SearchCard;
     static float SEARCH_CARD_INI_POS = 0;
@@ -127,54 +125,24 @@ public class NearbyFragment extends Fragment {
                 if (countDownTimer != null) {
                     countDownTimer.cancel();
                 }
-                countDownTimer = new CountDownTimer(1000, 1000) {//CountDownTimer(edittext1.getText()+edittext2.getText()) also parse it to long
+                
+                //Search after a small interval so that too many calls wont be made under fast typing
+                countDownTimer = new CountDownTimer(1000, 1000) {
 
-                    public void onTick(long millisUntilFinished) {
-
-                    }
+                    public void onTick(long millisUntilFinished) {}
 
                     public void onFinish() {
                         countDownTimer.cancel();
-                        String url;
+                        searchQuery = query;
                         showToolbar();
                         if (!query.equals("")) {
-                            url = Router.Homescreen.getNearbyRestaurents(MainApplication.getInstance().location,mOffset,ITEMS_PER_PAGE,query);
+                            fetchResultsForCurrentLocation();
                         } else {
+                            //Refresh the while list as user has removed his query
                             mCardsLeft = true;
-                            mOffset = 0;
-                            url = Router.Homescreen.getNearbyRestaurents(MainApplication.getInstance().location,mOffset,ITEMS_PER_PAGE,null);
-                            Log.d("urlsearch", url);
+                            mMainCardsList.clear();
+                            fetchResultsForCurrentLocation();
                         }
-
-                        new AsyncGet(c, url, new AsyncGet.AsyncResult() {
-                            @Override
-                            public void gotResult(String s) {
-                                Log.e("result", s);
-                                if (s == null) {
-                                    Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
-                                }
-                                ArrayList<CardModel> CardList = convertRow(s);
-                                if (CardList.size() != 0) {
-
-                                    mMainCardsList = CardList;
-                                    mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, c);
-                                    mRecyclerView.setAdapter(mMainPageAdapter);
-                                    if (query.equals("")) {
-
-                                        mRecyclerView.setOnScrollListener(mOnScrollListener);
-                                    }
-//                                    final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-//                                    editor.putString("home_cards", s);
-//                                    editor.apply();
-                                    MainApplication.getInstance().data.userMain.changeHomeCards(s);
-
-                                    Log.e("app", "editing done");
-                                } else {
-                                    Log.d("app", "no cards to show");
-                                    mCardsLeft = false;
-                                }
-                            }
-                        });
                     }
                 }.start();
                 return false;
@@ -231,11 +199,10 @@ public class NearbyFragment extends Fragment {
         locationEnabledCheck();
 
         //mLayoutManager.offsetChildrenVertical(dpToPx(52));
-        mOnScrollListener = new EndlessRecyclerOnScrollListener(
-                (LinearLayoutManager)mLayoutManager) {
+        mOnScrollListener = new EndlessRecyclerOnScrollListener((LinearLayoutManager)mLayoutManager) {
             @Override
             public void onLoadMore() {
-                loadMoreItems();
+                fetchResultsForCurrentLocation();
             }
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -262,100 +229,73 @@ public class NearbyFragment extends Fragment {
             }
         };
         mRecyclerView.setOnScrollListener(mOnScrollListener);
+        mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, c);
+        mRecyclerView.setAdapter(mMainPageAdapter);
 
 
 
-        //startService(new Intent(this, LocationService.class));
-//        lat = 13;
-//        longg = 80.2;
-
-
-//        SharedPreferences status = c.getSharedPreferences("USER", 0);
-//        final String cards = status.getString("home_cards", "");
+        //Load initial cards from cache or start a new request
         final String cards = MainApplication.getInstance().data.userMain.home_cards;
         if(!cards.isEmpty()){
             Log.e("Cached Card", cards);
-            mMainCardsList = convertRow(cards);
-            mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, c);
-            mRecyclerView.setAdapter(mMainPageAdapter);
-//            addMargin();
-        } else {
-            mOffset = 0;
-            String url = Router.Homescreen.getNearbyRestaurents(MainApplication.getInstance().location,mOffset,ITEMS_PER_PAGE, null);
-            Log.e("url", url);
-            new AsyncGet(c, url, new AsyncGet.AsyncResult() {
-                @Override
-                public void gotResult(String s) {
-                    Log.e("result",s);
-                    if(s==null) {
-                        Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
-                    }
-
-                    ArrayList<CardModel> CardList = convertRow(s);
-                    if (CardList.size() != 0) {
-                        mMainCardsList = CardList;
-                        mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, c);
-                        mRecyclerView.setAdapter(mMainPageAdapter);
-//                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-//                        editor.putString("home_cards", s);
-//                        editor.apply();
-                        MainApplication.getInstance().data.userMain.changeHomeCards(s);
-                        Log.e("app", "editing done");
-                    }
-                    else {
-                        Log.d("app", "no cards to show");
-                        mCardsLeft = false;
-                    }
-                }
-            });
+            mMainCardsList.clear();
+            mMainCardsList.addAll(convertRow(cards));
+            mMainPageAdapter.notifyDataSetChanged();
         }
+        
+        //Fetch new batch of results nevertheless
+        fetchResultsForCurrentLocation();
 
 
-        new MyLocation().getLocation(c, new MyLocation.LocationResult(){
+        //On location changed, refresh the complete list
+        new MyLocation().getLocation(c, new MyLocation.LocationResult() {
             @Override
-            public void gotLocation (Location location) {
-                Log.e("location stuff","Location Callback called.");
-                try{
+            public void gotLocation(Location location) {
+                Log.e("location stuff", "Location Callback called.");
+                try {
                     MainApplication.getInstance().location.setLatitude(location.getLatitude());
                     MainApplication.getInstance().location.setLongitude(location.getLongitude());
                     Log.e("latlong", location.toString());
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-//                SharedPreferences status = c.getSharedPreferences("USER", 0);
-//                TOKEN = status.getString("token", "");
-                TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
-                String url;
-                mOffset = 0;
-                url = Router.Homescreen.getNearbyRestaurents(MainApplication.getInstance().location,mOffset,ITEMS_PER_PAGE, null);
-                Log.e("url", url);
-
-                new AsyncGet(c, url, new AsyncGet.AsyncResult() {
-                    @Override
-                    public void gotResult(String s) {
-                        ArrayList<CardModel> CardList = convertRow(s);
-                        if(CardList.size()!=0){
-                            mMainCardsList = CardList;
-
-                            mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, c);
-                            mRecyclerView.setAdapter(mMainPageAdapter);
-//                            final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-//                            editor.putString("home_cards", s);
-//                            editor.apply();
-                            MainApplication.getInstance().data.userMain.changeHomeCards(s);
-                        }
-                        else {
-                            mCardsLeft = false;
-                        }
-                    }
-                });
+                mMainCardsList.clear();
+                fetchResultsForCurrentLocation();
             }
 
         });
 
         return layout;
     }
-    void move(float dy){
+    
+    private void fetchResultsForCurrentLocation(){
+        String requestSeatch = (searchQuery==null)?null:((searchQuery.equals(""))?null:searchQuery);
+        String url = Router.Homescreen.getNearbyRestaurents(MainApplication.getInstance().location,mMainCardsList.size(),ITEMS_PER_PAGE, requestSeatch);
+        Log.e("url", url);
+        new AsyncGet(c, url, new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                Log.e("result",s);
+                if(s==null) {
+                    Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
+                }
+                ArrayList<CardModel> CardList = convertRow(s);
+                if (CardList.size() != 0) {
+                    mMainCardsList.addAll(CardList);
+                    mMainPageAdapter.notifyDataSetChanged();
+                    MainApplication.getInstance().data.userMain.changeHomeCards(s);
+                    Log.e("app", "editing done");
+                }
+                else {
+                    Log.d("app", "no cards to show");
+                    mCardsLeft = false;
+                }
+            }
+        });
+    }
+    
+    
+    private void move(float dy){
         scolled+=dy;
         Log.d("Scrolling", dy + "//" + ViewHelper.getTranslationY(mToolbar) + "//" + mToolbar.getHeight() + "//" + SEARCH_CARD_INI_POS + "//" + ViewHelper.getTranslationY(SearchCard));
         if(ViewHelper.getTranslationY(SearchCard)>=SEARCH_CARD_INI_POS-mToolbar.getHeight() && ViewHelper.getTranslationY(SearchCard)<=SEARCH_CARD_INI_POS)
@@ -383,40 +323,6 @@ public class NearbyFragment extends Fragment {
             if (swipetab.getTranslationY() - dy > SWIPE_TAB_INI_POS)
                 dy = swipetab.getTranslationY()-SWIPE_TAB_INI_POS;
         }*/
-    }
-    public void loadMoreItems() {
-        Log.e("load", "in loadMoreItems()");
-        if (mCardsLeft) {
-            mOffset += (mOffset == 0) ? INITIAL_LOAD_LIMIT : ITEMS_PER_PAGE;
-            String url = Router.Homescreen.getNearbyRestaurents(MainApplication.getInstance().location,mOffset,ITEMS_PER_PAGE);
-            Log.e("url", url);
-            final String finalUrl = url;
-            new AsyncGet(c, url, new AsyncGet.AsyncResult() {
-                @Override
-                public void gotResult(String s) {
-                    Log.e("result", s);
-                    Logg.i("URL", finalUrl + " : " + s);
-                    if (s == null) {
-                        Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
-                    }
-                    ArrayList<CardModel> CardList = convertRow(s);
-                    if (CardList.size() != 0) {
-                        mMainCardsList.addAll(convertRow(s));
-//                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-//                        editor.putString("home_cards", s);
-//                        editor.apply();
-                        MainApplication.getInstance().data.userMain.changeHomeCards(s);
-                        Log.e("app", "editing done");
-                        mMainPageAdapter.notifyDataSetChanged();
-                        //Toast.makeText(getApplicationContext(), "More items ready", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Log.d("app", "no cards to show");
-                        mCardsLeft = false;
-                        mOffset = mMainCardsList.size();
-                    }
-                }
-            });
-        }
     }
     private ArrayList<CardModel> convertRow(String s) {
         ArrayList<CardModel> rowItems = new ArrayList<>();
@@ -481,13 +387,14 @@ public class NearbyFragment extends Fragment {
         }catch(Exception ex){ex.printStackTrace();}
         //LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         if(!gps_enabled && !network_enabled) {
-            locationimage.setVisibility(View.VISIBLE);
+//            locationimage.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        Log.d("NEARBYFRAGMENT", "onAttach");
         c=activity;
     }
     public static void showToolbar() {
@@ -555,4 +462,12 @@ public class NearbyFragment extends Fragment {
         return px;
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("NEARBYFRAGMENT", "onResume");
+        locationEnabledCheck();
+        fetchResultsForCurrentLocation();
+    }
 }
