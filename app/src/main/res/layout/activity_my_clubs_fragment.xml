@@ -5,22 +5,26 @@
     android:id="@+id/mycardslayout"
     android:background="#eaeaea"
     android:gravity="center"
-    tools:context="com.clozerr.app.MyClubsFragment">
+    tools:context="com.clozerr.app.Activities.HomeScreens.MyClubsFragment">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#eaeaea">
-
-        <com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/sliding_list"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="4dp"
-            android:layout_marginRight="4dp"
-            android:layout_marginBottom="0dp"
-            android:background="#eaeaea"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+            <com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/sliding_list"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginBottom="0dp"
+                android:background="#eaeaea"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </android.support.v4.widget.SwipeRefreshLayout>
 
         <include layout="@layout/search"
             android:layout_width="match_parent"

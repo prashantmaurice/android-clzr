@@ -62,6 +62,14 @@ public class Router {
 
     }
 
+    public static class Myclubs{
+        //http://api.clozerr.com/v2/user/favourites/list?access_token=TOKEN
+        public static String getMyclubs(){
+            return getNewDefaultBuilder().path("v2/user/favourites/list")
+                    .appendQueryParameter("access_token",getClozerrToken()).build().toString();
+        }
+    }
+
     public static class User{
         public static String gcmIdUpdate(String gcmId){
             return getNewDefaultBuilder().path("auth/update/gcm")

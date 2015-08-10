@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.clozerr.app.AsyncGet;
-import com.clozerr.app.MyClubsFragment;
 import com.clozerr.app.R;
 
 

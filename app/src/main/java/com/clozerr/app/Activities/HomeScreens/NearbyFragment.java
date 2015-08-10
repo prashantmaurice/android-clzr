@@ -277,6 +277,8 @@ public class NearbyFragment extends Fragment {
 
         });
 
+
+
         return layout;
     }
     

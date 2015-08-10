@@ -28,6 +28,7 @@ import com.clozerr.app.Activities.LoginScreens.LoginActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.CardModel;
+import com.clozerr.app.Handlers.LocalBroadcastHandler;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.R;
 import com.koushikdutta.ion.Ion;
@@ -229,9 +230,7 @@ public class NearbyFragmentAdapter extends RecyclerView.Adapter<NearbyFragmentAd
                                         like.setImageResource(R.drawable.like);
                                     } else {
                                         fav.add(currentItem.getVendorId());
-//                                        final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-//                                        editor.putString("user", s);
-//                                        editor.apply();
+                                        LocalBroadcastHandler.sendBroadcast(c,LocalBroadcastHandler.MYCLUBS_CHANGED);
                                         MainApplication.getInstance().data.userMain.changeUser(s);
                                         Toast.makeText(c, "Favorited and added to My Clubs.", Toast.LENGTH_LONG).show();
                                     }

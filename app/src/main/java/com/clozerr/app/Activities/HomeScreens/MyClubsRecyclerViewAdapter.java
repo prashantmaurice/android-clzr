@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.HomeScreens;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
+import com.clozerr.app.AsyncGet;
+import com.clozerr.app.CardModel;
+import com.clozerr.app.MainApplication;
+import com.clozerr.app.R;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
@@ -24,18 +28,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MyCardRecyclerViewAdapter extends RecyclerView.Adapter<MyCardRecyclerViewAdapter.ListItemViewHolder> {
+public class MyClubsRecyclerViewAdapter extends RecyclerView.Adapter<MyClubsRecyclerViewAdapter.ListItemViewHolder> {
 
     private List<CardModel> items;
     static Context c;
 
-    MyCardRecyclerViewAdapter(List<CardModel> modelData, Context c) {
+    public MyClubsRecyclerViewAdapter(List<CardModel> modelData, Context c) {
         if (modelData == null) {
             throw new IllegalArgumentException(
                     "modelData must not be null");
         }
         this.items = modelData;
-        MyCardRecyclerViewAdapter.c = c;
+        MyClubsRecyclerViewAdapter.c = c;
     }
 
     @Override

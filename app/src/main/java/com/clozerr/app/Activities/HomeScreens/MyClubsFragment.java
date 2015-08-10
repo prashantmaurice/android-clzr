@@ -1,10 +1,15 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.HomeScreens;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +27,12 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.AsyncGet;
+import com.clozerr.app.CardModel;
+import com.clozerr.app.Handlers.LocalBroadcastHandler;
+import com.clozerr.app.R;
+import com.clozerr.app.SpaceItemDecoration;
+import com.clozerr.app.Utils.Router;
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.nineoldandroids.animation.ValueAnimator;
 import com.nineoldandroids.view.ViewHelper;
@@ -31,9 +42,11 @@ import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class MyClubsFragment extends Fragment {
+    String TAG = "MYCLUBSFRAGMENT";
     Context c;
     View layout;
     View mScrollable;
@@ -46,8 +59,10 @@ public class MyClubsFragment extends Fragment {
     GridLayoutManager gridLayoutManager;
     int length_of_array = 0;
     static float SEARCH_CARD_INI_POS = 0;
-    public static ArrayList<CardModel> rowItems;
+    public static ArrayList<CardModel> rowItems = new ArrayList<>();
+    MyClubsRecyclerViewAdapter cardadapter;
     ImageButton like;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,12 +70,21 @@ public class MyClubsFragment extends Fragment {
         mRecyclerView = (ObservableRecyclerView) layout.findViewById(R.id.sliding_list);
         searchView = (SearchView) layout.findViewById(R.id.searchView);
         SearchCard = layout.findViewById(R.id.searchview);
-        rowItems = new ArrayList<>();
         SEARCH_CARD_INI_POS = ViewHelper.getTranslationY(SearchCard);
         mScrollable = getActivity().findViewById(R.id.drawerLayout);
         mToolbar = (Toolbar) getActivity().findViewById(R.id.toolbar_home);
         swipetab = getActivity().findViewById(R.id.tabs);
         like = (ImageButton)getActivity().findViewById(R.id.like);
+
+        mSwipeRefreshLayout = (SwipeRefreshLayout) layout.findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout.setProgressViewOffset(false, 300, 500);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Refresh items
+                refreshContent();
+            }
+        });
 
         final TextView searchHint = (TextView) layout.findViewById(R.id.searchHint);
         searchView.setOnSearchClickListener(new View.OnClickListener() {
@@ -168,119 +192,54 @@ public class MyClubsFragment extends Fragment {
                 move(dy);
             }
         });
-        Log.e("app", "in slidingmycards; set recycler");
 
+        //Add local broadcast listeners
+        LocalBroadcastManager.getInstance(c).registerReceiver(mMyClubsUpdateReceiver,
+            new IntentFilter(LocalBroadcastHandler.MYCLUBS_CHANGED));
 
-//        SharedPreferences status = c.getSharedPreferences("USER", 0);
-//        String TOKEN = status.getString("token", "");
-        String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
-
-        /*String urlVisited = "http://api.clozerr.com/vendor/get/visitedV2?access_token=" + TOKEN;
-        Log.e("urlslide", urlVisited);
-
-        new AsyncGet(c, urlVisited, new AsyncGet.AsyncResult() {
-            @Override
-            public void gotResult(String s) {
-                //  t1.setText(s);
-
-                Log.e("resultSlide", s);
-                convertRowMyCard(s);
-                MyCardRecyclerViewAdapter Cardadapter = new MyCardRecyclerViewAdapter(rowItems, c);
-                mRecyclerView.setAdapter(Cardadapter);
-                try {
-                    Tracker t = ((Analytics) c.getApplicationContext()).getTracker(Analytics.TrackerName.APP_TRACKER);
-
-                    t.setScreenName("MyCards");
-
-                    t.send(new HitBuilders.AppViewBuilder().build());
-                } catch (Exception e) {
-                    Toast.makeText(c, "Error" + e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-                if (s == null) {
-                    Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
-                }
-                //l1.setAdapter(adapter);
-            }
-        });*/
-
-        String urlFavorites = "http://api.clozerr.com/v2/user/favourites/list?access_token=" + TOKEN;
-        // TODO remove vendor/get/details async get from the loop
-        new AsyncGet(c, urlFavorites, new AsyncGet.AsyncResult() {
-            @Override
-            public void gotResult(String s) {
-/*                    JSONArray obj = new JSONArray(s);
-                    //JSONObject fav=obj.getJSONObject("favorites");
-                    //JSONArray vendors = fav.getJSONArray("vendor");
-                    for (int i = 0; i < obj.length(); ++i) {
-                        Boolean status = true;
-                        Toast.makeText(getActivity(), Integer.toString(obj.size()), Toast.LENGTH_SHORT).show();
-*//*                        for (int j = 0; j < obj.size(); j++) {
-                           if (obj.get(j).getVendorId().equals(vendors.getString(i))) {
-                                status = false;
-                                break;
-                            }
-                        }*//*
-                        S
-                        if (status == true) {
-                            String urlFavVendor = "http://api.clozerr.com/v2/vendor/get/details?vendor_id=" + vendors.getString(i);
-
-                            new AsyncGet(c, urlFavVendor, new AsyncGet.AsyncResult() {
-                                @Override
-                                public void gotResult(String s) {
-                                    String address = "", phoneNumber = "", vendorDescription = "";
-                                    double latitude = 0.0, longitude = 0.0;
-                                    JSONObject object = null;
-                                    try {
-                                        object = new JSONObject(s);
-                                        phoneNumber = object.getString("phone");
-                                        if (phoneNumber.equalsIgnoreCase("undefined"))
-                                            phoneNumber = "";
-                                        vendorDescription = object.getString("description");
-                                        if (vendorDescription.equalsIgnoreCase("undefined"))
-                                            vendorDescription = "";
-                                        latitude = object.getJSONArray("location").getDouble(0);
-                                        if (latitude <= 0.0)
-                                            latitude = 0.0;
-                                        longitude = object.getJSONArray("location").getDouble(1);
-                                        if (longitude <= 0.0)
-                                            longitude = 0.0;
-                                        CardModel item = new CardModel(
-                                                object.getString("name"),
-                                                phoneNumber,
-                                                vendorDescription,
-                                                object.getJSONArray("offers"),
-                                                latitude,
-                                                longitude,
-                                                object.getString("image"),
-                                                object.getString("fid"), object.getString("_id"),
-                                                0
-                                        );
-                                        rowItems.add(item);
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-                        }
-
-                    }*/
-                    convertRowMyCard(s);
-                    MyCardRecyclerViewAdapter Cardadapter = new MyCardRecyclerViewAdapter(rowItems, c);
-                    mRecyclerView.setAdapter(Cardadapter);
-                //  t1.setText(s);
-                if (s == null) {
-                    Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
-                }
-                //l1.setAdapter(adapter);
-            }
-        });
-
+        cardadapter = new MyClubsRecyclerViewAdapter(rowItems, c);
+        mRecyclerView.setAdapter(cardadapter);
+        refreshContent();
 
         return layout;
     }
 
-    private void convertRowMyCard(String s) {
+
+    private BroadcastReceiver mMyClubsUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG,"onReceive : mMyClubsUpdateReceiverD");
+            refreshContent();
+        }
+    };
+
+    @Override
+    public void onDestroy() {
+        // Unregister since the activity is about to be closed.
+        LocalBroadcastManager.getInstance(c).unregisterReceiver(mMyClubsUpdateReceiver);
+        super.onDestroy();
+    }
+
+    private void refreshContent(){
+        String urlFavorites = Router.Myclubs.getMyclubs();
+        Log.e("TEST2","sending : "+urlFavorites);
+        new AsyncGet(c, urlFavorites, new AsyncGet.AsyncResult() {
+            @Override
+            public void gotResult(String s) {
+                mSwipeRefreshLayout.setRefreshing(false);
+                Log.e("TEST2","result : "+s);
+                rowItems.clear();
+                rowItems.addAll(convertRowMyCard(s));
+                cardadapter.notifyDataSetChanged();
+                if (s == null) {
+                    Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private List<CardModel> convertRowMyCard(String s) {
+        List<CardModel> resultList = new ArrayList<>();
         JSONObject temp;
         JSONArray array;
         try {
@@ -312,12 +271,13 @@ public class MyClubsFragment extends Fragment {
                         0,"", true
                 );
                 Log.e("stringfunction", "processed");
-                rowItems.add(item);
+                resultList.add(item);
             }
         } catch (Exception e) {
             Log.e("uhoh", e.getMessage());
             e.printStackTrace();
         }
+        return resultList;
     }
 
     @Override
