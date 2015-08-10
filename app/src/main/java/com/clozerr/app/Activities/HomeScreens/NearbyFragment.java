@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -64,7 +65,7 @@ public class NearbyFragment extends Fragment {
     CountDownTimer countDownTimer;
     static View SearchCard;
     static float SEARCH_CARD_INI_POS = 0;
-    
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     
     public static NearbyFragment getInstance(){
@@ -83,6 +84,17 @@ public class NearbyFragment extends Fragment {
         mToolbar=(Toolbar)getActivity().findViewById(R.id.toolbar_home);
         swipetab=getActivity().findViewById(R.id.tabs);
         final TextView searchHint = (TextView)layout.findViewById(R.id.searchHint);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) layout.findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout.setProgressViewOffset(false, 300, 500);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Refresh items
+                mCardsLeft = true;
+                mMainCardsList.clear();
+                fetchResultsForCurrentLocation();
+            }
+        });
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -275,6 +287,7 @@ public class NearbyFragment extends Fragment {
         new AsyncGet(c, url, new AsyncGet.AsyncResult() {
             @Override
             public void gotResult(String s) {
+                mSwipeRefreshLayout.setRefreshing(false);
                 Log.e("result",s);
                 if(s==null) {
                     Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
