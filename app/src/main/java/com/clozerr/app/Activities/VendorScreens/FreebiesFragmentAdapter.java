@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.VendorScreens;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,7 +11,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.clozerr.app.Activities.VendorScreens.VendorActivity;
+import com.clozerr.app.FreebieDescription;
+import com.clozerr.app.R;
+import com.clozerr.app.RewardItem;
 import com.koushikdutta.ion.Ion;
 
 import java.util.List;
@@ -20,11 +22,11 @@ import java.util.List;
  * Created by Adarsh on 6/17/2015.
  */
 
-public class RewardsAdapter extends RecyclerView.Adapter<RewardsAdapter.ListItemViewHolder> {
+public class FreebiesFragmentAdapter extends RecyclerView.Adapter<FreebiesFragmentAdapter.ListItemViewHolder> {
 
     private List<RewardItem> items;
     static Context c;
-    RewardsAdapter(List<RewardItem> modelData, Context c) {
+    FreebiesFragmentAdapter(List<RewardItem> modelData, Context c) {
         if (modelData == null) {
             throw new IllegalArgumentException(
                     "modelData must not be null");
@@ -98,5 +100,10 @@ public class RewardsAdapter extends RecyclerView.Adapter<RewardsAdapter.ListItem
                 }
             });
         }
+    }
+
+
+    private void openCheckinDirectly(){
+
     }
 }

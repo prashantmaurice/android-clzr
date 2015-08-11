@@ -78,6 +78,14 @@ public class Router {
         }
     }
 
+    public static class Content{
+        public static String getFAQHtml(){
+            //http://api.clozerr.com/content?key=faq
+            return getNewDefaultBuilder().path("content")
+                    .appendQueryParameter("key", "faq").build().toString();
+        }
+    }
+
 }
 
 

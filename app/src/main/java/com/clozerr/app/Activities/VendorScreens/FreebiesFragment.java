@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.VendorScreens;
 
 /**
  * Created by Adarsh on 20-05-2015.
@@ -16,7 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.clozerr.app.Activities.VendorScreens.VendorActivity;
+import com.clozerr.app.AsyncGet;
+import com.clozerr.app.R;
+import com.clozerr.app.RewardItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -102,7 +104,7 @@ public class FreebiesFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        RewardsAdapter adapter = new RewardsAdapter(al,getActivity());
+        FreebiesFragmentAdapter adapter = new FreebiesFragmentAdapter(al,getActivity());
         listview.setAdapter(adapter);
     }
     @Override

@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
@@ -70,7 +69,6 @@ import com.clozerr.app.Utils.Router;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
-import com.google.android.gms.plus.Plus;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
@@ -98,8 +96,6 @@ public class HomeActivity extends ActionBarActivity {
     public String USER_PIC_URL = "";
     public Context mContext;
     Button button;
-    public static double lat;
-    public static double longi;
 
     private Toolbar toolbar;
     private ViewPager pager;
@@ -136,7 +132,7 @@ public class HomeActivity extends ActionBarActivity {
         GeofenceManagerService.checkAndStartService(this);
 
 
-        //Check whether this user is
+        //Check whether this user is first time user
         TokenHandler tokenHandler = MainApplication.getInstance().tokenHandler;
         Logg.d("tokenHandler",tokenHandler.clozerrtoken);
         if(!tokenHandler.isLoggedIn()&&!tokenHandler.hasSkippedLogin()){
@@ -144,10 +140,7 @@ public class HomeActivity extends ActionBarActivity {
             startActivityForResult(new Intent(this, SignupActivity.class),11000);
         }
 
-//        if (logincheck()==0)
-//            return;
 
-           // Enable if strict location is required
         setContentView(R.layout.activity_my);
         setupUI();
 
@@ -491,8 +484,8 @@ public class HomeActivity extends ActionBarActivity {
                         builder.setTitle("Confirm log out")
                                 .setMessage("If you choose to log out, you will no longer receive Clozerr's notifications about your rewards in nearby places " +
                                         "until your next log in.\nDo you still want to log out?")
-                                .setPositiveButton("Yes", dialogClickListener)
-                                .setNegativeButton("No", dialogClickListener).show();
+                                .setPositiveButton("Yes", dialogLogoutClickListener)
+                                .setNegativeButton("No", dialogLogoutClickListener).show();
                         break;
                 }
             }
@@ -502,41 +495,18 @@ public class HomeActivity extends ActionBarActivity {
 
        // Toast.makeText(this, "end nitview", Toast.LENGTH_SHORT).show();
     }
-    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+    DialogInterface.OnClickListener dialogLogoutClickListener = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
             switch (which){
                 case DialogInterface.BUTTON_POSITIVE:
                     //Yes button clicked
                     Toast.makeText(HomeActivity.this, "Logging out", Toast.LENGTH_SHORT).show();
-                    SharedPreferences example = getSharedPreferences("USER", 0);
-                    SharedPreferences.Editor editor = example.edit();
-                    editor.clear();
-                    editor.apply();
-                    String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
-                    USER_PIC_URL = USERNAME = USERID = TOKEN = "";
-                    if (LoginActivity.googleOrFb == 2 && LoginActivity.googleApiClient != null)
-                    {
-                        if (LoginActivity.googleApiClient.isConnected()) {
-                            Plus.AccountApi.clearDefaultAccount(LoginActivity.googleApiClient);
-                            LoginActivity.googleApiClient.disconnect();
-                        }
-                    }
-                    else if (LoginActivity.googleOrFb == 1)
-                    {
-//                        Session session = Session.getActiveSession();
-//                        if (session != null) {
-//                            if (!session.isClosed()) {
-//                                session.closeAndClearTokenInformation();
-//                            }
-//                        } else {
-//                            session = new Session(Home.this);
-//                            Session.setActiveSession(session);
-//                            session.closeAndClearTokenInformation();
-//                        }
-                    }
-                    //BeaconFinderService.disallowScanning(Home.this);
-                    startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+                    MainApplication.getInstance().tokenHandler.logout();
+
+                    USER_PIC_URL = USERNAME = USERID  = "";
+
+                    startActivity(new Intent(HomeActivity.this, HomeActivity.class));
                     finish();
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:

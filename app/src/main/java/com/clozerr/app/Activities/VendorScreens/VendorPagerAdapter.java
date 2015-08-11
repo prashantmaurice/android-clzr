@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.clozerr.app.AsyncGet;
-import com.clozerr.app.FreebiesFragment;
 import com.clozerr.app.MyStampsFragment;
 import com.clozerr.app.R;
 
@@ -29,10 +28,10 @@ class VendorPagerAdapter extends FragmentPagerAdapter {
         switch (position){
             case 0:VendorHomeFragment vendorHomeFragment=new VendorHomeFragment();
                 return vendorHomeFragment;
-            case 2:MyStampsFragment myStampsFragment=new MyStampsFragment();
-                return myStampsFragment;
             case 1:FreebiesFragment freebiesFragment = new FreebiesFragment();
                 return freebiesFragment;
+            case 2:MyStampsFragment myStampsFragment=new MyStampsFragment();
+                return myStampsFragment;
             case 3:VendorSettingsFragment vendorSettingsFragment = new VendorSettingsFragment();
                 return vendorSettingsFragment;
             default:return null;

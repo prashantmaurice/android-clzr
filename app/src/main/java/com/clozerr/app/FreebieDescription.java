@@ -7,6 +7,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.CardView;
@@ -116,7 +117,8 @@ public class FreebieDescription extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
-                String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+ TOKEN+"&offer_id="+offerid+"&vendor_id="+vendorid+"&gcm_id="+ GCMRegistrar.getRegistrationId(getApplicationContext());
+                String gcmIdEncoded = Uri.encode(GCMRegistrar.getRegistrationId(getApplicationContext()));
+                String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+ TOKEN+"&offer_id="+offerid+"&vendor_id="+vendorid+"&gcm_id="+ gcmIdEncoded;
                 Log.d("FreebieDescription", "checkin url - " + url);
                 VendorActivity.Rewards = "";
                 //Toast.makeText(getApplicationContext(),url,Toast.LENGTH_LONG).show();
@@ -137,18 +139,18 @@ public class FreebieDescription extends ActionBarActivity {
                                 for (int i = 0; i < displayView.getChildCount(); ++i) {
                                     View child = displayView.getChildAt(i);
                                     switch(child.getId()) {
-                            /*case R.id.confirmFrameLayout:
-                                child.findViewById(R.id.confirmButton).setOnClickListener(
-                                        new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                // Intent homeIntent = new Intent(getApplicationContext(), Home.class);
-                                                // homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                //  getApplicationContext().startActivity(homeIntent);
-                                                CouponDetails.this.finish();
-                                            }
-                                        });
-                                break;*/
+                        /*case R.id.confirmFrameLayout:
+                            child.findViewById(R.id.confirmButton).setOnClickListener(
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            // Intent homeIntent = new Intent(getApplicationContext(), Home.class);
+                                            // homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            //  getApplicationContext().startActivity(homeIntent);
+                                            CouponDetails.this.finish();
+                                        }
+                                    });
+                            break;*/
                                         case R.id.dateTimeLayout:
                                             String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis())),
                                                     time = new SimpleDateFormat("HH:mm").format(new Date(System.currentTimeMillis())) + " hrs";
@@ -186,6 +188,7 @@ public class FreebieDescription extends ActionBarActivity {
                         }
                     }
                 });
+
             }
         });
         findViewById(R.id.pin).setOnClickListener(new View.OnClickListener() {
