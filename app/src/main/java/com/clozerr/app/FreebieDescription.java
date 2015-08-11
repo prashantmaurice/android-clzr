@@ -26,6 +26,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.UtilActivities.QRActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.google.android.gcm.GCMRegistrar;
 
@@ -167,10 +168,10 @@ public class FreebieDescription extends ActionBarActivity {
                                             @Override
                                             public void onClick(View v) {
                                                 Intent qrIntent = new Intent(FreebieDescription.this, QRActivity.class);
-                                                qrIntent.putExtra("vendorId", vendorid);
-                                                qrIntent.putExtra("offerId", offerid);
+                                                qrIntent.putExtra(QRActivity.EXTRA_VENDORID, vendorid);
+                                                qrIntent.putExtra(QRActivity.EXTRA_OFFERID, offerid);
                                                 try {
-                                                    qrIntent.putExtra("checkinId", jsonObject.getString("_id"));
+                                                    qrIntent.putExtra(QRActivity.EXTRA_CHECKINID, jsonObject.getString("_id"));
                                                 } catch (JSONException ex) {
                                                     ex.printStackTrace();
                                                 }

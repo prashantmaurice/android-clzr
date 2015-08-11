@@ -1,14 +1,18 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.UtilActivities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.clozerr.app.AsyncGet;
+import com.clozerr.app.GenUtils;
+import com.clozerr.app.MainApplication;
+import com.clozerr.app.R;
 import com.clozerr.app.Utils.Constants;
 import com.google.android.gcm.GCMRegistrar;
 import com.google.zxing.BarcodeFormat;
@@ -21,7 +25,7 @@ import java.util.Arrays;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 
-public class QRActivity extends ActionBarActivity implements ZXingScannerView.ResultHandler {
+public class QRActivity extends FragmentActivity implements ZXingScannerView.ResultHandler {
 
     private static final String TAG = "QRActivity";
     private static final BarcodeFormat[] barcodeFormats =

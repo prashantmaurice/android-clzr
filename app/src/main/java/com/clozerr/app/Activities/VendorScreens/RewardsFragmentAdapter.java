@@ -20,7 +20,7 @@ import android.widget.Toast;
 
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.Models.RewardsObject;
-import com.clozerr.app.QRActivity;
+import com.clozerr.app.Activities.UtilActivities.QRActivity;
 import com.clozerr.app.R;
 import com.clozerr.app.Utils.Router;
 import com.google.android.gcm.GCMRegistrar;
@@ -53,8 +53,8 @@ public class RewardsFragmentAdapter extends RecyclerView.Adapter<RewardsFragment
     public ListItemViewHolder onCreateViewHolder(
         ViewGroup viewGroup, int viewType) {
         View itemView = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.freebies_item_layout,
-                                viewGroup,
-                                false);
+                viewGroup,
+                false);
 
 
 

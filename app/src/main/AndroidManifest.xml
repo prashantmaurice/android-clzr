@@ -191,7 +191,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".QRActivity"
+            android:name=".Activities.UtilActivities.QRActivity"
             android:label="@string/title_activity_qr" >
         </activity>
 
