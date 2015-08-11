@@ -1,8 +1,8 @@
 package com.clozerr.app;
 
-import android.app.Application;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.support.multidex.MultiDexApplication;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 /**
  * Created by Maurice on 19/05/15.
  */
-public class MainApplication extends Application {
+public class MainApplication extends MultiDexApplication {
 
     //private static final String PROPERTY_ID = "UA-60919025-1";UA-59529735-1
 

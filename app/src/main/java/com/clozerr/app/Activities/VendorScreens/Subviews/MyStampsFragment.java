@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.VendorScreens.Subviews;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,6 +14,9 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
+import com.clozerr.app.MyOffer;
+import com.clozerr.app.MyOffersRecyclerViewAdapter;
+import com.clozerr.app.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

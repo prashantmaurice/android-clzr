@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.VendorScreens.Subviews;
 
 /**
  * Created by Adarsh on 23-05-2015.
@@ -13,6 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.clozerr.app.R;
+
 public class MyStampsRecyclerViewAdapter extends RecyclerView.Adapter<MyStampsRecyclerViewAdapter.ListItemViewHolder> {
 
     private String[] values;

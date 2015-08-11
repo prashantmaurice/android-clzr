@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.VendorScreens.Subviews;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -9,6 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.clozerr.app.Models.RewardsObject;
+import com.clozerr.app.MyOffer;
+import com.clozerr.app.R;
 
 import java.util.ArrayList;
 
@@ -36,7 +40,7 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
         else items.add(new MyOffersCardModel("USED", c, allOffers)); // no offers left
     }*/
 
-    public MyOffersRecyclerViewAdapter(ArrayList<MyOffer> offers, Context context) {
+    public MyOffersRecyclerViewAdapter(ArrayList<RewardsObject> offers, Context context) {
         c = context;
         Log.e(TAG, "size - " + offers.size());
         mItems = offers;
