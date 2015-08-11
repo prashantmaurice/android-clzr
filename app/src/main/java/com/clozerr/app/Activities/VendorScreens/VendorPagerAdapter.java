@@ -5,35 +5,41 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.clozerr.app.Activities.VendorScreens.Subviews.RewardsFragment;
+import com.clozerr.app.Activities.VendorScreens.Subviews.VendorHomeFragment;
+import com.clozerr.app.Activities.VendorScreens.Subviews.VendorSettingsFragment;
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.MyStampsFragment;
 import com.clozerr.app.R;
 
 /**
- * Created by Adarsh on 20/5/15.
+ *  This is the main pager adapter for Vendors activity
  */
 class VendorPagerAdapter extends FragmentPagerAdapter {
     Context c;
     String[] tabheadings;
+    public static int OFFSET_PAGE_LIMIT = 3;
 
-    public VendorPagerAdapter(FragmentManager fm,Context c) {
+    //data variables
+    String vendorId,vendorTitle;
+
+    public VendorPagerAdapter(FragmentManager fm,Context c, String vendorId, String vendorTitle) {
         super(fm);
-        this.c=c;
-        tabheadings=c.getResources().getStringArray(R.array.vendortabheadings);
+        this.c = c;
+        this.vendorId = vendorId;
+        this.vendorTitle = vendorTitle;
+        tabheadings = c.getResources().getStringArray(R.array.vendortabheadings);
     }
 
     @Override
     public Fragment getItem(int position) {
         AsyncGet.dismissDialog();
         switch (position){
-            case 0:VendorHomeFragment vendorHomeFragment=new VendorHomeFragment();
-                return vendorHomeFragment;
-            case 1:RewardsFragment rewardsFragment = new RewardsFragment();
-                return rewardsFragment;
-            case 2:MyStampsFragment myStampsFragment=new MyStampsFragment();
-                return myStampsFragment;
-            case 3:VendorSettingsFragment vendorSettingsFragment = new VendorSettingsFragment();
-                return vendorSettingsFragment;
+            case 0: return VendorHomeFragment.newInstance(vendorId);
+            case 1: return RewardsFragment.newInstance(vendorId);
+            case 2: return MyStampsFragment.newInstance(vendorId);
+            case 3: return VendorSettingsFragment.newInstance(vendorId,vendorTitle);
+
             default:return null;
         }
 
@@ -49,4 +55,7 @@ class VendorPagerAdapter extends FragmentPagerAdapter {
     public int getCount() {
         return tabheadings.length;
     }
+
+
+
 }

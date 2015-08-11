@@ -25,6 +25,15 @@ public class MyStampsFragment extends Fragment {
     Context c;
     FrameLayout layout;
 
+    //Data variables
+    String vendorId;
+
+    public static MyStampsFragment newInstance(String vendorId) {
+        MyStampsFragment myFragment = new MyStampsFragment();
+        myFragment.vendorId = vendorId;
+        return myFragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         layout = (FrameLayout) inflater.inflate(R.layout.activity_mystamps_fragment, container, false);

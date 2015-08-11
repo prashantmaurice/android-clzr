@@ -1,4 +1,4 @@
-package com.clozerr.app.Activities.VendorScreens;
+package com.clozerr.app.Activities.VendorScreens.Subviews;
 
 /**
  * Created by Adarsh on 20-05-2015.
@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.DownloadImageTask;
 import com.clozerr.app.MainApplication;
@@ -46,6 +47,15 @@ public class VendorHomeFragment extends Fragment {
     private TextView mVendorAddressView, mVendorDescriptionView;
     private ImageButton mCallButton, mDirButton, favorites, whatsappshare,fb,gplus,twitter,share, mRateButton, mChatButton;
     private RecyclerView gallerylist;
+
+    //Data variables
+    String vendorId;
+
+    public static VendorHomeFragment newInstance(String vendorId) {
+        VendorHomeFragment myFragment = new VendorHomeFragment();
+        myFragment.vendorId = vendorId;
+        return myFragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
@@ -141,9 +151,9 @@ public class VendorHomeFragment extends Fragment {
                 String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
                 Log.i("name", getResources().getResourceName(R.id.favorites));
                 if (fav.indexOf(VendorActivity.detailsBundle.getString("vendorId")) == -1) {
-                    Log.e("VendorHomeFragment", "favs url - " + "http://api.clozerr.com/v2/user/add/favourites?vendor_id=" + VendorActivity.vendorId + "&access_token=" + TOKEN);
+                    Log.e("VendorHomeFragment", "favs url - " + "http://api.clozerr.com/v2/user/add/favourites?vendor_id=" + vendorId + "&access_token=" + TOKEN);
                     favorites.setImageResource(R.drawable.favorited);
-                    new AsyncGet(getActivity(), "http://api.clozerr.com/v2/user/add/favourites?vendor_id=" + VendorActivity.vendorId + "&access_token=" + TOKEN, new AsyncGet.AsyncResult() {
+                    new AsyncGet(getActivity(), "http://api.clozerr.com/v2/user/add/favourites?vendor_id=" + vendorId + "&access_token=" + TOKEN, new AsyncGet.AsyncResult() {
                         @Override
                         public void gotResult(String s) {
                             //l1.setAdapter(adapter);
@@ -172,9 +182,9 @@ public class VendorHomeFragment extends Fragment {
                         }
                     }, false);
                 } else {
-                    Log.e("VendorHomeFragment", "favs url - " + "http://api.clozerr.com/v2/user/remove/favourites?vendor_id=" + VendorActivity.vendorId + "&access_token=" + TOKEN);
+                    Log.e("VendorHomeFragment", "favs url - " + "http://api.clozerr.com/v2/user/remove/favourites?vendor_id=" + vendorId + "&access_token=" + TOKEN);
                     favorites.setImageResource(R.drawable.unfavorited);
-                    new AsyncGet(getActivity(), "http://api.clozerr.com/v2/user/remove/favourites?vendor_id=" + VendorActivity.vendorId + "&access_token=" + TOKEN, new AsyncGet.AsyncResult() {
+                    new AsyncGet(getActivity(), "http://api.clozerr.com/v2/user/remove/favourites?vendor_id=" + vendorId + "&access_token=" + TOKEN, new AsyncGet.AsyncResult() {
                         @Override
                         public void gotResult(String s) {
                             //l1.setAdapter(adapter);

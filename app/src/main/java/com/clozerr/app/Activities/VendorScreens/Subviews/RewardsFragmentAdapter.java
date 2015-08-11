@@ -1,10 +1,9 @@
-package com.clozerr.app.Activities.VendorScreens;
+package com.clozerr.app.Activities.VendorScreens.Subviews;
 
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
@@ -14,13 +13,12 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.UtilActivities.QRActivity;
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.Models.RewardsObject;
-import com.clozerr.app.Activities.UtilActivities.QRActivity;
 import com.clozerr.app.R;
 import com.clozerr.app.Utils.Router;
 import com.google.android.gcm.GCMRegistrar;
@@ -68,8 +66,8 @@ public class RewardsFragmentAdapter extends RecyclerView.Adapter<RewardsFragment
         viewHolder.name.setText(model.description);
         viewHolder.caption.setText(model.caption);
 
-        if( !model.unlocked )
-            viewHolder.layout.setBackgroundColor(Color.parseColor("#AAAAAA"));
+        if(!model.unlocked) viewHolder.overlay.setVisibility(View.VISIBLE);
+        else viewHolder.overlay.setVisibility(View.GONE);
 
         Ion.with((viewHolder.imageView))
                 //   .placeholder(R.drawable.call)
@@ -94,13 +92,11 @@ public class RewardsFragmentAdapter extends RecyclerView.Adapter<RewardsFragment
     }
 
 
-    public final static class ListItemViewHolder
-            extends RecyclerView.ViewHolder {
-        View view;
+    public final static class ListItemViewHolder extends RecyclerView.ViewHolder {
+        View view, overlay;
         ImageView imageView;
         TextView name;
         TextView caption;
-        LinearLayout layout;
         public RewardsObject currentItem;
 
         public ListItemViewHolder(final View itemView) {
@@ -109,8 +105,7 @@ public class RewardsFragmentAdapter extends RecyclerView.Adapter<RewardsFragment
             imageView = (ImageView) itemView.findViewById(R.id.freebieimage);
             name = (TextView)itemView.findViewById(R.id.freebiename);
             caption = (TextView)itemView.findViewById(R.id.freebiedescription);
-            layout = (LinearLayout)itemView.findViewById(R.id.freebielayout);
-
+            overlay = itemView.findViewById(R.id.overlay);
 
 //            itemView.setOnClickListener(new View.OnClickListener() {
 //                @Override

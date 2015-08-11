@@ -28,13 +28,13 @@ import android.widget.Toast;
 import com.clozerr.app.Analytics;
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.CardModel;
-import com.clozerr.app.Utils.Constants;
 import com.clozerr.app.GenUtils;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.PeriodicBFS;
 import com.clozerr.app.R;
 import com.clozerr.app.SlidingTabLayout;
 import com.clozerr.app.UnusedOffersActivity;
+import com.clozerr.app.Utils.Constants;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
@@ -48,7 +48,7 @@ import java.util.ArrayList;
 
 public class VendorActivity extends ActionBarActivity {
 
-    private static final String TAG = "VendorActivity";
+    private static final String TAG = "VENDORACTIVITY";
 
     private boolean fromPeriodicBFS = false;
     private Toolbar toolbar;
@@ -59,12 +59,16 @@ public class VendorActivity extends ActionBarActivity {
     public static String Rewards="";
     private String pinNumber;
     public static Bundle detailsBundle;
-    public static String vendorId;
     public static ImageView logoView;
     static String vendorTitle;
     public static int i=1;
     public String analyticsurlvendor=null;
     public static String TOKEN="";
+
+
+    //Data variables
+    String vendorId, vendorName = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,12 +90,11 @@ public class VendorActivity extends ActionBarActivity {
 
 
 
-        final String vendor_id = callingIntent.getStringExtra("vendor_id");
-        vendorId = vendor_id;
+        vendorId = callingIntent.getStringExtra("vendor_id");
 
 //        TOKEN = getSharedPreferences("USER", 0).getString("token", "");
         TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
-        final String urlVendor = "http://api.clozerr.com/v2/vendor/get/details?vendor_id=" + vendor_id;
+        final String urlVendor = "http://api.clozerr.com/v2/vendor/get/details?vendor_id=" + vendorId;
         Log.e(TAG, "vendor url - " + urlVendor);
         new AsyncGet(this, urlVendor, new AsyncGet.AsyncResult() {
             @Override
@@ -239,7 +242,8 @@ public class VendorActivity extends ActionBarActivity {
                         toolbar.setTitle(currentItem.getTitle());
                     }
                     pager = (ViewPager) findViewById(R.id.pager_vendor);
-                    pager.setAdapter(new VendorPagerAdapter(getSupportFragmentManager(), VendorActivity.this));
+                    pager.setAdapter(new VendorPagerAdapter(getSupportFragmentManager(), VendorActivity.this,vendorId,vendorName));
+                    pager.setOffscreenPageLimit(VendorPagerAdapter.OFFSET_PAGE_LIMIT);
                     mtabs = (SlidingTabLayout) findViewById(R.id.tabs_vendor);
                     mtabs.setDistributeEvenly(true);
                     mtabs.setCustomTabView(R.layout.custom_tab_view_vendor, R.id.tabtitle);

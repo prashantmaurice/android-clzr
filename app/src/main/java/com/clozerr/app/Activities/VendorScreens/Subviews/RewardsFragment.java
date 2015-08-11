@@ -1,4 +1,4 @@
-package com.clozerr.app.Activities.VendorScreens;
+package com.clozerr.app.Activities.VendorScreens.Subviews;
 
 /**
  * Created by Adarsh on 20-05-2015.
@@ -19,6 +19,7 @@ import android.widget.FrameLayout;
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.Models.RewardsObject;
 import com.clozerr.app.R;
+import com.clozerr.app.Utils.Router;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,9 +32,18 @@ public class RewardsFragment extends Fragment {
     Context c;
     FrameLayout layout;
     RecyclerView listview;
-    ArrayList<RewardsObject> rewardsObjects = new ArrayList<>();
     RewardsFragmentAdapter adapter;
 
+    //Data variables
+    String vendorId;
+    ArrayList<RewardsObject> rewardsObjects = new ArrayList<>();
+
+
+    public static RewardsFragment newInstance(String vendorId) {
+        RewardsFragment myFragment = new RewardsFragment();
+        myFragment.vendorId = vendorId;
+        return myFragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
@@ -44,7 +54,8 @@ public class RewardsFragment extends Fragment {
         adapter = new RewardsFragmentAdapter(rewardsObjects, getActivity());
         listview.setAdapter(adapter);
 
-        final String rewardsurl = "http://api.clozerr.com/v2/vendor/offers/rewardspage/?vendor_id=" + VendorActivity.vendorId + "&access_token=" + VendorActivity.TOKEN;
+
+        final String rewardsurl = Router.VendorScreen.getRewardsData(vendorId);
         new AsyncGet(c, rewardsurl, new AsyncGet.AsyncResult() {
             @Override
 
@@ -57,7 +68,7 @@ public class RewardsFragment extends Fragment {
 
                     //add additional variables
                     for(RewardsObject reward : rewardsObjects){
-                        reward.vendorId = VendorActivity.vendorId;
+                        reward.vendorId = vendorId;
                     }
                 } catch (JSONException e) {e.printStackTrace();}
                 adapter.notifyDataSetChanged();

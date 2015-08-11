@@ -9,7 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Gravity;
@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 
-public class FreebieDescription extends ActionBarActivity {
+public class FreebieDescription extends FragmentActivity {
     String offerid="";
     String button="USE IT";
     String vendorid="",caption="",description="", name="";

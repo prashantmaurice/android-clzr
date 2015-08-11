@@ -24,6 +24,10 @@ import java.util.Arrays;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
+/**
+ *  This activity is used when you check-in a restaurant, and a popup shows,
+ *  it can call this activity to scan QR codes
+ */
 
 public class QRActivity extends FragmentActivity implements ZXingScannerView.ResultHandler {
 
