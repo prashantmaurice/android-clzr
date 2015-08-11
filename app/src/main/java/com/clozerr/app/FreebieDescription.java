@@ -157,11 +157,11 @@ public class FreebieDescription extends ActionBarActivity {
                                             ((TextView)(child.findViewById(R.id.timeView))).setText(time);
                                             ((TextView)(child.findViewById(R.id.dateView))).setText(date);
                                             break;
-                                        case R.id.pinView:  ((TextView) child).setText(jsonObject.getString("pin"));
+                                        case R.id.tv_rewardUniqueCode:  ((TextView) child).setText(jsonObject.getString("pin"));
                                             break;
-                                        case R.id.confirmTitleView: ((TextView) child).setText(name);
+                                        case R.id.tv_title1: ((TextView) child).setText(name);
                                             break;
-                                        case R.id.confirmOfferView: ((TextView) child).setText(caption);
+                                        case R.id.tv_title2: ((TextView) child).setText(caption);
                                             break;
                                         case R.id.qrButton: child.setOnClickListener(new View.OnClickListener() {
                                             @Override
