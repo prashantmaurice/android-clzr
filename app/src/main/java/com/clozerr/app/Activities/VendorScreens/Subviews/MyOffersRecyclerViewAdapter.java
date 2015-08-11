@@ -11,15 +11,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.clozerr.app.Models.RewardsObject;
-import com.clozerr.app.MyOffer;
 import com.clozerr.app.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRecyclerViewAdapter.ListItemViewHolder> {
     private static final String TAG = "MyOffersRVAdapter";
     //private List<MyOffersCardModel> items;
-    private ArrayList<MyOffer> mItems;
+    private ArrayList<RewardsObject> mItems;
+    private ArrayList<RewardsObject> generatedItems = new ArrayList<>();
     static Context c;
 
     /*MyOffersRecyclerViewAdapter(List<MyOffer> allOffers, MyOffer currentOffer, Context context) {
@@ -44,13 +46,50 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
         c = context;
         Log.e(TAG, "size - " + offers.size());
         mItems = offers;
+        generatedItems.clear();
+        generatedItems.addAll(createRestOfTheStamps(mItems));
+    }
+    public ArrayList<RewardsObject> createRestOfTheStamps(ArrayList<RewardsObject> originalItems){
+        ArrayList<RewardsObject> result = new ArrayList<>();
+        Map<Integer,RewardsObject> map = new HashMap<>();
+
+        //map available stamps
+        int maxStampNum = 0; //to store what is the total number of stamps
+        for(RewardsObject reward : originalItems){
+            map.put(reward.stamps,reward);
+            if(reward.stamps>maxStampNum) maxStampNum = reward.stamps;
+        }
+
+        //generate stamps
+        for(int i=1;i<maxStampNum;i++){
+            if(map.containsKey(i)){
+                //This is a reward stamp
+                result.add(map.get(i));
+            }else{
+                //this is a generated empty stamp
+
+                //add Ui related dummy variables
+                RewardsObject rewardDummy = new RewardsObject();
+                rewardDummy.caption = "";
+                rewardDummy.stamps = i;
+                result.add(rewardDummy);
+            }
+        }
+        return result;
+    }
+
+
+    //This s called from parent as we need to generate Custom Array ourselves
+    public void notifyDataSetChangedCustom() {
+        generatedItems.clear();
+        generatedItems.addAll(createRestOfTheStamps(mItems));
+        super.notifyDataSetChanged();
     }
 
     @Override
     public ListItemViewHolder onCreateViewHolder(
             ViewGroup viewGroup, int viewType) {
-        View itemView = LayoutInflater.
-                from(viewGroup.getContext()).
+        View itemView = LayoutInflater.from(viewGroup.getContext()).
                 /*inflate(R.layout.offers_card,*/
                 inflate(R.layout.stamp_layout,
                         viewGroup,
@@ -104,11 +143,11 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
                 return "rounded_rect_40";
             }
         }).intoImageView(viewHolder.imageView);*/
-        MyOffer currentItem = mItems.get(position);
-        viewHolder.mCaptionView.setText(currentItem.getCaption());
-        viewHolder.stampnumber.setText(String.valueOf(currentItem.getStamps()));
+        RewardsObject currentItem = generatedItems.get(position);
+        viewHolder.mCaptionView.setText(currentItem.caption);
+        viewHolder.stampnumber.setText(String.valueOf(currentItem.stamps));
         //viewHolder.stampnumber.setBackgroundResource(R.drawable.cirkbackhover);
-        if(currentItem.getVisitedstatus()==true) {
+        if(currentItem.getVisitedstatus()) {
             viewHolder.stampnumber.setTextColor(Color.WHITE);
             //viewHolder.stampcheck.setVisibility(View.VISIBLE);
             viewHolder.stampnumber.setBackgroundResource(R.drawable.cirkbackhover);
@@ -132,7 +171,7 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
 
     @Override
     public int getItemCount() {
-        return mItems.size();
+        return generatedItems.size();
     }
 
     public final static class ListItemViewHolder extends RecyclerView.ViewHolder {

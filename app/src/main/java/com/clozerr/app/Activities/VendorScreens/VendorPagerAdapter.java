@@ -9,7 +9,7 @@ import com.clozerr.app.Activities.VendorScreens.Subviews.RewardsFragment;
 import com.clozerr.app.Activities.VendorScreens.Subviews.VendorHomeFragment;
 import com.clozerr.app.Activities.VendorScreens.Subviews.VendorSettingsFragment;
 import com.clozerr.app.AsyncGet;
-import com.clozerr.app.MyStampsFragment;
+import com.clozerr.app.Activities.VendorScreens.Subviews.MyStampsFragment;
 import com.clozerr.app.R;
 
 /**

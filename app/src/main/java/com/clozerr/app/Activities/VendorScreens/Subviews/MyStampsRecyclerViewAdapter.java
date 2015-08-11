@@ -34,7 +34,6 @@ public class MyStampsRecyclerViewAdapter extends RecyclerView.Adapter<MyStampsRe
     }
 
 
-
     @Override
     public void onBindViewHolder(final ListItemViewHolder viewHolder, int position) {
         ///viewHolder.currentItem = items.get(position);

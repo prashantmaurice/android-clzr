@@ -57,7 +57,6 @@ public class VendorActivity extends ActionBarActivity {
     private Intent callingIntent;
     private FloatingActionButton mCheckInButton;
     public static String Rewards="";
-    private String pinNumber;
     public static Bundle detailsBundle;
     public static ImageView logoView;
     static String vendorTitle;

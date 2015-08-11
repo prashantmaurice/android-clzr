@@ -60,6 +60,13 @@ public class VendorDetailsObject {
 
     //runtime variables
     public String vendorId;
+    private String name;
+    private String phone;
+    private String fid;
+    private String address;
+    private String category;
+    private String city;
+    private boolean visible;
 
 
     private VendorDetailsObject() {}
@@ -72,12 +79,21 @@ public class VendorDetailsObject {
         try {
             JSONObject params = obj.getJSONObject("params");
 
-            reward.rewardId = (obj.has("_id"))?obj.getString("_id"):"";
-            reward.type = (obj.has("type"))?obj.getString("type"):"";
-            reward.caption = (obj.has("caption"))?obj.getString("caption"):"";
-            reward.description = (obj.has("description"))?obj.getString("description"):"";
+
+            reward.name = (obj.has("name"))?obj.getString("name"):"";
+            reward.phone = (obj.has("phone"))?obj.getString("phone"):"";
             reward.image = (obj.has("image"))?obj.getString("image"):"";
-            reward.unlocked = (obj.has("unlocked"))?obj.getBoolean("unlocked"):true;
+            reward.fid = (obj.has("fid"))?obj.getString("fid"):"";
+            reward.address = (obj.has("address"))?obj.getString("address"):"";
+            reward.category = (obj.has("category"))?obj.getString("category"):"";
+            reward.description = (obj.has("description"))?obj.getString("description"):"";
+            reward.city = (obj.has("city"))?obj.getString("city"):"";
+            reward.visible = (obj.has("visible"))?obj.getBoolean("visible") :false;
+
+
+            reward.type = (obj.has("type"))?obj.getString("type") :"";
+            reward.caption = (obj.has("caption"))?obj.getString("caption") :"";
+            reward.description = (obj.has("description"))?obj.getString("description") :"";
 
             reward.type = (params.has("type"))?params.getString("type"):TYPE_LOYALTY;
             if(reward.type.equals(TYPE_LOYALTY)){

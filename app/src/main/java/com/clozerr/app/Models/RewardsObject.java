@@ -57,12 +57,13 @@ public class RewardsObject {
     //Constants
     public static final String TYPE_LOYALTY = "loyalty";
     public static final String TYPE_HAPPYHOUR = "happyHour";
+    public static final String TYPE_STAMPS= "S1";
 
     //runtime variables
     public String vendorId;
 
 
-    private RewardsObject() {}
+    public RewardsObject() {}
 
 
     //SERVER ENCODERS
@@ -90,7 +91,10 @@ public class RewardsObject {
                 for(int i=0;i<arr.length();i++){
                     reward.days.add(Integer.parseInt(arr.getString(i)));
                 }
-
+            }else if(reward.type.equals(TYPE_STAMPS)){
+                reward.unlocked = (params.has("unlocked"))?params.getBoolean("unlocked"):true;
+                reward.used = (params.has("used"))?params.getBoolean("used"):true;
+                reward.stamps = (params.has("stamps"))?params.getInt("stamps"):0;
             }
 
 
@@ -108,6 +112,10 @@ public class RewardsObject {
             } catch (JSONException e) {e.printStackTrace();}
         }
         return arrayList;
+    }
+
+    public boolean getVisitedstatus() {
+        return used;
     }
 
 //    public JSONObject encodeForServer(){

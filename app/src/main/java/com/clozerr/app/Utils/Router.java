@@ -87,6 +87,14 @@ public class Router {
     }
 
     public static class VendorScreen {
+
+        public static String getVendorOffersData(String vendorId) {
+            //http://api.clozerr.com/v2/vendor/offers/offerspage?access_token=ee82d33ccecb2723aa6de112db64da26&vendor_id=55c31e7fbd510fdc2d863db3
+            return getNewDefaultBuilder().path("v2/vendor/offers/offerspage")
+                    .appendQueryParameter("vendor_id", vendorId)
+                    .appendQueryParameter("access_token", getClozerrToken()).build().toString();
+        }
+
         public static String getRewardsData(String vendorId) {
             //http://api.clozerr.com/v2/vendor/offers/rewardspage/?vendor_id=" + VendorActivity.vendorId + "&access_token=" + VendorActivity.TOKEN;
             return getNewDefaultBuilder().path("v2/vendor/offers/rewardspage")
