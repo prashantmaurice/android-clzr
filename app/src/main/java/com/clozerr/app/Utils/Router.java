@@ -86,6 +86,17 @@ public class Router {
         }
     }
 
+    public static class VendorScreen {
+        public static String checkInAReward(String rewardId, String vendorId, String gcmId) {
+            //http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+ TOKEN+"&offer_id="+model.rewardId+"&vendor_id="+model.vendorId+"&gcm_id="+ gcmIdEncoded;
+            return getNewDefaultBuilder().path("v2/vendor/offers/checkin")
+                    .appendQueryParameter("offer_id", rewardId)
+                    .appendQueryParameter("vendor_id", vendorId)
+                    .appendQueryParameter("gcm_id", gcmId)
+                    .appendQueryParameter("access_token", getClozerrToken()).build().toString();
+        }
+    }
+
 }
 
 

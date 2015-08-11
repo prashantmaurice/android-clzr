@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
@@ -20,10 +19,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.clozerr.app.AsyncGet;
-import com.clozerr.app.MainApplication;
 import com.clozerr.app.Models.RewardsObject;
 import com.clozerr.app.QRActivity;
 import com.clozerr.app.R;
+import com.clozerr.app.Utils.Router;
 import com.google.android.gcm.GCMRegistrar;
 import com.koushikdutta.ion.Ion;
 
@@ -36,7 +35,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by Adarsh on 6/17/2015.
+ *  This is one of the fragments user in Vendors page
  */
 
 public class RewardsFragmentAdapter extends RecyclerView.Adapter<RewardsFragmentAdapter.ListItemViewHolder> {
@@ -53,8 +52,7 @@ public class RewardsFragmentAdapter extends RecyclerView.Adapter<RewardsFragment
     @Override
     public ListItemViewHolder onCreateViewHolder(
         ViewGroup viewGroup, int viewType) {
-        View itemView = LayoutInflater.from(viewGroup.getContext()).
-                        inflate(R.layout.freebies_item_layout,
+        View itemView = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.freebies_item_layout,
                                 viewGroup,
                                 false);
 
@@ -133,12 +131,8 @@ public class RewardsFragmentAdapter extends RecyclerView.Adapter<RewardsFragment
 
     }
     private void openCheckinDirectly(final Context c, final RewardsObject model){
-        String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
-        String gcmIdEncoded = Uri.encode(GCMRegistrar.getRegistrationId(c));
-        String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+ TOKEN+"&offer_id="+model.rewardId+"&vendor_id="+model.vendorId+"&gcm_id="+ gcmIdEncoded;
+        String url = Router.VendorScreen.checkInAReward(model.rewardId,model.vendorId,GCMRegistrar.getRegistrationId(c));
         Log.d("FreebieDescription", "checkin url - " + url);
-        VendorActivity.Rewards = "";
-
         if(!model.unlocked){
             Toast.makeText(c,"Sorry you are yet to unlock the reward",Toast.LENGTH_SHORT).show();
             return;
@@ -149,14 +143,12 @@ public class RewardsFragmentAdapter extends RecyclerView.Adapter<RewardsFragment
             public void gotResult(String s) {
                 try {
                     final JSONObject jsonObject = new JSONObject(s);
-//                            if(jsonObject.getString("result").equals("false"))
-//                                Toast.makeText(getApplicationContext(),"Sorry you are yet to unlock the reward",Toast.LENGTH_SHORT).show();
                     if(jsonObject.getString("vendor")!=null){
                         Toast.makeText(c,"Checked In Successfully. Please contact the billing staff.",Toast.LENGTH_SHORT).show();
                         getNewPopupWindow(c,jsonObject,model);
-                    }
-                    else
+                    }else{
                         Toast.makeText(c, "Check In Failed. Please try again", Toast.LENGTH_SHORT).show();
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -195,10 +187,10 @@ public class RewardsFragmentAdapter extends RecyclerView.Adapter<RewardsFragment
             @Override
             public void onClick(View v) {
                 Intent qrIntent = new Intent(c, QRActivity.class);
-                qrIntent.putExtra("vendorId", rewardsObject.vendorId);
-                qrIntent.putExtra("offerId", rewardsObject.rewardId);
+                qrIntent.putExtra(QRActivity.EXTRA_VENDORID, rewardsObject.vendorId);
+                qrIntent.putExtra(QRActivity.EXTRA_OFFERID, rewardsObject.rewardId);
                 try {
-                    qrIntent.putExtra("checkinId", jsonObject.getString("_id"));
+                    qrIntent.putExtra(QRActivity.EXTRA_OFFERID, jsonObject.getString("_id"));
                 } catch (JSONException ex) {
                     ex.printStackTrace();
                 }

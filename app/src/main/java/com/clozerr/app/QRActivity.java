@@ -29,6 +29,10 @@ public class QRActivity extends ActionBarActivity implements ZXingScannerView.Re
     private ZXingScannerView mScannerView;
     private String mVendorId = null, mOfferId = null, mCheckinId = null;
 
+    public static String EXTRA_VENDORID = "vendorId";
+    public static String EXTRA_CHECKINID = "checkinId";
+    public static String EXTRA_OFFERID = "offerId";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,12 +40,12 @@ public class QRActivity extends ActionBarActivity implements ZXingScannerView.Re
         mScannerView = (ZXingScannerView) findViewById(R.id.qrScannerView);
         if (savedInstanceState == null) {
             Intent callingIntent = getIntent();
-            if (mVendorId == null && callingIntent.hasExtra("vendorId"))
-                mVendorId = callingIntent.getStringExtra("vendorId");
-            if (mOfferId == null && callingIntent.hasExtra("offerId"))
-                mOfferId = callingIntent.getStringExtra("offerId");
-            if (mCheckinId == null && callingIntent.hasExtra("checkinId"))
-                mCheckinId = callingIntent.getStringExtra("checkinId");
+            if (mVendorId == null && callingIntent.hasExtra(EXTRA_VENDORID))
+                mVendorId = callingIntent.getStringExtra(EXTRA_VENDORID);
+            if (mOfferId == null && callingIntent.hasExtra(EXTRA_OFFERID))
+                mOfferId = callingIntent.getStringExtra(EXTRA_OFFERID);
+            if (mCheckinId == null && callingIntent.hasExtra(EXTRA_CHECKINID))
+                mCheckinId = callingIntent.getStringExtra(EXTRA_CHECKINID);
         }
         // the other condition is handled on onRestoreInstanceState
     }
@@ -71,16 +75,16 @@ public class QRActivity extends ActionBarActivity implements ZXingScannerView.Re
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("vendorId", mVendorId);
-        outState.putString("offerId", mOfferId);
-        outState.putString("checkinId", mCheckinId);
+        outState.putString(EXTRA_VENDORID, mVendorId);
+        outState.putString(EXTRA_OFFERID, mOfferId);
+        outState.putString(EXTRA_CHECKINID, mCheckinId);
     }
 
     @Override
     public void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        mVendorId = savedInstanceState.getString("vendorId");
-        mOfferId = savedInstanceState.getString("offerId");
-        mCheckinId = savedInstanceState.getString("checkinId");
+        mVendorId = savedInstanceState.getString(EXTRA_VENDORID);
+        mOfferId = savedInstanceState.getString(EXTRA_OFFERID);
+        mCheckinId = savedInstanceState.getString(EXTRA_CHECKINID);
         super.onRestoreInstanceState(savedInstanceState);
     }
 
