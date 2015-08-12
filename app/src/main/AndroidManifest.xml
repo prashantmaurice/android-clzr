@@ -229,6 +229,11 @@
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".Receivers.CampaignReceiver">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRecyclerViewAdapter.ListItemViewHolder> {
+public class MyStampsFragmentAdapter extends RecyclerView.Adapter<MyStampsFragmentAdapter.ListItemViewHolder> {
     private static final String TAG = "MyOffersRVAdapter";
     //private List<MyOffersCardModel> items;
     private ArrayList<RewardsObject> mItems;
@@ -42,7 +42,7 @@ public class MyOffersRecyclerViewAdapter extends RecyclerView.Adapter<MyOffersRe
         else items.add(new MyOffersCardModel("USED", c, allOffers)); // no offers left
     }*/
 
-    public MyOffersRecyclerViewAdapter(ArrayList<RewardsObject> offers, Context context) {
+    public MyStampsFragmentAdapter(ArrayList<RewardsObject> offers, Context context) {
         c = context;
         Log.e(TAG, "size - " + offers.size());
         mItems = offers;

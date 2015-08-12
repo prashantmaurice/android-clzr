@@ -17,11 +17,9 @@ import android.widget.TextView;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.Models.RewardsObject;
-import com.clozerr.app.MyOffer;
 import com.clozerr.app.R;
 import com.clozerr.app.Utils.Router;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,7 +29,7 @@ public class MyStampsFragment extends Fragment {
 
     Context c;
     FrameLayout layout;
-    MyOffersRecyclerViewAdapter adapter;
+    MyStampsFragmentAdapter adapter;
 
     //Data variables
     String vendorId;
@@ -50,14 +48,10 @@ public class MyStampsFragment extends Fragment {
         recyclerview.setLayoutManager(new GridLayoutManager(c,3));
         recyclerview.setItemAnimator(new DefaultItemAnimator());
         recyclerview.setHasFixedSize(true);
-        adapter = new MyOffersRecyclerViewAdapter(rewardsObjects, getActivity());
+        adapter = new MyStampsFragmentAdapter(rewardsObjects, getActivity());
         recyclerview.setAdapter(adapter);
         final TextView textView = (TextView) layout.findViewById(R.id.stampdesc);
         textView.setText(VendorActivity.detailsBundle.getString("policy"));
-        //final String[] values = new String[] { "1","2","3","4","5","6","7","8","9","10" };
-        //ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.stamp_layout, R.id.stampnumber, values);
-        //recyclerview.setAdapter(new MyStampsRecyclerViewAdapter(values,getActivity()));
-
 
 
         final String url = Router.VendorScreen.getVendorOffersData(vendorId);
@@ -97,84 +91,6 @@ public class MyStampsFragment extends Fragment {
         initViews();
     }
 
-    private ArrayList<MyOffer> convertRowMyOffers(String s){
-        ArrayList<MyOffer> rowItems = new ArrayList<>();
-
-        MyOffer item = null;
-        try {
-            //Log.e(TAG, "json passed - " + s);
-            JSONObject someObject = new JSONObject(s);
-            JSONArray array = someObject.getJSONArray("offers");
-            int maxStamps = getMaxStampCount( array );
-            //Toast.makeText(getActivity(),s, Toast.LENGTH_LONG).show();
-            MyOffer.SXOfferExtras extras = null;
-            int i=0;
-            for(int j=0;;j++) {
-                int flag=0;
-                for (i = 0; i < array.length(); ++i) {
-                    JSONObject offerObject = array.getJSONObject(i);
-                    extras = null;
-                    String type = offerObject.getString("type");
-                    if (type.equalsIgnoreCase("SX"))
-                        extras = new MyOffer.SXOfferExtras(offerObject.getJSONObject("stampStatus").getInt("total"),
-                                offerObject.getDouble("billAmt"));
-                    if (j == offerObject.getJSONObject("params").getInt("stamps") - 1) {
-                        item = new MyOffer(type,
-                                null,
-                                null,
-                                offerObject.getString("caption"),
-                                offerObject.getString("description"),
-                                offerObject.getJSONObject("params").getInt("stamps"),
-                                offerObject.getJSONObject("params").getBoolean("used"),
-                                offerObject.getJSONObject("params").getBoolean("unlocked"),
-                                extras,
-                                offerObject.getString("_id"),
-                                someObject.getInt("stamps")>=offerObject.getJSONObject("params").getInt("stamps")?true:false);
-                                //offerObject.getJSONObject("params").getBoolean("unlocked"));
-                        rowItems.add(item);
-                        flag = 1;
-                        break;
-                    }
-                }
-                    if(flag==0)
-                    {
-                        item = new MyOffer(null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                j+1,
-                                false,
-                                true,
-                                extras,
-                                null,
-                                someObject.getInt("stamps")>=j+1?true:false);
-                        rowItems.add(item);
-                    }
-
-
-                if(j==maxStamps-1) break;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return rowItems;
-    }
-
-    private int getMaxStampCount(JSONArray array) {
-        int max = 0;
-        for( int k = 0; k < array.length(); k++ ){
-            int num = 0;
-            try {
-                num = array.getJSONObject(k).getJSONObject("params").getInt("stamps");
-            }catch(org.json.JSONException ex){
-                ex.printStackTrace();
-            }
-            if( num > max )
-                max = num;
-        }
-        return max;
-    }
 
     private void initViews() {
         layout.getForeground().mutate().setAlpha(0);
