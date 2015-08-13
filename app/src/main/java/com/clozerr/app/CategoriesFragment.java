@@ -320,7 +320,7 @@ public class CategoriesFragment extends Fragment{
     }
     void move(float dy){
         scolled+=dy;
-        Log.d("Scrolling", dy + "//" + ViewHelper.getTranslationY(mToolbar)+"//"+mToolbar.getHeight()+"//"+SEARCH_CARD_INI_POS + "//"+ViewHelper.getTranslationY(SearchCard));
+        //Log.d("Scrolling", dy + "//" + ViewHelper.getTranslationY(mToolbar)+"//"+mToolbar.getHeight()+"//"+SEARCH_CARD_INI_POS + "//"+ViewHelper.getTranslationY(SearchCard));
         if(ViewHelper.getTranslationY(SearchCard)>=SEARCH_CARD_INI_POS-mToolbar.getHeight() && ViewHelper.getTranslationY(SearchCard)<=SEARCH_CARD_INI_POS)
             if((!(ViewHelper.getTranslationY(mToolbar)<=-mToolbar.getHeight()) && dy>=0) || ((ViewHelper.getTranslationY(mToolbar)<0)&& dy<=0)) {
                 if (ViewHelper.getTranslationY(mToolbar) - dy > 0) {

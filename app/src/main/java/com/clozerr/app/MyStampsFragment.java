@@ -69,6 +69,7 @@ public class MyStampsFragment extends Fragment {
             JSONObject someObject = new JSONObject(s);
             JSONArray array = someObject.getJSONArray("offers");
             int maxStamps = getMaxStampCount( array );
+            //Log.e(maxStamps);
             //Toast.makeText(getActivity(),s, Toast.LENGTH_LONG).show();
             MyOffer.SXOfferExtras extras = null;
             int i=0;
@@ -116,7 +117,7 @@ public class MyStampsFragment extends Fragment {
                     }
 
 
-                if(j==maxStamps-1) break;
+                if(j>=maxStamps-1) break;
             }
         } catch (Exception e) {
             e.printStackTrace();

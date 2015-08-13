@@ -53,9 +53,9 @@ public class GeofenceManagerService extends Service {
     private static final float GEOFENCE_MINIMUM_RADIUS_METERS = 100.0F;
     private static final long GEOFENCE_EXPIRATION = TimeUnit.MILLISECONDS.convert(1L, TimeUnit.DAYS);
     private static final int GEOFENCE_URL_TIMEOUT = (int)TimeUnit.MILLISECONDS.convert(3L, TimeUnit.SECONDS);
-        // of the int type as Ion library accepts only int timeout
+    // of the int type as Ion library accepts only int timeout
     //private static final int GEOFENCE_DWELL_TIME = (int)TimeUnit.MILLISECONDS.convert(5L, TimeUnit.SECONDS);
-        // of the int type as Geofencing API accepts only int delay
+    // of the int type as Geofencing API accepts only int delay
     private static final int NOTIFICATION_ID = 100;
 
     public static final HashMap<String, GeofenceParams> geofenceParamsHashMap = new HashMap<>();
@@ -229,7 +229,9 @@ public class GeofenceManagerService extends Service {
         return listNearBuilder.build().toString();
     }
 
-    private static void loadURLAndAddGeofences(final Context context) {
+    // Method can be called to reload fences too.
+    public static void loadURLAndAddGeofences(final Context context) {
+
         String geofenceUriString = getGeofenceUriString();
         Log.e(TAG, "fence url - " + geofenceUriString);
         Ion.with(context).load(geofenceUriString).setTimeout(GEOFENCE_URL_TIMEOUT).asJsonArray()
@@ -238,47 +240,54 @@ public class GeofenceManagerService extends Service {
                     public void onCompleted(Exception e, JsonArray result) {
                         if (e != null) {
                             e.printStackTrace();
-                        } else {
-                            try {
-                                JSONArray root = new JSONArray(result.toString());
-                                GenUtils.writeDownloadedStringToFile(context,
-                                        root.toString(), Constants.FileNames.GEOFENCE_PARAMS);
-                                for (int i = 0; i < root.length(); ++i) {
-                                    JSONObject fenceObject = root.getJSONObject(i);
-                                    geofenceParamsHashMap.put(fenceObject.getString("_id"),
-                                            new GeofenceParams(fenceObject));
-                                }
-                                LocationServices.GeofencingApi.removeGeofences(
-                                        googleApiClient,
-                                        getGeofencePendingIntent(context)
-                                ).setResultCallback(new ResultCallback<Status>() {
-                                    @Override
-                                    public void onResult(Status status) {
-                                        if (status.isSuccess())
-                                            LocationServices.GeofencingApi.addGeofences(
-                                                    googleApiClient,
-                                                    getGeofencingRequest(),
-                                                    getGeofencePendingIntent(context)
-                                            ).setResultCallback(new ResultCallback<Status>() {
-                                                @Override
-                                                public void onResult(Status status) {
-                                                    Log.e(TAG, "in onResult(" + status.getStatusMessage() + ")" +
-                                                    " - for adding geofences");
-                                                    if (status.isSuccess())
-                                                        Log.e(TAG, "success");
-                                                    else if (status.isCanceled())
-                                                        Log.e(TAG, "canceled");
-                                                    else if (status.isInterrupted())
-                                                        Log.e(TAG, "interrupted");
-                                                }
-                                            });
-                                        else Log.e(TAG, "error : " + status.getStatusMessage());
-                                    }
-                                });
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
+                            return;
                         }
+
+                        try {
+                            JSONArray root = new JSONArray(result.toString());
+                            GenUtils.writeDownloadedStringToFile(context,
+                                    root.toString(), Constants.FileNames.GEOFENCE_PARAMS);
+
+                            // Clear out the old geofences.
+                            geofenceParamsHashMap.clear();
+                            for (int i = 0; i < root.length(); ++i) {
+                                JSONObject fenceObject = root.getJSONObject(i);
+                                geofenceParamsHashMap.put(fenceObject.getString("_id"),
+                                        new GeofenceParams(fenceObject));
+                            }
+                            // Remove existing geofences:
+                            LocationServices.GeofencingApi.removeGeofences(
+                                    googleApiClient,
+                                    getGeofencePendingIntent(context)
+                            ).setResultCallback(new ResultCallback<Status>() {
+                                @Override
+                                public void onResult(Status status) {
+                                    // Add the new geofences.
+                                    if (status.isSuccess())
+                                        LocationServices.GeofencingApi.addGeofences(
+                                                googleApiClient,
+                                                getGeofencingRequest(),
+                                                getGeofencePendingIntent(context)
+                                        ).setResultCallback(new ResultCallback<Status>() {
+                                            @Override
+                                            public void onResult(Status status) {
+                                                Log.e(TAG, "in onResult(" + status.getStatusMessage() + ")" +
+                                                        " - for adding geofences");
+                                                if (status.isSuccess())
+                                                    Log.e(TAG, "success");
+                                                else if (status.isCanceled())
+                                                    Log.e(TAG, "canceled");
+                                                else if (status.isInterrupted())
+                                                    Log.e(TAG, "interrupted");
+                                            }
+                                        });
+                                    else Log.e(TAG, "error : " + status.getStatusMessage());
+                                }
+                            });
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
                     }
                 });
     }
@@ -318,6 +327,10 @@ public class GeofenceManagerService extends Service {
         public float radius;
         public int type;
         public JSONObject extras;
+        public int alarmInterval;
+        public int scanPeriod;
+        public int scanLimit;
+        public int scanOffset;
 
         public GeofenceParams() {}
 
@@ -331,12 +344,28 @@ public class GeofenceManagerService extends Service {
             type = fenceObject.getInt("type");
 
             extras = fenceObject.has("params") ? fenceObject.getJSONObject("params") : null;
+
+            this.alarmInterval = fenceObject.has("scan_data") ? fenceObject.getJSONObject("scan_data").getInt("interval") : 120;
+            this.scanPeriod = fenceObject.has("scan_data") ? fenceObject.getJSONObject("scan_data").getInt("period") : 7;
+            this.scanLimit = fenceObject.has("scan_data") ? fenceObject.getJSONObject("scan_data").getInt("limit") : 20;
+            this.scanOffset = fenceObject.has("scan_data") ? fenceObject.getJSONObject("scan_data").getInt("offset") : 150;
+
         }
 
         public GeofenceParams(LatLng coordinates, float radius, int type) {
             this.coordinates = coordinates;
             this.radius = radius;
             this.type = type;
+            this.alarmInterval = 120;
+            this.scanPeriod = 7;
+        }
+
+        public GeofenceParams(LatLng coordinates, float radius, int type, int scanPeriod, int alarmInterval) {
+            this.coordinates = coordinates;
+            this.radius = radius;
+            this.type = type;
+            this.alarmInterval = alarmInterval;
+            this.scanPeriod = scanPeriod;
         }
 
         public ArrayList<Integer> getIncludedTypes() { return getIncludedTypes(type); }
@@ -382,7 +411,7 @@ public class GeofenceManagerService extends Service {
             GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
             if (geofencingEvent.hasError()) {
                 String errorMessage = GeofenceErrorMessages.getErrorString(this,
-                                                        geofencingEvent.getErrorCode());
+                        geofencingEvent.getErrorCode());
                 Log.e(TAG, errorMessage);
                 return;
             }
@@ -404,8 +433,10 @@ public class GeofenceManagerService extends Service {
                         Log.e(TAG, "entered " + triggeringGeofence.getRequestId());
                         analytics.appendQueryParameter("dimensions[geofence]", "entered " + triggeringGeofence.getRequestId());
                         GenUtils.putAnalytics(this, TAG, analytics.build().toString());
+
+
                         if (geofenceTypes.contains(GEOFENCE_TYPE_RANGE)) {
-                            PeriodicBFS.checkAndStartScan(this);
+                            PeriodicBFS.checkAndStartScan(this, params.scanPeriod, params.alarmInterval, params.scanLimit, params.scanOffset );
                         }
                         if (geofenceTypes.contains(GEOFENCE_TYPE_RELOAD)) {
                             GeofenceManagerService.loadURLAndAddGeofences(this);

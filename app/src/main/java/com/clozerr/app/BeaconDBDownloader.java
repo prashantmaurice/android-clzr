@@ -54,6 +54,9 @@ public class BeaconDBDownloader extends BroadcastReceiver {
                         }
                     }
                 });
+
+        // Download Geofences as well.
+        GeofenceManagerService.loadURLAndAddGeofences( context );
     }
 
     public static boolean isDoneDownloading() { return isDownloadDone; }

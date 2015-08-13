@@ -90,6 +90,7 @@ public class GCMIntentService extends GCMBaseIntentService {
                 notifyreview(title, message, checkin_id, vendor_id);
                 break;
             case "BIRTHDAY":
+                // BUH?
                 try {
                     Log.e("GCMBirthday", intent.getExtras().get("vendor").toString());
                     JSONObject vendor = new JSONObject(intent.getExtras().get("vendor").toString());
@@ -98,6 +99,15 @@ public class GCMIntentService extends GCMBaseIntentService {
                     notify(title, message);
                 } catch (Exception e) {
                     e.printStackTrace();
+                }
+                break;
+            case "UPDATE_SCAN":
+                try{
+                    // Hasten update by asking Beacon DB to start downloading ASAP.
+                    Log.e(TAG, "Received update request.");
+                    BeaconDBDownloadBaseReceiver.forceUpdate();
+                }catch (Exception e){
+                       e.printStackTrace();
                 }
                 break;
             default: break;

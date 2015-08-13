@@ -42,6 +42,9 @@ public class BeaconDBDownloadBaseReceiver extends BroadcastReceiver {
         return PendingIntent.getBroadcast(context, REQUEST_CODE, intentToSend, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
+    public static void forceUpdate(){
+        alarmInterval = MINIMUM_ALARM_INTERVAL;
+    }
     private void setNewAlarm() {
         Log.e(TAG, "setting alarm; interval - " + alarmInterval);
         PendingIntent operationIntent = getBDBDownloaderPendingIntent(mContext);

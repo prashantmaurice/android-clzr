@@ -297,7 +297,12 @@ public class VendorActivity extends ActionBarActivity {
                                     VendorActivity.this.onBackPressed();
                                 }
                             });
-                    builder.show();
+                    try {
+                        builder.show();
+                        // Catch exception when user destroys VendorActivity before the Dialog is shown.
+                    }catch( Exception ex ){
+                        ex.printStackTrace();
+                    }
                 }
             }
         });

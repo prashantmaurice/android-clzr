@@ -10,6 +10,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -26,16 +27,19 @@ import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.Region;
 import com.jaalee.sdk.ServiceReadyCallback;
 
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
 
 @TargetApi(18)
 public class PeriodicBFS extends BeaconFinderService {
 
     private static final String TAG = "PBFS";
 
-    private static final long ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(90L, TimeUnit.SECONDS);
-    private static final long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(15L, TimeUnit.SECONDS);
+    private static long ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert(120L, TimeUnit.SECONDS);
+    private static long SCAN_PERIOD = TimeUnit.MILLISECONDS.convert(7L, TimeUnit.SECONDS);
+    private static int SCAN_LIMIT = 20;
     //private static final long SCAN_PAUSE_INTERVAL = TimeUnit.MILLISECONDS.convert(60L, TimeUnit.SECONDS);
     //private static final long MAX_SCAN_RESTART_INTERVAL = ALARM_INTERVAL * 2 + SCAN_PAUSE_INTERVAL;
     private static final long MAX_SCAN_RESTART_INTERVAL = ALARM_INTERVAL * 3;
@@ -47,8 +51,12 @@ public class PeriodicBFS extends BeaconFinderService {
     private static Integer maxRssi = null;
     private static VendorParams vendorToNotify = null;
     private static boolean running = false;
+    private static int scanCount = 0;
 
-    public PeriodicBFS() { super(TAG); }
+    private static ArrayList<List<Beacon>> scanFrameData;
+
+
+    public PeriodicBFS() { super(TAG); scanFrameData = new ArrayList<List<Beacon>>(); }
 
     private static NotificationCompat.Builder getDefaultNotificationBuilder(Context context) {
         return new NotificationCompat.Builder(context)
@@ -59,12 +67,45 @@ public class PeriodicBFS extends BeaconFinderService {
     }
 
     private static void putAnalyticsForVendor(Context context, final VendorParams vendorParams) {
-        final String analyticsURL = GenUtils.getDefaultAnalyticsUriBuilder(context, Constants.Metrics.BEACON_DETECTION)
-                .appendQueryParameter("dimensions[vendor_id]", vendorParams.id)
-                .appendQueryParameter("dimensions[beacon_major]", vendorParams.beaconParams.major.toString())
-                .appendQueryParameter("dimensions[beacon_minor]", vendorParams.beaconParams.minor.toString())
-                .build().toString();
+
+        String vendorId = "";
+
+
+        Uri.Builder enc = GenUtils.getDefaultAnalyticsUriBuilder(context, Constants.Metrics.BEACON_DETECTION);
+        String scanData = convertToDataString( scanFrameData );
+
+
+
+        // If a notification was sent out.
+        if( vendorParams != null ) {
+            enc.appendQueryParameter("dimensions[vendor_id]", vendorParams.id)
+            .appendQueryParameter("dimensions[beacon_major]", vendorParams.beaconParams.major.toString())
+            .appendQueryParameter("dimensions[beacon_minor]", vendorParams.beaconParams.minor.toString());
+        }
+
+        enc.appendQueryParameter("dimensions[scan_data]", scanData);
+
+        final String analyticsURL = enc.build().toString();
         GenUtils.putAnalytics(context, TAG, analyticsURL);
+    }
+
+    // Uses SFL ( Scan Frame Language ) to represent data.
+    // It translates as: <FRAME>;<FRAME>;<FRAME>; ...
+    // where <FRAME> is <BEACON> <BEACON> <BEACON> ...
+    // where <BEACON> is <MAJOR>-<MINOR>-<RSSI>
+    // This data is invaluable in understanding beacon detection
+    // issues on a large scale. This will also help in configuring
+    // scan frame times to optimize for a particular BLE chipset.
+    private static String convertToDataString(ArrayList<List<Beacon>> scanFrameData) {
+        String str = "";
+        for( List<Beacon> frame : scanFrameData ){
+            for( Beacon beacon : frame ) {
+                str += beacon.getMajor() + "-" + beacon.getMajor() + "-" + beacon.getRssi();
+                str += " ";
+            }
+            str += ";";
+        }
+        return str;
     }
 
     private static void showNotificationForVendor(Context context, final VendorParams vendorParams)
@@ -142,23 +183,38 @@ public class PeriodicBFS extends BeaconFinderService {
                         }
                     });
             if (currentVendor != null && !isRejected(getApplicationContext(), currentVendor) && rssi > currentVendor.thresholdRssi) {
-                putAnalyticsForVendor(this, currentVendor);
+
                 if (maxRssi == null || maxRssi < rssi) {
                     maxRssi = rssi;
                     vendorToNotify = currentVendor;
                 }
+
             }
         }
+        scanFrameData.add( new ArrayList<>(beaconList) );
     }
 
     public void startScanning() {
+
+        // Stop scans if we hit stop scan limit.
+
+        Log.e(TAG, "scan count: " + scanCount + " out of " + SCAN_LIMIT );
+        if( scanCount > SCAN_LIMIT && SCAN_LIMIT != -1 ){
+            checkAndStopScan( getApplicationContext() );
+            return;
+        }
+
         setListener(true);
         turnOnBluetooth(getApplicationContext());
         maxRssi = null;
         vendorToNotify = null;
+        scanFrameData.clear();
+        Log.e(TAG, "Waiting for BT State");
         new BTStateListener(SCAN_PERIOD) {
             @Override
             public void onBTStateReached(Context context, int state) {
+                Log.e(TAG, "State:" +state);
+                Log.e(TAG, "BT state changed");
                 if (state == BluetoothAdapter.STATE_ON) {
                     unregisterSelf(context);
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -167,6 +223,7 @@ public class PeriodicBFS extends BeaconFinderService {
                             beaconManager.connect(new ServiceReadyCallback() {
                                 @Override
                                 public void onServiceReady() {
+                                    scanCount ++;
                                     Log.e(TAG, "Started Scan");
                                     scanningRegion = new Region(Constants.APP_PACKAGE_NAME, getUuidWithoutHyphens(commonBeaconUUID), null, null);
                                     // scan for all possible major & minor values, so no rules
@@ -184,6 +241,7 @@ public class PeriodicBFS extends BeaconFinderService {
         beaconManager.stopRanging(scanningRegion);
         turnOffBluetooth(getApplicationContext());
         Log.e(TAG, "Stopped Scan");
+        putAnalyticsForVendor(this, vendorToNotify);
         if (vendorToNotify != null) {
             showNotificationForVendor(this, vendorToNotify);
             vendorToNotify = null;
@@ -194,6 +252,8 @@ public class PeriodicBFS extends BeaconFinderService {
 
     @Override
     protected void doWakefulWork(Intent intent) {
+
+
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
@@ -201,6 +261,7 @@ public class PeriodicBFS extends BeaconFinderService {
                 new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        Log.e(TAG, "Stopping scans.");
                         stopScanning();
                     }
                 }, SCAN_PERIOD);
@@ -215,7 +276,35 @@ public class PeriodicBFS extends BeaconFinderService {
 
     public static boolean isRunning() { return running; }
 
+    public static void checkAndStartScan(Context context, int scanPeriod, int alarmInterval, int scanLimit, int scanOffset ) {
+
+        SCAN_PERIOD = TimeUnit.MILLISECONDS.convert( scanPeriod, TimeUnit.SECONDS );
+        ALARM_INTERVAL = TimeUnit.MILLISECONDS.convert( alarmInterval, TimeUnit.SECONDS );
+        SCAN_LIMIT = scanLimit;
+        long scanOffsetm = TimeUnit.MILLISECONDS.convert( scanOffset, TimeUnit.SECONDS );
+
+        scanCount = 0;
+        if (!running && checkCompatibility(context)) {
+            running = true;
+            commonBeaconUUID = PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.SPKeys.BEACON_UUID, "");
+
+            final Context c = context;
+
+            Log.e( TAG, "Delaying schedule: " + scanOffset);
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Log.e(TAG, "Delayed Scheduling of alarms.");
+                    scheduleAlarms( c );
+                }
+            }, scanOffsetm);
+
+        }
+    }
+
     public static void checkAndStartScan(Context context) {
+
+        scanCount = 0;
         if (!running && checkCompatibility(context)) {
             running = true;
             commonBeaconUUID = PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.SPKeys.BEACON_UUID, "");
