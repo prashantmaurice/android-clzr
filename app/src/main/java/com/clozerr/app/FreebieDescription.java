@@ -7,8 +7,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Gravity;
@@ -25,6 +26,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.UtilActivities.QRActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.google.android.gcm.GCMRegistrar;
 
@@ -37,7 +39,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 
-public class FreebieDescription extends ActionBarActivity {
+public class FreebieDescription extends FragmentActivity {
     String offerid="";
     String button="USE IT";
     String vendorid="",caption="",description="", name="";
@@ -116,7 +118,8 @@ public class FreebieDescription extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
-                String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+ TOKEN+"&offer_id="+offerid+"&vendor_id="+vendorid+"&gcm_id="+ GCMRegistrar.getRegistrationId(getApplicationContext());
+                String gcmIdEncoded = Uri.encode(GCMRegistrar.getRegistrationId(getApplicationContext()));
+                String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+ TOKEN+"&offer_id="+offerid+"&vendor_id="+vendorid+"&gcm_id="+ gcmIdEncoded;
                 Log.d("FreebieDescription", "checkin url - " + url);
                 VendorActivity.Rewards = "";
                 //Toast.makeText(getApplicationContext(),url,Toast.LENGTH_LONG).show();
@@ -137,38 +140,38 @@ public class FreebieDescription extends ActionBarActivity {
                                 for (int i = 0; i < displayView.getChildCount(); ++i) {
                                     View child = displayView.getChildAt(i);
                                     switch(child.getId()) {
-                            /*case R.id.confirmFrameLayout:
-                                child.findViewById(R.id.confirmButton).setOnClickListener(
-                                        new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                // Intent homeIntent = new Intent(getApplicationContext(), Home.class);
-                                                // homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                //  getApplicationContext().startActivity(homeIntent);
-                                                CouponDetails.this.finish();
-                                            }
-                                        });
-                                break;*/
+                        /*case R.id.confirmFrameLayout:
+                            child.findViewById(R.id.confirmButton).setOnClickListener(
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            // Intent homeIntent = new Intent(getApplicationContext(), Home.class);
+                                            // homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            //  getApplicationContext().startActivity(homeIntent);
+                                            CouponDetails.this.finish();
+                                        }
+                                    });
+                            break;*/
                                         case R.id.dateTimeLayout:
                                             String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis())),
                                                     time = new SimpleDateFormat("HH:mm").format(new Date(System.currentTimeMillis())) + " hrs";
                                             ((TextView)(child.findViewById(R.id.timeView))).setText(time);
                                             ((TextView)(child.findViewById(R.id.dateView))).setText(date);
                                             break;
-                                        case R.id.pinView:  ((TextView) child).setText(jsonObject.getString("pin"));
+                                        case R.id.tv_rewardUniqueCode:  ((TextView) child).setText(jsonObject.getString("pin"));
                                             break;
-                                        case R.id.confirmTitleView: ((TextView) child).setText(name);
+                                        case R.id.tv_title1: ((TextView) child).setText(name);
                                             break;
-                                        case R.id.confirmOfferView: ((TextView) child).setText(caption);
+                                        case R.id.tv_title2: ((TextView) child).setText(caption);
                                             break;
                                         case R.id.qrButton: child.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
                                                 Intent qrIntent = new Intent(FreebieDescription.this, QRActivity.class);
-                                                qrIntent.putExtra("vendorId", vendorid);
-                                                qrIntent.putExtra("offerId", offerid);
+                                                qrIntent.putExtra(QRActivity.EXTRA_VENDORID, vendorid);
+                                                qrIntent.putExtra(QRActivity.EXTRA_OFFERID, offerid);
                                                 try {
-                                                    qrIntent.putExtra("checkinId", jsonObject.getString("_id"));
+                                                    qrIntent.putExtra(QRActivity.EXTRA_CHECKINID, jsonObject.getString("_id"));
                                                 } catch (JSONException ex) {
                                                     ex.printStackTrace();
                                                 }
@@ -186,6 +189,7 @@ public class FreebieDescription extends ActionBarActivity {
                         }
                     }
                 });
+
             }
         });
         findViewById(R.id.pin).setOnClickListener(new View.OnClickListener() {

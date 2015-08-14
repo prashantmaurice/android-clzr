@@ -4,6 +4,7 @@
     android:layout_gravity="center"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/colorPrimary"
     android:layout_marginEnd="5dp"
     android:layout_marginStart="5dp">
 
@@ -25,7 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Vendor"
-                android:id="@+id/confirmTitleView"
+                android:id="@+id/tv_title1"
                 android:textColor="#FF000000"
                 android:textStyle="bold"
                 android:textSize="20sp"
@@ -37,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Offer"
-                android:id="@+id/confirmOfferView"
+                android:id="@+id/tv_title2"
                 android:textColor="#FF000000"
                 android:textStyle="bold"
                 android:textSize="20sp"
@@ -53,7 +54,8 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:paddingLeft="60dp"
-                android:paddingRight="60dp">
+                android:paddingRight="60dp"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -109,7 +111,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="0000"
-                android:id="@+id/pinView"
+                android:id="@+id/tv_rewardUniqueCode"
                 android:textColor="#FF000000"
                 android:textStyle="bold"
                 android:textSize="22dp"

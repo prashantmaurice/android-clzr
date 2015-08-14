@@ -191,7 +191,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".QRActivity"
+            android:name=".Activities.UtilActivities.QRActivity"
             android:label="@string/title_activity_qr" >
         </activity>
 
@@ -225,6 +225,11 @@
         <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
         <receiver android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
             android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".Receivers.CampaignReceiver">
             <intent-filter>
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
             </intent-filter>

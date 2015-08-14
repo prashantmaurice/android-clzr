@@ -74,7 +74,7 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
                 //    .animateLoad(spinAnimation)
                 //    .animateIn(fadeInAnimation)
                 .load(current.getImageUrl());
-
+        viewHolder.overlay.setVisibility(View.GONE);
 //        viewHolder.stampnumber.setOnTouchListener(new View.OnTouchListener() {
 //
 //            @Override
@@ -147,6 +147,7 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
         public ImageView image;
         //public Button checkinButton;
         ImageView pin;
+        public View overlay;
 
         public ListItemViewHolder(View itemView) {
             super(itemView);
@@ -155,6 +156,7 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
             caption = (TextView) itemView.findViewById(R.id.freebiename);
             description = (TextView) itemView.findViewById(R.id.freebiedescription);
             vendorId = vendorName = "";
+            overlay = itemView.findViewById(R.id.overlay);
             //checkinButton = (Button) itemView.findViewById(R.id.useit);
 
             pin=(ImageView)itemView.findViewById(R.id.pinimage);

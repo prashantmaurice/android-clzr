@@ -256,7 +256,7 @@ public class NearbyFragment extends Fragment {
         }
         
         //Fetch new batch of results nevertheless
-        fetchResultsForCurrentLocation();
+        //fetchResultsForCurrentLocation();
 
 
         //On location changed, refresh the complete list
@@ -477,12 +477,11 @@ public class NearbyFragment extends Fragment {
         return px;
     }
 
-
     @Override
     public void onResume() {
         super.onResume();
         Log.d("NEARBYFRAGMENT", "onResume");
         locationEnabledCheck();
-        fetchResultsForCurrentLocation();
+        //fetchResultsForCurrentLocation();
     }
 }

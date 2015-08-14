@@ -14,4 +14,5 @@
 
     <color name="dimmer">#EE000000</color>
     <color name="white">#ffffff</color>
+    <color name="almostWhite">#F0F0F0</color>
 </resources>

@@ -1,14 +1,18 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.UtilActivities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.clozerr.app.AsyncGet;
+import com.clozerr.app.GenUtils;
+import com.clozerr.app.MainApplication;
+import com.clozerr.app.R;
 import com.clozerr.app.Utils.Constants;
 import com.google.android.gcm.GCMRegistrar;
 import com.google.zxing.BarcodeFormat;
@@ -20,14 +24,22 @@ import java.util.Arrays;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
+/**
+ *  This activity is used when you check-in a restaurant, and a popup shows,
+ *  it can call this activity to scan QR codes
+ */
 
-public class QRActivity extends ActionBarActivity implements ZXingScannerView.ResultHandler {
+public class QRActivity extends FragmentActivity implements ZXingScannerView.ResultHandler {
 
     private static final String TAG = "QRActivity";
     private static final BarcodeFormat[] barcodeFormats =
             new BarcodeFormat[]{ BarcodeFormat.QR_CODE };
     private ZXingScannerView mScannerView;
     private String mVendorId = null, mOfferId = null, mCheckinId = null;
+
+    public static String EXTRA_VENDORID = "vendorId";
+    public static String EXTRA_CHECKINID = "checkinId";
+    public static String EXTRA_OFFERID = "offerId";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,12 +48,12 @@ public class QRActivity extends ActionBarActivity implements ZXingScannerView.Re
         mScannerView = (ZXingScannerView) findViewById(R.id.qrScannerView);
         if (savedInstanceState == null) {
             Intent callingIntent = getIntent();
-            if (mVendorId == null && callingIntent.hasExtra("vendorId"))
-                mVendorId = callingIntent.getStringExtra("vendorId");
-            if (mOfferId == null && callingIntent.hasExtra("offerId"))
-                mOfferId = callingIntent.getStringExtra("offerId");
-            if (mCheckinId == null && callingIntent.hasExtra("checkinId"))
-                mCheckinId = callingIntent.getStringExtra("checkinId");
+            if (mVendorId == null && callingIntent.hasExtra(EXTRA_VENDORID))
+                mVendorId = callingIntent.getStringExtra(EXTRA_VENDORID);
+            if (mOfferId == null && callingIntent.hasExtra(EXTRA_OFFERID))
+                mOfferId = callingIntent.getStringExtra(EXTRA_OFFERID);
+            if (mCheckinId == null && callingIntent.hasExtra(EXTRA_CHECKINID))
+                mCheckinId = callingIntent.getStringExtra(EXTRA_CHECKINID);
         }
         // the other condition is handled on onRestoreInstanceState
     }
@@ -71,16 +83,16 @@ public class QRActivity extends ActionBarActivity implements ZXingScannerView.Re
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("vendorId", mVendorId);
-        outState.putString("offerId", mOfferId);
-        outState.putString("checkinId", mCheckinId);
+        outState.putString(EXTRA_VENDORID, mVendorId);
+        outState.putString(EXTRA_OFFERID, mOfferId);
+        outState.putString(EXTRA_CHECKINID, mCheckinId);
     }
 
     @Override
     public void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        mVendorId = savedInstanceState.getString("vendorId");
-        mOfferId = savedInstanceState.getString("offerId");
-        mCheckinId = savedInstanceState.getString("checkinId");
+        mVendorId = savedInstanceState.getString(EXTRA_VENDORID);
+        mOfferId = savedInstanceState.getString(EXTRA_OFFERID);
+        mCheckinId = savedInstanceState.getString(EXTRA_CHECKINID);
         super.onRestoreInstanceState(savedInstanceState);
     }
 

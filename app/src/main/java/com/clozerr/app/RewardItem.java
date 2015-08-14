@@ -5,11 +5,11 @@ package com.clozerr.app;
  */
 public class RewardItem {
     String Name;
-    String Caption;
-    String Description;
-    String Image;
-    String RewardId;
-    Boolean Unlocked;
+    public String Caption;
+    public String Description;
+    public String Image;
+    public String RewardId;
+    public Boolean Unlocked;
     public RewardItem(String Name,String Caption,String Description,String Image, String RewardId, Boolean Unlocked){
         this.Name = capitalise(splitCamelCase(Name));
         this.Caption = Caption;

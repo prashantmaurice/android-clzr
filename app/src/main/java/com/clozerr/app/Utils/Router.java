@@ -78,6 +78,40 @@ public class Router {
         }
     }
 
+    public static class Content{
+        public static String getFAQHtml(){
+            //http://api.clozerr.com/content?key=faq
+            return getNewDefaultBuilder().path("content")
+                    .appendQueryParameter("key", "faq").build().toString();
+        }
+    }
+
+    public static class VendorScreen {
+
+        public static String getVendorOffersData(String vendorId) {
+            //http://api.clozerr.com/v2/vendor/offers/offerspage?access_token=ee82d33ccecb2723aa6de112db64da26&vendor_id=55c31e7fbd510fdc2d863db3
+            return getNewDefaultBuilder().path("v2/vendor/offers/offerspage")
+                    .appendQueryParameter("vendor_id", vendorId)
+                    .appendQueryParameter("access_token", getClozerrToken()).build().toString();
+        }
+
+        public static String getRewardsData(String vendorId) {
+            //http://api.clozerr.com/v2/vendor/offers/rewardspage/?vendor_id=" + VendorActivity.vendorId + "&access_token=" + VendorActivity.TOKEN;
+            return getNewDefaultBuilder().path("v2/vendor/offers/rewardspage")
+                    .appendQueryParameter("vendor_id", vendorId)
+                    .appendQueryParameter("access_token", getClozerrToken()).build().toString();
+        }
+
+        public static String checkInAReward(String rewardId, String vendorId, String gcmId) {
+            //http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+ TOKEN+"&offer_id="+model.rewardId+"&vendor_id="+model.vendorId+"&gcm_id="+ gcmIdEncoded;
+            return getNewDefaultBuilder().path("v2/vendor/offers/checkin")
+                    .appendQueryParameter("offer_id", rewardId)
+                    .appendQueryParameter("vendor_id", vendorId)
+                    .appendQueryParameter("gcm_id", gcmId)
+                    .appendQueryParameter("access_token", getClozerrToken()).build().toString();
+        }
+    }
+
 }
 
 

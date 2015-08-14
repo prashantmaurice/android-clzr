@@ -38,8 +38,8 @@ public class MyStampsFragment extends Fragment {
 
                         MyOffersRecyclerViewAdapter myOffersAdapter = new MyOffersRecyclerViewAdapter(myOffers, currentOffer, CouponDetails.this);
                         mRecyclerView.setAdapter(myOffersAdapter);*/
-        MyOffersRecyclerViewAdapter adapter = new MyOffersRecyclerViewAdapter(myOffers, getActivity());
-        recyclerview.setAdapter(adapter);
+        //MyOffersRecyclerViewAdapter adapter = new MyOffersRecyclerViewAdapter(myOffers, getActivity());
+        //recyclerview.setAdapter(adapter);
         final TextView textView = (TextView) layout.findViewById(R.id.stampdesc);
         textView.setText(VendorActivity.detailsBundle.getString("policy"));
         //final String[] values = new String[] { "1","2","3","4","5","6","7","8","9","10" };

@@ -24,6 +24,8 @@ public class SharedPrefs {
     public JSONObject userData = new JSONObject();
     public JSONObject loginData = new JSONObject();
     public JSONObject cacheData = new JSONObject();
+    public JSONObject campaignData = new JSONObject();
+
 
     private SharedPrefs(Context context) {
         this.mContext = context;
@@ -63,6 +65,15 @@ public class SharedPrefs {
         editor.apply();
     }
 
+    //CAMPAIGN DATA
+    public void saveCampaignData() {
+        Logg.d(TAG, "saveCampaignData in Prefs");
+        Logg.d("SAVE PREFS saveCampaignData :=====", campaignData.toString());
+        SharedPreferences.Editor editor = prefs_trackers.edit();
+        editor.putString(Str.campaignData, campaignData.toString());
+        editor.apply();
+    }
+
 
 
 
@@ -81,6 +92,7 @@ public class SharedPrefs {
             userData = new JSONObject(getString(PrefsTypes.TRACKERS, Str.userData,"{}"));
             loginData = new JSONObject(getString(PrefsTypes.TRACKERS, Str.loginData,"{}"));
             cacheData = new JSONObject(getString(PrefsTypes.TRACKERS, Str.cacheData,"{}"));
+            campaignData = new JSONObject(getString(PrefsTypes.TRACKERS, Str.campaignData,"{}"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -115,6 +127,8 @@ public class SharedPrefs {
         static String userData = "userData";
         static String loginData = "loginData";
         static String cacheData = "cacheData";
+        static String campaignData = "campaignData";
+
     }
 
 

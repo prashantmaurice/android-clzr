@@ -1,4 +1,4 @@
-package com.clozerr.app.Activities.VendorScreens;
+package com.clozerr.app.Activities.VendorScreens.Subviews;
 
 /**
  * Created by Aravind.S on 20-05-2015.
@@ -22,6 +22,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.R;
 
@@ -31,10 +32,21 @@ public class VendorSettingsFragment extends Fragment {
     Context c;
     FrameLayout layout;
     private SettingsFragment mSettingsFragment;
+
+    //Data variables
+    String vendorId,vendorTitle;
+
+    public static VendorSettingsFragment newInstance(String vendorId, String vendorTitle) {
+        VendorSettingsFragment myFragment = new VendorSettingsFragment();
+        myFragment.vendorId = vendorId;
+        myFragment.vendorTitle = vendorTitle;
+        return myFragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         layout = (FrameLayout) inflater.inflate(R.layout.activity_vendor_settings_fragment, container, false);
-        mSettingsFragment = new SettingsFragment();
+        mSettingsFragment = SettingsFragment.newInstance(vendorId,vendorTitle);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(c);
         preferences.registerOnSharedPreferenceChangeListener(mSettingsFragment);
         if (savedInstanceState == null) {
@@ -61,7 +73,16 @@ public class VendorSettingsFragment extends Fragment {
         //layout.getForeground().mutate().setAlpha(0);
     }
     public static class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
-        public SettingsFragment() {
+        String vendorId, vendorName;
+
+        public SettingsFragment(){
+
+        }
+        public static SettingsFragment newInstance(String vendorId, String vendorName) {
+            SettingsFragment myFragment = new SettingsFragment();
+            myFragment.vendorId = vendorId;
+            myFragment.vendorName = vendorName;
+            return myFragment;
         }
 
         @Override
@@ -74,7 +95,7 @@ public class VendorSettingsFragment extends Fragment {
                 public boolean onPreferenceClick(Preference preference)
                 { //code for what you want it to do return true;
                     Intent shortcutIntent = new Intent(getActivity(), VendorActivity.class);
-                    shortcutIntent.putExtra("vendor_id",VendorActivity.vendorId);
+                    shortcutIntent.putExtra("vendor_id",vendorId);
 //                    SharedPreferences example = getActivity().getSharedPreferences("USER", 0);
 //                    SharedPreferences.Editor editor = example.edit();
 //                    editor.putString("latitude", Home.lat+"");
@@ -87,7 +108,7 @@ public class VendorSettingsFragment extends Fragment {
                     shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     Intent addIntent = new Intent();
-                    addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, VendorActivity.vendorTitle);
+                    addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, vendorName);
 
                     ImageView image = VendorActivity.logoView;
                     Bitmap bitmap = ((BitmapDrawable)image.getDrawable()).getBitmap();

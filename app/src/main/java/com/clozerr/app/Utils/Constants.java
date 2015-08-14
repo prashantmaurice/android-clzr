@@ -55,6 +55,7 @@ public class Constants {
     }
 
     public static class Metrics {
+        public static final String CAMPAIGN = "campaign";
         public static final String GEOFENCE_TRANSITION = "Geofence_Transition";
         public static final String HOME_SCREEN = "Clozerr_Home_Screen";
         public static final String IN_STORE_INSTALL = "In_Store_Install";
