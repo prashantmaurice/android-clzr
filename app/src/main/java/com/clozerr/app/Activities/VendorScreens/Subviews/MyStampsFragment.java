@@ -1,9 +1,13 @@
 package com.clozerr.app.Activities.VendorScreens.Subviews;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +20,7 @@ import android.widget.TextView;
 
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.clozerr.app.AsyncGet;
+import com.clozerr.app.Handlers.LocalBroadcastHandler;
 import com.clozerr.app.Models.RewardsObject;
 import com.clozerr.app.R;
 import com.clozerr.app.Utils.Router;
@@ -45,15 +50,32 @@ public class MyStampsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         layout = (FrameLayout) inflater.inflate(R.layout.activity_mystamps_fragment, container, false);
         final RecyclerView recyclerview=(RecyclerView)layout.findViewById(R.id.stampslist);
-        recyclerview.setLayoutManager(new GridLayoutManager(c,3));
+        recyclerview.setLayoutManager(new GridLayoutManager(c, 3));
         recyclerview.setItemAnimator(new DefaultItemAnimator());
         recyclerview.setHasFixedSize(true);
         adapter = new MyStampsFragmentAdapter(rewardsObjects, getActivity());
         recyclerview.setAdapter(adapter);
         final TextView textView = (TextView) layout.findViewById(R.id.stampdesc);
         textView.setText(VendorActivity.detailsBundle.getString("policy"));
+        reloadData();
 
 
+        //Add local broadcast listeners
+        LocalBroadcastManager.getInstance(c).registerReceiver(mMyStampsUpdateReceiver,
+                new IntentFilter(LocalBroadcastHandler.MYSTAMPS_CHANGED));
+
+        return layout;
+    }
+
+    private BroadcastReceiver mMyStampsUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("MYSTAMPS","onReceive : mMyStampsUpdateReceiverD");
+            reloadData();
+        }
+    };
+
+    public void reloadData(){
         final String url = Router.VendorScreen.getVendorOffersData(vendorId);
         new AsyncGet(c, url, new AsyncGet.AsyncResult() {
             @Override
@@ -74,9 +96,6 @@ public class MyStampsFragment extends Fragment {
                 adapter.notifyDataSetChangedCustom();
             }
         }, true);
-
-
-        return layout;
     }
 
     @Override
@@ -89,6 +108,13 @@ public class MyStampsFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initViews();
+    }
+
+    @Override
+    public void onDestroy() {
+        // Unregister since the activity is about to be closed.
+        LocalBroadcastManager.getInstance(c).unregisterReceiver(mMyStampsUpdateReceiver);
+        super.onDestroy();
     }
 
 

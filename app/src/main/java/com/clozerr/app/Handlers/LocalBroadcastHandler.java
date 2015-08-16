@@ -13,6 +13,7 @@ public class LocalBroadcastHandler {
     public static String PROFILE_UPDATED = "PROFILE_UPDATED";
     public static String LOCATION_UPDATED = "LOCATION_UPDATED";
     public static String MYCLUBS_CHANGED = "MYCLUBS_CHANGED";
+    public static String MYSTAMPS_CHANGED = "MYSTAMPS_CHANGED";
 
     public static void sendBroadcast(Context context, String intentCode){
         Intent intent = new Intent(intentCode);

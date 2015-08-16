@@ -8,11 +8,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
 
+import com.clozerr.app.Utils.Logg;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
@@ -21,8 +22,6 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.SocketTimeoutException;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Created by junaid on 2/11/14.
@@ -57,7 +56,9 @@ public class AsyncGet extends AsyncTask<String, String, String> {
 
         }
         else if (context instanceof Activity && toDisplayProgress)
-            Toast.makeText(context,"Network error. Check your network connections and try again.",Toast.LENGTH_LONG).show();
+            Logg.e("ERROR","Network error. Check your network connections and try again.");
+        //TODO : disabled to stop nfitications, once check this stack
+//            Toast.makeText(context,"Network error. Check your network connections and try again.",Toast.LENGTH_LONG).show();
     }
 
     public AsyncGet(Context context, String url, AsyncResult as) {

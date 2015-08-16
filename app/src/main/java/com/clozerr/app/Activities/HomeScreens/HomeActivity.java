@@ -205,7 +205,7 @@ public class HomeActivity extends ActionBarActivity {
 
 
 
-        nav_username.setText("TEST");
+        nav_username.setText("Not logged in");
         updateUI();
 
 
