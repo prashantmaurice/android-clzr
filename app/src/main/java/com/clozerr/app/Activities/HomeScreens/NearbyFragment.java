@@ -255,8 +255,8 @@ public class NearbyFragment extends Fragment {
             mMainPageAdapter.notifyDataSetChanged();
         }
         
-        //Fetch new batch of results nevertheless
-        //fetchResultsForCurrentLocation();
+        //Fetch results on create
+        fetchResultsForCurrentLocation();
 
 
         //On location changed, refresh the complete list

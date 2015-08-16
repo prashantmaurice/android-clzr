@@ -91,7 +91,7 @@ public class SignupActivity extends FragmentActivity {
     TokenHandler tokenHandler;
 
     //VIEW VARIABLES
-    private ImageButton btn_login_facebook, btn_login_google;
+    private ImageButton btn_login_facebook, btn_login_google,btn_login_notnow;
     private ViewPager mPager;
 
 
@@ -517,6 +517,15 @@ public class SignupActivity extends FragmentActivity {
             @Override
             public void onClick(View view) {
                 LoginManager.getInstance().logInWithReadPermissions(SignupActivity.this, Arrays.asList("email", "public_profile"));
+            }
+        });
+
+        btn_login_notnow = (ImageButton) findViewById(R.id.btn_login_notnow);
+        btn_login_notnow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                tokenHandler.skipLogin();
+                gotoMainApp();
             }
         });
 

@@ -217,6 +217,13 @@ public class TokenHandler {
         void onClozerTokenUpdated();
     }
 
+    public void skipLogin(){
+        if(!loginSkip){
+            loginSkip = true;
+            saveTokenDataLocally();
+        }
+    }
+
     public void print(){
         JSONObject obj = new JSONObject();
         try {
