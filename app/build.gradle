@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    signingConfigs {
+//    signingConfigs {
 
-        config {
-            keyAlias 'clozerr_key'
-            keyPassword 'clozerr'
-            storeFile file('/Users/saipraveenb/Documents/android.jks')
-            storePassword 'clozerr'
-        }
-    }
+//        config {
+//            keyAlias 'clozerr_key'
+//            keyPassword 'clozerr'
+//            storeFile file('/Users/maurice/Desktop/clozerr.jks')
+//            storePassword 'clozerr'
+//        }
+//    }
 
 
     //https://developer.android.com/intl/zh-cn/tools/building/multidex.html
@@ -47,7 +47,7 @@ android {
         }
         debug {
 //            signingConfig signingConfigs.config
-            signingConfig signingConfigs.config
+//            signingConfig signingConfigs.config
         }
     }
 }

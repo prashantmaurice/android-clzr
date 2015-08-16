@@ -40,8 +40,7 @@ public class SharedPrefs {
 
     //USER DATA
     public void saveUserData() {
-        Logg.d(TAG, "saveUserData in Prefs");
-        Logg.d("SAVE PREFS userData :=====", userData.toString());
+        Logg.d(TAG, "saveUserData =====> "+ userData.toString());
         SharedPreferences.Editor editor = prefs_trackers.edit();
         editor.putString(Str.userData, userData.toString());
         editor.apply();
@@ -49,8 +48,7 @@ public class SharedPrefs {
 
     //LOGIN DATA
     public void saveLoginData() {
-        Logg.d(TAG, "saveLoginData in Prefs");
-        Logg.d("SAVE PREFS saveLoginData :=====", loginData.toString());
+        Logg.d(TAG, "saveLoginData =====> "+ loginData.toString());
         SharedPreferences.Editor editor = prefs_trackers.edit();
         editor.putString(Str.loginData, loginData.toString());
         editor.apply();
@@ -58,8 +56,7 @@ public class SharedPrefs {
 
     //CACHE DATA
     public void saveCacheData() {
-        Logg.d(TAG, "saveCacheData in Prefs");
-        Logg.d("SAVE PREFS cacheData :=====", cacheData.toString());
+        Logg.d(TAG, "cacheData =====> "+ cacheData.toString());
         SharedPreferences.Editor editor = prefs_trackers.edit();
         editor.putString(Str.cacheData, cacheData.toString());
         editor.apply();
@@ -67,8 +64,7 @@ public class SharedPrefs {
 
     //CAMPAIGN DATA
     public void saveCampaignData() {
-        Logg.d(TAG, "saveCampaignData in Prefs");
-        Logg.d("SAVE PREFS saveCampaignData :=====", campaignData.toString());
+        Logg.d(TAG, "saveCampaignData =====> "+ campaignData.toString());
         SharedPreferences.Editor editor = prefs_trackers.edit();
         editor.putString(Str.campaignData, campaignData.toString());
         editor.apply();
