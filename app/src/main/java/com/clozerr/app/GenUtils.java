@@ -136,4 +136,17 @@ public class GenUtils {
     public static void showDebugToast(Context context, String text){
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
+    public static void showToast(Context context, final String text){
+        if (context == null) context = MainApplication.getInstance();
+        Handler handler = new Handler(Looper.getMainLooper());
+        final Context finalContext = context;
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(finalContext, text, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 }
+

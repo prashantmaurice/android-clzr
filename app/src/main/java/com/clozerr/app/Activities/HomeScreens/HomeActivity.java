@@ -502,12 +502,9 @@ public class HomeActivity extends ActionBarActivity {
                 case DialogInterface.BUTTON_POSITIVE:
                     //Yes button clicked
                     Toast.makeText(HomeActivity.this, "Logging out", Toast.LENGTH_SHORT).show();
-                    MainApplication.getInstance().tokenHandler.logout();
+                    MainApplication.getInstance().tokenHandler.logout(HomeActivity.this);
 
-                    USER_PIC_URL = USERNAME = USERID  = "";
-
-                    startActivity(new Intent(HomeActivity.this, HomeActivity.class));
-                    finish();
+                    USER_PIC_URL = USERNAME = USERID  = "";//Todo : remove this
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
                     //Toast.makeText(Home.this, "Thanks for staying. You are awesome.", Toast.LENGTH_SHORT).show();

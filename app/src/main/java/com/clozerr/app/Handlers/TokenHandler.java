@@ -1,22 +1,30 @@
 package com.clozerr.app.Handlers;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.clozerr.app.Activities.HomeScreens.HomeActivity;
 import com.clozerr.app.GenUtils;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.Models.UserMain;
 import com.clozerr.app.Storage.SharedPrefs;
 import com.clozerr.app.Utils.Logg;
 import com.facebook.AccessToken;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.plus.Plus;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,6 +35,7 @@ import java.io.IOException;
  * This contains all the User data excluding kids,
  */
 public class TokenHandler {
+    static String TAG = "TOKENHANDLER";
     private Context mContext;
     private static TokenHandler instance;
     private SharedPrefs sPrefs;
@@ -72,6 +81,7 @@ public class TokenHandler {
     //Some extra variables
     public String categories_cards;
     public String home_cards;
+    private GoogleApiClient finalMGoogleApiClient;//used when logging out
 
 
     private TokenHandler(Context context) {
@@ -133,19 +143,24 @@ public class TokenHandler {
         return (!clozerrtoken.isEmpty());
     }
     public boolean loggedByFb(){
-        return (!authProvider.equals(AUTH_FACEBOOK));
+        return (authProvider.equals(AUTH_FACEBOOK));
     }
     public boolean loggedByGoogle(){
-        return (!authProvider.equals(AUTH_FACEBOOK));
+        return (authProvider.equals(AUTH_GOOGLE));
     }
 
     /** SOME PUBLIC PUT FUNCTIONS */
-    public void logout() {
+    public void logout(Activity activity) {
         clozerrtoken = "";
         email = "";
         socialtoken = "";
         authProvider = AUTH_NONE;
+        username = "";
+        picurl  = "";
+        loginSkip = false;
         saveTokenDataLocally();
+        if(loggedByGoogle())logoutGoogle(activity);
+        if(loggedByFb())logoutFacebook(activity);
     }
 
     public void addSocialToken(String token, String authProviderStr){
@@ -236,4 +251,52 @@ public class TokenHandler {
         } catch (JSONException e) {e.printStackTrace();}
     }
 
+    /** LOGOUT STACKS */
+    public void logoutGoogle(final Activity activity){
+        //Logout from google
+        Logg.e(TAG,"Started Google Logout Procedure");
+        finalMGoogleApiClient = new GoogleApiClient.Builder(activity)
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(Bundle bundle) {
+                        googleLogoutCallback(activity);
+                        Logg.e(TAG, "Successfully logged out from google");
+                        Logg.d(TAG, "restarting...");
+
+                        //FInally kill the calling activity and restart app
+                        activity.startActivity(new Intent(activity, HomeActivity.class));
+                        activity.finish();
+                    }
+
+                    @Override
+                    public void onConnectionSuspended(int i) {
+                        ToastMain.showSmartToast(activity, "Error logging out","Error : google logout : onConnectionSuspended");
+                    }
+                })
+                .addApi(Plus.API)
+                .addScope(new Scope(Scopes.PROFILE))
+                .build();
+        finalMGoogleApiClient.connect();
+    }
+
+    private void googleLogoutCallback(Context context) {
+        if (finalMGoogleApiClient != null) {
+            if (finalMGoogleApiClient.isConnected()) {
+                Plus.AccountApi.clearDefaultAccount(finalMGoogleApiClient);
+                finalMGoogleApiClient.disconnect();
+                ToastMain.showSmartToast(context, "Successfully logged out of Google");
+                return;
+            }
+        }
+        ToastMain.showSmartToast(context, "Error in logging out of google", "Error, google logout error : 301");
+    }
+
+    public void logoutFacebook(Activity activity) {
+        LoginManager.getInstance().logOut();
+        Logg.e(TAG, "Successfully logged out from Facebook");
+        Logg.d(TAG, "restarting...");
+        //FInally kill the calling activity and restart app
+        activity.startActivity(new Intent(activity, HomeActivity.class));
+        activity.finish();
+    }
 }
