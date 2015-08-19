@@ -188,9 +188,9 @@ public class CategoryDetail extends ActionBarActivity{
         TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
         if(!cards.equals("")){
             Log.e("Cached Card", cards);
-            mMainCardsList = convertRow(cards);
-            mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, this);
-            mRecyclerView.setAdapter(mMainPageAdapter);
+//            mMainCardsList = convertRow(cards);
+//            mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, this);
+//            mRecyclerView.setAdapter(mMainPageAdapter);
         } else {
             mOffset = 0;
 //            String url = "http://api.clozerr.com/v2/vendor/search/near?category=" + categorybundle.getString("categoryname").replace(" ", "%20") +
@@ -207,9 +207,9 @@ public class CategoryDetail extends ActionBarActivity{
 
                     ArrayList<CardModel> CardList = convertRow(s);
                     if (CardList.size() != 0) {
-                        mMainCardsList = CardList;
-                        mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, CategoryDetail.this);
-                        mRecyclerView.setAdapter(mMainPageAdapter);
+//                        mMainCardsList = CardList;
+//                        mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, CategoryDetail.this);
+//                        mRecyclerView.setAdapter(mMainPageAdapter);
                         final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                         editor.putString(categorybundle.getString("categoryname")+"category_cards", s);
                         editor.apply();
@@ -250,9 +250,9 @@ public class CategoryDetail extends ActionBarActivity{
                         if (s != "") {
                             ArrayList<CardModel> CardList = convertRow(s);
                             if (CardList.size() != 0) {
-                                mMainCardsList = CardList;
-                                mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, CategoryDetail.this);
-                                mRecyclerView.setAdapter(mMainPageAdapter);
+//                                mMainCardsList = CardList;
+//                                mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, CategoryDetail.this);
+//                                mRecyclerView.setAdapter(mMainPageAdapter);
 
                                 final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                                 editor.putString(categorybundle.getString("categoryname")+"category_cards", s);
@@ -417,7 +417,7 @@ private ArrayList<CardModel> convertRow(String s) {
     }
     void move(float dy){
         scolled+=dy;
-        Log.d("Scrolling", dy + "//" + ViewHelper.getTranslationY(mToolbar) + "//" + mToolbar.getHeight() + "//" + SEARCH_CARD_INI_POS + "//" + ViewHelper.getTranslationY(SearchCard));
+//        Log.d("Scrolling", dy + "//" + ViewHelper.getTranslationY(mToolbar) + "//" + mToolbar.getHeight() + "//" + SEARCH_CARD_INI_POS + "//" + ViewHelper.getTranslationY(SearchCard));
         if(ViewHelper.getTranslationY(SearchCard)>=SEARCH_CARD_INI_POS-mToolbar.getHeight() && ViewHelper.getTranslationY(SearchCard)<=SEARCH_CARD_INI_POS)
             if((!(ViewHelper.getTranslationY(mToolbar)<=-mToolbar.getHeight()) && dy>=0) || ((ViewHelper.getTranslationY(mToolbar)<0)&& dy<=0)) {
                 if (ViewHelper.getTranslationY(mToolbar) - dy > 0) {

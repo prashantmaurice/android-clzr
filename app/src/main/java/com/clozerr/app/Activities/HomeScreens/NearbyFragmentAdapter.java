@@ -27,9 +27,9 @@ import android.widget.Toast;
 import com.clozerr.app.Activities.LoginScreens.LoginActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.clozerr.app.AsyncGet;
-import com.clozerr.app.CardModel;
 import com.clozerr.app.Handlers.LocalBroadcastHandler;
 import com.clozerr.app.MainApplication;
+import com.clozerr.app.Models.NearbyRestaurentObject;
 import com.clozerr.app.R;
 import com.koushikdutta.ion.Ion;
 
@@ -45,7 +45,7 @@ import java.util.List;
  */
 public class NearbyFragmentAdapter extends RecyclerView.Adapter<NearbyFragmentAdapter.ListItemViewHolder> {
 
-    private List<CardModel> items;
+    private List<NearbyRestaurentObject> items;
     static Context c;
 //    SharedPreferences status;
     boolean NotNow;
@@ -55,10 +55,9 @@ public class NearbyFragmentAdapter extends RecyclerView.Adapter<NearbyFragmentAd
 
     //public static String vendor_name_temp = "";
 
-    public NearbyFragmentAdapter(List<CardModel> modelData, Context c) {
+    public NearbyFragmentAdapter(List<NearbyRestaurentObject> modelData, Context c) {
         if (modelData == null) {
-            throw new IllegalArgumentException(
-                    "modelData must not be null");
+            throw new IllegalArgumentException("modelData must not be null");
         }
         this.items = modelData;
         this.c = c;
@@ -83,17 +82,16 @@ public class NearbyFragmentAdapter extends RecyclerView.Adapter<NearbyFragmentAd
     @Override
     public void onBindViewHolder(final ListItemViewHolder viewHolder, int position) {
         viewHolder.currentItem = items.get(position);
-        CardModel model = items.get(position);
+        NearbyRestaurentObject model = items.get(position);
         viewHolder.txtTitle.setText(model.getTitle());
         viewHolder.txtCaption.setText(model.getCaption());
         viewHolder.txtDist.setText(model.getDistanceString());
-        Log.i("fav","changing favs");
+        Log.i("fav", "changing favs");
         updateFavs();
-        if(fav.indexOf(model.getVendorId())!=-1)
+        if(model.isFavourite())
             viewHolder.like.setImageResource(R.drawable.favorited);
         else
             viewHolder.like.setImageResource(R.drawable.like);
-        Log.i("fave","leaving favs");
         /*LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 dpToPx(viewHolder.linearLayout.getWidth())/2
@@ -104,7 +102,7 @@ public class NearbyFragmentAdapter extends RecyclerView.Adapter<NearbyFragmentAd
        // new DownloadImageTask(viewHolder.imageView).execute(model.getImageId());
         // viewHolder.txtDist.setText(model.getDesc());
 
-        Ion.with(c).load(model.getImageId()).withBitmap().placeholder(R.drawable.defoffer).transform(new com.koushikdutta.ion.bitmap.Transform() {
+        Ion.with(c).load(model.getImageUrl()).withBitmap().placeholder(R.drawable.defoffer).transform(new com.koushikdutta.ion.bitmap.Transform() {
             public Bitmap transform(Bitmap bitmap) {
                 Log.d("Bitmap transform", "wd:" + viewHolder.imageView.getWidth() + " ht:" + viewHolder.imageView.getHeight() );
                 Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getWidth()/2, Bitmap.Config.ARGB_8888);
@@ -180,7 +178,7 @@ public class NearbyFragmentAdapter extends RecyclerView.Adapter<NearbyFragmentAd
         LinearLayout linearLayout;
         ImageButton like;
         //TextView txtrating;
-        public CardModel currentItem;
+        public NearbyRestaurentObject currentItem;
 
         public ListItemViewHolder(final View itemView) {
             super(itemView);
@@ -293,10 +291,7 @@ public class NearbyFragmentAdapter extends RecyclerView.Adapter<NearbyFragmentAd
                     if (VendorActivity.i == 0 && !NotNow)
                     {
                         Intent detailIntent = new Intent(c, VendorActivity.class);
-                        detailIntent.putExtra("vendor_id", currentItem.getVendorId());
-                        detailIntent.putExtra("offer_id", currentItem.getOfferId());
-                        detailIntent.putExtra("offer_caption", currentItem.getCaption());
-                        detailIntent.putExtra("offer_text", currentItem.getOfferDescription());
+                        detailIntent.putExtra(VendorActivity.EXTRA_VENDORID, currentItem.getVendorId());
                         if( currentItem.isActive() )
                             c.startActivity(detailIntent);
                     }

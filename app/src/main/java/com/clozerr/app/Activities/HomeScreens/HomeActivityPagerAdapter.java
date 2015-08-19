@@ -29,8 +29,8 @@ public class HomeActivityPagerAdapter extends FragmentPagerAdapter {
                 NearbyFragment nearbyFragment = new NearbyFragment();
                 return nearbyFragment;
             case 1:
-                MyClubsFragment myClubsFragment = new MyClubsFragment();
-                return myClubsFragment;
+                FavouritesFragment favouritesFragment = new FavouritesFragment();
+                return favouritesFragment;
             default:return null;
         }
 

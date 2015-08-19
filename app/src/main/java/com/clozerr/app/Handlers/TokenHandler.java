@@ -150,18 +150,6 @@ public class TokenHandler {
     }
 
     /** SOME PUBLIC PUT FUNCTIONS */
-    public void logout(Activity activity) {
-        clozerrtoken = "";
-        email = "";
-        socialtoken = "";
-        authProvider = AUTH_NONE;
-        username = "";
-        picurl  = "";
-        loginSkip = false;
-        saveTokenDataLocally();
-        if(loggedByGoogle())logoutGoogle(activity);
-        if(loggedByFb())logoutFacebook(activity);
-    }
 
     public void addSocialToken(String token, String authProviderStr){
         socialtoken = token;
@@ -170,6 +158,7 @@ public class TokenHandler {
     }
 
     public void getClozerrToken(final ClozerrTokenListener listener){
+        Logg.d(TAG,"fetching Clozerr Token....");
         String authGuy = (authProvider.equals(AUTH_GOOGLE))?"google":"facebook";
         String url = "http://api.clozerr.com/auth/login/"+authGuy+"?token=" + socialtoken;
         Logg.d("url",url);
@@ -177,6 +166,7 @@ public class TokenHandler {
             @Override
             public void onResponse(JSONObject response) {
                 try {
+                    Logg.d(TAG,"Received response for Clozerr Token");
                     Logg.m("MAIN", "Response : Email check = " + response.toString());
                     if(response.getBoolean("result")) {
                         String token = response.getString("token");
@@ -185,13 +175,17 @@ public class TokenHandler {
                         MainApplication.getInstance().tokenHandler.username = profile.getString("name");
                         MainApplication.getInstance().tokenHandler.picurl = profile.getString("picture");
                         MainApplication.getInstance().tokenHandler.saveTokenDataLocally();
-                        listener.onClozerTokenUpdated();
+                        listener.onClozerTokenUpdated(true);
                     }else{
+                        Logg.e(TAG,"error in parsing clozerr token");
                         GenUtils.showDebugToast(mContext.getApplicationContext(), "error in parsing clozerr token");
+                        listener.onClozerTokenUpdated(false);
                     }
                 } catch (JSONException e) {
+                    Logg.e(TAG,"error in fetching clozerr token");
                     GenUtils.showDebugToast(mContext.getApplicationContext(), "error in fetching clozerr token");
                     e.printStackTrace();
+                    listener.onClozerTokenUpdated(false);
                 }
             }
         }, new Response.ErrorListener() {
@@ -200,8 +194,8 @@ public class TokenHandler {
                 GenUtils.showDebugToast(mContext.getApplicationContext(), "server did not return clozerr token");
 
                 loginSkip = true;
-                listener.onClozerTokenUpdated();
-                Log.d("ERROR", "Error in getting all user data" + error.getLocalizedMessage());
+                listener.onClozerTokenUpdated(false);
+                Log.d("ERROR"+TAG, "Error in getting Clozerr token 1231" + error.getLocalizedMessage());
             }
         });
         MainApplication.getInstance().getRequestQueue().add(jsonObjectRequest);
@@ -229,7 +223,7 @@ public class TokenHandler {
     }
 
     public interface ClozerrTokenListener{
-        void onClozerTokenUpdated();
+        void onClozerTokenUpdated(boolean isUpdated);
     }
 
     public void skipLogin(){
@@ -243,6 +237,7 @@ public class TokenHandler {
         JSONObject obj = new JSONObject();
         try {
             obj.put("username",""+MainApplication.getInstance().tokenHandler.username);
+            obj.put("authProvider",""+authProvider);
             obj.put("picurl",""+MainApplication.getInstance().tokenHandler.picurl);
             obj.put("clozerrtoken",""+MainApplication.getInstance().tokenHandler.clozerrtoken);
             obj.put("socialtoken",""+MainApplication.getInstance().tokenHandler.socialtoken);
@@ -252,7 +247,20 @@ public class TokenHandler {
     }
 
     /** LOGOUT STACKS */
-    public void logoutGoogle(final Activity activity){
+
+    /**
+     * This is the main function that has to be called in order to completely logout
+     *
+     * @param activity
+     */
+    public void logout(Activity activity) {
+        Logg.d(TAG,"Logout procedure started...");
+        print();
+        if(loggedByGoogle())logoutGoogle(activity);
+        if(loggedByFb())logoutFacebook(activity);
+        //It never reaches here as above method itself calls the callbacks to exit app
+    }
+    private void logoutGoogle(final Activity activity){
         //Logout from google
         Logg.e(TAG,"Started Google Logout Procedure");
         finalMGoogleApiClient = new GoogleApiClient.Builder(activity)
@@ -260,6 +268,7 @@ public class TokenHandler {
                     @Override
                     public void onConnected(Bundle bundle) {
                         googleLogoutCallback(activity);
+                        clearCacheData();
                         Logg.e(TAG, "Successfully logged out from google");
                         Logg.d(TAG, "restarting...");
 
@@ -291,12 +300,23 @@ public class TokenHandler {
         ToastMain.showSmartToast(context, "Error in logging out of google", "Error, google logout error : 301");
     }
 
-    public void logoutFacebook(Activity activity) {
+    private void logoutFacebook(Activity activity) {
         LoginManager.getInstance().logOut();
+        clearCacheData();
         Logg.e(TAG, "Successfully logged out from Facebook");
         Logg.d(TAG, "restarting...");
         //FInally kill the calling activity and restart app
         activity.startActivity(new Intent(activity, HomeActivity.class));
         activity.finish();
+    }
+    private void clearCacheData(){
+        clozerrtoken = "";
+        email = "";
+        socialtoken = "";
+        authProvider = AUTH_NONE;
+        username = "";
+        picurl  = "";
+        loginSkip = false;
+        saveTokenDataLocally();
     }
 }
