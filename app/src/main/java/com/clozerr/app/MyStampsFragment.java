@@ -11,9 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.TextView;
-
-import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -32,7 +29,7 @@ public class MyStampsFragment extends Fragment {
         recyclerview.setLayoutManager(new GridLayoutManager(c,3));
         recyclerview.setItemAnimator(new DefaultItemAnimator());
         recyclerview.setHasFixedSize(true);
-        ArrayList<MyOffer> myOffers = convertRowMyOffers(VendorActivity.detailsBundle.getString("Alloffers"));
+//        ArrayList<MyOffer> myOffers = convertRowMyOffers(VendorActivity.detailsBundle.getString("Alloffers"));
         //Toast.makeText(getActivity(), VendorActivity.detailsBundle.getString("Alloffers"), Toast.LENGTH_LONG).show();
                         /*MyOffer currentOffer = getCurrentOffer(s);
 
@@ -40,8 +37,8 @@ public class MyStampsFragment extends Fragment {
                         mRecyclerView.setAdapter(myOffersAdapter);*/
         //MyOffersRecyclerViewAdapter adapter = new MyOffersRecyclerViewAdapter(myOffers, getActivity());
         //recyclerview.setAdapter(adapter);
-        final TextView textView = (TextView) layout.findViewById(R.id.stampdesc);
-        textView.setText(VendorActivity.detailsBundle.getString("policy"));
+//        final TextView textView = (TextView) layout.findViewById(R.id.stampdesc);
+//        textView.setText(VendorActivity.detailsBundle.getString("policy"));
         //final String[] values = new String[] { "1","2","3","4","5","6","7","8","9","10" };
         //ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.stamp_layout, R.id.stampnumber, values);
         //recyclerview.setAdapter(new MyStampsRecyclerViewAdapter(values,getActivity()));

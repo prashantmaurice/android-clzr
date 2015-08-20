@@ -106,7 +106,7 @@ public class Constants {
         TELL_FRIEND,
         PINNED_OFFERS,
         SETTINGS,
-        LOGOUT
+        NavListId, LOGOUT,LOGIN
     }
     public static ArrayList<NavObject> getNavList() {
         return new ArrayList<NavObject>() {{
@@ -118,6 +118,18 @@ public class Constants {
             add(new NavObject("My Pinned Offers", R.drawable.pinfilled, NavListId.PINNED_OFFERS));
             add(new NavObject("Settings", R.drawable.settings, NavListId.SETTINGS));
             add(new NavObject("Log out", R.drawable.logout, NavListId.LOGOUT));
+        }};
+    }
+    public static ArrayList<NavObject> getNavListGuest() {
+        return new ArrayList<NavObject>() {{
+            add(new NavObject("About Us", R.drawable.aboutclozerr, NavListId.ABOUTUS));
+            add(new NavObject("FAQ's", R.drawable.aboutus, NavListId.FAQ));
+            add(new NavObject("Like/Follow Clozerr", R.drawable.facebooklike, NavListId.LIKE_CLOZERR));
+            add(new NavObject("Rate Clozerr", R.drawable.rate, NavListId.RATE_CLOZERR));
+            add(new NavObject("Tell Friends about Clozerr", R.drawable.share, NavListId.TELL_FRIEND));
+            add(new NavObject("My Pinned Offers", R.drawable.pinfilled, NavListId.PINNED_OFFERS));
+            add(new NavObject("Settings", R.drawable.settings, NavListId.SETTINGS));
+            add(new NavObject("Log in", R.drawable.logout, NavListId.LOGIN));
         }};
     }
 }

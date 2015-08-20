@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.Handlers.LocalBroadcastHandler;
 import com.clozerr.app.Models.RewardsObject;
@@ -56,7 +55,7 @@ public class MyStampsFragment extends Fragment {
         adapter = new MyStampsFragmentAdapter(rewardsObjects, getActivity());
         recyclerview.setAdapter(adapter);
         final TextView textView = (TextView) layout.findViewById(R.id.stampdesc);
-        textView.setText(VendorActivity.detailsBundle.getString("policy"));
+//        textView.setText(VendorActivity.detailsBundle.getString("policy"));
         reloadData();
 
 

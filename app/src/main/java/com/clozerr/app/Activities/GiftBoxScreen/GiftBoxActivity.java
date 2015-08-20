@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.GiftBoxScreen;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -11,6 +11,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.clozerr.app.AsyncGet;
+import com.clozerr.app.GenUtils;
+import com.clozerr.app.MyOffer;
+import com.clozerr.app.R;
 import com.clozerr.app.Utils.Router;
 
 import org.json.JSONArray;
@@ -22,6 +26,7 @@ import java.util.ArrayList;
 
 public class GiftBoxActivity extends ActionBarActivity {
     private Toolbar toolbar;
+
     private GiftBoxRecyclerViewAdapter mMainPageAdapter;
     private RecyclerView mRecyclerView;
     public static String GIFTBOXDATA = "giftboxdatajson";
@@ -55,7 +60,7 @@ public class GiftBoxActivity extends ActionBarActivity {
                 }
                 //Toast.makeText(getApplicationContext(),String.valueOf(rowItems.size()),Toast.LENGTH_SHORT).show();
                 if (rowItems.size() == 0) {
-                    GenUtils.showDebugToast(this,"Showing empty giftbox");
+                    GenUtils.showDebugToast(this, "Showing empty giftbox");
                     findViewById(R.id.alertgiftbox).setVisibility(View.VISIBLE);
                 }
                 mMainPageAdapter = new GiftBoxRecyclerViewAdapter(rowItems, mContext);

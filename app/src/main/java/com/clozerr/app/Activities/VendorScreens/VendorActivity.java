@@ -27,9 +27,9 @@ import android.widget.Toast;
 
 import com.clozerr.app.Analytics;
 import com.clozerr.app.AsyncGet;
-import com.clozerr.app.CardModel;
 import com.clozerr.app.GenUtils;
 import com.clozerr.app.MainApplication;
+import com.clozerr.app.Models.VendorDetailsObject;
 import com.clozerr.app.PeriodicBFS;
 import com.clozerr.app.R;
 import com.clozerr.app.SlidingTabLayout;
@@ -38,12 +38,7 @@ import com.clozerr.app.Utils.Constants;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.net.URLEncoder;
-import java.util.ArrayList;
 
 
 public class VendorActivity extends ActionBarActivity {
@@ -58,7 +53,7 @@ public class VendorActivity extends ActionBarActivity {
     private Intent callingIntent;
     private FloatingActionButton mCheckInButton;
     public static String Rewards="";
-    public static Bundle detailsBundle;
+//    public static Bundle detailsBundle;
     public static ImageView logoView;
     static String vendorTitle;
     public static int i=1;
@@ -89,7 +84,7 @@ public class VendorActivity extends ActionBarActivity {
         mCheckInButton = (FloatingActionButton) findViewById(R.id.checkinButton);
         mCheckInButton.setImageDrawable(myIcon);
 
-        detailsBundle = new Bundle();
+//        detailsBundle = new Bundle();
 
 
 
@@ -103,133 +98,15 @@ public class VendorActivity extends ActionBarActivity {
             @Override
             public void gotResult(String s) {
                 try {
-                    //Toast.makeText(getApplicationContext(), Constants.URLBuilders.ANALYTICSCOPY.toString(),Toast.LENGTH_SHORT).show();
-                    String address = "", phoneNumber = "", vendorDescription = "",fb = "",gplus = "",twitter = "",logo = "", visitOfferId = "";
                     //BeaconFinderService.BeaconDBParams params = null;
-                    double latitude = 0.0, longitude = 0.0;
                     JSONObject object = new JSONObject(s);
+                    VendorDetailsObject vendorDetailsObject = VendorDetailsObject.decodeFromServer(object);
 
-                    try {
-                        phoneNumber = object.getString("phone");
-                        if (phoneNumber.equalsIgnoreCase("undefined"))
-                            phoneNumber = "";
-                        vendorDescription = object.getString("description");
-                        if (vendorDescription.equalsIgnoreCase("undefined"))
-                            vendorDescription = "";
-                        latitude = object.getJSONArray("location").getDouble(0);
-                        if (latitude <= 0.0)
-                            latitude = 0.0;
-                        longitude = object.getJSONArray("location").getDouble(1);
-                        if (longitude <= 0.0)
-                            longitude = 0.0;
-                        visitOfferId = object.getString("visitOfferId");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        //Toast.makeText(CouponDetails.this, "Error - " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-                    }
                     /*if (object.has("beacons") && object.getJSONObject("beacons").has("major") &&
                             object.getJSONObject("beacons").has("minor")) {
                         params = new BeaconFinderService.BeaconDBParams(object.getJSONObject("beacons"));
                         Log.e(TAG, "BDB params - " + params.toString());
                     }*/
-                    //Log.e("description", vendorDescription);
-                    try
-                    {
-                        //logo = object.getString("logo");
-                        logo = object.getString("image_base") + URLEncoder.encode(object.getString("resource_name"), "UTF-8") + "_logo";
-                        Log.i("logo",logo);
-                    }
-                    catch(Exception e)
-                    {
-                        //e.printStackTrace();
-                    }
-                    try
-                    {
-                        fb =object.getString("fb");
-                        if(fb.equalsIgnoreCase("undefined"))
-                            fb = "";
-                    }
-                    catch(Exception e)
-                    {
-                        //e.printStackTrace();
-                    }
-                    try
-                    {
-                        gplus = object.getString("gplus");
-                        if(gplus.equalsIgnoreCase("undefined"))
-                            gplus = "";
-                    }
-                    catch(Exception e)
-                    {
-                        //e.printStackTrace();
-                    }
-                    try
-                    {
-                        twitter = object.getString("twitter");
-                        if(twitter.equalsIgnoreCase("undefined"))
-                            twitter = "";
-                    }
-                    catch(Exception e)
-                    {
-                        ///e.printStackTrace();
-                    }
-                    address = object.getString("address");
-                    final CardModel currentItem = new CardModel(
-                            object.getString("name"),
-                            phoneNumber,
-                            vendorDescription,
-                            object.getJSONArray("offers"),
-                            latitude,
-                            longitude,
-                            object.getString("image_base") + URLEncoder.encode(object.getString("resource_name"), "UTF-8"),
-                            object.getString("fid"), object.getString("_id"),
-                            0,
-                            "",
-                            true
-                    );
-                    ArrayList<String> questions = new ArrayList<String>();
-                    JSONArray questionArray = object.getJSONArray("question");
-                    for (int i = 0, count = questionArray.length(); i < count; i++) {
-                        try {
-                            questions.add(questionArray.getString(i));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    detailsBundle.putStringArrayList("questions", questions);
-                    ArrayList<String> gallery = new ArrayList<String>();
-                    JSONArray galleryArray = object.getJSONArray("gallery");
-                    for (int i = 0, count = galleryArray.length(); i < count; i++) {
-                        try {
-                            gallery.add(galleryArray.getString(i));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    detailsBundle.putStringArrayList("gallery", gallery);
-                     /*JSONArray question= object.getJSONArray("question");
-                    for(int i=0;i<question.length();i++){
-                      ques_arr.add(question.getString(i));
-                    }*/
-                    //Log.e("title", currentItem.getTitle());
-                    //Toast.makeText(CouponDetails.this, "title - " + currentItem.getTitle(), Toast.LENGTH_SHORT).show();
-                    detailsBundle.putString("vendorTitle", currentItem.getTitle());
-                    //detailsBundle.putString("offerText", currentItem.getOfferDescription() );
-                    detailsBundle.putString("vendorId", currentItem.getVendorId());
-                    detailsBundle.putString("description", vendorDescription);
-                    detailsBundle.putString("address", address);
-                    //detailsBundle.putString("offerId", currentItem.getOfferId());
-                    detailsBundle.putString("vendorImage", currentItem.getImageId());
-                    detailsBundle.putDouble("latitude", latitude);
-                    detailsBundle.putDouble("longitude", longitude);
-                    detailsBundle.putDouble("distance", currentItem.getDistance());
-                    detailsBundle.putString("distanceString", currentItem.getDistanceString());
-                    detailsBundle.putString("phoneNumber", phoneNumber);
-                    detailsBundle.putString("fb",fb);
-                    detailsBundle.putString("gplus",gplus);
-                    detailsBundle.putString("twitter",twitter);
-                    detailsBundle.putString("logo",logo);
-                    detailsBundle.putString("visitOfferId", visitOfferId);
 
 
                     //currentItem.getQuestions();
@@ -242,10 +119,10 @@ public class VendorActivity extends ActionBarActivity {
                     if (toolbar != null) {
                         setSupportActionBar(toolbar);
                         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                        toolbar.setTitle(currentItem.getTitle());
+                        toolbar.setTitle(vendorDetailsObject.name);
                     }
                     pager = (ViewPager) findViewById(R.id.pager_vendor);
-                    pager.setAdapter(new VendorPagerAdapter(getSupportFragmentManager(), VendorActivity.this,vendorId,vendorName));
+                    pager.setAdapter(new VendorPagerAdapter(getSupportFragmentManager(), VendorActivity.this,vendorDetailsObject));
                     pager.setOffscreenPageLimit(VendorPagerAdapter.OFFSET_PAGE_LIMIT);
                     mtabs = (SlidingTabLayout) findViewById(R.id.tabs_vendor);
                     mtabs.setDistributeEvenly(true);
@@ -260,28 +137,11 @@ public class VendorActivity extends ActionBarActivity {
                     if (fromPeriodicBFS)
                         pager.setCurrentItem(1);
 
-                    detailsBundle.putString("vendorTitle", currentItem.getTitle());
-                    //detailsBundle.putString("offerText", currentItem.getOfferDescription() );
-                    vendorTitle = currentItem.getTitle();
-                    detailsBundle.putString("vendorId", currentItem.getVendorId());
-                    detailsBundle.putString("description", vendorDescription);
-                    detailsBundle.putString("address", address);
-                    //detailsBundle.putString("offerId", currentItem.getOfferId());
-                    detailsBundle.putString("vendorImage", currentItem.getImageId());
-                    detailsBundle.putDouble("latitude", latitude);
-                    detailsBundle.putDouble("longitude", longitude);
-                    detailsBundle.putDouble("distance", currentItem.getDistance());
-                    detailsBundle.putString("distanceString", currentItem.getDistanceString());
-                    detailsBundle.putString("phoneNumber", phoneNumber);
-                    try {
-                        detailsBundle.putString("policy", object.getJSONObject("settings").getString("policy"));
-                    }catch(JSONException ex){
-                        detailsBundle.putString("policy", "");
-                    }
+                    vendorTitle = vendorDetailsObject.name;
                     //currentItem.getQuestions();
 
                     analyticsurlvendor = GenUtils.getDefaultAnalyticsUriBuilder(getApplicationContext(), Constants.Metrics.VENDOR_SCREEN)
-                            .appendQueryParameter("dimensions[vendor]", detailsBundle.getString("vendorId") )
+                            .appendQueryParameter("dimensions[vendor]", vendorDetailsObject.vendorId )
                             .build().toString();
                     GenUtils.putAnalytics(getApplicationContext(), TAG, analyticsurlvendor);
 
@@ -314,7 +174,7 @@ public class VendorActivity extends ActionBarActivity {
             }
         });
 
-        analyticsurlvendor = GenUtils.getDefaultAnalyticsUriBuilder(this, detailsBundle.getString("vendorTitle")+Constants.Metrics.SUFFIX_VENDOR_SCREEN)
+        analyticsurlvendor = GenUtils.getDefaultAnalyticsUriBuilder(this, vendorName+Constants.Metrics.SUFFIX_VENDOR_SCREEN)
                             .build().toString();
         GenUtils.putAnalytics(this, TAG, analyticsurlvendor);
 
@@ -365,13 +225,13 @@ public class VendorActivity extends ActionBarActivity {
                 //  t1.setText(s);
 
                 Log.e("Offers", s);
-                detailsBundle.putString("Alloffers", s);
+//                detailsBundle.putString("Alloffers", s);
                 //Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
 
                 try {
                     Tracker t = ((Analytics) getApplication()).getTracker(Analytics.TrackerName.APP_TRACKER);
 
-                    t.setScreenName(detailsBundle.getString("vendorId") + "_offer");
+                    t.setScreenName(vendorId + "_offer");
 
                     t.send(new HitBuilders.AppViewBuilder().build());
                 } catch (Exception e) {
@@ -395,7 +255,7 @@ public class VendorActivity extends ActionBarActivity {
 
                 Log.e("Offers", s);
                 //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
-                detailsBundle.putString("unlockedoffers", s);
+//                detailsBundle.putString("unlockedoffers", s);
                 //Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
                 //l1.setAdapter(adapter);
                 if (s == null) {
@@ -411,7 +271,7 @@ public class VendorActivity extends ActionBarActivity {
                 //  t1.setText(s);
 
                 Log.e("Offers", s);
-                detailsBundle.putString("PinnedOffers", s);
+//                detailsBundle.putString("PinnedOffers", s);
                 //Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
                 //l1.setAdapter(adapter);
                 if (s == null) {

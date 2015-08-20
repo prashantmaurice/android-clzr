@@ -16,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.koushikdutta.ion.Ion;
 
 import org.json.JSONArray;
@@ -227,8 +226,8 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
                 public void onClick(View view) {
                     Intent intent = new Intent(c, FreebieDescription.class);
                     intent.putExtra("offerid", currentItem.getOfferid());
-                    intent.putExtra("vendorid", (!vendorId.isEmpty()) ? vendorId : VendorActivity.detailsBundle.getString("vendorId"));
-                    intent.putExtra("vendorName", (!vendorName.isEmpty()) ? vendorName : VendorActivity.detailsBundle.getString("vendorTitle"));
+//                    intent.putExtra("vendorid", (!vendorId.isEmpty()) ? vendorId : VendorActivity.detailsBundle.getString("vendorId"));
+//                    intent.putExtra("vendorName", (!vendorName.isEmpty()) ? vendorName : VendorActivity.detailsBundle.getString("vendorTitle"));
                     intent.putExtra("caption", currentItem.getCaption());
                     intent.putExtra("description", currentItem.getDescription());
                     c.startActivity(intent);

@@ -12,8 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.clozerr.app.Activities.VendorScreens.VendorActivity;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,10 +38,10 @@ public class UnusedOffersActivity extends ActionBarActivity {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        final ArrayList<MyOffer> values = convertRowMyOffers(VendorActivity.detailsBundle.getString("unlockedoffers"));
+//        final ArrayList<MyOffer> values = convertRowMyOffers(VendorActivity.detailsBundle.getString("unlockedoffers"));
         //ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.freebies_item_layout, R.id.freebiename, values);
-        UnusedOffersAdapter adapter = new UnusedOffersAdapter(values,this);
-        mRecyclerView.setAdapter(adapter);
+//        UnusedOffersAdapter adapter = new UnusedOffersAdapter(values,this);
+//        mRecyclerView.setAdapter(adapter);
         String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
         String urlPinning = "http://api.clozerr.com/v2/user/add/pinned?access_token=" + TOKEN;
         new AsyncGet(getApplicationContext(), urlPinning, new AsyncGet.AsyncResult() {
@@ -237,9 +235,9 @@ public class UnusedOffersActivity extends ActionBarActivity {
 
     private void startCheckinWithoutOffer() {
         Intent intent = new Intent(getApplicationContext(), FreebieDescription.class);
-        intent.putExtra("offerid", VendorActivity.detailsBundle.getString("visitOfferId"));
-        intent.putExtra("vendorid", VendorActivity.detailsBundle.getString("vendorId"));
-        intent.putExtra("vendorName", VendorActivity.detailsBundle.getString("vendorTitle"));
+//        intent.putExtra("offerid", VendorActivity.detailsBundle.getString("visitOfferId"));
+//        intent.putExtra("vendorid", VendorActivity.detailsBundle.getString("vendorId"));
+//        intent.putExtra("vendorName", VendorActivity.detailsBundle.getString("vendorTitle"));
         intent.putExtra("caption", "No Offer");
         intent.putExtra("description", "No Offer available. Checkin to get stamps.");
         intent.putExtra("button", "CHECK-IN");

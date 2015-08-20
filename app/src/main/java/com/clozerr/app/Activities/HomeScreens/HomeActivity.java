@@ -51,13 +51,12 @@ import com.clozerr.app.DownloadImageTask;
 import com.clozerr.app.FAQ;
 import com.clozerr.app.GenUtils;
 import com.clozerr.app.GeofenceManagerService;
-import com.clozerr.app.GiftBoxActivity;
+import com.clozerr.app.Activities.GiftBoxScreen.GiftBoxActivity;
 import com.clozerr.app.Handlers.TokenHandler;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.Models.NavObject;
 import com.clozerr.app.Models.UserMain;
 import com.clozerr.app.Models.UserMainLive;
-import com.clozerr.app.NavDrawAdapter;
 import com.clozerr.app.PinnedOffersActivity;
 import com.clozerr.app.R;
 import com.clozerr.app.SettingsActivity;
@@ -90,6 +89,8 @@ import static com.clozerr.app.R.drawable.rest7;
 public class HomeActivity extends ActionBarActivity {
 
     private static final String TAG = "HomeActivity";
+    private static final int INTENT_LOGIN = 11000;
+
 
     public String USERNAME = "";
     public String USERID = "";
@@ -103,7 +104,7 @@ public class HomeActivity extends ActionBarActivity {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private ListView leftDrawerList;
-    private NavDrawAdapter navAdapter;
+    private HomeActivityNavAdapter navAdapter;
     private FrameLayout freebielayout;
     private String giftBoxJsonString;
     UserMainLive userMainLive;
@@ -137,7 +138,7 @@ public class HomeActivity extends ActionBarActivity {
         Logg.d("tokenHandler",tokenHandler.clozerrtoken);
         if(!tokenHandler.isLoggedIn()&&!tokenHandler.hasSkippedLogin()){
             //first time user
-            startActivityForResult(new Intent(this, SignupActivity.class),11000);
+            startActivityForResult(new Intent(this, SignupActivity.class),INTENT_LOGIN);
         }
 
 
@@ -426,7 +427,8 @@ public class HomeActivity extends ActionBarActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar_home);
         giftbox = (ImageView) toolbar.findViewById(R.id.giftbox);
 
-        navAdapter = new NavDrawAdapter(this,Constants.getNavList());
+        boolean loggedIn = MainApplication.getInstance().tokenHandler.isLoggedIn();
+        navAdapter = new HomeActivityNavAdapter(this,(loggedIn)?Constants.getNavList():Constants.getNavListGuest());
         leftDrawerList.setAdapter(navAdapter);
         leftDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -486,6 +488,9 @@ public class HomeActivity extends ActionBarActivity {
                                         "until your next log in.\nDo you still want to log out?")
                                 .setPositiveButton("Yes", dialogLogoutClickListener)
                                 .setNegativeButton("No", dialogLogoutClickListener).show();
+                        break;
+                    case LOGIN:
+                        startActivityForResult(new Intent(HomeActivity.this, SignupActivity.class),INTENT_LOGIN);
                         break;
                 }
             }

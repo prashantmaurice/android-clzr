@@ -212,7 +212,7 @@
         </receiver>
 
         <activity
-            android:name=".GiftBoxActivity"
+            android:name=".Activities.GiftBoxScreen.GiftBoxActivity"
             android:label="@string/title_activity_gift_box" >
         </activity>
         <activity

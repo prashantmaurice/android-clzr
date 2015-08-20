@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.HomeScreens;
 
 import android.content.Context;
 import android.util.Log;
@@ -11,19 +11,20 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.clozerr.app.Models.NavObject;
+import com.clozerr.app.R;
 
 import java.util.ArrayList;
 
 /**
  * This handles the entire NavDrawer view generations
  */
-public class NavDrawAdapter extends ArrayAdapter<NavObject> {
+public class HomeActivityNavAdapter extends ArrayAdapter<NavObject> {
     public ArrayList<NavObject> text;
     public LayoutInflater navinflater;
     private Context context;
     int i;
 
-    public NavDrawAdapter(Context context, ArrayList<NavObject> texts) {
+    public HomeActivityNavAdapter(Context context, ArrayList<NavObject> texts) {
         super(context, R.layout.navdrawlist, texts);
         text = texts;
         this.context = context;

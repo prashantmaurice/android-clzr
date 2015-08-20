@@ -27,6 +27,7 @@ import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.DownloadImageTask;
 import com.clozerr.app.MainApplication;
+import com.clozerr.app.Models.VendorDetailsObject;
 import com.clozerr.app.R;
 import com.koushikdutta.ion.Ion;
 
@@ -50,10 +51,12 @@ public class VendorHomeFragment extends Fragment {
 
     //Data variables
     String vendorId;
+    private VendorDetailsObject vendorDetailsObject;
 
-    public static VendorHomeFragment newInstance(String vendorId) {
+    public static VendorHomeFragment newInstance(VendorDetailsObject vendorDetailsObject) {
         VendorHomeFragment myFragment = new VendorHomeFragment();
-        myFragment.vendorId = vendorId;
+        myFragment.vendorId = vendorDetailsObject.vendorId;
+        myFragment.vendorDetailsObject = vendorDetailsObject;
         return myFragment;
     }
 
@@ -62,16 +65,16 @@ public class VendorHomeFragment extends Fragment {
         layout = (FrameLayout) inflater.inflate(R.layout.activity_vendor_home_fragment, container, false);
         initViews();
 
-        Ion.with(mVendorImageView).load(VendorActivity.detailsBundle.getString("vendorImage")) ;
-        if(!VendorActivity.detailsBundle.getString("logo").equalsIgnoreCase("undefined"))
-              new DownloadImageTask(mVendorLogoView).execute(VendorActivity.detailsBundle.getString("logo"));
+        Ion.with(mVendorImageView).load(vendorDetailsObject.getImageUrl()) ;
+        if(!vendorDetailsObject.getImageUrl().isEmpty())
+              new DownloadImageTask(mVendorLogoView).execute(vendorDetailsObject.getLogoImageUrl());
 
         VendorActivity.logoView = mVendorLogoView;
 
-        mVendorTitleView.setText(VendorActivity.detailsBundle.getString("vendorTitle"));
+        mVendorTitleView.setText(vendorDetailsObject.name);
         //mVendorAboutView.setText(VendorActivity.detailsBundle.getString("description"));
-        mVendorAddressView.setText(VendorActivity.detailsBundle.getString("address"));
-        mVendorDescriptionView.setText(VendorActivity.detailsBundle.getString("description"));
+        mVendorAddressView.setText(vendorDetailsObject.address);
+        mVendorDescriptionView.setText(vendorDetailsObject.description);
 //        final SharedPreferences status = c.getSharedPreferences("USER",0);
 //        final String NotNow = status.getString("notNow","false");
 
@@ -99,7 +102,7 @@ public class VendorHomeFragment extends Fragment {
             }
         }
         Log.i("fav","changing favs");
-        if(fav.indexOf(VendorActivity.detailsBundle.getString("vendorId"))!=-1)
+        if(fav.indexOf(vendorDetailsObject.vendorId)!=-1)
             favorites.setImageResource(R.drawable.favorited);
         else
             favorites.setImageResource(R.drawable.unfavorited);
@@ -108,9 +111,9 @@ public class VendorHomeFragment extends Fragment {
         mCallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!VendorActivity.detailsBundle.getString("phoneNumber").isEmpty()) {
+                if (!vendorDetailsObject.phone.isEmpty()) {
                     Intent dialIntent = new Intent(Intent.ACTION_DIAL);
-                    dialIntent.setData(Uri.parse("tel:" + VendorActivity.detailsBundle.getString("phoneNumber")));
+                    dialIntent.setData(Uri.parse("tel:" + vendorDetailsObject.phone));
                     startActivity(dialIntent);
                 } else
                     Toast.makeText(getActivity(), "Sorry, the phone number has not been provided by the vendor.",
@@ -122,8 +125,8 @@ public class VendorHomeFragment extends Fragment {
             public void onClick(View v) {
                 //if (VendorActivity.detailsBundle.getDouble("latitude") && !VendorActivity.detailsBundle.getString("longitude").isEmpty() ) {
                     Intent intent = new Intent(Intent.ACTION_VIEW,
-                            Uri.parse("http://maps.google.com/maps?daddr=" + VendorActivity.detailsBundle.getDouble("latitude")
-                                    + "," + VendorActivity.detailsBundle.getDouble("longitude")));
+                            Uri.parse("http://maps.google.com/maps?daddr=" +vendorDetailsObject.lat
+                                    + "," + vendorDetailsObject.longg));
                     startActivity(intent);
                 //}
                 //else
@@ -150,7 +153,7 @@ public class VendorHomeFragment extends Fragment {
 //                String TOKEN = status.getString("token", "");
                 String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
                 Log.i("name", getResources().getResourceName(R.id.favorites));
-                if (fav.indexOf(VendorActivity.detailsBundle.getString("vendorId")) == -1) {
+                if (fav.indexOf(vendorDetailsObject.vendorId) == -1) {
                     Log.e("VendorHomeFragment", "favs url - " + "http://api.clozerr.com/v2/user/add/favourites?vendor_id=" + vendorId + "&access_token=" + TOKEN);
                     favorites.setImageResource(R.drawable.favorited);
                     new AsyncGet(getActivity(), "http://api.clozerr.com/v2/user/add/favourites?vendor_id=" + vendorId + "&access_token=" + TOKEN, new AsyncGet.AsyncResult() {
@@ -162,7 +165,7 @@ public class VendorHomeFragment extends Fragment {
                                 Toast.makeText(getActivity(), "Connection error", Toast.LENGTH_SHORT).show();
                                 favorites.setImageResource(R.drawable.unfavorited);
                             } else {
-                                fav.add(VendorActivity.detailsBundle.getString("vendorId"));
+                                fav.add(vendorDetailsObject.vendorId);
 //                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
 //                                editor.putString("user", s);
 //                                editor.apply();
@@ -193,7 +196,7 @@ public class VendorHomeFragment extends Fragment {
                                 Toast.makeText(getActivity(), "Connection error", Toast.LENGTH_SHORT).show();
                                 favorites.setImageResource(R.drawable.favorited);
                             } else {
-                                fav.remove(VendorActivity.detailsBundle.getString("vendorId"));
+                                fav.remove(vendorDetailsObject.vendorId);
 //                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
 //                                editor.putString("user", s);
 //                                editor.apply();
@@ -224,27 +227,27 @@ public class VendorHomeFragment extends Fragment {
         twitter.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                if(!VendorActivity.detailsBundle.getString("twitter").equals(""))
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(VendorActivity.detailsBundle.getString("twitter"))));
-                else
-                    Toast.makeText(getActivity(),"This Vendor Doesnt have a active twitter page",Toast.LENGTH_SHORT).show();
+//                if(!VendorActivity.detailsBundle.getString("twitter").equals(""))
+//                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(VendorActivity.detailsBundle.getString("twitter"))));
+//                else
+//                    Toast.makeText(getActivity(),"This Vendor Doesnt have a active twitter page",Toast.LENGTH_SHORT).show();
             }
         });
         fb.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                String facebookUrl = VendorActivity.detailsBundle.getString("fb");
-
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(facebookUrl)));
+//                String facebookUrl = VendorActivity.detailsBundle.getString("fb");
+//
+//                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(facebookUrl)));
             }
         });
         gplus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!VendorActivity.detailsBundle.getString("gplus").equals(""))
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(VendorActivity.detailsBundle.getString("gplus"))));
-                else
-                    Toast.makeText(getActivity(),"This Vendor Doesnt have a active google plus page",Toast.LENGTH_SHORT).show();
+//                if(!VendorActivity.detailsBundle.getString("gplus").equals(""))
+//                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(VendorActivity.detailsBundle.getString("gplus"))));
+//                else
+//                    Toast.makeText(getActivity(),"This Vendor Doesnt have a active google plus page",Toast.LENGTH_SHORT).show();
             }
         });
         share.setOnClickListener(new View.OnClickListener() {
@@ -252,7 +255,7 @@ public class VendorHomeFragment extends Fragment {
             public void onClick(View view) {
                 Intent sharingIntent = new Intent(Intent.ACTION_SEND);
                 sharingIntent.setType("text/plain");
-                String shareBody = "Check out this place I found on Clozerr: "+VendorActivity.detailsBundle.getString("vendorTitle")+" https://play.google.com/store/apps/details?id=com.clozerr.app";;
+                String shareBody = "Check out this place I found on Clozerr: "+vendorDetailsObject.name+" https://play.google.com/store/apps/details?id=com.clozerr.app";;
                 sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Clozerr");
                 sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
@@ -306,7 +309,7 @@ public class VendorHomeFragment extends Fragment {
 
             Intent waIntent = new Intent(Intent.ACTION_SEND);
             waIntent.setType("text/plain");
-            String text = "Check out this place I found on Clozerr: "+VendorActivity.detailsBundle.getString("vendorTitle")+" https://play.google.com/store/apps/details?id=com.clozerr.app";
+            String text = "Check out this place I found on Clozerr: "+vendorDetailsObject.name+" https://play.google.com/store/apps/details?id=com.clozerr.app";
 
             PackageInfo info=pm.getPackageInfo("com.whatsapp", PackageManager.GET_META_DATA);
             //Check if package exists or not. If not then code

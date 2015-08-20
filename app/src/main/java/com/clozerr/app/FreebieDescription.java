@@ -264,9 +264,9 @@ public class FreebieDescription extends FragmentActivity {
             public void onClick(View view) {
                 Intent sharingIntent = new Intent(Intent.ACTION_SEND);
                 sharingIntent.setType("text/plain");
-                String shareBody = "Check out the offer I got @ " + VendorActivity.detailsBundle.getString("vendorTitle") + " using Clozerr: " + description + " https://play.google.com/store/apps/details?id=com.clozerr.app";
+//                String shareBody = "Check out the offer I got @ " + VendorActivity.detailsBundle.getString("vendorTitle") + " using Clozerr: " + description + " https://play.google.com/store/apps/details?id=com.clozerr.app";
                 sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Clozerr");
-                sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+//                sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
             }
         });
@@ -354,13 +354,13 @@ public class FreebieDescription extends FragmentActivity {
 
             Intent waIntent = new Intent(Intent.ACTION_SEND);
             waIntent.setType("text/plain");
-            String text = "Check out the offer I got @ " +VendorActivity.detailsBundle.getString("vendorTitle")+" using Clozerr: "+description+" https://play.google.com/store/apps/details?id=com.clozerr.app";
+//            String text = "Check out the offer I got @ " +VendorActivity.detailsBundle.getString("vendorTitle")+" using Clozerr: "+description+" https://play.google.com/store/apps/details?id=com.clozerr.app";
 
             PackageInfo info=pm.getPackageInfo("com.whatsapp", PackageManager.GET_META_DATA);
             //Check if package exists or not. If not then code
             //in catch block will be called
             waIntent.setPackage("com.whatsapp");
-            waIntent.putExtra(Intent.EXTRA_TEXT, text);
+//            waIntent.putExtra(Intent.EXTRA_TEXT, text);
             startActivity(Intent.createChooser(waIntent, "Share with"));
 
         } catch (PackageManager.NameNotFoundException e) {
