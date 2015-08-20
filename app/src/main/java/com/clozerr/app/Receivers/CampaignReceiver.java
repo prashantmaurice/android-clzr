@@ -30,28 +30,26 @@ public class CampaignReceiver extends BroadcastReceiver {
         CampaignHandler campaignHandler = CampaignHandler.getInstance(context);
 
 
+
         if ((referrer == null) || (referrer.length() == 0)) {
             //No campaign found
-
             return;
         }
+
+        campaignHandler.campaignRaw = referrer;
+
         try {
             referrer = URLDecoder.decode(referrer, "UTF-8");
 
-
-
             //SAVE DATA IN OUR LOCAL
             Map<String, String> params = getQueryMap(referrer);
-            campaignHandler.campaignRaw = referrer;
+
             campaignHandler.utm_source = URLDecoder.decode(params.get("utm_source"), "UTF-8");
             campaignHandler.utm_medium = URLDecoder.decode(params.get("utm_medium"), "UTF-8");
             campaignHandler.utm_term = URLDecoder.decode(params.get("utm_term"), "UTF-8");
             campaignHandler.utm_content = URLDecoder.decode(params.get("utm_content"), "UTF-8");
             campaignHandler.utm_campaign = URLDecoder.decode(params.get("utm_campaign"), "UTF-8");
-            campaignHandler.saveCampaignDataLocally();
 
-            //SEND DATA TO OUR SERVER
-            campaignHandler.sendCampaignDataIfNotSent();
 
 
         } catch (UnsupportedEncodingException e) {
@@ -59,6 +57,11 @@ public class CampaignReceiver extends BroadcastReceiver {
         } catch (IllegalStateException e) {
             e.printStackTrace();
         }
+
+        campaignHandler.saveCampaignDataLocally();
+
+        //SEND DATA TO OUR SERVER
+        campaignHandler.sendCampaignDataIfNotSent();
 
 
 

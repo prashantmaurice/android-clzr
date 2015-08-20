@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
 //    signingConfigs {
-
 //        config {
 //            keyAlias 'clozerr_key'
 //            keyPassword 'clozerr'
@@ -10,9 +9,15 @@ android {
 //            storePassword 'clozerr'
 //        }
 //    }
-
-
     //https://developer.android.com/intl/zh-cn/tools/building/multidex.html
+    signingConfigs {
+        config {
+            keyAlias 'clozerr_key'
+            keyPassword 'clozerr'
+            storeFile file('/Users/saipraveenb/Documents/android.jks')
+            storePassword 'clozerr'
+        }
+    }
     productFlavors {
         // Define separate dev and prod product flavors.
         dev {
@@ -26,10 +31,8 @@ android {
             minSdkVersion 16
         }
     }
-
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
-
     defaultConfig {
         applicationId "com.clozerr.app"
         minSdkVersion 16
@@ -44,10 +47,12 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
         debug {
 //            signingConfig signingConfigs.config
 //            signingConfig signingConfigs.config
+            signingConfig signingConfigs.config
         }
     }
 }

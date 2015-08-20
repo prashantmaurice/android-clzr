@@ -54,9 +54,10 @@ public class PeriodicBFS extends BeaconFinderService {
     private static int scanCount = 0;
 
     private static ArrayList<List<Beacon>> scanFrameData;
+    private static boolean foundBeacon;
 
 
-    public PeriodicBFS() { super(TAG); scanFrameData = new ArrayList<List<Beacon>>(); }
+    public PeriodicBFS() { super(TAG); scanFrameData = new ArrayList<List<Beacon>>(); foundBeacon = false;}
 
     private static NotificationCompat.Builder getDefaultNotificationBuilder(Context context) {
         return new NotificationCompat.Builder(context)
@@ -171,6 +172,7 @@ public class PeriodicBFS extends BeaconFinderService {
     @Override
     protected void onRangedBeacons(final List<Beacon> beaconList) {
         for (Beacon beacon : beaconList) {
+            foundBeacon = true;
             final BeaconDBParams params = new BeaconDBParams(beacon);
             int rssi = beacon.getRssi();
             Log.e(TAG, "major - " + params.major + "; minor - " + params.minor + "; RSSI - " + rssi);
@@ -182,6 +184,7 @@ public class PeriodicBFS extends BeaconFinderService {
                                     vendorParams.beaconParams.equals(params);
                         }
                     });
+
             if (currentVendor != null && !isRejected(getApplicationContext(), currentVendor) && rssi > currentVendor.thresholdRssi) {
 
                 if (maxRssi == null || maxRssi < rssi) {
@@ -209,6 +212,7 @@ public class PeriodicBFS extends BeaconFinderService {
         maxRssi = null;
         vendorToNotify = null;
         scanFrameData.clear();
+        foundBeacon = false;
         Log.e(TAG, "Waiting for BT State");
         new BTStateListener(SCAN_PERIOD) {
             @Override
@@ -241,7 +245,10 @@ public class PeriodicBFS extends BeaconFinderService {
         beaconManager.stopRanging(scanningRegion);
         turnOffBluetooth(getApplicationContext());
         Log.e(TAG, "Stopped Scan");
-        putAnalyticsForVendor(this, vendorToNotify);
+
+        if( foundBeacon )
+            putAnalyticsForVendor(this, vendorToNotify);
+
         if (vendorToNotify != null) {
             showNotificationForVendor(this, vendorToNotify);
             vendorToNotify = null;

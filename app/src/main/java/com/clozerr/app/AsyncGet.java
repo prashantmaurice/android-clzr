@@ -71,7 +71,7 @@ public class AsyncGet extends AsyncTask<String, String, String> {
         HttpResponse httpResponse = null;
         HttpEntity httpEntity = null;
 
-        int timeout = 3000;
+        int timeout = 7500;
         HttpParams httpParams = new BasicHttpParams();
         HttpConnectionParams.setConnectionTimeout(httpParams, timeout);
         HttpConnectionParams.setSoTimeout(httpParams, timeout);

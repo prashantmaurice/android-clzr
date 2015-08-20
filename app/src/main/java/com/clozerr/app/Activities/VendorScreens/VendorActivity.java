@@ -241,7 +241,7 @@ public class VendorActivity extends ActionBarActivity {
                         toolbar.setTitle(currentItem.getTitle());
                     }
                     pager = (ViewPager) findViewById(R.id.pager_vendor);
-                    pager.setAdapter(new VendorPagerAdapter(getSupportFragmentManager(), VendorActivity.this,vendorId,vendorName));
+                    pager.setAdapter(new VendorPagerAdapter(getSupportFragmentManager(), VendorActivity.this,vendorId,currentItem.getTitle()));
                     pager.setOffscreenPageLimit(VendorPagerAdapter.OFFSET_PAGE_LIMIT);
                     mtabs = (SlidingTabLayout) findViewById(R.id.tabs_vendor);
                     mtabs.setDistributeEvenly(true);
