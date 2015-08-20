@@ -78,6 +78,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Random;
 
 import static com.clozerr.app.R.drawable.rest1;
@@ -97,6 +98,7 @@ public class HomeActivity extends ActionBarActivity {
     public String USER_PIC_URL = "";
     public Context mContext;
     Button button;
+    boolean loggedIn;
 
     private Toolbar toolbar;
     private ViewPager pager;
@@ -115,6 +117,7 @@ public class HomeActivity extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        initDrawer();
         updateUI();
     }
 
@@ -138,10 +141,12 @@ public class HomeActivity extends ActionBarActivity {
         Logg.d("tokenHandler",tokenHandler.clozerrtoken);
         if(!tokenHandler.isLoggedIn()&&!tokenHandler.hasSkippedLogin()){
             //first time user
-            startActivityForResult(new Intent(this, SignupActivity.class),INTENT_LOGIN);
+//            startActivityForResult(new Intent(this, SignupActivity.class),INTENT_LOGIN);
+            startActivity(new Intent(this, SignupActivity.class));
         }
 
 
+        loggedIn = MainApplication.getInstance().tokenHandler.isLoggedIn();
         setContentView(R.layout.activity_my);
         setupUI();
 
@@ -427,13 +432,13 @@ public class HomeActivity extends ActionBarActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar_home);
         giftbox = (ImageView) toolbar.findViewById(R.id.giftbox);
 
-        boolean loggedIn = MainApplication.getInstance().tokenHandler.isLoggedIn();
-        navAdapter = new HomeActivityNavAdapter(this,(loggedIn)?Constants.getNavList():Constants.getNavListGuest());
+        final ArrayList<NavObject> navList = (loggedIn)?Constants.getNavList():Constants.getNavListGuest();
+        navAdapter = new HomeActivityNavAdapter(this,navList);
         leftDrawerList.setAdapter(navAdapter);
         leftDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                NavObject clickedObject = Constants.getNavList().get(i);
+                NavObject clickedObject = navList.get(i);
 
                 switch(clickedObject.listId){
                     case ABOUTUS:
@@ -490,7 +495,8 @@ public class HomeActivity extends ActionBarActivity {
                                 .setNegativeButton("No", dialogLogoutClickListener).show();
                         break;
                     case LOGIN:
-                        startActivityForResult(new Intent(HomeActivity.this, SignupActivity.class),INTENT_LOGIN);
+//                        startActivityForResult(new Intent(HomeActivity.this, SignupActivity.class),INTENT_LOGIN);
+                        startActivity(new Intent(HomeActivity.this, SignupActivity.class));
                         break;
                 }
             }

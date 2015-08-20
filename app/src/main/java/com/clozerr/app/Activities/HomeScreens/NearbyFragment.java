@@ -26,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.clozerr.app.AsyncGet;
-import com.clozerr.app.CardModel;
 import com.clozerr.app.EndlessRecyclerOnScrollListener;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.Models.NearbyRestaurentObject;
@@ -41,7 +40,6 @@ import com.nineoldandroids.view.ViewHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 
 /**
@@ -349,57 +347,7 @@ public class NearbyFragment extends Fragment {
                 dy = swipetab.getTranslationY()-SWIPE_TAB_INI_POS;
         }*/
     }
-    private ArrayList<CardModel> convertRow(String s) {
-        ArrayList<CardModel> rowItems = new ArrayList<>();
-        JSONArray array;
-        try {
-            array = new JSONArray(s);
-            for(int i = 0 ; i < array.length() ; i++){
-                String phonenumber;
-                try {
-                    phonenumber = array.getJSONObject(i).getString("phonenumber");
-                }
-                catch(Exception e)
-                {
-                    phonenumber="0123456789";
-                }
-                String vendorDescription;
-                try {
-                    vendorDescription = array.getJSONObject(i).getString("description");
-                }
-                catch(Exception e)
-                {
-                    vendorDescription="No Restaurant Description Available Now";
-                }
-                String fid;
-                try {
-                    fid=array.getJSONObject(i).getString("fid");
-                }catch (Exception e){
-                    fid="";
-                }
-                JSONArray offers;
-                try{
-                    offers = array.getJSONObject(i).getJSONArray("offers");
-                }catch (Exception e){
-                    offers = new JSONArray("[{}]");
-                }
-                Log.e("description", vendorDescription);
-                CardModel item = new CardModel(
-                        array.getJSONObject(i).getString("name"),
-                        phonenumber, vendorDescription,
-                        offers,
-                        array.getJSONObject(i).getJSONArray("location").getDouble(0),
-                        array.getJSONObject(i).getJSONArray("location").getDouble(1),
-                        array.getJSONObject(i).getString("image_base") + URLEncoder.encode(array.getJSONObject(i).getString("resource_name"),"UTF-8"),
-                        fid,array.getJSONObject(i).getString("_id"),0,array.getJSONObject(i).getString("caption"),array.getJSONObject(i).getBoolean("active")
-                );
-                rowItems.add(item);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return rowItems;
-    }
+
 
     private void locationEnabledCheck() {
         boolean gps_enabled=false ,network_enabled=false;

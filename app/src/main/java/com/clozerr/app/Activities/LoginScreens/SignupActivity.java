@@ -142,9 +142,9 @@ public class SignupActivity extends FragmentActivity {
     }
 
     private void gotoMainApp(){
-        finish();
-//        Intent intent = new Intent(SignupActivity.this, HomeActivity.class);
-//        startActivity(intent);
+//        finish();
+        Intent intent = new Intent(SignupActivity.this, HomeActivity.class);
+        startActivity(intent);
     }
 
     /** Helper functions */
