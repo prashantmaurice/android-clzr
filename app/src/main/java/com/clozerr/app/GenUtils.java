@@ -149,6 +149,9 @@ public class GenUtils {
         });
     }
     public static ProgressDialog generateLoader(Context context, String text){
+//        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//        builder.setMessage(R.string.dialog_message).setTitle(R.string.dialog_title);
+//        AlertDialog dialog = builder.create();
         ProgressDialog pdialog=new ProgressDialog(context);
         pdialog.setMessage("" + text);
         pdialog.show();

@@ -200,7 +200,6 @@ public class NearbyFragmentAdapter extends RecyclerView.Adapter<NearbyFragmentAd
 //            final SharedPreferences status = c.getSharedPreferences("USER", 0);
 //            final boolean NotNow = status.getString("notNow", "false");
 
-            final boolean NotNow = MainApplication.getInstance().data.userMain.notNow;
 
 
             final ArrayList<String> fav = new ArrayList<String>();

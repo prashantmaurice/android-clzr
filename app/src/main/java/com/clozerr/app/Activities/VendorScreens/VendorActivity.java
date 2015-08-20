@@ -1,6 +1,7 @@
 package com.clozerr.app.Activities.VendorScreens;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,7 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,23 +26,30 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.VendorScreens.Subviews.CheckInAlertController;
 import com.clozerr.app.Analytics;
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.GenUtils;
+import com.clozerr.app.Handlers.ToastMain;
 import com.clozerr.app.MainApplication;
+import com.clozerr.app.Models.RewardsObject;
 import com.clozerr.app.Models.VendorDetailsObject;
 import com.clozerr.app.PeriodicBFS;
 import com.clozerr.app.R;
 import com.clozerr.app.SlidingTabLayout;
-import com.clozerr.app.UnusedOffersActivity;
 import com.clozerr.app.Utils.Constants;
+import com.clozerr.app.Utils.Router;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public class VendorActivity extends ActionBarActivity {
+
+public class VendorActivity extends AppCompatActivity {
 
     private static final String TAG = "VENDORACTIVITY";
     public static final String EXTRA_VENDORID = "vendor_id";
@@ -148,7 +156,8 @@ public class VendorActivity extends ActionBarActivity {
                     mCheckInButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            startActivity(new Intent(VendorActivity.this, UnusedOffersActivity.class));
+                            showCheckInDialog();
+//                            startActivity(new Intent(VendorActivity.this, UnusedOffersActivity.class));
                         }
                     });
                 } catch (Exception e) {
@@ -333,6 +342,62 @@ public class VendorActivity extends ActionBarActivity {
         });
 
         return popupWindow;
+    }
+
+    private void showCheckInDialog(){
+        final ProgressDialog loader = GenUtils.generateLoader(VendorActivity.this, "Fetching available offers...");
+        final String rewardsurl = Router.VendorScreen.getRewardsData(vendorId);
+        new AsyncGet(VendorActivity.this, rewardsurl, new AsyncGet.AsyncResult() {
+            @Override
+
+            public void gotResult(String s) {
+                Log.d("rewardsurl", rewardsurl);
+                try {
+                    loader.dismiss();
+                    JSONObject result = new JSONObject(s);
+                    ArrayList<RewardsObject> rewards = RewardsObject.decodeFromServer(result.getJSONArray("rewards"));
+                    //add additional variables
+                    for(RewardsObject reward : rewards){
+                        //TODO : sai should send vendorId in that API
+                        reward.vendorId = vendorId;
+                    }
+                    final ArrayList<RewardsObject> unlockedrewards = new ArrayList<>();
+                    List<String> options = new ArrayList<>();
+                    for(RewardsObject reward : rewards){
+                        if(reward.unlocked){
+                            unlockedrewards.add(reward);
+                            options.add(reward.description);
+                        }
+                    }
+                    options.add("Checkin without reward");
+
+
+                    CharSequence[] cs = options.toArray(new CharSequence[options.size()]);
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(VendorActivity.this, R.style.RewardsDialogTheme);
+                    builder.setTitle("Select a reward").setItems(cs, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int index) {
+                            if(index<unlockedrewards.size()){
+                                //Checkin with reward
+                                CheckInAlertController.openCheckinDirectly(VendorActivity.this, unlockedrewards.get(index));
+                            }else{
+                                //Checkin without reward
+                                ToastMain.showSmartToast(VendorActivity.this,"Sai: implement this");
+                                //TODO:sai call your checkin without reward API here
+
+                            }
+                        }
+                    });
+                    builder.create().show();
+
+                } catch (JSONException e) {e.printStackTrace();}
+            }
+        }, true);
+
+
+
+
+
     }
 
     @Override

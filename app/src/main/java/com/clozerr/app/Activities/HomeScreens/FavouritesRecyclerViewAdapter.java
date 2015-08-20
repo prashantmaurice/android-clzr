@@ -2,7 +2,6 @@ package com.clozerr.app.Activities.HomeScreens;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,7 +18,6 @@ import com.clozerr.app.CardModel;
 import com.clozerr.app.Handlers.ToastMain;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.R;
-import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
 import org.json.JSONArray;
@@ -62,20 +60,22 @@ public class FavouritesRecyclerViewAdapter extends RecyclerView.Adapter<Favourit
         viewHolder.txtTitle.setText(model.getTitle());
         //viewHolder.txtStamps.setText(model.getStampString());
         viewHolder.txtDist.setText(model.getDistanceString());
-        Ion.with(c)
+        Ion.with(viewHolder.imageView).load(model.getImageId()) ;
+//        Ion.with(c)
 //                .placeholder(R.drawable.call)
              //   .error(R.drawable.bat)
                         //    .animateLoad(spinAnimation)
                         //    .animateIn(fadeInAnimation)
-                .load(model.getImageId()).asBitmap().setCallback(new FutureCallback<Bitmap>() {
-            @Override
-            public void onCompleted(Exception e, Bitmap result) {
-                //TODO : uncomment below code and amek it bug free
-//                if( result != null )
-                    viewHolder.imageView.setImageBitmap(Bitmap.createScaledBitmap(result,1600,900,false));
-            }
-        });
-            }
+//                .load(model.getImageId()).asBitmap().setCallback(new FutureCallback<Bitmap>() {
+//            @Override
+
+//            public void onCompleted(Exception e, Bitmap result) {
+////                if( result != null )
+//                Ion.with(mVendorImageView).load(vendorDetailsObject.getImageUrl()) ;
+////                    viewHolder.imageView.setImageBitmap(Bitmap.createScaledBitmap(result,1600,900,false));
+//            }
+//        });
+    }
 
     @Override
     public int getItemCount() {

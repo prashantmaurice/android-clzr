@@ -42,6 +42,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.clozerr.app.AboutUs;
+import com.clozerr.app.Activities.GiftBoxScreen.GiftBoxActivity;
 import com.clozerr.app.Activities.LoginScreens.LoginActivity;
 import com.clozerr.app.Activities.LoginScreens.SignupActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
@@ -51,7 +52,6 @@ import com.clozerr.app.DownloadImageTask;
 import com.clozerr.app.FAQ;
 import com.clozerr.app.GenUtils;
 import com.clozerr.app.GeofenceManagerService;
-import com.clozerr.app.Activities.GiftBoxScreen.GiftBoxActivity;
 import com.clozerr.app.Handlers.TokenHandler;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.Models.NavObject;
@@ -487,6 +487,7 @@ public class HomeActivity extends ActionBarActivity {
                         break;
 
                     case LOGOUT:
+                        GenUtils.generateLoader(HomeActivity.this,"Logging out. Please wait...");
                         AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
                         builder.setTitle("Confirm log out")
                                 .setMessage("If you choose to log out, you will no longer receive Clozerr's notifications about your rewards in nearby places " +

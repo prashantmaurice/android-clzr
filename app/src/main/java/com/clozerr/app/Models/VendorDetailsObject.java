@@ -99,6 +99,7 @@ public class VendorDetailsObject {
     public boolean unlocked;
     public String rewardId;
     public String vendorId;
+    public String vendorLogoUrl;
     public String name;
     public String lat, longg;
 
@@ -148,6 +149,12 @@ public class VendorDetailsObject {
             vendor.city = (obj.has("city"))?obj.getString("city"):"";
             vendor.visible = (obj.has("visible"))?obj.getBoolean("visible") :false;
 
+
+            //TODO:sai : catch variables above and use them here to support Logo
+            //new API variables that are yest to be added
+            vendor.vendorLogoUrl = (obj.has("vendorLogoUrl"))?obj.getString("vendorLogoUrl"):"";
+
+
             if(obj.has("location")){
                 JSONArray location = obj.getJSONArray("location");
                 vendor.lat = location.getString(0);
@@ -194,12 +201,7 @@ public class VendorDetailsObject {
         return "";
     }
     public String getLogoImageUrl() {
-        try {
-            return imageBase+ URLEncoder.encode(resourceName, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return "";
+        return vendorLogoUrl;
     }
 
 }
