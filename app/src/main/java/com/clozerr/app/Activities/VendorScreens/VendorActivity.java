@@ -49,6 +49,7 @@ import java.util.ArrayList;
 public class VendorActivity extends ActionBarActivity {
 
     private static final String TAG = "VENDORACTIVITY";
+    public static final String EXTRA_VENDORID = "vendor_id";
 
     private boolean fromPeriodicBFS = false;
     private Toolbar toolbar;
@@ -78,6 +79,9 @@ public class VendorActivity extends ActionBarActivity {
         Rewards = "";
 
         callingIntent = getIntent();
+
+
+        //TODO : @sai : check if this is deprecated, like what is the
         fromPeriodicBFS = callingIntent != null && callingIntent.getBooleanExtra("from_periodic_scan", false);
         if (fromPeriodicBFS)
             PeriodicBFS.dismissNotifications(this);
@@ -89,7 +93,7 @@ public class VendorActivity extends ActionBarActivity {
 
 
 
-        vendorId = callingIntent.getStringExtra("vendor_id");
+        vendorId = callingIntent.getStringExtra(EXTRA_VENDORID);
 
 //        TOKEN = getSharedPreferences("USER", 0).getString("token", "");
         TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;

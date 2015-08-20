@@ -76,6 +76,7 @@ import java.util.Arrays;
 
 
 public class SignupActivity extends FragmentActivity {
+    static String TAG = "SIGNUPACTIVITY";
 
     //SETTINGS VARIABLES
     private static final int RC_SIGN_IN = 0;
@@ -153,11 +154,11 @@ public class SignupActivity extends FragmentActivity {
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(final LoginResult loginResult) {
-                Logg.m("MAIN", "Facebook Login Success : AccessToken=" + loginResult.getAccessToken().getToken());
+                Logg.m(TAG, "Facebook Login Success : AccessToken=" + loginResult.getAccessToken().getToken());
                 tokenHandler.addSocialToken(loginResult.getAccessToken().getToken(), UserMain.AUTH_FACEBOOK);
                 tokenHandler.getClozerrToken(new TokenHandler.ClozerrTokenListener() {
                     @Override
-                    public void onClozerTokenUpdated() {
+                    public void onClozerTokenUpdated(boolean isUpdated) {
                         gotoMainApp();
                     }
                 });
@@ -165,12 +166,12 @@ public class SignupActivity extends FragmentActivity {
 
             @Override
             public void onCancel() {
-                Logg.m("MAIN", "Response  : Facebook Graph = Cancelled");
+                Logg.m(TAG, "Response  : Facebook Graph = Cancelled");
             }
 
             @Override
             public void onError(FacebookException e) {
-                Logg.m("MAIN", "Response  : Facebook Graph = Error=" + e.toString());
+                Logg.m(TAG, "Response  : Facebook Graph = Error=" + e.toString());
             }
         });
     }
@@ -179,7 +180,7 @@ public class SignupActivity extends FragmentActivity {
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override
                     public void onConnected(Bundle bundle) {
-                        Logg.e("MIAN","onConnected");
+                        Logg.e(TAG,"onConnected");
                         mSignInClicked = false;
                         GenUtils.showDebugToast(SignupActivity.this, "User is connected to google account!");
                         final String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
@@ -192,7 +193,7 @@ public class SignupActivity extends FragmentActivity {
                                     tokenHandler.addSocialToken(token, UserMain.AUTH_GOOGLE);
                                     tokenHandler.getClozerrToken(new TokenHandler.ClozerrTokenListener() {
                                         @Override
-                                        public void onClozerTokenUpdated() {
+                                        public void onClozerTokenUpdated(boolean isUpdated) {
                                             gotoMainApp();
                                         }
                                     });
@@ -209,16 +210,16 @@ public class SignupActivity extends FragmentActivity {
 
                     @Override
                     public void onConnectionSuspended(int i) {
-                        Logg.e("MIAN","onConnectionSuspended");
+                        Logg.e(TAG,"onConnectionSuspended");
                         mGoogleApiClient.connect();
                     }
                 })
                 .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(ConnectionResult connectionResult) {
-                        Logg.e("MIAN","onConnectionFailed");
+                        Logg.e(TAG,"onConnectionFailed");
                         if (!connectionResult.hasResolution()) {
-                            Logg.e("ERROR","Google login : "+connectionResult.toString());
+                            Logg.e("ERROR"+TAG,"Google login : "+connectionResult.toString());
                             GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), SignupActivity.this, 0).show();
                             return;
                         }
@@ -268,7 +269,7 @@ public class SignupActivity extends FragmentActivity {
     protected void onStart() {
         super.onStart();
         if(mGoogleApiClient!=null){
-            Logg.e("MIAN", "mGoogleApiClient.connect()");
+            Logg.e(TAG, "mGoogleApiClient.connect()");
             mGoogleApiClient.connect();
         }
     }
@@ -585,8 +586,8 @@ public class SignupActivity extends FragmentActivity {
     }
 
 
-    ArrayList<String> slidesQuotes = new ArrayList<>(Arrays.asList("", "<span style='font-size=16px'>tap &#9825; and add<br>clubs to <b>my clubs</b></span>", "unlock rewards","<span style='font-size=16px'>tap <b>check in</b> and choose<br>reward to redeem</span>","<span style='font-size=16px'>tap <b>check in</b> and choose<br>reward to redeem</span>"));
-    ArrayList<Integer> slidesImages = new ArrayList<>(Arrays.asList(R.drawable.signup_slide_2,R.drawable.signup_slide_2,R.drawable.signup_slide_3,R.drawable.signup_slide_4,R.drawable.signup_slide_5));
+    ArrayList<String> slidesQuotes = new ArrayList<>(Arrays.asList("Rewarding you<br>at places you love ! ", "<span style='font-size=16px'>tap &#9825; and add<br>clubs to <b>favourites</b></span>", "unlock various rewards","<span style='font-size=16px'>tap <b>check in</b> and choose<br>reward to redeem</span>","<span style='font-size=16px'>tap <b>check-in</b><br>and redeem a reward</span>"));
+    ArrayList<Integer> slidesImages = new ArrayList<>(Arrays.asList(R.drawable.clozerr_new_logo,R.drawable.signup_slide_2,R.drawable.signup_slide_3,R.drawable.signup_slide_4,R.drawable.signup_slide_5));
 
     //OUR MAIN SLIDE VIEW FRAGMENT ADAPTER */
     public class DemoCollectionPagerAdapter extends FragmentPagerAdapter {
@@ -596,7 +597,7 @@ public class SignupActivity extends FragmentActivity {
 
         @Override
         public Fragment getItem(int i) {
-            if(i==0) return new IntroSlideFragment();
+//            if(i==0) return new IntroSlideFragment();
 
             Fragment fragment = new SlideFragment();
             Bundle args = new Bundle();
@@ -633,6 +634,8 @@ public class SignupActivity extends FragmentActivity {
             return rootView;
         }
     }
+
+    //Use this if you want to show custom UI in first slide like GIF etc
     public static class IntroSlideFragment extends Fragment {
         @Override
         public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {

@@ -5,7 +5,7 @@
     android:id="@+id/mycardslayout"
     android:background="#eaeaea"
     android:gravity="center"
-    tools:context="com.clozerr.app.Activities.HomeScreens.MyClubsFragment">
+    tools:context="com.clozerr.app.Activities.HomeScreens.FavouritesFragment">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

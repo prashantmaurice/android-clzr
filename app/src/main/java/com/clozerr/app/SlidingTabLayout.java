@@ -34,7 +34,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-        import com.clozerr.app.Activities.HomeScreens.MyClubsFragment;
+        import com.clozerr.app.Activities.HomeScreens.FavouritesFragment;
         import com.clozerr.app.Activities.HomeScreens.NearbyFragment;
 
 /**
@@ -322,8 +322,8 @@ public class SlidingTabLayout extends HorizontalScrollView {
                     NearbyFragment.showSearchbarToInitial();
                     break;
                 case 2:
-                    MyClubsFragment.showToolbar();
-                    MyClubsFragment.showSearchbarToInitial();
+                    FavouritesFragment.showToolbar();
+                    FavouritesFragment.showSearchbarToInitial();
             }
         }
 

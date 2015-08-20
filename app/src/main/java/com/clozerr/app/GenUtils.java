@@ -1,5 +1,6 @@
 package com.clozerr.app;
 
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -136,4 +137,23 @@ public class GenUtils {
     public static void showDebugToast(Context context, String text){
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
+    public static void showToast(Context context, final String text){
+        if (context == null) context = MainApplication.getInstance();
+        Handler handler = new Handler(Looper.getMainLooper());
+        final Context finalContext = context;
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(finalContext, text, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    public static ProgressDialog generateLoader(Context context, String text){
+        ProgressDialog pdialog=new ProgressDialog(context);
+        pdialog.setMessage("" + text);
+        pdialog.show();
+        return pdialog;
+    }
+
 }
+

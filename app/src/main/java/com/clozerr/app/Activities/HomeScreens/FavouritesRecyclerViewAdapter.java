@@ -28,18 +28,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MyClubsRecyclerViewAdapter extends RecyclerView.Adapter<MyClubsRecyclerViewAdapter.ListItemViewHolder> {
+public class FavouritesRecyclerViewAdapter extends RecyclerView.Adapter<FavouritesRecyclerViewAdapter.ListItemViewHolder> {
 
     private List<CardModel> items;
     static Context c;
 
-    public MyClubsRecyclerViewAdapter(List<CardModel> modelData, Context c) {
+    public FavouritesRecyclerViewAdapter(List<CardModel> modelData, Context c) {
         if (modelData == null) {
             throw new IllegalArgumentException(
                     "modelData must not be null");
         }
         this.items = modelData;
-        MyClubsRecyclerViewAdapter.c = c;
+        FavouritesRecyclerViewAdapter.c = c;
     }
 
     @Override
@@ -70,8 +70,9 @@ public class MyClubsRecyclerViewAdapter extends RecyclerView.Adapter<MyClubsRecy
                 .load(model.getImageId()).asBitmap().setCallback(new FutureCallback<Bitmap>() {
             @Override
             public void onCompleted(Exception e, Bitmap result) {
-                if( result != null )
-                    viewHolder.imageView.setImageBitmap(Bitmap.createScaledBitmap(result,1600,900,false));
+                //TODO : uncomment below code and amek it bug free
+//                if( result != null )
+//                    viewHolder.imageView.setImageBitmap(Bitmap.createScaledBitmap(result,1600,900,false));
             }
         });
             }

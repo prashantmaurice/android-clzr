@@ -29,6 +29,7 @@ import com.clozerr.app.AsyncGet;
 import com.clozerr.app.CardModel;
 import com.clozerr.app.EndlessRecyclerOnScrollListener;
 import com.clozerr.app.MainApplication;
+import com.clozerr.app.Models.NearbyRestaurentObject;
 import com.clozerr.app.MyLocation;
 import com.clozerr.app.R;
 import com.clozerr.app.SpaceItemDecoration;
@@ -38,6 +39,7 @@ import com.nineoldandroids.animation.ValueAnimator;
 import com.nineoldandroids.view.ViewHelper;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -53,7 +55,7 @@ public class NearbyFragment extends Fragment {
     ObservableRecyclerView mRecyclerView;
     static View swipetab;
     private NearbyFragmentAdapter mMainPageAdapter;
-    private ArrayList<CardModel> mMainCardsList = new ArrayList<>();
+    private ArrayList<NearbyRestaurentObject> mMainCardsList = new ArrayList<>();
     private RecyclerView.LayoutManager mLayoutManager;
     private EndlessRecyclerOnScrollListener mOnScrollListener;
     private ImageView locationimage;
@@ -251,7 +253,9 @@ public class NearbyFragment extends Fragment {
         if(!cards.isEmpty()){
             Log.e("Cached Card", cards);
             mMainCardsList.clear();
-            mMainCardsList.addAll(convertRow(cards));
+            try {
+                mMainCardsList.addAll(NearbyRestaurentObject.decodeFromServer(new JSONArray(cards)));
+            } catch (JSONException e) {e.printStackTrace();}
             mMainPageAdapter.notifyDataSetChanged();
         }
         
@@ -294,9 +298,15 @@ public class NearbyFragment extends Fragment {
                 if(s==null) {
                     Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
                 }
-                ArrayList<CardModel> CardList = convertRow(s);
-                if (CardList.size() != 0) {
-                    mMainCardsList.addAll(CardList);
+                ArrayList<NearbyRestaurentObject> nearbyList = null;
+                try {
+                    nearbyList = NearbyRestaurentObject.decodeFromServer(new JSONArray(s));
+                } catch (JSONException e) {
+                    Log.d("ERROR","Could not parse nearby Json array");
+                    e.printStackTrace();
+                }
+                if (nearbyList.size() != 0) {
+                    mMainCardsList.addAll(nearbyList);
                     mMainPageAdapter.notifyDataSetChanged();
                     MainApplication.getInstance().data.userMain.changeHomeCards(s);
                     Log.e("app", "editing done");
@@ -312,7 +322,7 @@ public class NearbyFragment extends Fragment {
     
     private void move(float dy){
         scolled+=dy;
-        Log.d("Scrolling", dy + "//" + ViewHelper.getTranslationY(mToolbar) + "//" + mToolbar.getHeight() + "//" + SEARCH_CARD_INI_POS + "//" + ViewHelper.getTranslationY(SearchCard));
+//        Log.d("Scrolling", dy + "//" + ViewHelper.getTranslationY(mToolbar) + "//" + mToolbar.getHeight() + "//" + SEARCH_CARD_INI_POS + "//" + ViewHelper.getTranslationY(SearchCard));
         if(ViewHelper.getTranslationY(SearchCard)>=SEARCH_CARD_INI_POS-mToolbar.getHeight() && ViewHelper.getTranslationY(SearchCard)<=SEARCH_CARD_INI_POS)
         if((!(ViewHelper.getTranslationY(mToolbar)<=-mToolbar.getHeight()) && dy>=0) || ((ViewHelper.getTranslationY(mToolbar)<0)&& dy<=0)) {
             if (ViewHelper.getTranslationY(mToolbar) - dy > 0) {
