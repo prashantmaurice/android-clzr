@@ -26,8 +26,8 @@ public class MyCardModel {
         this.location.setLongitude(longi);
 
         Location userLocation = new Location("User location");
-        userLocation.setLatitude(Double.valueOf(Home.lat));
-        userLocation.setLongitude(Double.valueOf(Home.longi));
+        userLocation.setLatitude(MainApplication.getInstance().location.getLatitude());
+        userLocation.setLongitude(MainApplication.getInstance().location.getLongitude());
         this.distance=userLocation.distanceTo(this.location)+" km";
 
         this.franchiseId = fId;

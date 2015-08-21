@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.clozerr.app.Activities.LoginScreens.LoginActivity;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.Scopes;
@@ -100,7 +101,7 @@ public class AsyncTokenGet extends AsyncTask<Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... params) {
-        String accountName = Plus.AccountApi.getAccountName(Login.googleApiClient);
+        String accountName = Plus.AccountApi.getAccountName(LoginActivity.googleApiClient);
         Account account = new Account(accountName, GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
         //String scopes = "audience:server:client_id:" + Constants.SERVER_CLIENT_ID; // Not the app's client ID.
         String scopes = "oauth2:" + Scopes.PLUS_LOGIN + " " + Scopes.PROFILE;

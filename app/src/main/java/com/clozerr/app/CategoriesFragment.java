@@ -2,7 +2,6 @@ package com.clozerr.app;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -151,10 +150,12 @@ public class CategoriesFragment extends Fragment{
                 move(dy);
             }
         });
-        SharedPreferences status = c.getSharedPreferences("USER", 0);
-        String TOKEN = status.getString("token", "");
-        final String cards = status.getString("categories_cards", "");
-        if(!cards.equals("")){
+//        SharedPreferences status = c.getSharedPreferences("USER", 0);
+//        String TOKEN = status.getString("token", "");
+        String TOKEN =  MainApplication.getInstance().tokenHandler.clozerrtoken;
+        final String cards = MainApplication.getInstance().data.userMain.categories_cards;
+//        final String cards = status.getString("categories_cards", "");
+        if(!cards.isEmpty()){
             Log.e("Cached Card", cards);
             CategoryRecyclerViewAdapter categoryAdapter = new CategoryRecyclerViewAdapter(convertRowCategory(cards), c);
             mRecyclerView.setAdapter(categoryAdapter);
@@ -167,9 +168,10 @@ public class CategoriesFragment extends Fragment{
                     //  t1.setText(s);
 
                     Log.e(TAG, "result - " + s);
-                    final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                    editor.putString("categories_cards", s);
-                    editor.apply();
+//                    final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+//                    editor.putString("categories_cards", s);
+//                    editor.apply();
+                    MainApplication.getInstance().data.userMain.changeCategoryCards(s);
                     Log.e("app", "categories caching done");
                     if (s == null) {
                         Toast.makeText(c, "No internet connection", Toast.LENGTH_SHORT).show();
@@ -192,9 +194,10 @@ public class CategoriesFragment extends Fragment{
 
                     CategoryRecyclerViewAdapter categoryAdapter = new CategoryRecyclerViewAdapter(convertRowCategory(s), c);
                     mRecyclerView.setAdapter(categoryAdapter);
-                    final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                    editor.putString("categories_cards", s);
-                    editor.apply();
+//                    final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+//                    editor.putString("categories_cards", s);
+//                    editor.apply();
+                    MainApplication.getInstance().data.userMain.changeCategoryCards(s);
                     Log.e("app", "categories caching done");
                     try {
                         Tracker t = ((Analytics) c.getApplicationContext()).getTracker(Analytics.TrackerName.APP_TRACKER);
@@ -317,7 +320,7 @@ public class CategoriesFragment extends Fragment{
     }
     void move(float dy){
         scolled+=dy;
-        Log.d("Scrolling", dy + "//" + ViewHelper.getTranslationY(mToolbar)+"//"+mToolbar.getHeight()+"//"+SEARCH_CARD_INI_POS + "//"+ViewHelper.getTranslationY(SearchCard));
+        //Log.d("Scrolling", dy + "//" + ViewHelper.getTranslationY(mToolbar)+"//"+mToolbar.getHeight()+"//"+SEARCH_CARD_INI_POS + "//"+ViewHelper.getTranslationY(SearchCard));
         if(ViewHelper.getTranslationY(SearchCard)>=SEARCH_CARD_INI_POS-mToolbar.getHeight() && ViewHelper.getTranslationY(SearchCard)<=SEARCH_CARD_INI_POS)
             if((!(ViewHelper.getTranslationY(mToolbar)<=-mToolbar.getHeight()) && dy>=0) || ((ViewHelper.getTranslationY(mToolbar)<0)&& dy<=0)) {
                 if (ViewHelper.getTranslationY(mToolbar) - dy > 0) {

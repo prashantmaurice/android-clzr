@@ -9,17 +9,19 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.clozerr.app.Activities.HomeScreens.HomeActivity;
+import com.clozerr.app.Activities.VendorScreens.VendorActivity;
+import com.clozerr.app.Utils.Constants;
 import com.google.android.gcm.GCMBaseIntentService;
 
 import org.json.JSONObject;
 
-import static com.clozerr.app.Home.SENDER_ID;
 
 
 public class GCMIntentService extends GCMBaseIntentService {
 
     public GCMIntentService() {
-        super(SENDER_ID);
+        super(Constants.GOOGLE_PROJECTID);
     }
 
     private static final String TAG = "GCMIntentService";
@@ -44,14 +46,14 @@ public class GCMIntentService extends GCMBaseIntentService {
                         .setContentTitle( title )
                         .setContentText( content )
                         .setDefaults(NotificationCompat.DEFAULT_ALL);
-        Intent resultIntent = new Intent(this, Home.class);
+        Intent resultIntent = new Intent(this, HomeActivity.class);
         // The stack builder object will contain an artificial back stack for the
         // started Activity.
         // This ensures that navigating backward from the Activity leads out of
         // your application to the Home screen.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(Home.class);
+        stackBuilder.addParentStack(HomeActivity.class);
         // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
@@ -88,6 +90,7 @@ public class GCMIntentService extends GCMBaseIntentService {
                 notifyreview(title, message, checkin_id, vendor_id);
                 break;
             case "BIRTHDAY":
+                // BUH?
                 try {
                     Log.e("GCMBirthday", intent.getExtras().get("vendor").toString());
                     JSONObject vendor = new JSONObject(intent.getExtras().get("vendor").toString());
@@ -96,6 +99,15 @@ public class GCMIntentService extends GCMBaseIntentService {
                     notify(title, message);
                 } catch (Exception e) {
                     e.printStackTrace();
+                }
+                break;
+            case "UPDATE_SCAN":
+                try{
+                    // Hasten update by asking Beacon DB to start downloading ASAP.
+                    Log.e(TAG, "Received update request.");
+                    BeaconDBDownloadBaseReceiver.forceUpdate();
+                }catch (Exception e){
+                       e.printStackTrace();
                 }
                 break;
             default: break;
@@ -125,7 +137,7 @@ public class GCMIntentService extends GCMBaseIntentService {
         // your application to the Home screen.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(Home.class);
+        stackBuilder.addParentStack(HomeActivity.class);
         // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =

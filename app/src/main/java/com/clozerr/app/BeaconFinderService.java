@@ -13,8 +13,10 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
-import android.util.Log;
+
 import com.android.internal.util.Predicate;
+import com.clozerr.app.Activities.VendorScreens.VendorActivity;
+import com.clozerr.app.Utils.Constants;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.jaalee.sdk.Beacon;
 import com.jaalee.sdk.BeaconManager;
@@ -127,8 +129,9 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         isScanningAllowed = sharedPreferences.getBoolean(context.getResources().getString(R.string.beacon_detection), true);
         commonBeaconUUID = sharedPreferences.getString(Constants.SPKeys.BEACON_UUID, "");
-        sharedPreferences = context.getSharedPreferences("USER", 0);
-        isUserLoggedIn = !sharedPreferences.getString("token", "").isEmpty();
+//        sharedPreferences = context.getSharedPreferences("USER", 0);
+//        isUserLoggedIn = !sharedPreferences.getString("token", "").isEmpty();
+        isUserLoggedIn = MainApplication.getInstance().tokenHandler.isLoggedIn();
         if (logInNecessary)
             return (isUserLoggedIn && isScanningAllowed && !commonBeaconUUID.isEmpty());
         else
@@ -147,6 +150,7 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         PreferenceManager.getDefaultSharedPreferences(context).edit()
                 .putBoolean(Constants.SPKeys.APP_DISABLE_BT, shouldAppDeactivateBluetooth).apply();
         if (!bluetoothAdapter.isEnabled()) {                            // disabled, so enable BT
+            Log.e(TAG, "actually turning on bluetooth");
             bluetoothAdapter.enable();
         }
     }
@@ -156,6 +160,8 @@ public abstract class BeaconFinderService extends WakefulIntentService {
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Constants.SPKeys.APP_DISABLE_BT, false)) {
             // if app did not turn on BT, don't disable it as user might need it
             Log.e(TAG,"App has to turn on bluetooth");
+            if (bluetoothAdapter == null)
+                bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             bluetoothAdapter.disable();
         }
     }

@@ -2,7 +2,6 @@ package com.clozerr.app;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -12,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,16 +29,16 @@ public class MyStampsFragment extends Fragment {
         recyclerview.setLayoutManager(new GridLayoutManager(c,3));
         recyclerview.setItemAnimator(new DefaultItemAnimator());
         recyclerview.setHasFixedSize(true);
-        ArrayList<MyOffer> myOffers = convertRowMyOffers(VendorActivity.detailsBundle.getString("Alloffers"));
+//        ArrayList<MyOffer> myOffers = convertRowMyOffers(VendorActivity.detailsBundle.getString("Alloffers"));
         //Toast.makeText(getActivity(), VendorActivity.detailsBundle.getString("Alloffers"), Toast.LENGTH_LONG).show();
                         /*MyOffer currentOffer = getCurrentOffer(s);
 
                         MyOffersRecyclerViewAdapter myOffersAdapter = new MyOffersRecyclerViewAdapter(myOffers, currentOffer, CouponDetails.this);
                         mRecyclerView.setAdapter(myOffersAdapter);*/
-        MyOffersRecyclerViewAdapter adapter = new MyOffersRecyclerViewAdapter(myOffers, getActivity());
-        recyclerview.setAdapter(adapter);
-        final TextView textView = (TextView) layout.findViewById(R.id.stampdesc);
-        textView.setText(VendorActivity.detailsBundle.getString("policy"));
+        //MyOffersRecyclerViewAdapter adapter = new MyOffersRecyclerViewAdapter(myOffers, getActivity());
+        //recyclerview.setAdapter(adapter);
+//        final TextView textView = (TextView) layout.findViewById(R.id.stampdesc);
+//        textView.setText(VendorActivity.detailsBundle.getString("policy"));
         //final String[] values = new String[] { "1","2","3","4","5","6","7","8","9","10" };
         //ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.stamp_layout, R.id.stampnumber, values);
         //recyclerview.setAdapter(new MyStampsRecyclerViewAdapter(values,getActivity()));
@@ -68,6 +66,7 @@ public class MyStampsFragment extends Fragment {
             JSONObject someObject = new JSONObject(s);
             JSONArray array = someObject.getJSONArray("offers");
             int maxStamps = getMaxStampCount( array );
+            //Log.e(maxStamps);
             //Toast.makeText(getActivity(),s, Toast.LENGTH_LONG).show();
             MyOffer.SXOfferExtras extras = null;
             int i=0;
@@ -115,7 +114,7 @@ public class MyStampsFragment extends Fragment {
                     }
 
 
-                if(j==maxStamps-1) break;
+                if(j>=maxStamps-1) break;
             }
         } catch (Exception e) {
             e.printStackTrace();

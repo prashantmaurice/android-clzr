@@ -1,7 +1,6 @@
 package com.clozerr.app;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
@@ -33,7 +32,6 @@ public class AboutUs extends ActionBarActivity {
             Log.d("faq", "toolbar");
             getSupportActionBar().setHomeButtonEnabled(true);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
@@ -50,9 +48,10 @@ public class AboutUs extends ActionBarActivity {
 
     private void openURL() {
 
-
-        SharedPreferences status = getSharedPreferences("USER", 0);
-        final String sum = status.getString("about_us_html", /*"<html><body><div><div><div><div><div><h5>What is CLOZERR?</h5></div><div id=\\\"collapseOne\\\"><div>Clozerr is an android application which allows you to try out awesome places around you by giving you an attractive offer on your first visit followed by a loyalty program to reward you on your subsequent visits. </div></div></div><div><div><h5>How can I redeem an offer in CLOZERR?</h5></div><div id=\\\"collapseTwo\\\"><div>Visit the place listed on Clozerr and tap the 'Check In' button, that's it sit back and enjoy the offer.</div></div></div><div><div><h5 >What are loyalty rewards?</h5></div><div id=\\\"collapseThree\\\"><div>Loyalty rewards are those offers which are provided to you on your subsequent visits to the same place before the campaign ends. For example a restaurant can give you a free pizza on your 4th visit. You need to mark your visits at the store so as to use this loyalty offer. </div>   </div></div><div><div ><h5>What kind of places can I find on CLOZERR?</h5></div><div id=\\\"collapseFour\\\"><div>Clozerr has tie-ups with various kinds of businesses ranging from general departmental store to high end restaurants. It is an app which can be used by all sorts of customers for all needs.</div></div></div><div><div><h5>Will I get intelligent push notifications from the app?</h5></div><div id=\\\"collapseSix\\\"><div>Yes indeed. You will get intelligent push notifications from the app.x</div></div>   </div><div><div><h5>Can I suggest any particular place in my neighbourhood to CLOZERR?</h5></div><div id=\\\"collapseSeven\\\"><div>Yes, you can suggest any new restaurant/salon/boutique/cafe which you would like to be a part of Clozerr. You can contact us and we will contact the shop owner. </div></div></div><div><div><h5>How do I reach out to CLOZERR?</h5></div><div id=\\\"collapseEight\\\"><div>Please mail us at- mail@clozerr.com</div></div></div></div></div></body></html>"*/ "About Us");
+        String sum = MainApplication.getInstance().data.cacheMain.about_us_html;
+        if(sum.isEmpty()){
+            sum = "loading....";
+        }
         webView.loadData(sum,"text/html",null);
         new AsyncGet(this, "http://api.clozerr.com/content?key=about_us", new AsyncGet.AsyncResult() {
             @Override
@@ -61,15 +60,9 @@ public class AboutUs extends ActionBarActivity {
                 try {
                     html = new JSONObject(s);
                     String about_us_html=html.getString("data");
-                    if(sum.equals(about_us_html)) {
-
-                    }
-                    else{
-                        final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-                        editor.putString("about_us_html", about_us_html);
-                        editor.apply();
-                        webView.loadData(about_us_html,"text/html",null);
-                    }
+                    MainApplication.getInstance().data.cacheMain.about_us_html = about_us_html;
+                    MainApplication.getInstance().data.cacheMain.saveCacheDataLocally();
+                    webView.loadData(about_us_html,"text/html",null);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -117,6 +110,7 @@ public class AboutUs extends ActionBarActivity {
             return true;
         }
         if (id == R.id.home) {
+//            finish();
             NavUtils.navigateUpFromSameTask(this);
         }
 

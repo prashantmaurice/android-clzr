@@ -2,10 +2,8 @@ package com.clozerr.app.Storage;
 
 import android.content.Context;
 
+import com.clozerr.app.Models.CacheMain;
 import com.clozerr.app.Models.UserMain;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  *  Instance of Data object contains all access to the complete date model underneath.
@@ -20,8 +18,10 @@ import org.json.JSONObject;
 public class Data {
     private static Data instance;
     public UserMain userMain;
+    public CacheMain cacheMain;
 
     private Data(Context context) {
+        cacheMain = CacheMain.getInstance(context);
         userMain = UserMain.getInstance(context);
     }
 
@@ -32,13 +32,13 @@ public class Data {
     }
 
     //Refill function to generate all previous data
-    public void refillCompleteData(JSONObject response){
-        try {
-            userMain.decodeFromServer(response.getJSONObject("user"));
-            userMain.saveUserDataLocally();
-
-        } catch (JSONException e) {e.printStackTrace();}
-    };
+//    public void refillCompleteData(JSONObject response){
+//        try {
+//            userMain.decodeFromServer(response.getJSONObject("user"));
+//            userMain.saveUserDataLocally();
+//
+//        } catch (JSONException e) {e.printStackTrace();}
+//    };
 
 //    public void pullDataFromServer(final String email, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) throws JSONException {
 //        String url = Router.User.getWIthEmailComplete(email);
@@ -50,6 +50,7 @@ public class Data {
 //    }
 
     public void saveCompleteDataLocally(){
+        cacheMain.saveCacheDataLocally();
         userMain.saveUserDataLocally();
     }
 

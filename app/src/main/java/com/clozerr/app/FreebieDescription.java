@@ -7,8 +7,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Gravity;
@@ -17,14 +18,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Button;
 
+import com.clozerr.app.Activities.UtilActivities.QRActivity;
+import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.google.android.gcm.GCMRegistrar;
 
 import org.json.JSONArray;
@@ -36,12 +39,12 @@ import java.util.ArrayList;
 import java.util.Date;
 
 
-public class FreebieDescription extends ActionBarActivity {
+public class FreebieDescription extends FragmentActivity {
     String offerid="";
     String button="USE IT";
     String vendorid="",caption="",description="", name="";
     SharedPreferences status;
-    String NotNow;
+    boolean NotNow;
     ArrayList<String> pinned;
     ImageButton pin;
     ImageButton whatsappshare;
@@ -114,7 +117,9 @@ public class FreebieDescription extends ActionBarActivity {
         findViewById(R.id.useit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+Home.TOKEN+"&offer_id="+offerid+"&vendor_id="+vendorid+"&gcm_id="+ GCMRegistrar.getRegistrationId(getApplicationContext());
+                String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
+                String gcmIdEncoded = Uri.encode(GCMRegistrar.getRegistrationId(getApplicationContext()));
+                String url = "http://api.clozerr.com/v2/vendor/offers/checkin?access_token="+ TOKEN+"&offer_id="+offerid+"&vendor_id="+vendorid+"&gcm_id="+ gcmIdEncoded;
                 Log.d("FreebieDescription", "checkin url - " + url);
                 VendorActivity.Rewards = "";
                 //Toast.makeText(getApplicationContext(),url,Toast.LENGTH_LONG).show();
@@ -135,38 +140,38 @@ public class FreebieDescription extends ActionBarActivity {
                                 for (int i = 0; i < displayView.getChildCount(); ++i) {
                                     View child = displayView.getChildAt(i);
                                     switch(child.getId()) {
-                            /*case R.id.confirmFrameLayout:
-                                child.findViewById(R.id.confirmButton).setOnClickListener(
-                                        new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                // Intent homeIntent = new Intent(getApplicationContext(), Home.class);
-                                                // homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                //  getApplicationContext().startActivity(homeIntent);
-                                                CouponDetails.this.finish();
-                                            }
-                                        });
-                                break;*/
+                        /*case R.id.confirmFrameLayout:
+                            child.findViewById(R.id.confirmButton).setOnClickListener(
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            // Intent homeIntent = new Intent(getApplicationContext(), Home.class);
+                                            // homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            //  getApplicationContext().startActivity(homeIntent);
+                                            CouponDetails.this.finish();
+                                        }
+                                    });
+                            break;*/
                                         case R.id.dateTimeLayout:
                                             String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis())),
                                                     time = new SimpleDateFormat("HH:mm").format(new Date(System.currentTimeMillis())) + " hrs";
                                             ((TextView)(child.findViewById(R.id.timeView))).setText(time);
                                             ((TextView)(child.findViewById(R.id.dateView))).setText(date);
                                             break;
-                                        case R.id.pinView:  ((TextView) child).setText(jsonObject.getString("pin"));
+                                        case R.id.tv_rewardUniqueCode:  ((TextView) child).setText(jsonObject.getString("pin"));
                                             break;
-                                        case R.id.confirmTitleView: ((TextView) child).setText(name);
+                                        case R.id.tv_title1: ((TextView) child).setText(name);
                                             break;
-                                        case R.id.confirmOfferView: ((TextView) child).setText(caption);
+                                        case R.id.tv_title2: ((TextView) child).setText(caption);
                                             break;
                                         case R.id.qrButton: child.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
                                                 Intent qrIntent = new Intent(FreebieDescription.this, QRActivity.class);
-                                                qrIntent.putExtra("vendorId", vendorid);
-                                                qrIntent.putExtra("offerId", offerid);
+                                                qrIntent.putExtra(QRActivity.EXTRA_VENDORID, vendorid);
+                                                qrIntent.putExtra(QRActivity.EXTRA_OFFERID, offerid);
                                                 try {
-                                                    qrIntent.putExtra("checkinId", jsonObject.getString("_id"));
+                                                    qrIntent.putExtra(QRActivity.EXTRA_CHECKINID, jsonObject.getString("_id"));
                                                 } catch (JSONException ex) {
                                                     ex.printStackTrace();
                                                 }
@@ -184,12 +189,14 @@ public class FreebieDescription extends ActionBarActivity {
                         }
                     }
                 });
+
             }
         });
         findViewById(R.id.pin).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String urlPinning = "http://api.clozerr.com/v2/user/add/pinned?access_token=" + Home.TOKEN +"&offer_id="+offerid;
+                String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
+                String urlPinning = "http://api.clozerr.com/v2/user/add/pinned?access_token=" + TOKEN +"&offer_id="+offerid;
                 if(pinned.indexOf(offerid)==-1)
                 {
                     new AsyncGet(getApplicationContext(), urlPinning, new AsyncGet.AsyncResult() {
@@ -197,9 +204,10 @@ public class FreebieDescription extends ActionBarActivity {
                         public void gotResult(String s) {
                             try {
                                 JSONObject obj = new JSONObject(s);
-                                final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-                                editor.putString("user",s);
-                                editor.apply();
+//                                final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
+//                                editor.putString("user", s);
+//                                editor.apply();
+                                MainApplication.getInstance().data.userMain.changeUser(s);
                                 //Toast.makeText(getActivity(),s,Toast.LENGTH_SHORT).show();
                                 pin.setImageResource(R.drawable.pinfilled);
                                 Toast.makeText(getApplicationContext(), "Added to pinned offers", Toast.LENGTH_SHORT).show();
@@ -218,14 +226,15 @@ public class FreebieDescription extends ActionBarActivity {
                 }
                 else
                 {
-                    new AsyncGet(getApplicationContext(), "http://api.clozerr.com/v2/user/remove/pinned?access_token=" + Home.TOKEN +"&offer_id="+offerid, new AsyncGet.AsyncResult() {
+                    new AsyncGet(getApplicationContext(), "http://api.clozerr.com/v2/user/remove/pinned?access_token=" + TOKEN +"&offer_id="+offerid, new AsyncGet.AsyncResult() {
                         @Override
                         public void gotResult(String s) {
                             try {
                                 JSONObject obj = new JSONObject(s);
-                                final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
-                                editor.putString("user",s);
-                                editor.apply();
+//                                final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
+//                                editor.putString("user",s);
+//                                editor.apply();
+                                MainApplication.getInstance().data.userMain.changeUser(s);
                                 //Toast.makeText(getActivity(),s,Toast.LENGTH_SHORT).show();
                                 pin.setImageResource(R.drawable.pin100);
                                 Toast.makeText(getApplicationContext(), "Removed from pinned offers", Toast.LENGTH_SHORT).show();
@@ -255,21 +264,25 @@ public class FreebieDescription extends ActionBarActivity {
             public void onClick(View view) {
                 Intent sharingIntent = new Intent(Intent.ACTION_SEND);
                 sharingIntent.setType("text/plain");
-                String shareBody = "Check out the offer I got @ " +VendorActivity.detailsBundle.getString("vendorTitle")+" using Clozerr: "+description+" https://play.google.com/store/apps/details?id=com.clozerr.app";
+//                String shareBody = "Check out the offer I got @ " + VendorActivity.detailsBundle.getString("vendorTitle") + " using Clozerr: " + description + " https://play.google.com/store/apps/details?id=com.clozerr.app";
                 sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Clozerr");
-                sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+//                sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
             }
         });
     }
     public void updatePind(){
         status = getSharedPreferences("USER", 0);
-        NotNow = status.getString("notNow","false");
+        NotNow = MainApplication.getInstance().data.userMain.notNow;
+//        NotNow = status.getString("notNow", "false");
         pinned = new ArrayList<String>();
         JSONArray pind ;
-        if(NotNow.equals("false")) {
+//        if(NotNow.equals("false")) {
+        if(!NotNow) {
             try {
-                JSONObject userobj = new JSONObject(status.getString("user", "null"));
+//                JSONObject userobj = new JSONObject(status.getString("user", "null"));
+                String jsonTxt = (MainApplication.getInstance().data.userMain.user.isEmpty())?"null":MainApplication.getInstance().data.userMain.user;
+                JSONObject userobj = new JSONObject(jsonTxt);
                 pind = userobj.getJSONArray("pinned");
                 Log.i("pinned", pind.toString());
                 if (pind != null) {
@@ -341,13 +354,13 @@ public class FreebieDescription extends ActionBarActivity {
 
             Intent waIntent = new Intent(Intent.ACTION_SEND);
             waIntent.setType("text/plain");
-            String text = "Check out the offer I got @ " +VendorActivity.detailsBundle.getString("vendorTitle")+" using Clozerr: "+description+" https://play.google.com/store/apps/details?id=com.clozerr.app";
+//            String text = "Check out the offer I got @ " +VendorActivity.detailsBundle.getString("vendorTitle")+" using Clozerr: "+description+" https://play.google.com/store/apps/details?id=com.clozerr.app";
 
             PackageInfo info=pm.getPackageInfo("com.whatsapp", PackageManager.GET_META_DATA);
             //Check if package exists or not. If not then code
             //in catch block will be called
             waIntent.setPackage("com.whatsapp");
-            waIntent.putExtra(Intent.EXTRA_TEXT, text);
+//            waIntent.putExtra(Intent.EXTRA_TEXT, text);
             startActivity(Intent.createChooser(waIntent, "Share with"));
 
         } catch (PackageManager.NameNotFoundException e) {

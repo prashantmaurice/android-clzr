@@ -15,6 +15,10 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.clozerr.app.Activities.HomeScreens.HomeActivity;
+import com.clozerr.app.Activities.VendorScreens.VendorActivity;
+import com.clozerr.app.Utils.Router;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -132,8 +136,11 @@ public class LocationService extends Service {
         @Override
         public void onLocationChanged(final Location location) {
             Log.d("change","location");
-            Log.d("accuracy",""+location.getAccuracy());
-            String url ="http://api.clozerr.com/v2/vendor/search/near?latitude=" + location.getLatitude() + "&longitude=" + location.getLongitude() + "&limit=" + MIN_NEAR_VENDOR;
+            Log.d("accuracy", "" + location.getAccuracy());
+            MainApplication.getInstance().location.setLatitude(location.getLatitude());
+            MainApplication.getInstance().location.setLongitude(location.getLongitude());
+            String url = Router.Homescreen.getNearbyRestaurents(location, 0, MIN_NEAR_VENDOR, null);
+//            String url ="http://api.clozerr.com/v2/vendor/search/near?latitude=" + location.getLatitude() + "&longitude=" + location.getLongitude() + "&limit=" + MIN_NEAR_VENDOR;
             new AsyncGet(LocationService.this, url , new AsyncGet.AsyncResult() {
                 @Override
                 public void gotResult(String s) {
@@ -163,11 +170,15 @@ public class LocationService extends Service {
                             catch (Exception e){
                                 continue;
                             }
-                            SharedPreferences example = getSharedPreferences("USER", 0);
-                            SharedPreferences.Editor editor = example.edit();
-                            editor.putString("latitude", location.getLatitude()+"");
-                            editor.putString("longitude", location.getLongitude()+"");
-                            editor.apply();
+//                            SharedPreferences example = getSharedPreferences("USER", 0);
+//                            SharedPreferences.Editor editor = example.edit();
+//                            editor.putString("latitude", location.getLatitude()+"");
+//                            editor.putString("longitude", location.getLongitude() + "");
+//                            editor.apply();
+                            MainApplication.getInstance().data.userMain.latitude = location.getLatitude()+"";
+                            MainApplication.getInstance().data.userMain.longitude =location.getLongitude()+"";
+                            MainApplication.getInstance().data.userMain.saveUserDataLocally();
+
                             Intent intent = new Intent(LocationService.this, VendorActivity.class);
                             intent.putExtra("vendor_id", jsonObject.getString("_id"));
                             /*JSONArray jsonArray=jsonObject.getJSONArray("offers");
@@ -185,7 +196,7 @@ public class LocationService extends Service {
                                     Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             PendingIntent pIntent = PendingIntent.getActivity(LocationService.this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-                            Intent intent1 = new Intent(LocationService.this, Home.class);
+                            Intent intent1 = new Intent(LocationService.this, HomeActivity.class);
                             PendingIntent pIntent1 = PendingIntent.getActivity(LocationService.this, 0, intent1, 0);
                             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                             if(sharedPref.getBoolean("nbd_detect", true)) {

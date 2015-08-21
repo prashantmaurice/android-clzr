@@ -4,6 +4,7 @@
     android:layout_gravity="center"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/colorPrimary"
     android:layout_marginEnd="5dp"
     android:layout_marginStart="5dp">
 
@@ -25,7 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Vendor"
-                android:id="@+id/confirmTitleView"
+                android:id="@+id/tv_title1"
                 android:textColor="#FF000000"
                 android:textStyle="bold"
                 android:textSize="20sp"
@@ -37,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Offer"
-                android:id="@+id/confirmOfferView"
+                android:id="@+id/tv_title2"
                 android:textColor="#FF000000"
                 android:textStyle="bold"
                 android:textSize="20sp"
@@ -53,7 +54,8 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:paddingLeft="60dp"
-                android:paddingRight="60dp">
+                android:paddingRight="60dp"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -109,7 +111,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="0000"
-                android:id="@+id/pinView"
+                android:id="@+id/tv_rewardUniqueCode"
                 android:textColor="#FF000000"
                 android:textStyle="bold"
                 android:textSize="22dp"
@@ -151,19 +153,37 @@
 
             </FrameLayout>
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_margin="0dp"
-                android:gravity="center"
-                android:padding="5dp"
-                android:text="USE QR CODE"
-                android:id="@+id/qrButton"
-                android:textColor="#ffffff"
-                android:background="@color/colorPrimary"/>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|right">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Alternate method to redeem scan"
+                    android:id="@+id/textView6"
+                    android:paddingRight="10dp"
+                    android:textIsSelectable="false"
+                    android:textSize="12dp"
+                    android:textColor="#aaa" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_margin="0dp"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="USE QR CODE"
+                    android:id="@+id/qrButton"
+                    android:textColor="#ffffff"
+                    android:background="@color/colorPrimary"/>
+            </LinearLayout>
 
         </LinearLayout>
 
     </android.support.v7.widget.CardView>
+
 </LinearLayout>

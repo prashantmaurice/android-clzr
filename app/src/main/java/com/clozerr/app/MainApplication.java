@@ -1,8 +1,13 @@
 package com.clozerr.app;
 
-import android.app.Application;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.support.multidex.MultiDexApplication;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
+import com.clozerr.app.Handlers.TokenHandler;
+import com.clozerr.app.Models.UserMainLive;
 import com.clozerr.app.Storage.Data;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Logger;
@@ -13,7 +18,7 @@ import java.util.HashMap;
 /**
  * Created by Maurice on 19/05/15.
  */
-public class MainApplication extends Application {
+public class MainApplication extends MultiDexApplication {
 
     //private static final String PROPERTY_ID = "UA-60919025-1";UA-59529735-1
 
@@ -21,8 +26,11 @@ public class MainApplication extends Application {
     private static MainApplication sInstance;
     SharedPreferences sharedPreferences;
     public Data data;
+    public UserMainLive userMainLive;
+    public TokenHandler tokenHandler;
+    public Location location = new Location("Location");
     boolean mBound = false;
-
+    RequestQueue queue;
     public enum TrackerName {
         APP_TRACKER,
         GLOBAL_TRACKER,
@@ -32,17 +40,19 @@ public class MainApplication extends Application {
     HashMap<TrackerName, Tracker> mTrackers = new HashMap<TrackerName, Tracker>();
 
 
-
-
-
-
     @Override
     public void onCreate() {
         super.onCreate();
         sInstance = this;
 
-        sharedPreferences = getSharedPreferences("Tinystep", MODE_PRIVATE);//will be deprecated soon
+        //set default location
+        location.setLatitude(13);
+        location.setLongitude(80.2);
+
+        sharedPreferences = getSharedPreferences("Clozerr", MODE_PRIVATE);//will be deprecated soon
         data = Data.getInstance(this);//this gets all the data from preferances and Db
+        queue = Volley.newRequestQueue(this);
+        tokenHandler = TokenHandler.getInstance(this);
     }
 
     public synchronized static MainApplication getInstance() {
@@ -51,6 +61,10 @@ public class MainApplication extends Application {
 
     public SharedPreferences getSharedPreferences() {
         return sharedPreferences;
+    }
+
+    public RequestQueue getRequestQueue() {
+        return queue;
     }
 
     synchronized Tracker getTracker(TrackerName trackerId) {

@@ -24,6 +24,10 @@
     <style name="PopupWindowAnimation">
         <item name="android:windowEnterAnimation">@anim/popup_show</item>
         <item name="android:windowExitAnimation">@anim/popup_hide</item>
+        <item name="android:windowMinWidthMajor">97%</item>
+        <item name="android:windowMinWidthMinor">97%</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:background">@android:color/transparent</item>
     </style>
 
     <style name="image_slider">
@@ -51,5 +55,14 @@
     <style name="menu_labels_style">
         <item name="android:background">@drawable/fab_label_background</item>
         <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="profileDialog" parent="Theme.AppCompat.Light.Dialog">
+        <!--<item name="@android:background">@color/white</item>-->
+        <!--<item name="@android:textColor">@color/text_primary_shade_8</item>-->
+    </style>
+
+    <style name="RewardsDialogTheme" parent="android:Theme.Holo.Light.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:background">@android:color/transparent</item>
     </style>
 </resources>

@@ -29,7 +29,7 @@
     <string-array name="tabheadings">
         <!--<item>CATEGORIES</item>-->
         <item>NEARBY</item>
-        <item>MY CLUBS</item>
+        <item>FAVOURITES</item>
     </string-array>
     <string-array name="vendortabheadings">
         <item>HOME</item>
@@ -62,4 +62,6 @@
 
     <!-- Google Play Services error for Toast -->
     <string name="play_services_error_fmt">Google Play Services Error: %i, please try signing in again</string>
+    <string name="facebook_app_id">643340145745435</string>
+    <string name="GcmProjectId">496568600186</string>
 </resources>

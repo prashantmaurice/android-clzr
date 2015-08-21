@@ -1,8 +1,8 @@
 package com.clozerr.app;
 
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -16,6 +16,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.clozerr.app.Utils.Constants;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
@@ -48,8 +49,9 @@ public class GenUtils {
     }
 
     public static Uri.Builder getDefaultAnalyticsUriBuilder(Context context, String metric) {
-        SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences("USER", 0);
-        String TOKEN = sharedPreferences.getString("token", "");
+//        SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences("USER", 0);
+//        String TOKEN = sharedPreferences.getString("token", "");
+        String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
         String nowAsISO = getCurrentTimeAsISOString();
 
         Uri.Builder result = getClearedUriBuilder(Constants.URLBuilders.ANALYTICS)
@@ -132,4 +134,29 @@ public class GenUtils {
         PreferenceManager.getDefaultSharedPreferences(context).edit()
                 .putBoolean(Constants.SPKeys.FIRST_RUN, false).apply();
     }
+    public static void showDebugToast(Context context, String text){
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+    }
+    public static void showToast(Context context, final String text){
+        if (context == null) context = MainApplication.getInstance();
+        Handler handler = new Handler(Looper.getMainLooper());
+        final Context finalContext = context;
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(finalContext, text, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    public static ProgressDialog generateLoader(Context context, String text){
+//        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//        builder.setMessage(R.string.dialog_message).setTitle(R.string.dialog_title);
+//        AlertDialog dialog = builder.create();
+        ProgressDialog pdialog=new ProgressDialog(context);
+        pdialog.setMessage("" + text);
+        pdialog.show();
+        return pdialog;
+    }
+
 }
+

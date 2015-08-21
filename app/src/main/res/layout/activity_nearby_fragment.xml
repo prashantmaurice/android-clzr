@@ -2,35 +2,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#eaeaea"
     tools:context=".NearbyFragment">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#eaeaea">
-        <com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/list"
-            android:layout_alignParentTop="true"
-            android:background="#eaeaea"
-            android:layout_marginBottom="0dp"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefreshLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-        <include layout="@layout/search"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="114dp"/>
+                <com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/list"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginBottom="0dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </android.support.v4.widget.SwipeRefreshLayout>
 
-    </RelativeLayout>
+
+            <include layout="@layout/search"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:padding="8dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="105dp"/>
+
+        </RelativeLayout>
 
         <ImageView
             android:layout_width="match_parent"

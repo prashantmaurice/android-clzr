@@ -27,7 +27,12 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.Session;
+import com.clozerr.app.Activities.HomeScreens.HomeActivityNavAdapter;
+import com.clozerr.app.Activities.HomeScreens.NearbyFragmentAdapter;
+import com.clozerr.app.Activities.LoginScreens.LoginActivity;
+import com.clozerr.app.Activities.VendorScreens.VendorActivity;
+import com.clozerr.app.Utils.Constants;
+import com.clozerr.app.Utils.Router;
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.google.android.gms.plus.Plus;
 import com.nineoldandroids.animation.ValueAnimator;
@@ -37,15 +42,17 @@ import org.json.JSONArray;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+
+//import com.facebook.Session;
 
 
 public class CategoryDetail extends ActionBarActivity{
 
     public static String TOKEN = "";
     Toolbar mToolbar;
-    private RecyclerViewAdapter mMainPageAdapter;
+    private NearbyFragmentAdapter mMainPageAdapter;
     private ArrayList<CardModel> mMainCardsList;
     private RecyclerView.LayoutManager mLayoutManager;
     private EndlessRecyclerOnScrollListener mOnScrollListener;
@@ -61,21 +68,30 @@ public class CategoryDetail extends ActionBarActivity{
     View mScrollable;
     private String[] leftSliderData = {"About us","FAQ's","Like/Follow Clozerr","Rate Clozerr", "Tell Friends about Clozerr", "My Pinned Offers", "Settings", "Log out"};
 
+    String USERNAME;
+    String USER_PIC_URL;
+
+    //view variables
+    TextView username;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category_detail);
         categorybundle=getIntent().getExtras();
+
+        USERNAME = MainApplication.getInstance().data.userMain.name;
+        USER_PIC_URL = MainApplication.getInstance().data.userMain.gplus_pic;
+
         nitView();
-        TextView username = (TextView)findViewById(R.id.nav_text);
-        if(Home.USERNAME.length()!=0)
-            username.setText(Home.USERNAME);
+
+
+        if(USERNAME.length()!=0) username.setText(USERNAME);
         swipetab = findViewById(R.id.tab);
-        Log.e("pic", Home.USER_PIC_URL);
+        Log.e("pic", USER_PIC_URL);
         SearchCard = findViewById(R.id.card_view);
         SEARCH_CARD_INI_POS = ViewHelper.getTranslationY(SearchCard);
-        new DownloadImageTask((de.hdodenhof.circleimageview.CircleImageView)findViewById(R.id.nav_image))
-                .execute(Home.USER_PIC_URL);
+        new DownloadImageTask((CircleImageView) findViewById(R.id.nav_image)).execute(USER_PIC_URL);
         final ObservableRecyclerView mRecyclerView = (ObservableRecyclerView) findViewById(R.id.list);
         searchView = (SearchView)findViewById(R.id.searchView);
         mScrollable=findViewById(R.id.drawerLayout);
@@ -158,8 +174,8 @@ public class CategoryDetail extends ActionBarActivity{
 
 
         //startService(new Intent(this, LocationService.class));
-        Home.lat = 13;
-        Home.longi = 80.2;
+//        HomeActivity.lat = 13;
+//        HomeActivity.longi = 80.2;
         findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -169,16 +185,18 @@ public class CategoryDetail extends ActionBarActivity{
 
         SharedPreferences status = getSharedPreferences("USER", 0);
         final String cards = status.getString(categorybundle.getString("categoryname")+"category_cards", "");
-        TOKEN = status.getString("token", "");
+//        TOKEN = status.getString("token", "");
+        TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
         if(!cards.equals("")){
             Log.e("Cached Card", cards);
-            mMainCardsList = convertRow(cards);
-            mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, this);
-            mRecyclerView.setAdapter(mMainPageAdapter);
+//            mMainCardsList = convertRow(cards);
+//            mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, this);
+//            mRecyclerView.setAdapter(mMainPageAdapter);
         } else {
             mOffset = 0;
-            String url = "http://api.clozerr.com/v2/vendor/search/near?category=" + categorybundle.getString("categoryname").replace(" ", "%20") +
-                    "&latitude=" + Home.lat + "&longitude=" + Home.longi + ((TOKEN.isEmpty()) ? "" : ("&access_token=" + TOKEN));
+//            String url = "http://api.clozerr.com/v2/vendor/search/near?category=" + categorybundle.getString("categoryname").replace(" ", "%20") +
+//                    "&latitude=" + MainApplication.getInstance().location.getLatitude() + "&longitude=" + MainApplication.getInstance().location.getLongitude()+ ((TOKEN.isEmpty()) ? "" : ("&access_token=" + TOKEN));
+            String url = Router.Homescreen.getNearbyRestaurents(MainApplication.getInstance().location, mOffset, -1, null,categorybundle.getString("categoryname"));
             Log.e("url", url);
             new AsyncGet(this, url, new AsyncGet.AsyncResult() {
                 @Override
@@ -190,9 +208,9 @@ public class CategoryDetail extends ActionBarActivity{
 
                     ArrayList<CardModel> CardList = convertRow(s);
                     if (CardList.size() != 0) {
-                        mMainCardsList = CardList;
-                        mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, CategoryDetail.this);
-                        mRecyclerView.setAdapter(mMainPageAdapter);
+//                        mMainCardsList = CardList;
+//                        mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, CategoryDetail.this);
+//                        mRecyclerView.setAdapter(mMainPageAdapter);
                         final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                         editor.putString(categorybundle.getString("categoryname")+"category_cards", s);
                         editor.apply();
@@ -212,18 +230,19 @@ public class CategoryDetail extends ActionBarActivity{
             public void gotLocation (Location location) {
                 Log.e("location stuff","Location Callback called.");
                 try{
-                    Home.lat=location.getLatitude();
-                    Home.longi=location.getLongitude();
-                    Log.e("lat", Home.lat + "");
-                    Log.e("long", Home.longi + "");
+                    MainApplication.getInstance().location.setLatitude(location.getLatitude());
+                    MainApplication.getInstance().location.setLongitude(location.getLongitude());
+                    Log.e("lat", MainApplication.getInstance().location.getLatitude() + "");
+                    Log.e("long", MainApplication.getInstance().location.getLongitude() + "");
                 }catch (Exception e){
                     e.printStackTrace();
                 }
 
                 String url;
                 mOffset = 0;
-                url = "http://api.clozerr.com/v2/vendor/search/near?category="+categorybundle.getString("categoryname").replace(" ","%20") +
-                        "&latitude=" + Home.lat + "&longitude=" + Home.longi + ((TOKEN.isEmpty()) ? "" : ("&access_token=" + TOKEN));
+//                url = "http://api.clozerr.com/v2/vendor/search/near?category="+categorybundle.getString("categoryname").replace(" ","%20") +
+//                        "&latitude=" + MainApplication.getInstance().location.getLatitude() + "&longitude=" + MainApplication.getInstance().location.getLongitude() + ((TOKEN.isEmpty()) ? "" : ("&access_token=" + TOKEN));
+                url = Router.Homescreen.getNearbyRestaurents(MainApplication.getInstance().location, mOffset, -1, null,categorybundle.getString("categoryname"));
                 Log.e("url", url);
                 // TODO support pagination
                 new AsyncGet(CategoryDetail.this, url, new AsyncGet.AsyncResult() {
@@ -232,9 +251,9 @@ public class CategoryDetail extends ActionBarActivity{
                         if (s != "") {
                             ArrayList<CardModel> CardList = convertRow(s);
                             if (CardList.size() != 0) {
-                                mMainCardsList = CardList;
-                                mMainPageAdapter = new RecyclerViewAdapter(mMainCardsList, CategoryDetail.this);
-                                mRecyclerView.setAdapter(mMainPageAdapter);
+//                                mMainCardsList = CardList;
+//                                mMainPageAdapter = new NearbyFragmentAdapter(mMainCardsList, CategoryDetail.this);
+//                                mRecyclerView.setAdapter(mMainPageAdapter);
 
                                 final SharedPreferences.Editor editor = getSharedPreferences("USER", 0).edit();
                                 editor.putString(categorybundle.getString("categoryname")+"category_cards", s);
@@ -399,7 +418,7 @@ private ArrayList<CardModel> convertRow(String s) {
     }
     void move(float dy){
         scolled+=dy;
-        Log.d("Scrolling", dy + "//" + ViewHelper.getTranslationY(mToolbar) + "//" + mToolbar.getHeight() + "//" + SEARCH_CARD_INI_POS + "//" + ViewHelper.getTranslationY(SearchCard));
+//        Log.d("Scrolling", dy + "//" + ViewHelper.getTranslationY(mToolbar) + "//" + mToolbar.getHeight() + "//" + SEARCH_CARD_INI_POS + "//" + ViewHelper.getTranslationY(SearchCard));
         if(ViewHelper.getTranslationY(SearchCard)>=SEARCH_CARD_INI_POS-mToolbar.getHeight() && ViewHelper.getTranslationY(SearchCard)<=SEARCH_CARD_INI_POS)
             if((!(ViewHelper.getTranslationY(mToolbar)<=-mToolbar.getHeight()) && dy>=0) || ((ViewHelper.getTranslationY(mToolbar)<0)&& dy<=0)) {
                 if (ViewHelper.getTranslationY(mToolbar) - dy > 0) {
@@ -460,16 +479,9 @@ private ArrayList<CardModel> convertRow(String s) {
         ListView leftDrawerList = (ListView) findViewById(R.id.nav_listView);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        //navigationDrawerAdapter=new ArrayAdapter<String>( Home.this, android.R.layout.simple_list_item_1, leftSliderData);
-        // navigationDrawerAdapter=new ArrayAdapter<String>( Home.this, R.layout.navdrawlist,R.id.textView, leftSliderData);
-        // Log.i("omy",leftSliderData[0]);
-        List<String> l = Arrays.asList(leftSliderData);
+        username = (TextView)findViewById(R.id.nav_text);
 
-// if List<String> isnt specific enough:
-        ArrayList<String> al = new ArrayList<>(l);
-        // ArrayList<String> arr ;
-        // arr= (ArrayList<String>) Arrays.asList(leftSliderData);
-        NavDrawAdapter nav = new NavDrawAdapter(this, al);
+        HomeActivityNavAdapter nav = new HomeActivityNavAdapter(this, Constants.getNavList());
         leftDrawerList.setAdapter(nav);
         leftDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -508,15 +520,15 @@ private ArrayList<CardModel> convertRow(String s) {
 
                 else if(i==2) {
                     Uri uri = null;
-                    if (Login.googleOrFb == 1)
+                    if (LoginActivity.googleOrFb == 1)
                     {
                         uri = Uri.parse("https://www.facebook.com/clozerrdeals");
                     }
-                    else if (Login.googleOrFb == 2)
+                    else if (LoginActivity.googleOrFb == 2)
                     {
                         uri = Uri.parse("https://plus.google.com/112342093373744098489/about");
                     }
-                    if (uri == null) Log.e("navdraw", "null" + Login.googleOrFb);
+                    if (uri == null) Log.e("navdraw", "null" + LoginActivity.googleOrFb);
                     Intent intent = new Intent(Intent.ACTION_VIEW,uri);
                     /*// Create and start the chooser
                     Intent chooser = Intent.createChooser(intent, "Open with");*/
@@ -547,29 +559,30 @@ private ArrayList<CardModel> convertRow(String s) {
                     SharedPreferences.Editor editor = example.edit();
                     editor.clear();
                     editor.apply();
-                    Home.USER_PIC_URL = Home.USERNAME = Home.USERID = TOKEN = "";
-                    if (Login.googleOrFb == 2 && Login.googleApiClient != null)
+                    //WTF is this????
+//                    HomeActivity.USER_PIC_URL = HomeActivity.USERNAME = HomeActivity.USERID = TOKEN = "";
+                    if (LoginActivity.googleOrFb == 2 && LoginActivity.googleApiClient != null)
                     {
-                        if (Login.googleApiClient.isConnected()) {
-                            Plus.AccountApi.clearDefaultAccount(Login.googleApiClient);
-                            Login.googleApiClient.disconnect();
+                        if (LoginActivity.googleApiClient.isConnected()) {
+                            Plus.AccountApi.clearDefaultAccount(LoginActivity.googleApiClient);
+                            LoginActivity.googleApiClient.disconnect();
                         }
                     }
-                    else if (Login.googleOrFb == 1)
+                    else if (LoginActivity.googleOrFb == 1)
                     {
-                        Session session = Session.getActiveSession();
-                        if (session != null) {
-                            if (!session.isClosed()) {
-                                session.closeAndClearTokenInformation();
-                            }
-                        } else {
-                            session = new Session(CategoryDetail.this);
-                            Session.setActiveSession(session);
-                            session.closeAndClearTokenInformation();
-                        }
+//                        Session session = Session.getActiveSession();
+//                        if (session != null) {
+//                            if (!session.isClosed()) {
+//                                session.closeAndClearTokenInformation();
+//                            }
+//                        } else {
+//                            session = new Session(CategoryDetail.this);
+//                            Session.setActiveSession(session);
+//                            session.closeAndClearTokenInformation();
+//                        }
                     }
                     //BeaconFinderService.disallowScanning(Home.this);
-                    startActivity(new Intent(CategoryDetail.this, Login.class));
+                    startActivity(new Intent(CategoryDetail.this, LoginActivity.class));
                     finish();
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:

@@ -22,6 +22,10 @@ public class SharedPrefs {
 
     //ALL DATA STORED
     public JSONObject userData = new JSONObject();
+    public JSONObject loginData = new JSONObject();
+    public JSONObject cacheData = new JSONObject();
+    public JSONObject campaignData = new JSONObject();
+
 
     private SharedPrefs(Context context) {
         this.mContext = context;
@@ -36,10 +40,33 @@ public class SharedPrefs {
 
     //USER DATA
     public void saveUserData() {
-        Logg.d(TAG, "saved all UserData in Prefs");
-        Logg.d("SAVE PREFS userData :=====", userData.toString());
+        Logg.d(TAG, "saveUserData =====> "+ userData.toString());
         SharedPreferences.Editor editor = prefs_trackers.edit();
         editor.putString(Str.userData, userData.toString());
+        editor.apply();
+    }
+
+    //LOGIN DATA
+    public void saveLoginData() {
+        Logg.d(TAG, "saveLoginData =====> "+ loginData.toString());
+        SharedPreferences.Editor editor = prefs_trackers.edit();
+        editor.putString(Str.loginData, loginData.toString());
+        editor.apply();
+    }
+
+    //CACHE DATA
+    public void saveCacheData() {
+        Logg.d(TAG, "cacheData =====> "+ cacheData.toString());
+        SharedPreferences.Editor editor = prefs_trackers.edit();
+        editor.putString(Str.cacheData, cacheData.toString());
+        editor.apply();
+    }
+
+    //CAMPAIGN DATA
+    public void saveCampaignData() {
+        Logg.d(TAG, "saveCampaignData =====> "+ campaignData.toString());
+        SharedPreferences.Editor editor = prefs_trackers.edit();
+        editor.putString(Str.campaignData, campaignData.toString());
         editor.apply();
     }
 
@@ -59,6 +86,9 @@ public class SharedPrefs {
         });
         try {
             userData = new JSONObject(getString(PrefsTypes.TRACKERS, Str.userData,"{}"));
+            loginData = new JSONObject(getString(PrefsTypes.TRACKERS, Str.loginData,"{}"));
+            cacheData = new JSONObject(getString(PrefsTypes.TRACKERS, Str.cacheData,"{}"));
+            campaignData = new JSONObject(getString(PrefsTypes.TRACKERS, Str.campaignData,"{}"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -91,6 +121,10 @@ public class SharedPrefs {
     //Holder for all strings used
     public static class Str{
         static String userData = "userData";
+        static String loginData = "loginData";
+        static String cacheData = "cacheData";
+        static String campaignData = "campaignData";
+
     }
 
 

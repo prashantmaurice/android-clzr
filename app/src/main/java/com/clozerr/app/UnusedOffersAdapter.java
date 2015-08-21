@@ -6,14 +6,12 @@ package com.clozerr.app;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,8 +29,8 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
     private ArrayList<MyOffer> values;
     static Context c;
     Resources reso;
-    public SharedPreferences status;
-    public String NotNow;
+//    public SharedPreferences status;
+    public boolean NotNow;
     public static ArrayList<String> pinned;
 
     UnusedOffersAdapter(ArrayList<MyOffer> offers, Context c) {
@@ -75,7 +73,7 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
                 //    .animateLoad(spinAnimation)
                 //    .animateIn(fadeInAnimation)
                 .load(current.getImageUrl());
-
+        viewHolder.overlay.setVisibility(View.GONE);
 //        viewHolder.stampnumber.setOnTouchListener(new View.OnTouchListener() {
 //
 //            @Override
@@ -106,13 +104,19 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
     }
 
     public void updatePind(){
-        status = c.getSharedPreferences("USER",0);
-        NotNow = status.getString("notNow","false");
+//        status = c.getSharedPreferences("USER",0);
+
+        NotNow = MainApplication.getInstance().data.userMain.notNow;
+
+//        NotNow = status.getString("notNow","false");
         pinned = new ArrayList<String>();
         JSONArray pind ;
-        if(NotNow.equals("false")) {
+        if(!NotNow) {
+//        if(NotNow.equals("false")) {
             try {
-                JSONObject userobj = new JSONObject(status.getString("user", "null"));
+//                JSONObject userobj = new JSONObject(status.getString("user", "null"));
+                String jsonTxt = (MainApplication.getInstance().data.userMain.user.isEmpty())?"null":MainApplication.getInstance().data.userMain.user;
+                JSONObject userobj = new JSONObject(jsonTxt);
                 pind = userobj.getJSONArray("pinned");
                 Log.i("pinned", pind.toString());
                 if (pind != null) {
@@ -142,6 +146,7 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
         public ImageView image;
         //public Button checkinButton;
         ImageView pin;
+        public View overlay;
 
         public ListItemViewHolder(View itemView) {
             super(itemView);
@@ -150,13 +155,15 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
             caption = (TextView) itemView.findViewById(R.id.freebiename);
             description = (TextView) itemView.findViewById(R.id.freebiedescription);
             vendorId = vendorName = "";
+            overlay = itemView.findViewById(R.id.overlay);
             //checkinButton = (Button) itemView.findViewById(R.id.useit);
 
             pin=(ImageView)itemView.findViewById(R.id.pinimage);
             pin.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String urlPinning = "http://api.clozerr.com/v2/user/add/pinned?access_token=" + Home.TOKEN +"&offer_id="+currentItem.getOfferid();
+                    String TOKEN = MainApplication.getInstance().tokenHandler.clozerrtoken;
+                    String urlPinning = "http://api.clozerr.com/v2/user/add/pinned?access_token=" + TOKEN +"&offer_id="+currentItem.getOfferid();
                     if(pinned.indexOf(currentItem.getOfferid())==-1)
                     {
                     new AsyncGet(c, urlPinning, new AsyncGet.AsyncResult() {
@@ -164,9 +171,10 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
                         public void gotResult(String s) {
                             try {
                                 JSONObject obj = new JSONObject(s);
-                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                                editor.putString("user",s);
-                                editor.apply();
+//                                final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+//                                editor.putString("user",s);
+//                                editor.apply();
+                                MainApplication.getInstance().data.userMain.changeUser(s);
                                 //Toast.makeText(getActivity(),s,Toast.LENGTH_SHORT).show();
                                 pin.setImageResource(R.drawable.pinfilled);
                                 Toast.makeText(c, "Added to pinned offers", Toast.LENGTH_SHORT).show();
@@ -185,14 +193,15 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
                     }
                     else
                     {
-                        new AsyncGet(c, "http://api.clozerr.com/v2/user/remove/pinned?access_token=" + Home.TOKEN +"&offer_id="+currentItem.getOfferid(), new AsyncGet.AsyncResult() {
+                        new AsyncGet(c, "http://api.clozerr.com/v2/user/remove/pinned?access_token=" + TOKEN +"&offer_id="+currentItem.getOfferid(), new AsyncGet.AsyncResult() {
                             @Override
                             public void gotResult(String s) {
                                 try {
                                     JSONObject obj = new JSONObject(s);
-                                    final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
-                                    editor.putString("user",s);
-                                    editor.apply();
+//                                    final SharedPreferences.Editor editor = c.getSharedPreferences("USER", 0).edit();
+//                                    editor.putString("user",s);
+//                                    editor.apply();
+                                    MainApplication.getInstance().data.userMain.changeUser(s);
                                     //Toast.makeText(getActivity(),s,Toast.LENGTH_SHORT).show();
                                     pin.setImageResource(R.drawable.pin100);
                                     Toast.makeText(c, "Removed from pinned offers", Toast.LENGTH_SHORT).show();
@@ -217,8 +226,8 @@ public class UnusedOffersAdapter extends RecyclerView.Adapter<UnusedOffersAdapte
                 public void onClick(View view) {
                     Intent intent = new Intent(c, FreebieDescription.class);
                     intent.putExtra("offerid", currentItem.getOfferid());
-                    intent.putExtra("vendorid", (!vendorId.isEmpty()) ? vendorId : VendorActivity.detailsBundle.getString("vendorId"));
-                    intent.putExtra("vendorName", (!vendorName.isEmpty()) ? vendorName : VendorActivity.detailsBundle.getString("vendorTitle"));
+//                    intent.putExtra("vendorid", (!vendorId.isEmpty()) ? vendorId : VendorActivity.detailsBundle.getString("vendorId"));
+//                    intent.putExtra("vendorName", (!vendorName.isEmpty()) ? vendorName : VendorActivity.detailsBundle.getString("vendorTitle"));
                     intent.putExtra("caption", currentItem.getCaption());
                     intent.putExtra("description", currentItem.getDescription());
                     c.startActivity(intent);

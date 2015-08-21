@@ -1,5 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" tools:context="com.clozerr.app.Home">
+    xmlns:tools="http://schemas.android.com/tools" tools:context="com.clozerr.app.Activities.HomeScreens.HomeActivity">
     <ImageView
         android:layout_width="100dp"
         android:layout_height="25dp"

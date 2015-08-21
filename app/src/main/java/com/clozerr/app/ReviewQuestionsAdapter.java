@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.Session;
+import com.clozerr.app.Activities.LoginScreens.LoginActivity;
+//import com.facebook.Session;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -149,10 +149,13 @@ public class ReviewQuestionsAdapter extends RecyclerView.Adapter<ReviewQuestions
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
-                        SharedPreferences example = c.getSharedPreferences("USER", 0);
-                        SharedPreferences.Editor editor = example.edit();
-                        editor.putString("notNow", "false");
-                        editor.apply();
+//                        SharedPreferences example = c.getSharedPreferences("USER", 0);
+//                        SharedPreferences.Editor editor = example.edit();
+//                        editor.putString("notNow", "false");
+//                        editor.apply();
+
+                        MainApplication.getInstance().data.userMain.changeNotNow(false);
+
                         //Yes button clicked
                            /* Intent mStartActivity = new Intent(c,Login.class);
                             int mPendingIntentId = 123456;
@@ -162,18 +165,18 @@ public class ReviewQuestionsAdapter extends RecyclerView.Adapter<ReviewQuestions
                             System.exit(0);*/
                         // Toast.makeText(c, "Logging out", Toast.LENGTH_SHORT).show();
 
-                        Session session = Session.getActiveSession();
-                        if (session != null) {
-                            if (!session.isClosed()) {
-                                session.closeAndClearTokenInformation();
-                            }
-                        } else {
-                            session = new Session(c);
-                            Session.setActiveSession(session);
-                            session.closeAndClearTokenInformation();
-                        }
+//                        Session session = Session.getActiveSession();
+//                        if (session != null) {
+//                            if (!session.isClosed()) {
+//                                session.closeAndClearTokenInformation();
+//                            }
+//                        } else {
+//                            session = new Session(c);
+//                            Session.setActiveSession(session);
+//                            session.closeAndClearTokenInformation();
+//                        }
 
-                        c.startActivity(new Intent(c, Login.class));
+                        c.startActivity(new Intent(c, LoginActivity.class));
 
                         if(c instanceof Activity)
                             ((Activity)c).finish();
