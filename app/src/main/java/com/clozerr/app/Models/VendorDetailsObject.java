@@ -152,7 +152,7 @@ public class VendorDetailsObject {
 
             //TODO:sai : catch variables above and use them here to support Logo
             //new API variables that are yest to be added
-            vendor.vendorLogoUrl = (obj.has("vendorLogoUrl"))?obj.getString("vendorLogoUrl"):"";
+            vendor.vendorLogoUrl = (obj.has("logo"))?obj.getString("logo"):"";
 
 
             if(obj.has("location")){
