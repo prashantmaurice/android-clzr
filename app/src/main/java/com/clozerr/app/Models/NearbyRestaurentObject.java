@@ -31,6 +31,8 @@ import java.util.ArrayList;
      active: false,
      favourite: false
  }
+
+ TODO : Send direct restaurent image Url instead of resource name and base
  */
 public class NearbyRestaurentObject {
 

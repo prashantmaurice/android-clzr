@@ -50,5 +50,11 @@
         android:textStyle="bold"
         android:textColor="#777777"
         android:visibility="gone"
-        android:id="@+id/alertgiftbox"/>
+        android:id="@+id/alertgiftbox" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/iv_empty_giftbox"
+        android:src="@drawable/empty_rewards" />
 </RelativeLayout>

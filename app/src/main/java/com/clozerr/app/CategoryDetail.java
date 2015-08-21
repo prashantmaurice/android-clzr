@@ -27,6 +27,7 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clozerr.app.Activities.HomeScreens.HomeActivityNavAdapter;
 import com.clozerr.app.Activities.HomeScreens.NearbyFragmentAdapter;
 import com.clozerr.app.Activities.LoginScreens.LoginActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
@@ -480,7 +481,7 @@ private ArrayList<CardModel> convertRow(String s) {
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         username = (TextView)findViewById(R.id.nav_text);
 
-        NavDrawAdapter nav = new NavDrawAdapter(this, Constants.getNavList());
+        HomeActivityNavAdapter nav = new HomeActivityNavAdapter(this, Constants.getNavList());
         leftDrawerList.setAdapter(nav);
         leftDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

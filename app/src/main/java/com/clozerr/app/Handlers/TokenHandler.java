@@ -167,13 +167,12 @@ public class TokenHandler {
             public void onResponse(JSONObject response) {
                 try {
                     Logg.d(TAG,"Received response for Clozerr Token");
-                    Logg.m("MAIN", "Response : Email check = " + response.toString());
                     if(response.getBoolean("result")) {
                         String token = response.getString("token");
                         JSONObject profile = response.getJSONObject("user").getJSONObject("profile");
                         MainApplication.getInstance().tokenHandler.clozerrtoken = token;
-                        MainApplication.getInstance().tokenHandler.username = profile.getString("name");
-                        MainApplication.getInstance().tokenHandler.picurl = profile.getString("picture");
+                        if(profile.has("name"))MainApplication.getInstance().tokenHandler.username = profile.getString("name");
+                        if(profile.has("picture"))MainApplication.getInstance().tokenHandler.picurl = profile.getString("picture");
                         MainApplication.getInstance().tokenHandler.saveTokenDataLocally();
                         listener.onClozerTokenUpdated(true);
                     }else{

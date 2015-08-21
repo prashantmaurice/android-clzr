@@ -10,12 +10,14 @@ import com.clozerr.app.Activities.VendorScreens.Subviews.VendorHomeFragment;
 import com.clozerr.app.Activities.VendorScreens.Subviews.VendorSettingsFragment;
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.Activities.VendorScreens.Subviews.MyStampsFragment;
+import com.clozerr.app.Models.VendorDetailsObject;
 import com.clozerr.app.R;
 
 /**
  *  This is the main pager adapter for Vendors activity
  */
 class VendorPagerAdapter extends FragmentPagerAdapter {
+    private final VendorDetailsObject vendorDetailsObject;
     Context c;
     String[] tabheadings;
     public static int OFFSET_PAGE_LIMIT = 3;
@@ -23,11 +25,12 @@ class VendorPagerAdapter extends FragmentPagerAdapter {
     //data variables
     String vendorId,vendorTitle;
 
-    public VendorPagerAdapter(FragmentManager fm,Context c, String vendorId, String vendorTitle) {
+    public VendorPagerAdapter(FragmentManager fm,Context c, VendorDetailsObject vendorDetailsObject) {
         super(fm);
         this.c = c;
-        this.vendorId = vendorId;
-        this.vendorTitle = vendorTitle;
+        this.vendorId = vendorDetailsObject.vendorId;
+        this.vendorTitle = vendorDetailsObject.name;
+        this.vendorDetailsObject = vendorDetailsObject;
         tabheadings = c.getResources().getStringArray(R.array.vendortabheadings);
     }
 
@@ -35,10 +38,10 @@ class VendorPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         AsyncGet.dismissDialog();
         switch (position){
-            case 0: return VendorHomeFragment.newInstance(vendorId);
+            case 0: return VendorHomeFragment.newInstance(vendorDetailsObject);
             case 1: return RewardsFragment.newInstance(vendorId);
             case 2: return MyStampsFragment.newInstance(vendorId);
-            case 3: return VendorSettingsFragment.newInstance(vendorId,vendorTitle);
+            case 3: return VendorSettingsFragment.newInstance(vendorDetailsObject);
 
             default:return null;
         }

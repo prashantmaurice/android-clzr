@@ -153,19 +153,37 @@
 
             </FrameLayout>
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_margin="0dp"
-                android:gravity="center"
-                android:padding="5dp"
-                android:text="USE QR CODE"
-                android:id="@+id/qrButton"
-                android:textColor="#ffffff"
-                android:background="@color/colorPrimary"/>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|right">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Alternate method to redeem scan"
+                    android:id="@+id/textView6"
+                    android:paddingRight="10dp"
+                    android:textIsSelectable="false"
+                    android:textSize="12dp"
+                    android:textColor="#aaa" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_margin="0dp"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="USE QR CODE"
+                    android:id="@+id/qrButton"
+                    android:textColor="#ffffff"
+                    android:background="@color/colorPrimary"/>
+            </LinearLayout>
 
         </LinearLayout>
 
     </android.support.v7.widget.CardView>
+
 </LinearLayout>

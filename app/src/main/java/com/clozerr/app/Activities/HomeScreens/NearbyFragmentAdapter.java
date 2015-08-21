@@ -1,6 +1,5 @@
 package com.clozerr.app.Activities.HomeScreens;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -24,10 +23,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.clozerr.app.Activities.LoginScreens.LoginActivity;
+import com.clozerr.app.Activities.LoginScreens.SignupActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.Handlers.LocalBroadcastHandler;
+import com.clozerr.app.Handlers.ToastMain;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.Models.NearbyRestaurentObject;
 import com.clozerr.app.R;
@@ -169,8 +169,7 @@ public class NearbyFragmentAdapter extends RecyclerView.Adapter<NearbyFragmentAd
         }
     }
 
-    public final static class ListItemViewHolder
-            extends RecyclerView.ViewHolder {
+    public final static class ListItemViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         TextView txtTitle;
         TextView txtDist;
@@ -201,7 +200,6 @@ public class NearbyFragmentAdapter extends RecyclerView.Adapter<NearbyFragmentAd
 //            final SharedPreferences status = c.getSharedPreferences("USER", 0);
 //            final boolean NotNow = status.getString("notNow", "false");
 
-            final boolean NotNow = MainApplication.getInstance().data.userMain.notNow;
 
 
             final ArrayList<String> fav = new ArrayList<String>();
@@ -288,69 +286,30 @@ public class NearbyFragmentAdapter extends RecyclerView.Adapter<NearbyFragmentAd
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (VendorActivity.i == 0 && !NotNow)
-                    {
-                        Intent detailIntent = new Intent(c, VendorActivity.class);
-                        detailIntent.putExtra(VendorActivity.EXTRA_VENDORID, currentItem.getVendorId());
-                        if( currentItem.isActive() )
+                    if(MainApplication.getInstance().tokenHandler.isLoggedIn()){
+                        if(currentItem.isActive()){
+                            Intent detailIntent = new Intent(c, VendorActivity.class);
+                            detailIntent.putExtra(VendorActivity.EXTRA_VENDORID, currentItem.getVendorId());
                             c.startActivity(detailIntent);
-                    }
-                    else  {
-
-                        // CouponPage.i = 2;
+                        }else{
+                            ToastMain.showSmartToast(c,"Coming soon....");
+                        }
+                    }else{
                         AlertDialog.Builder builder = new AlertDialog.Builder(c);
-                        builder.setMessage("You have to login to view.Want to proceed to login page?").setPositiveButton("Yes", dialogClickListener)
+                        builder.setMessage("You have to login to view. Want to proceed to login page?").setPositiveButton("Yes", dialogClickListener)
                                 .setNegativeButton("No", dialogClickListener).show();
-                        // startActivity(new Intent(c,CouponPage.class));
-
-
                     }
                 }
             });
-            //if(currentItem.getVendorId())
         }
-//suggest rest
-        //border -- lines
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
-//                        SharedPreferences example = c.getSharedPreferences("USER", 0);
-//                        SharedPreferences.Editor editor = example.edit();
-//                        editor.putString("notNow", "false");
-//                        editor.apply();
-                        MainApplication.getInstance().data.userMain.changeNotNow(false);
-                        //Yes button clicked
-                           /* Intent mStartActivity = new Intent(c,Login.class);
-                            int mPendingIntentId = 123456;
-                            PendingIntent mPendingIntent = PendingIntent.getActivity(c, mPendingIntentId,    mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
-                            AlarmManager mgr = (AlarmManager)c.getSystemService(Context.ALARM_SERVICE);
-                            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
-                            System.exit(0);*/
-                        // Toast.makeText(c, "Logging out", Toast.LENGTH_SHORT).show();
-
-//                        Session session = Session.getActiveSession();
-//                        if (session != null) {
-//                            if (!session.isClosed()) {
-//                                session.closeAndClearTokenInformation();
-//                            }
-//                        } else {
-//                            session = new Session(c);
-//                            Session.setActiveSession(session);
-//                            session.closeAndClearTokenInformation();
-//                        }
-
-                        c.startActivity(new Intent(c, LoginActivity.class));
-
-                        if(c instanceof Activity)
-                            ((Activity)c).finish();
-                        else
-                            Toast.makeText(c,"Error", Toast.LENGTH_SHORT);
+                        c.startActivity(new Intent(c, SignupActivity.class));
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
-                        //Toast.makeText(Home.this, "Thanks for staying. You are awesome.", Toast.LENGTH_SHORT).show();
-                        //No button clicked
                         break;
                 }
             }

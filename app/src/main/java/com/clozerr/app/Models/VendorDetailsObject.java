@@ -4,34 +4,90 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 /**
- * This contains all the User data excluding kids,
+ * This is used in VendorActivity to parse vendor details
  *
  *
  *
  * general object :
  * {
-     _id: "55c31feabd510fdc2d863dc0",
-     type: "S0",
-     caption: "Happy Hour Reward",
-     description: "Buy 2 get 1 Pizza free",
-     image: "https://s3-ap-southeast-1.amazonaws.com/clozerr/app/general/icons/happy+hour.png",
-     params: {
-         type: "happyHour",
-         startHour: "16",
-         endHour: "19",
-         days: [
-             "1",
-             "2",
-             "3",
-             "4",
-             "5"
-         ]
+     visitOfferId: "55adea98c626a0bfb3a08c6d",
+     _id: "55c31e7fbd510fdc2d863db3",
+     location: [
+         13.0509259,
+         80.21205439999994
+     ],
+     name: "The Pasta Bar Veneto",
+     phone: "8939990001",
+     image: "http://s3-ap-southeast-1.amazonaws.com/clozerr/app/coupons-alpha/",
+     fid: "9927281564987162",
+     date_created: "2015-08-06T08:44:47.561Z",
+     dateUpdated: "2015-08-06T10:41:12.708Z",
+     settings: {
+         sxEnabled: "false",
+         billAmt: "100",
+         birthday: {
+             activated: "false",
+             birthdayWish: "Happy birthday",
+             notifyFirst: "false",
+             notifyExact: "true"
+         },
+         neighbourhoodperks: {
+             distance: "1",
+             activated: "false",
+             message: "Free coffee.."
+         },
+         visitreminder: {
+             activated: "false",
+             days: "7",
+             visitMessage: "Get a Coffee free!"
+         },
+         policy: "One stamp for every visit",
+         viewState: {
+            active: true
+         }
      },
-     unlocked: false
-   }
+     resource_name: "55c31e7fbd510fdc2d863db3",
+     image_base: "https://s3-ap-southeast-1.amazonaws.com/clozerr/app/coupons-alpha/",
+     __v: 10,
+     address: "1st Floor, Shop No. 113, No:183, The Vijaya Forum Mall, N S K, Salai, Arcot Road, Green Park Private Entrance, Vadapalani, The Forum Vijaya Mall, Chennai, Tamil Nadu 600026",
+     category: "Food",
+     beacons: {
+         minor: "15188",
+         major: "48658",
+         message: "Welcome to The Pasta Bar Veneto!",
+         title: "The Pasta Bar Veneto"
+     },
+     description: "The Pasta Bar Veneto serves delectable Italian cuisine at unlike Italian prices. Passionately made from real ingredients, the dishes are indeed a treat to your taste buds. Dine in to discover the difference.",
+     city: "undefined",
+     visible: true,
+     geofences: [ ],
+     tags: [ ],
+     gallery: [ ],
+     qrcodes: [ ],
+     flags: [ ],
+     question: [
+     "Food",
+     "Ambience",
+     "Quality of Service"
+     ],
+     offers_old: [
+         "55c31e81bd510fdc2d863db9",
+         "55c3360dbd510fdc2d863e01"
+     ],
+     offers: [
+         "55c31e81bd510fdc2d863db6",
+         "55c31e81bd510fdc2d863db7",
+         "55c31e81bd510fdc2d863db8",
+         "55c31e81bd510fdc2d863dba",
+         "55c31fd3bd510fdc2d863dbf",
+         "55c31feabd510fdc2d863dc0"
+     ]
+ }
  */
 public class VendorDetailsObject {
 
@@ -39,9 +95,14 @@ public class VendorDetailsObject {
     public String type;
     public String caption;
     public String description;
-    public String image;
+    public String image,imageBase,resourceName;
     public boolean unlocked;
     public String rewardId;
+    public String vendorId;
+    public String vendorLogoUrl;
+    public String name;
+    public String lat, longg;
+
 
     //param variables
         //type = loyalty
@@ -59,11 +120,9 @@ public class VendorDetailsObject {
     public static final String TYPE_HAPPYHOUR = "happyHour";
 
     //runtime variables
-    public String vendorId;
-    private String name;
-    private String phone;
+    public String phone;
     private String fid;
-    private String address;
+    public String address;
     private String category;
     private String city;
     private boolean visible;
@@ -75,56 +134,43 @@ public class VendorDetailsObject {
     //SERVER ENCODERS
     /** Called when starting the app to fill data at start */
     public static VendorDetailsObject decodeFromServer(JSONObject obj){
-        VendorDetailsObject reward = new VendorDetailsObject();
+        VendorDetailsObject vendor = new VendorDetailsObject();
         try {
-            JSONObject params = obj.getJSONObject("params");
+            vendor.vendorId = (obj.has("_id"))?obj.getString("_id"):"";
+            vendor.name = (obj.has("name"))?obj.getString("name"):"";
+            vendor.phone = (obj.has("phone"))?obj.getString("phone"):"";
+            vendor.image = (obj.has("image"))?obj.getString("image"):"";
+            vendor.imageBase = (obj.has("image_base"))?obj.getString("image_base"):"";
+            vendor.resourceName = (obj.has("resource_name"))?obj.getString("resource_name"):"";
+            vendor.fid = (obj.has("fid"))?obj.getString("fid"):"";
+            vendor.address = (obj.has("address"))?obj.getString("address"):"";
+            vendor.category = (obj.has("category"))?obj.getString("category"):"";
+            vendor.description = (obj.has("description"))?obj.getString("description"):"";
+            vendor.city = (obj.has("city"))?obj.getString("city"):"";
+            vendor.visible = (obj.has("visible"))?obj.getBoolean("visible") :false;
 
 
-            reward.name = (obj.has("name"))?obj.getString("name"):"";
-            reward.phone = (obj.has("phone"))?obj.getString("phone"):"";
-            reward.image = (obj.has("image"))?obj.getString("image"):"";
-            reward.fid = (obj.has("fid"))?obj.getString("fid"):"";
-            reward.address = (obj.has("address"))?obj.getString("address"):"";
-            reward.category = (obj.has("category"))?obj.getString("category"):"";
-            reward.description = (obj.has("description"))?obj.getString("description"):"";
-            reward.city = (obj.has("city"))?obj.getString("city"):"";
-            reward.visible = (obj.has("visible"))?obj.getBoolean("visible") :false;
+            //TODO:sai : catch variables above and use them here to support Logo
+            //new API variables that are yest to be added
+            vendor.vendorLogoUrl = (obj.has("vendorLogoUrl"))?obj.getString("vendorLogoUrl"):"";
 
 
-            reward.type = (obj.has("type"))?obj.getString("type") :"";
-            reward.caption = (obj.has("caption"))?obj.getString("caption") :"";
-            reward.description = (obj.has("description"))?obj.getString("description") :"";
-
-            reward.type = (params.has("type"))?params.getString("type"):TYPE_LOYALTY;
-            if(reward.type.equals(TYPE_LOYALTY)){
-                reward.used = (params.has("used"))?params.getBoolean("used"):true;
-                reward.stamps = (params.has("stamps"))?params.getInt("stamps"):0;
-            }else if(reward.type.equals(TYPE_HAPPYHOUR)){
-                reward.startHour = (params.has("startHour"))?Integer.parseInt(params.getString("startHour")):0;
-                reward.endHour = (params.has("endHour"))?Integer.parseInt(params.getString("endHour")):23;
-                JSONArray arr = params.getJSONArray("days");
-                for(int i=0;i<arr.length();i++){
-                    reward.days.add(Integer.parseInt(arr.getString(i)));
-                }
-
+            if(obj.has("location")){
+                JSONArray location = obj.getJSONArray("location");
+                vendor.lat = location.getString(0);
+                vendor.longg = location.getString(1);
             }
 
+            //TODO : add rest of the data in this object
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return reward;
+        return vendor;
     }
 
-    public static ArrayList<VendorDetailsObject> decodeFromServer(JSONArray arr){
-        ArrayList<VendorDetailsObject> arrayList = new ArrayList<>();
-        for(int i=0;i<arr.length();i++){
-            try {
-                arrayList.add(decodeFromServer(arr.getJSONObject(i)));
-            } catch (JSONException e) {e.printStackTrace();}
-        }
-        return arrayList;
-    }
+
+
 
 //    public JSONObject encodeForServer(){
 //        JSONObject jsonObject = new JSONObject();
@@ -145,5 +191,17 @@ public class VendorDetailsObject {
 //        return jsonObject;
 //    }
 
+
+    public String getImageUrl() {
+        try {
+            return imageBase+ URLEncoder.encode(resourceName, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+    public String getLogoImageUrl() {
+        return vendorLogoUrl;
+    }
 
 }

@@ -1,14 +1,15 @@
 package com.clozerr.app.Activities.LoginScreens;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -75,7 +76,7 @@ import java.util.Arrays;
  */
 
 
-public class SignupActivity extends FragmentActivity {
+public class SignupActivity extends AppCompatActivity {
     static String TAG = "SIGNUPACTIVITY";
 
     //SETTINGS VARIABLES
@@ -94,6 +95,7 @@ public class SignupActivity extends FragmentActivity {
     //VIEW VARIABLES
     private ImageButton btn_login_facebook, btn_login_google,btn_login_notnow;
     private ViewPager mPager;
+    private ProgressDialog progressDialog;
 
 
 
@@ -142,9 +144,9 @@ public class SignupActivity extends FragmentActivity {
     }
 
     private void gotoMainApp(){
-        finish();
-//        Intent intent = new Intent(SignupActivity.this, HomeActivity.class);
-//        startActivity(intent);
+//        finish();
+        Intent intent = new Intent(SignupActivity.this, HomeActivity.class);
+        startActivity(intent);
     }
 
     /** Helper functions */
@@ -180,11 +182,13 @@ public class SignupActivity extends FragmentActivity {
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override
                     public void onConnected(Bundle bundle) {
+
                         Logg.e(TAG,"onConnected");
                         mSignInClicked = false;
                         GenUtils.showDebugToast(SignupActivity.this, "User is connected to google account!");
                         final String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
                         final String scope = "oauth2:" + Scopes.PLUS_LOGIN;
+                        showLoader("Logging in Clozerr server....");
                         AsyncTask task = new AsyncTask() {
                             @Override
                             protected Object doInBackground(Object... params) {
@@ -201,6 +205,7 @@ public class SignupActivity extends FragmentActivity {
                                 } catch (IOException | GoogleAuthException e) {
                                     GenUtils.showDebugToast(SignupActivity.this, "no token available with google");//should never come here
                                     e.printStackTrace();
+                                    hideLoader();
                                 }
                                 return null;
                             }
@@ -232,6 +237,7 @@ public class SignupActivity extends FragmentActivity {
                                 resolveSignInError();
                             }
                         }
+                        hideLoader();
                     }
                 }).addApi(Plus.API)
                 .addScope(Plus.SCOPE_PLUS_LOGIN).build();
@@ -282,6 +288,7 @@ public class SignupActivity extends FragmentActivity {
     private void signInWithGplus() {
         if (!mGoogleApiClient.isConnecting()) {
             mSignInClicked = true;
+            showLoader("Signing in Though google....");
             resolveSignInError();
         }
     }
@@ -496,12 +503,14 @@ public class SignupActivity extends FragmentActivity {
 //        asyncTask.execute(this);
 //
 //    }
-    private void logInToMainApp(){
-        Intent intent1 = new Intent(SignupActivity.this, HomeActivity.class);
-        startActivity(intent1);
-        finish();
-    }
 
+    private void showLoader(String text){
+        if(progressDialog!=null) if(progressDialog.isShowing()) progressDialog.dismiss();
+        progressDialog = GenUtils.generateLoader(SignupActivity.this,text);
+    }
+    private void hideLoader(){
+        if(progressDialog!=null) if(progressDialog.isShowing()) progressDialog.dismiss();
+    }
 
 
     /** UI OF SIGNUP SCREEN */
@@ -642,5 +651,7 @@ public class SignupActivity extends FragmentActivity {
             return inflater.inflate(R.layout.fragment_signup_slide_first, container, false);
         }
     }
+
+
 
 }

@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.clozerr.app.MainApplication;
+import com.clozerr.app.Models.VendorDetailsObject;
 import com.clozerr.app.R;
 
 
@@ -34,19 +35,18 @@ public class VendorSettingsFragment extends Fragment {
     private SettingsFragment mSettingsFragment;
 
     //Data variables
-    String vendorId,vendorTitle;
+    VendorDetailsObject vendorDetailsObject;
 
-    public static VendorSettingsFragment newInstance(String vendorId, String vendorTitle) {
+    public static VendorSettingsFragment newInstance(VendorDetailsObject vendorDetailsObject) {
         VendorSettingsFragment myFragment = new VendorSettingsFragment();
-        myFragment.vendorId = vendorId;
-        myFragment.vendorTitle = vendorTitle;
+        myFragment.vendorDetailsObject = vendorDetailsObject;
         return myFragment;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         layout = (FrameLayout) inflater.inflate(R.layout.activity_vendor_settings_fragment, container, false);
-        mSettingsFragment = SettingsFragment.newInstance(vendorId,vendorTitle);
+        mSettingsFragment = SettingsFragment.newInstance(vendorDetailsObject);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(c);
         preferences.registerOnSharedPreferenceChangeListener(mSettingsFragment);
         if (savedInstanceState == null) {
@@ -73,15 +73,13 @@ public class VendorSettingsFragment extends Fragment {
         //layout.getForeground().mutate().setAlpha(0);
     }
     public static class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
-        String vendorId, vendorName;
-
+        VendorDetailsObject vendorDetailsObject;
         public SettingsFragment(){
 
         }
-        public static SettingsFragment newInstance(String vendorId, String vendorName) {
+        public static SettingsFragment newInstance(VendorDetailsObject vendorDetailsObject) {
             SettingsFragment myFragment = new SettingsFragment();
-            myFragment.vendorId = vendorId;
-            myFragment.vendorName = vendorName;
+            myFragment.vendorDetailsObject = vendorDetailsObject;
             return myFragment;
         }
 
@@ -92,35 +90,35 @@ public class VendorSettingsFragment extends Fragment {
             Preference button = (Preference)findPreference("shortcut");
             button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
-                public boolean onPreferenceClick(Preference preference)
-                { //code for what you want it to do return true;
+                public boolean onPreferenceClick(Preference preference) { //code for what you want it to do return true;
                     Intent shortcutIntent = new Intent(getActivity(), VendorActivity.class);
-                    shortcutIntent.putExtra("vendor_id",vendorId);
+                    shortcutIntent.putExtra("vendor_id", vendorDetailsObject.vendorId);
 //                    SharedPreferences example = getActivity().getSharedPreferences("USER", 0);
 //                    SharedPreferences.Editor editor = example.edit();
 //                    editor.putString("latitude", Home.lat+"");
 //                    editor.putString("longitude", Home.longi+"");
 //                    editor.apply();
-                    MainApplication.getInstance().data.userMain.latitude = MainApplication.getInstance().location.getLatitude()+"";
-                    MainApplication.getInstance().data.userMain.longitude = MainApplication.getInstance().location.getLongitude()+"";
+                    MainApplication.getInstance().data.userMain.latitude = MainApplication.getInstance().location.getLatitude() + "";
+                    MainApplication.getInstance().data.userMain.longitude = MainApplication.getInstance().location.getLongitude() + "";
                     MainApplication.getInstance().data.userMain.saveUserDataLocally();
 
                     shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     Intent addIntent = new Intent();
-                    addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, vendorName);
 
                     ImageView image = VendorActivity.logoView;
-                    Bitmap bitmap = ((BitmapDrawable)image.getDrawable()).getBitmap();
+                    Bitmap bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
 
 
+                    addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, vendorDetailsObject.name);
                     addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON, bitmap);
                     addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
                     addIntent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
                     getActivity().sendBroadcast(addIntent);
                     Toast.makeText(getActivity(), "Pinned To Home Screen", Toast.LENGTH_SHORT).show();
                     return true;
-                } });
+                }
+            });
 
 
         }
@@ -142,6 +140,7 @@ public class VendorSettingsFragment extends Fragment {
 
             }
         }
+
 
     }
 }

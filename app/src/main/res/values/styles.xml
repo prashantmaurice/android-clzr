@@ -60,4 +60,9 @@
         <!--<item name="@android:background">@color/white</item>-->
         <!--<item name="@android:textColor">@color/text_primary_shade_8</item>-->
     </style>
+
+    <style name="RewardsDialogTheme" parent="android:Theme.Holo.Light.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
 </resources>

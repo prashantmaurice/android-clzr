@@ -42,6 +42,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.clozerr.app.AboutUs;
+import com.clozerr.app.Activities.GiftBoxScreen.GiftBoxActivity;
 import com.clozerr.app.Activities.LoginScreens.LoginActivity;
 import com.clozerr.app.Activities.LoginScreens.SignupActivity;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
@@ -51,13 +52,11 @@ import com.clozerr.app.DownloadImageTask;
 import com.clozerr.app.FAQ;
 import com.clozerr.app.GenUtils;
 import com.clozerr.app.GeofenceManagerService;
-import com.clozerr.app.GiftBoxActivity;
 import com.clozerr.app.Handlers.TokenHandler;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.Models.NavObject;
 import com.clozerr.app.Models.UserMain;
 import com.clozerr.app.Models.UserMainLive;
-import com.clozerr.app.NavDrawAdapter;
 import com.clozerr.app.PinnedOffersActivity;
 import com.clozerr.app.R;
 import com.clozerr.app.SettingsActivity;
@@ -79,6 +78,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Random;
 
 import static com.clozerr.app.R.drawable.rest1;
@@ -90,12 +90,15 @@ import static com.clozerr.app.R.drawable.rest7;
 public class HomeActivity extends ActionBarActivity {
 
     private static final String TAG = "HomeActivity";
+    private static final int INTENT_LOGIN = 11000;
+
 
     public String USERNAME = "";
     public String USERID = "";
     public String USER_PIC_URL = "";
     public Context mContext;
     Button button;
+    boolean loggedIn;
 
     private Toolbar toolbar;
     private ViewPager pager;
@@ -103,7 +106,7 @@ public class HomeActivity extends ActionBarActivity {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private ListView leftDrawerList;
-    private NavDrawAdapter navAdapter;
+    private HomeActivityNavAdapter navAdapter;
     private FrameLayout freebielayout;
     private String giftBoxJsonString;
     UserMainLive userMainLive;
@@ -114,6 +117,7 @@ public class HomeActivity extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        initDrawer();
         updateUI();
     }
 
@@ -137,10 +141,12 @@ public class HomeActivity extends ActionBarActivity {
         Logg.d("tokenHandler",tokenHandler.clozerrtoken);
         if(!tokenHandler.isLoggedIn()&&!tokenHandler.hasSkippedLogin()){
             //first time user
-            startActivityForResult(new Intent(this, SignupActivity.class),11000);
+//            startActivityForResult(new Intent(this, SignupActivity.class),INTENT_LOGIN);
+            startActivity(new Intent(this, SignupActivity.class));
         }
 
 
+        loggedIn = MainApplication.getInstance().tokenHandler.isLoggedIn();
         setContentView(R.layout.activity_my);
         setupUI();
 
@@ -426,12 +432,13 @@ public class HomeActivity extends ActionBarActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar_home);
         giftbox = (ImageView) toolbar.findViewById(R.id.giftbox);
 
-        navAdapter = new NavDrawAdapter(this,Constants.getNavList());
+        final ArrayList<NavObject> navList = (loggedIn)?Constants.getNavList():Constants.getNavListGuest();
+        navAdapter = new HomeActivityNavAdapter(this,navList);
         leftDrawerList.setAdapter(navAdapter);
         leftDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                NavObject clickedObject = Constants.getNavList().get(i);
+                NavObject clickedObject = navList.get(i);
 
                 switch(clickedObject.listId){
                     case ABOUTUS:
@@ -480,12 +487,17 @@ public class HomeActivity extends ActionBarActivity {
                         break;
 
                     case LOGOUT:
+                        GenUtils.generateLoader(HomeActivity.this,"Logging out. Please wait...");
                         AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
                         builder.setTitle("Confirm log out")
                                 .setMessage("If you choose to log out, you will no longer receive Clozerr's notifications about your rewards in nearby places " +
                                         "until your next log in.\nDo you still want to log out?")
                                 .setPositiveButton("Yes", dialogLogoutClickListener)
                                 .setNegativeButton("No", dialogLogoutClickListener).show();
+                        break;
+                    case LOGIN:
+//                        startActivityForResult(new Intent(HomeActivity.this, SignupActivity.class),INTENT_LOGIN);
+                        startActivity(new Intent(HomeActivity.this, SignupActivity.class));
                         break;
                 }
             }

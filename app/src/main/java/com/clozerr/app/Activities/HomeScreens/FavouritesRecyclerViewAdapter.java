@@ -2,7 +2,6 @@ package com.clozerr.app.Activities.HomeScreens;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,9 +15,9 @@ import android.widget.Toast;
 import com.clozerr.app.Activities.VendorScreens.VendorActivity;
 import com.clozerr.app.AsyncGet;
 import com.clozerr.app.CardModel;
+import com.clozerr.app.Handlers.ToastMain;
 import com.clozerr.app.MainApplication;
 import com.clozerr.app.R;
-import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
 import org.json.JSONArray;
@@ -35,8 +34,7 @@ public class FavouritesRecyclerViewAdapter extends RecyclerView.Adapter<Favourit
 
     public FavouritesRecyclerViewAdapter(List<CardModel> modelData, Context c) {
         if (modelData == null) {
-            throw new IllegalArgumentException(
-                    "modelData must not be null");
+            throw new IllegalArgumentException("modelData must not be null");
         }
         this.items = modelData;
         FavouritesRecyclerViewAdapter.c = c;
@@ -62,20 +60,22 @@ public class FavouritesRecyclerViewAdapter extends RecyclerView.Adapter<Favourit
         viewHolder.txtTitle.setText(model.getTitle());
         //viewHolder.txtStamps.setText(model.getStampString());
         viewHolder.txtDist.setText(model.getDistanceString());
-        Ion.with(c)
-             //   .placeholder(R.drawable.call)
+        Ion.with(viewHolder.imageView).load(model.getImageId()) ;
+//        Ion.with(c)
+//                .placeholder(R.drawable.call)
              //   .error(R.drawable.bat)
                         //    .animateLoad(spinAnimation)
                         //    .animateIn(fadeInAnimation)
-                .load(model.getImageId()).asBitmap().setCallback(new FutureCallback<Bitmap>() {
-            @Override
-            public void onCompleted(Exception e, Bitmap result) {
-                //TODO : uncomment below code and amek it bug free
-//                if( result != null )
-//                    viewHolder.imageView.setImageBitmap(Bitmap.createScaledBitmap(result,1600,900,false));
-            }
-        });
-            }
+//                .load(model.getImageId()).asBitmap().setCallback(new FutureCallback<Bitmap>() {
+//            @Override
+
+//            public void onCompleted(Exception e, Bitmap result) {
+////                if( result != null )
+//                Ion.with(mVendorImageView).load(vendorDetailsObject.getImageUrl()) ;
+////                    viewHolder.imageView.setImageBitmap(Bitmap.createScaledBitmap(result,1600,900,false));
+//            }
+//        });
+    }
 
     @Override
     public int getItemCount() {
@@ -217,20 +217,14 @@ public class FavouritesRecyclerViewAdapter extends RecyclerView.Adapter<Favourit
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    SharedPreferences status = c.getSharedPreferences("USER", 0);
-//                    String NotNow = status.getString("notNow", "false");
-                    NotNow = MainApplication.getInstance().data.userMain.notNow;
-                    if (VendorActivity.i == 0 && !NotNow)
-                    {
+                    //Already logged in
+                    if(currentItem.isActive()){
                         Intent detailIntent = new Intent(c, VendorActivity.class);
-                        detailIntent.putExtra("vendor_id", currentItem.getVendorId());
-                        /*detailIntent.putExtra("stamps", currentItem.getStamps());
-                        detailIntent.putExtra("offer_id", currentItem.getOfferId());
-                        detailIntent.putExtra("offer_text", currentItem.getOfferDescription());*/
-                        //RecyclerViewAdapter.vendor_name_temp = currentItem.getTitle();
+                        detailIntent.putExtra(VendorActivity.EXTRA_VENDORID, currentItem.getVendorId());
                         c.startActivity(detailIntent);
+                    }else{
+                        ToastMain.showSmartToast(c, "Coming soon....");
                     }
-
                 }
             });
         }

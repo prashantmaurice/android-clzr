@@ -1,4 +1,4 @@
-package com.clozerr.app;
+package com.clozerr.app.Activities.GiftBoxScreen;
 
 /**
  * Created by Adarsh on 23-05-2015.
@@ -16,7 +16,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.clozerr.app.Activities.VendorScreens.VendorActivity;
+import com.clozerr.app.AsyncGet;
+import com.clozerr.app.FreebieDescription;
+import com.clozerr.app.MainApplication;
+import com.clozerr.app.MyOffer;
+import com.clozerr.app.R;
 import com.koushikdutta.ion.Ion;
 
 import org.json.JSONArray;
@@ -222,8 +226,9 @@ public class GiftBoxRecyclerViewAdapter extends RecyclerView.Adapter<GiftBoxRecy
                 public void onClick(View view) {
                     Intent intent = new Intent(c, FreebieDescription.class);
                     intent.putExtra("offerid", currentItem.getOfferid());
-                    intent.putExtra("vendorid", (!vendorId.isEmpty()) ? vendorId : VendorActivity.detailsBundle.getString("vendorId"));
-                    intent.putExtra("vendorName", (!vendorName.isEmpty()) ? vendorName : VendorActivity.detailsBundle.getString("vendorTitle"));
+                    //TODO : activate this
+//                    intent.putExtra("vendorid", (!vendorId.isEmpty()) ? vendorId : VendorActivity.detailsBundle.getString("vendorId"));
+//                    intent.putExtra("vendorName", (!vendorName.isEmpty()) ? vendorName : VendorActivity.detailsBundle.getString("vendorTitle"));
                     intent.putExtra("caption", currentItem.getCaption());
                     intent.putExtra("description", currentItem.getDescription());
                     c.startActivity(intent);
